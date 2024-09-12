@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import LoginForm from "../../components/login/LoginForm";
 import CardTranslate from "../../components/util/CardTranslate";
 
-export default function login() {
+export default function LoginPage() {
   const [isEnglish, setIsEnglish] = useState(false);
 
   const handleLanguageToggle = () => {

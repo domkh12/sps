@@ -2,8 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
-import Login from './pages/auth/login'
 import ErrorPage from './pages/error-page/ErrorPage'
+import LoginPage from './pages/auth/LoginPage'
 
 const router = createBrowserRouter([
   {
@@ -13,7 +13,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <Login />,
+    element: <LoginPage />,
   },
 ]);
 
