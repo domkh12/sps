@@ -6,7 +6,7 @@ import { IoCarSportOutline } from "react-icons/io5";
 import { IoIosLogOut } from "react-icons/io";
 import { useLocation, Link } from "react-router-dom";
 import { FaChartPie } from "react-icons/fa";
-import { HiOutlineArrowLeft } from "react-icons/hi";
+import { HiOutlineArrowLeft, HiShoppingBag } from "react-icons/hi";
 import { FaParking, FaCar, FaUser } from "react-icons/fa";
 import { TbMessageFilled } from "react-icons/tb";
 import { HiMiniBanknotes } from "react-icons/hi2";
@@ -49,14 +49,14 @@ function SideBar() {
           >
             {translate("vehicle")}
           </Sidebar.Item>
-          <Sidebar.Item
-            as={Link}
+          <Sidebar.Collapse label="User" as={Link}
             to="/admin/user"
             icon={FaUser}
-            active={location.pathname === "/admin/user"}
-          >
-            {translate("user")}
-          </Sidebar.Item>
+            active={location.pathname === "/admin/user"}>
+            <Sidebar.Item href="#">General User</Sidebar.Item>
+            <Sidebar.Item href="#">Management</Sidebar.Item>
+            <Sidebar.Item href="#">Admin</Sidebar.Item>
+          </Sidebar.Collapse>
           <Sidebar.Item
             as={Link}
             to="/admin/message"
