@@ -1,11 +1,21 @@
-import { Card } from "flowbite-react";
-import React from "react";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setLanguage } from "../../redux/feature/translate/languageSlice.js";
 
-export default function CardTranslate({ isEnglish, onClick }) {
+export default function CardTranslate() {
+  const dispatch = useDispatch(); 
+
+  const [isEnglish, setIsEnglish] = useState(false);
+
+  const handleLanguageToggle = () => {
+    setIsEnglish(!isEnglish);
+    dispatch(setLanguage(isEnglish ? "en" : "kh"));
+  };
+
   return (
     <div
-      className="flex items-center justify-center gap-2 border-[1px] border-gray-300 rounded-md p-2 w-[120px] cursor-pointer"
-      onClick={onClick}
+      className="flex items-center justify-center gap-2 p-[5px] w-[55px] cursor-pointer h-[40px] rounded-lg"
+      onClick={handleLanguageToggle}
       onContextMenu={(e) => e.preventDefault()}
     >
       <img
@@ -15,10 +25,9 @@ export default function CardTranslate({ isEnglish, onClick }) {
             : "/flag/combodia-flag.png"
         }
         alt={isEnglish ? "united-kingdom-flag" : "cambodia-flag"}
-        className="w-[30px] h-[20px]"
+        className="w-auto h-[30px] rounded-[5px]"
         draggable="false"
       />
-      <p >{isEnglish ? "English" : "ភាសាខ្មែរ"}</p>
     </div>
   );
 }
