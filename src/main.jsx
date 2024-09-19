@@ -19,6 +19,8 @@ import User from "./pages/dashboard/User.jsx";
 import Message from "./pages/dashboard/Message.jsx";
 import Payment from "./pages/dashboard/Payment.jsx";
 import Setting from "./pages/dashboard/Setting.jsx";
+import Usermanager from "./pages/dashboard/Usermanager.jsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -50,6 +52,7 @@ const router = createBrowserRouter([
         path: "user",
         element: <User />,
       },
+     
       {
         path: "message",
         element: <Message />,
@@ -61,6 +64,10 @@ const router = createBrowserRouter([
       {
         path: "setting",
         element: <Setting />,
+      },
+      {
+        path: "usermanager",
+        element: <Usermanager/>,
       },
     ],
   },

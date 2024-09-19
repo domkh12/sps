@@ -8,7 +8,7 @@ import { BiDetail } from "react-icons/bi";
 import { MdEditSquare } from "react-icons/md";
 import { MdAutoDelete } from "react-icons/md";
 import { BiSort } from "react-icons/bi";
-function User() {
+function Usermanager() {
   
   return (
     <div className="overflow-x-auto">
@@ -29,10 +29,12 @@ function User() {
           <Table.HeadCell >Name</Table.HeadCell>
           <Table.HeadCell>Photo</Table.HeadCell>
           <Table.HeadCell>Gender</Table.HeadCell>
-          <Table.HeadCell>Adress</Table.HeadCell>
-          <Table.HeadCell>Phone Number</Table.HeadCell>
+          <Table.HeadCell>Role</Table.HeadCell>
+          <Table.HeadCell>Department</Table.HeadCell>
+          <Table.HeadCell>Designation</Table.HeadCell>
+          <Table.HeadCell> Phone Number</Table.HeadCell>
           <Table.HeadCell>Email</Table.HeadCell>
-          <Table.HeadCell>Date Of Birth</Table.HeadCell>
+          <Table.HeadCell>Nationality</Table.HeadCell>
           <Table.HeadCell>Action</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only"><BiDetail />Edit</span>
@@ -97,4 +99,4 @@ function User() {
   );
 }
 
-export default User;
+export default Usermanager;
