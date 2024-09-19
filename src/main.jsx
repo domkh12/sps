@@ -50,7 +50,7 @@ const router = createBrowserRouter([
       },
       {
         path: "user",
-        element: <User />,
+        element: <User/>,
       },
      
       {
@@ -59,7 +59,7 @@ const router = createBrowserRouter([
       },
       {
         path: "payment",
-        element: <Payment />,
+        element: <Payment/>,
       },
       {
         path: "setting",
@@ -69,6 +69,7 @@ const router = createBrowserRouter([
         path: "usermanager",
         element: <Usermanager/>,
       },
+     
     ],
   },
 ]);
