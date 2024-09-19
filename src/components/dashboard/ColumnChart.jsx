@@ -119,7 +119,7 @@ function ColumnChart() {
           </p>
         </div>
         <div className="flex items-center px-2.5 py-0.5 text-base font-semibold text-red-500 dark:text-red-500 text-center">
-          5%
+          - 5%
           <svg
             className="w-3 h-3 ms-1"
             aria-hidden="true"

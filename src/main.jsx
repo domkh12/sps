@@ -19,6 +19,7 @@ import User from "./pages/dashboard/User.jsx";
 import Message from "./pages/dashboard/Message.jsx";
 import Payment from "./pages/dashboard/Payment.jsx";
 import Setting from "./pages/dashboard/Setting.jsx";
+import ProtectedRoute from "./pages/auth/ProtectedRoute.jsx";
 import Usermanager from "./pages/dashboard/Usermanager.jsx";
 
 const router = createBrowserRouter([
@@ -31,43 +32,46 @@ const router = createBrowserRouter([
     path: "/login",
     element: <LoginPage />,
   },
-
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: <ProtectedRoute />,
     children: [
       {
-        path: "dashboard",
-        element: <Dashboard />,
-      },
-      {
-        path: "parking",
-        element: <Parking />,
-      },
-      {
-        path: "vehicle",
-        element: <Vehicle />,
-      },
-      {
-        path: "user",
-        element: <User/>,
-      },
-     
-      {
-        path: "message",
-        element: <Message />,
-      },
-      {
-        path: "payment",
-        element: <Payment/>,
-      },
-      {
-        path: "setting",
-        element: <Setting />,
-      },
-      {
-        path: "usermanager",
-        element: <Usermanager/>,
+        element: <AdminLayout />,
+        children: [
+          {
+            path: "dashboard",
+            element: <Dashboard />,
+          },
+          {
+            path: "parking",
+            element: <Parking />,
+          },
+          {
+            path: "vehicle",
+            element: <Vehicle />,
+          },
+          {
+            path: "user",
+            element: <User />,
+          },
+          {
+            path: "message",
+            element: <Message />,
+          },
+          {
+            path: "payment",
+            element: <Payment />,
+          },
+          {
+            path: "setting",
+            element: <Setting />,
+          },
+          {
+            path: "usermanager",
+            element: <Usermanager />,
+          },
+        ],
       },
      
     ],
