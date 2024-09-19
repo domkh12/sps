@@ -20,7 +20,7 @@ import Message from "./pages/dashboard/Message.jsx";
 import Payment from "./pages/dashboard/Payment.jsx";
 import Setting from "./pages/dashboard/Setting.jsx";
 import Usermanager from "./pages/dashboard/Usermanager.jsx";
-
+import Useradmin from "./pages/dashboard/Useradmin.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -68,6 +68,10 @@ const router = createBrowserRouter([
       {
         path: "usermanager",
         element: <Usermanager/>,
+      },
+      {
+        path: "useradmin",
+        element: <Useradmin/>,
       },
     ],
   },

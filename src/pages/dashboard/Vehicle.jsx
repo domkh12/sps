@@ -79,6 +79,7 @@ function Vehicle() {
         </Table.Body>
       </Table>
     </div>
+
   );
 }
 
