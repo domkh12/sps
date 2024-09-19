@@ -79,11 +79,8 @@ function PieChart() {
       <div className="flex justify-between mb-5">
         <div>
           <h5 className="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">
-            200
+            Total Parking
           </h5>
-          <p className="text-base font-normal text-gray-500 dark:text-gray-400">
-            Vehicles this week
-          </p>
         </div>
       </div>
       <div ref={chartRef}></div>

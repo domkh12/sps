@@ -12,10 +12,15 @@ import { TbMessageFilled } from "react-icons/tb";
 import { HiMiniBanknotes } from "react-icons/hi2";
 import { IoMdSettings } from "react-icons/io";
 import { IoLogIn } from "react-icons/io5";
+import { useDispatch } from "react-redux";
 
 function SideBar() {
   const { translate } = useTranslation();
+  const dispatch = useDispatch()
 
+  const handleLogout=()=>{
+    dispatch(logout());
+  }
   const location = useLocation();
 
   return (
@@ -83,7 +88,7 @@ function SideBar() {
           >
             {translate("setting")}
           </Sidebar.Item>
-          <Sidebar.Item as={Link} to="/logout" icon={IoLogIn}>
+          <Sidebar.Item as={Link} onClick={handleLogout} icon={IoLogIn}>
             {translate("logout")}
           </Sidebar.Item>
         </Sidebar.ItemGroup>

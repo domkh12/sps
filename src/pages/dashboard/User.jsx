@@ -91,6 +91,32 @@ function User() {
               </a>
             </Table.Cell>
           </Table.Row>
+          <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+            <Table.Cell className="p-4">
+              <Checkbox />
+            </Table.Cell>
+            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+            NPIC-0002
+            </Table.Cell>
+            <Table.Cell>Nai Kong</Table.Cell>
+            <Table.Cell> <Avatar img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQh0gQnaMzL3UHAIbUCQi-DeExFsXLwH-N0MA&s" alt="avatar of Jese" rounded /></Table.Cell>
+            <Table.Cell>Male</Table.Cell>
+            <Table.Cell>Phnom Penh</Table.Cell>
+            <Table.Cell>0123654789</Table.Cell>
+            <Table.Cell>kong@gmail.com</Table.Cell>
+            <Table.Cell>03/12/2003</Table.Cell>
+            <Table.Cell className="flex">
+            <a href="#" className="flex font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+              <BiDetail  className="mr-5 h-5 w-5"/>
+              </a>
+              <a href="#" className="flex font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+              <MdEditSquare className="mr-5 h-5 w-5" />
+              </a>
+              <a href="#" className="flex font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+             <MdAutoDelete className="mr-5 h-5 w-5"/>
+              </a>
+            </Table.Cell>
+          </Table.Row>
         </Table.Body>
       </Table>
     </div>
