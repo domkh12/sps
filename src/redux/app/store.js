@@ -6,10 +6,7 @@ const store = configureStore({
   reducer: {
     language: languageReducer,
     auth: authReducer,
-    // [authApi.reducerPath]: authApi.reducer,
   },
-  // middleware: (getDefaultMiddleware) =>
-  //   getDefaultMiddleware().concat(authApi.middleware),
 });
 
 export default store;

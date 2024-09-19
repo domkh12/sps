@@ -4,6 +4,7 @@ import SideBar from "../../components/dashboard/SideBar.jsx";
 import NavBarDashboard from "../../components/dashboard/NavBarDashboard.jsx";
 import { Flowbite } from "flowbite-react";
 function AdminLayout() {
+ 
   return (
     <Flowbite>
       <div className="flex flex-col h-screen">
