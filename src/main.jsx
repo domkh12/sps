@@ -24,6 +24,7 @@ import Usermanager from "./pages/dashboard/Usermanager.jsx";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
+import Useradmin from "./pages/dashboard/Useradmin.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -75,6 +76,7 @@ const router = createBrowserRouter([
           },
         ],
       },
+     
     ],
   },
 ]);
