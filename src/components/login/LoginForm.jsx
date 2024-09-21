@@ -1,20 +1,19 @@
 import React, { useState } from "react";
-import { Button, Card, Spinner, Toast } from "flowbite-react";
+import { Button, Card, Spinner } from "flowbite-react";
 import useTranslation from "../hook/UseTranslation.jsx";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 import { login } from "../../redux/feature/auth/authSlice";
 import { useNavigate } from "react-router-dom";
-import { HiX } from "react-icons/hi";
+import { toast } from "react-toastify";
 
 export default function LoginForm() {
   const { isLoading, error } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { translate } = useTranslation();
-  const [showToast, setShowToast] = useState(false);
 
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
@@ -43,10 +42,14 @@ export default function LoginForm() {
           validationSchema={LoginSchema}
           onSubmit={async (values, { setSubmitting }) => {
             try {
-              await dispatch(login(values)).unwrap();
-              navigate("/admin/dashboard");
+              const result = await dispatch(login(values)).unwrap();        
+              if (!result) {
+                toast.error("Username and password ");
+              } else {
+                navigate("/admin/dashboard");
+              }
             } catch (error) {
-              setShowToast(true);
+              toast.error("Username and password invalid!");
             } finally {
               setSubmitting(false);
             }
@@ -83,24 +86,25 @@ export default function LoginForm() {
               </div>
 
               <div className="relative">
-                <Field
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  className="w-full border border-gray-300 rounded-md p-2"
-                  placeholder={translate("password")}
-                />
-
-                {showPassword ? (
-                  <IoEyeOffOutline
-                    className="absolute right-2 top-5 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-                    onClick={togglePasswordVisibility}
+                <div className="relative">
+                  <Field
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    className="w-full border border-gray-300 rounded-md p-2 pr-10"
+                    placeholder={translate("password")}
                   />
-                ) : (
-                  <IoEyeOutline
-                    className="absolute right-2 top-5 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
                     onClick={togglePasswordVisibility}
-                  />
-                )}
+                  >
+                    {showPassword ? (
+                      <IoEyeOff className="h-5 w-5 text-gray-500" />
+                    ) : (
+                      <IoEye className="h-5 w-5 text-gray-500" />
+                    )}
+                  </button>
+                </div>
 
                 {errors.password && touched.password && (
                   <div className="text-red-500">{errors.password}</div>
@@ -113,7 +117,7 @@ export default function LoginForm() {
                 disabled={isSubmitting || isLoading}
               >
                 {isLoading ? (
-                  <Spinner aria-label="Login..." />
+                  <Spinner aria-label="Login..." size="sm" />
                 ) : (
                   translate("login")
                 )}
@@ -124,17 +128,6 @@ export default function LoginForm() {
           )}
         </Formik>
       </Card>
-      {showToast && (
-        <Toast className="fixed top-5 right-5">
-          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200">
-            <HiX className="h-5 w-5" />
-          </div>
-          <div className="ml-3 text-sm font-normal">
-            {translate("Username and password are invalid!")}
-          </div>
-          <Toast.Toggle onDismiss={() => setShowToast(false)} />
-        </Toast>
-      )}
     </>
   );
 }

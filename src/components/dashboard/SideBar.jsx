@@ -1,26 +1,23 @@
 import React from "react";
 import { Sidebar } from "flowbite-react";
 import useTranslation from "../hook/UseTranslation";
-import { CiCreditCard2, CiParking1, CiSettings, CiUser } from "react-icons/ci";
-import { IoCarSportOutline } from "react-icons/io5";
-import { IoIosLogOut } from "react-icons/io";
 import { useLocation, Link } from "react-router-dom";
 import { FaChartPie } from "react-icons/fa";
-import { HiOutlineArrowLeft, HiShoppingBag } from "react-icons/hi";
 import { FaParking, FaCar, FaUser } from "react-icons/fa";
 import { TbMessageFilled } from "react-icons/tb";
 import { HiMiniBanknotes } from "react-icons/hi2";
 import { IoMdSettings } from "react-icons/io";
 import { IoLogIn } from "react-icons/io5";
 import { useDispatch } from "react-redux";
+import { logout } from "../../redux/feature/auth/authSlice";
 
 function SideBar() {
   const { translate } = useTranslation();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const handleLogout=()=>{
+  const handleLogout = () => {
     dispatch(logout());
-  }
+  };
   const location = useLocation();
 
   return (
@@ -54,13 +51,16 @@ function SideBar() {
           >
             {translate("vehicle")}
           </Sidebar.Item>
-          <Sidebar.Collapse label="User" as={Link}
-            to="/admin/user"
-            icon={FaUser}
-            active={location.pathname === "/admin/user"}>
-            <Sidebar.Item href="#">General User</Sidebar.Item>
-            <Sidebar.Item href="#">Management</Sidebar.Item>
-            <Sidebar.Item href="#">Admin</Sidebar.Item>
+          <Sidebar.Collapse label="User" icon={FaUser}>
+            <Sidebar.Item as={Link} to="/admin/user/general">
+              General User
+            </Sidebar.Item>
+            <Sidebar.Item as={Link} to="/admin/user/management">
+              Management
+            </Sidebar.Item>
+            <Sidebar.Item as={Link} to="/admin/user/admin">
+              Admin
+            </Sidebar.Item>
           </Sidebar.Collapse>
           <Sidebar.Item
             as={Link}

@@ -1,17 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import BASE_URL from "../../app/api/BASE_URL";
 
 // Async thunk for login
 export const login = createAsyncThunk(
   "auth/login",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        BASE_URL+"/auth/login",
-        { email, password }
-      );
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
+        email,
+        password,
+      });
       localStorage.setItem("token", response.data.accessToken);
+      localStorage.setItem("refreshToken", response.data.refreshToken);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -22,12 +22,22 @@ export const login = createAsyncThunk(
 export const refreshToken = createAsyncThunk(
   "auth/refreshToken",
   async (_, { rejectWithValue }) => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (!refreshToken) {
+      return rejectWithValue({ reason: "Refresh token is missing" });
+    }
     try {
-      const response = await axios.post("/api/refresh-token");
-      localStorage.setItem("token", response.data.token);
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/refresh`, {
+        token: refreshToken,
+      });
+      localStorage.setItem("token", response.data.accessToken);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      return rejectWithValue(
+        error.response?.data || { reason: "Refresh failed" }
+      );
     }
   }
 );
@@ -35,8 +45,7 @@ export const refreshToken = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: null,
-    token: localStorage.getItem("token"),
+    token: null,
     isAuthenticated: false,
     isLoading: false,
     error: null,
@@ -44,7 +53,7 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       localStorage.removeItem("token");
-      state.user = null;
+      localStorage.removeItem("refreshToken");
       state.token = null;
       state.isAuthenticated = false;
     },
@@ -58,8 +67,9 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = true;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
+        state.token = action.payload.accessToken;
+        localStorage.setItem("token", action.payload.accessToken);
+        localStorage.setItem("refreshToken", action.payload.refreshToken);
         state.error = null;
       })
       .addCase(login.rejected, (state, action) => {
@@ -68,6 +78,12 @@ const authSlice = createSlice({
       })
       .addCase(refreshToken.fulfilled, (state, action) => {
         state.token = action.payload.token;
+        state.isAuthenticated = true;
+      })
+      .addCase(refreshToken.rejected, (state) => {
+        state.isAuthenticated = false;
+        state.token = null;
+        localStorage.removeItem("token");
       });
   },
 });

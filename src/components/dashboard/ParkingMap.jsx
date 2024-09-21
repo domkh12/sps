@@ -13,8 +13,6 @@ import { Card, Progress } from "flowbite-react";
 // Fix for default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  //   iconRetinaUrl:
-  //     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon-2x.png",
   iconUrl: "/icons/location.svg",
   shadowUrl: "/icons/locationShadow.svg",
 });

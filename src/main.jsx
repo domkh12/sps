@@ -21,6 +21,8 @@ import Payment from "./pages/dashboard/Payment.jsx";
 import Setting from "./pages/dashboard/Setting.jsx";
 import ProtectedRoute from "./pages/auth/ProtectedRoute.jsx";
 import Usermanager from "./pages/dashboard/Usermanager.jsx";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const router = createBrowserRouter([
   {
@@ -81,6 +83,7 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <HelmetProvider>
       <Provider store={store}>
+        <ToastContainer />
         <RouterProvider router={router} />
       </Provider>
     </HelmetProvider>
