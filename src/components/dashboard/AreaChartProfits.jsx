@@ -30,7 +30,7 @@ function AreaChartProfits() {
     ],
     chart: {
       height: "100%",
-      maxWidth: "100%",
+      maxWidth: "100%",      
       type: "area",
       fontFamily: "Suwannaphum, serif",
       dropShadow: {

@@ -10,7 +10,7 @@ function Dashboard() {
   return (
     <div className="grid grid-cols-1 gap-4">
       <AreaChartProfits />
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 lg:grid-cols-1 gap-4">
         <ColumnChart />
         <AreaVehicles />
         <PieChart />

@@ -2,7 +2,7 @@ import React from "react";
 
 function InputSearch() {
   return (
-    <form className="flex items-center max-w-sm mx-auto">
+    <form className="flex items-center max-w-md mx-auto">
       <label htmlFor="simple-search" className="sr-only">
         Search
       </label>

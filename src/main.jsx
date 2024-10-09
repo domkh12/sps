@@ -1,3 +1,4 @@
+import "./init.js";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
@@ -22,64 +23,95 @@ import Setting from "./pages/dashboard/Setting.jsx";
 import ProtectedRoute from "./pages/auth/ProtectedRoute.jsx";
 import Usermanager from "./pages/dashboard/Usermanager.jsx";
 import { ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 import Useradmin from "./pages/dashboard/Useradmin.jsx";
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Navigate to="/login" replace />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/admin",
-    element: <ProtectedRoute />,
-    children: [
-      {
-        element: <AdminLayout />,
-        children: [
-          {
-            path: "dashboard",
-            element: <Dashboard />,
-          },
-          {
-            path: "parking",
-            element: <Parking />,
-          },
-          {
-            path: "vehicle",
-            element: <Vehicle />,
-          },
-          {
-            path: "user",
-            element: <User />,
-          },
-          {
-            path: "message",
-            element: <Message />,
-          },
-          {
-            path: "payment",
-            element: <Payment />,
-          },
-          {
-            path: "setting",
-            element: <Setting />,
-          },
-          {
-            path: "usermanager",
-            element: <Usermanager />,
-          },
-        ],
-      },
-     
-    ],
-  },
-]);
+import ListParking from "./components/dashboard/ListParking.jsx";
+import Parking2dView from "./components/dashboard/parking/Parking2dView.jsx";
+import UserList from "./pages/dashboard/user/UserList.jsx";
+import VehicleList from "./pages/dashboard/vehicle/VehicleList.jsx";
+import EditUser from "./pages/dashboard/user/EditUser.jsx";
+import AddNewUser from "./pages/dashboard/user/AddNewUser.jsx";
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <Navigate to="/login" replace />,
+      errorElement: <ErrorPage />,
+    },
+    {
+      path: "/login",
+      element: <LoginPage />,
+    },
+    {
+      path: "/admin",
+      element: <AdminLayout />,
+      // children: [
+      //   {
+      //     element: <AdminLayout />,
+      children: [
+        {
+          path: "dashboard",
+          element: <Dashboard />,
+        },
+        {
+          path: "parking",
+          element: <Parking />,
+          children: [
+            {
+              path: "list",
+              element: <ListParking />,
+            },
+            {
+              path: ":uuid",
+              element: <Parking2dView />,
+            },
+          ],
+        },
+        // {
+        //   path: "vehicle",
+        //   element: <Vehicle />,
+        // },
+        {
+          path: "vehicles",
+          element: <VehicleList />,
+        },
+        {
+          path: "users",    
+          element: <UserList />,
+          children: [
+            {
+              path: "new",
+              element: <AddNewUser />,
+            },
+            {
+              path: ":id",
+              element: <EditUser />,
+            },
+          ],
+        },
+        {
+          path: "message",
+          element: <Message />,
+        },
+        {
+          path: "payment",
+          element: <Payment />,
+        },
+        {
+          path: "setting",
+          element: <Setting />,
+        },
+        {
+          path: "usermanager",
+          element: <Usermanager />,
+        },
+      ],
+    },
+  ]
+  //   },
+  // ]
+);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

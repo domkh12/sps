@@ -3,25 +3,28 @@ import { Outlet } from "react-router-dom";
 import SideBar from "../../components/dashboard/SideBar.jsx";
 import NavBarDashboard from "../../components/dashboard/NavBarDashboard.jsx";
 import { Flowbite } from "flowbite-react";
+import { useSelector } from "react-redux";
 function AdminLayout() {
- 
+  const isCollapsed = useSelector((state) => state.action.isCollapsed);
+  // const outletOverflow = useSelector((state)=>state.action.outletOverflow)
+
   return (
     <Flowbite>
       <div className="flex flex-col h-screen">
-        <div className="fixed top-0 left-0 right-0 z-[9999]">
+        <div className="fixed top-0 left-0 right-0 z-[11]">
           <NavBarDashboard />
         </div>
         <div className="flex flex-grow pt-16">
           {" "}
-          {/* Adjust pt value based on NavBarDashboard height */}
-          <div className="fixed top-16 left-0 bottom-0">
+          <div className="fixed top-16 left-0 bottom-0 z-[10]">
             {" "}
-            {/* Adjust top value based on NavBarDashboard height */}
             <SideBar />
           </div>
-          <div className="flex-grow ml-64 overflow-auto p-4 dark:bg-gray-900">
-            {" "}
-            {/* Adjust ml value based on SideBar width */}
+          <div
+            className={`${
+              isCollapsed ? "ml-20 md:ml-0" : "ml-56 md:ml-0"
+            } flex-grow overflow-auto dark:bg-gray-900 z-0`}
+          >
             <Outlet />
           </div>
         </div>

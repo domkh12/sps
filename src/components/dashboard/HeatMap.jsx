@@ -1,7 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import ApexCharts from "apexcharts";
-import { Dropdown } from "flowbite-react";
-import { FaAngleDown } from "react-icons/fa6";
 
 function HeatMap() {
   const chartRef = useRef(null);
@@ -212,16 +210,19 @@ function HeatMap() {
             { x: 23, y: 30 },
           ],
         },
-      ],
+      ],      
       chart: {
-        height: 350,
+        height: 370,
         type: "heatmap",
+        toolbar: {
+          show: false,
+        },
       },
       plotOptions: {
         heatmap: {
           shadeIntensity: 0.5,
-          radius: 0,
-          useFillColorAsStroke: true,
+          radius: 2,
+          useFillColorAsStroke: false,
           colorScale: {
             ranges: [
               {
@@ -273,7 +274,7 @@ function HeatMap() {
         position: "top",
       },
       yaxis: {
-        reversed: false,
+        reversed: true,
       },
     };
 

@@ -15,7 +15,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
       keepUnusedDataFor: 5,
       transformResponse: (responseData) => {
         const loadedUsers = responseData.map((user) => {
-          user.id = user._id;
+          user.id = user.uuid;
           return user;
         });
         return usersAdapter.setAll(initialState, loadedUsers);
@@ -24,15 +24,50 @@ export const userApiSlice = apiSlice.injectEndpoints({
         if (result?.ids) {
           return [
             { type: "User", id: "LIST" },
-            ...result.ids.map((id) => ({ type: "User" ,id})),
+            ...result.ids.map((id) => ({ type: "User", id })),
           ];
         } else return [{ type: "User", id: "LIST" }];
       },
     }),
+    addNewUser: builder.mutation({
+      query: (initialState) => ({
+        url: "/users",
+        method: "POST",
+        body: {
+          ...initialState,
+        },
+      }),
+      invalidatesTags: [{ type: "User", id: "LIST" }],
+    }),
+    updateUser: builder.mutation({
+      query: (initialUserData) => ({
+        url: "/users",
+        method: "PATCH",
+        body: {
+          ...initialUserData,
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
+    }),
+    deleteUser: builder.mutation({
+      query: ({ id }) => ({
+        url: "/users",
+        method: "DELETE",
+        body: {
+          id,
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
+    }),
   }),
 });
 
-export const { useGetUsersQuery } = userApiSlice;
+export const {
+  useGetUsersQuery,
+  useAddNewUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+} = userApiSlice;
 
 // return the query result object
 export const selectUserResult = userApiSlice.endpoints.getUsers.select();
