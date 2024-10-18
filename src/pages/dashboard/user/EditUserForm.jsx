@@ -1,33 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { useAddNewUserMutation } from "../../../redux/feature/users/userApiSlice";
+import {
+  useDeleteUserMutation,
+  useUpdateUserMutation,
+} from "../../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
 import { boolean } from "yup";
-import { ROLES } from "./../../../config/roles";
 import { Button, Checkbox, Label, TextInput } from "flowbite-react";
+import { ROLES } from "../../../config/roles";
 import { toast } from "react-toastify";
 
-function AddNewUser() {
+function EditUserForm({user}) {
   const USER_REGEX = /^[A-z]{3,50}$/;
   const PASSWORD_REGEX = /^[A-z0-9!@#$%]{4,12}$/;
   const EMAIL_REGEX = /^[a-zA-Z0-9_.+\-]+[\x40][a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
   const PHONE_REGEX = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/;
 
-  const [addNewUser, { isLoading, isSuccess, isError, error }] =
-    useAddNewUserMutation();
+  const [updateUser, { isSuccess, isLoading, isError, error }] =
+    useUpdateUserMutation();  
 
   const navigate = useNavigate();
 
-  const [fullName, setFullName] = useState("");
+  const [fullName, setFullName] = useState(user.fullName);
   const [isValidFullName, setIsValidFullName] = useState(false);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(user.email);
   const [isValidEmail, setIsValidEmail] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState(user.password);
+  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
   const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(false);
   const [isValidPassword, setIsValidPassword] = useState(false);
-  const [isValidConfirmPassword, setIsValidConfirmPassword] = useState(false);
-  const [roleName, setRoleName] = useState(["STAFF"]); 
+  const [roleName, setRoleName] = useState(user.roleNames); 
 
   useEffect(() => {
     setIsValidFullName(USER_REGEX.test(fullName));
@@ -46,10 +47,6 @@ function AddNewUser() {
   }, [phoneNumber]);
 
   useEffect(() => {
-    setIsValidConfirmPassword(PASSWORD_REGEX.test(confirmPassword));
-  }, [confirmPassword]);
-
-  useEffect(() => {
     if (isSuccess) {
       setFullName("");
       setEmail("");
@@ -58,7 +55,7 @@ function AddNewUser() {
       setRoleName([]);
       navigate("/dash/users");
 
-      toast.success("Success", {
+      toast.success("Update Successful", {
         position: "top-center",
         autoClose: 2000,
         hideProgressBar: true,
@@ -71,26 +68,10 @@ function AddNewUser() {
     }
   }, [isSuccess, navigate]);
 
-  useEffect(() => {
-    if (isError) {
-      toast.error(`${error?.data?.error?.description}`, {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: false,
-        progress: undefined,
-        theme: "dark",
-      });
-    }
-  }, [isError]);
-
   const onFullNameChanged = (e) => setFullName(e.target.value);
   const onEmailChanged = (e) => setEmail(e.target.value);
   const onPasswordChanged = (e) => setPassword(e.target.value);
   const onPhoneNumberChanged = (e) => setPhoneNumber(e.target.value);
-  const onConfirmPasswordChanged = (e) => setConfirmPassword(e.target.value)
 
   const onRoleNameChanged = (role) => {
     if (roleName.includes(role)) {
@@ -109,16 +90,15 @@ function AddNewUser() {
       isValidEmail,
       isValidPassword,
       isValidPhoneNumber,
-      isValidConfirmPassword
     ].every(boolean) && !isLoading;
 
   const onSaveUserClicked = async (e) => {
     e.preventDefault();
     if (canSave) {
-      await addNewUser({ fullName, email, password, roleName, phoneNumber });
+      await updateUser({id: user.uuid, fullName, email, password, phoneNumber, roleName });    
     }
   };
-
+console.log(roleName)
   const handleBtnBackClicked = () => {
     navigate("/dash/users");
   };
@@ -126,9 +106,9 @@ function AddNewUser() {
   const content = (
     <>
       <form onSubmit={onSaveUserClicked} className="p-4">
-        <h2 className="text-xl font-bold">New User</h2>
+        <h2 className="text-xl font-bold">Update User</h2>
         <Label htmlFor="fullName" id="fullName">
-          Full Name
+          fullName
         </Label>
         <TextInput
           id="fullName"
@@ -147,22 +127,14 @@ function AddNewUser() {
           value={email}
           onChange={onEmailChanged}
         />
-        <Label htmlFor="">Password</Label>
+        {/* <Label htmlFor="">Password</Label>
         <TextInput
           type="password"
           name="password"
           id="password"
           value={password}
           onChange={onPasswordChanged}
-        />
-        <Label htmlFor="">Confirm Password</Label>
-        <TextInput
-          type="confirmPassword"
-          name="confirmPassword"
-          id="confirmPassword"
-          value={confirmPassword}
-          onChange={onConfirmPasswordChanged}
-        />
+        /> */}
         <Label htmlFor="">PhoneNumber</Label>
         <TextInput
           type="text"
@@ -199,10 +171,10 @@ function AddNewUser() {
           <Button
             type="submit"
             className="bg-blue-700"
-            title="Save"
+            title="Update"
             disabled={!canSave}
           >
-            Save
+            Update
           </Button>
         </div>
       </form>
@@ -212,4 +184,4 @@ function AddNewUser() {
   return content;
 }
 
-export default AddNewUser;
+export default EditUserForm;

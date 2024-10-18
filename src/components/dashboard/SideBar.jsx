@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Drawer, Label, Sidebar, TextInput } from "flowbite-react";
 import useTranslation from "../hook/UseTranslation";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { FaChartPie } from "react-icons/fa";
 import { FaParking, FaCar, FaUser } from "react-icons/fa";
 import { TbMessageFilled } from "react-icons/tb";
@@ -9,24 +9,31 @@ import { HiMiniBanknotes } from "react-icons/hi2";
 import { IoMdSettings } from "react-icons/io";
 import { IoLogIn } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../redux/feature/auth/authSlice";
 import InputSearch from "../util/InputSearch";
-import { toggleCollapsed } from "../../redux/feature/actions/ActionSlice";
+import { toggleCollapsed } from "../../redux/feature/actions/actionSlice";
+import { useSendLogoutMutation } from "../../redux/feature/auth/authApiSlice";
 
 function SideBar() {
   const { translate } = useTranslation();
   const isCollapsed = useSelector((state) => state.action.isCollapsed);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleLogout = () => {
-    dispatch(logout());
-  };
+  const [sendLogout, { isSuccess, isLoading, isError, error }] =
+    useSendLogoutMutation();
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate("/");
+    }
+  }, [isSuccess, navigate]); 
+
+  const handleLogout = () => sendLogout();
 
   const handleToggleCollapse = () => {
     dispatch(toggleCollapsed());
   };
-
-  const location = useLocation();
 
   const sidebarContent = (
     <Sidebar.Items className="flex flex-col gap-2">

@@ -12,7 +12,7 @@ import InputSearch from "../util/InputSearch";
 import Notification from "../util/Notification";
 import { HiMenuAlt2 } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleCollapsed } from "../../redux/feature/actions/ActionSlice";
+import { toggleCollapsed } from "../../redux/feature/actions/actionSlice";
 import { IoSearch } from "react-icons/io5";
 
 function NavBarDashboard() {
@@ -46,13 +46,13 @@ function NavBarDashboard() {
           </span>
         </div>
         <div className="flex-grow flex justify-center md:hidden">
-          <InputSearch />
+          {/* <InputSearch /> */}
         </div>
         
         
         <div className="flex md:order-2 gap-4 items-center">
         <Button onClick={handleToggleCollapse} className="hidden md:flex w-10 h-10">
-          <IoSearch className="h-5 w-5 text-gray-700" />
+          <IoSearch className="h-5 w-5 text-gray-700"/>
         </Button>
           <DarkThemeToggle />
           <Notification />

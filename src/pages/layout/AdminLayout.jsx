@@ -1,13 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import SideBar from "../../components/dashboard/SideBar.jsx";
 import NavBarDashboard from "../../components/dashboard/NavBarDashboard.jsx";
 import { Flowbite } from "flowbite-react";
 import { useSelector } from "react-redux";
 function AdminLayout() {
-  const isCollapsed = useSelector((state) => state.action.isCollapsed);
-  // const outletOverflow = useSelector((state)=>state.action.outletOverflow)
-
+  const isCollapsed = useSelector((state) => state.action.isCollapsed);  
   return (
     <Flowbite>
       <div className="flex flex-col h-screen">

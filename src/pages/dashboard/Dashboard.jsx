@@ -5,8 +5,10 @@ import AreaChartProfits from "../../components/dashboard/AreaChartProfits";
 import AreaVehicles from "../../components/dashboard/AreaVehicles";
 import HeatMap from "../../components/dashboard/HeatMap";
 import ParkingMap from "../../components/dashboard/ParkingMap";
+import { useSelector } from "react-redux";
 
 function Dashboard() {
+  
   return (
     <div className="grid grid-cols-1 gap-4">
       <AreaChartProfits />
