@@ -487,24 +487,21 @@ export function Profile() {
         </div>
       </Tabs.Item>
      
-      <Tabs.Item title="Documents" icon={TiDocumentText}>
-          <Banner>
-          <div className=" min-h-12 flex w-full justify-between border-t border-gray-200p-4 dark:border-gray-600 dark:bg-gray-700  w-500 h-90 bg-gray-300 rounded-xl ">
-            <div className="mx-auto flex items-center">
-               <p> No Record Found</p>
+        <Tabs.Item title="Documents" icon={TiDocumentText}>
+            <Banner>
+            <div className=" min-h-12 flex w-full justify-between border-t border-gray-200p-4 dark:border-gray-600 dark:bg-gray-700  w-500 h-90 bg-gray-300 rounded-xl ">
+              <div className="mx-auto flex items-center">
+                <p> No Record Found</p>
+              </div>
             </div>
-          </div>
-        </Banner>
-      </Tabs.Item>
-      <Tabs.Item title="Edit" icon={ GrEdit }>
-        <p> THis page is Edit</p>
-      </Tabs.Item>
-     
+          </Banner>
+        </Tabs.Item>
+            <Tabs.Item title="Edit" icon={ GrEdit }>
+            <p> THis page is Edit</p>
+          </Tabs.Item>
     </Tabs>
   </div>
   </>
-  );  
-
-  
+);  
 }
 export default Profile;
