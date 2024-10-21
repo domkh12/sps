@@ -1,9 +1,10 @@
 import React from "react";
-import { useGetUsersQuery } from "../../../redux/feature/users/userApiSlice";
-import { Button, Checkbox, Table } from "flowbite-react";
+import { useGetUsersQuery } from "../../redux/feature/users/userApiSlice";
+import { Button, Checkbox, Table, TextInput } from "flowbite-react";
 import UserRow from "./UserRow";
 import { Outlet, useNavigate } from "react-router-dom";
 import { MdOutlineAdd } from "react-icons/md";
+import { FaPlus, FaSearch } from "react-icons/fa";
 
 function UserList() {
   const navigator = useNavigate();
@@ -37,14 +38,22 @@ function UserList() {
 
     content = (
       <div className="overflow-x-auto p-4 flex flex-col gap-4">
-        <div className="flex justify-end">
-          <Button
-              className="bg-primary w-[8vw] hover:bg-primary-hover ring-transparent"
-              onClick={handleBtnAddNewClicked}
-            >
-              Add New
+        <div className="flex justify-between items-center">
+          <div className="flex gap-2">
+            <TextInput placeholder="Search" />
+            <Button className="bg-primary">
+              <FaSearch className="mr-2" />
+              <span>Search</span>
             </Button>
-        </div>        
+          </div>
+          <Button
+            className="bg-primary hover:bg-primary-hover ring-transparent"
+            onClick={handleBtnAddNewClicked}
+          >
+            <FaPlus className="mr-2"/>
+            Add New
+          </Button>
+        </div>
         <Table>
           <Table.Head className="overflow-auto">
             <Table.HeadCell className="p-4">

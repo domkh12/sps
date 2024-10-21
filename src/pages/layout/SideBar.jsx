@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Drawer, Label, Sidebar, TextInput } from "flowbite-react";
-import useTranslation from "../hook/UseTranslation";
-import { useLocation, Link, useNavigate } from "react-router-dom";
-import { FaChartPie } from "react-icons/fa";
+import useTranslation from "../../components/hook/UseTranslation";
+import { useLocation, NavLink, useNavigate } from "react-router-dom";
+import { FaChartPie, FaUsers } from "react-icons/fa";
 import { FaParking, FaCar, FaUser } from "react-icons/fa";
 import { TbMessageFilled } from "react-icons/tb";
 import { HiMiniBanknotes } from "react-icons/hi2";
 import { IoMdSettings } from "react-icons/io";
 import { IoLogIn } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
-import InputSearch from "../util/InputSearch";
+import InputSearch from "../../components/util/InputSearch";
 import { toggleCollapsed } from "../../redux/feature/actions/actionSlice";
 import { useSendLogoutMutation } from "../../redux/feature/auth/authApiSlice";
 
@@ -27,7 +27,7 @@ function SideBar() {
     if (isSuccess) {
       navigate("/");
     }
-  }, [isSuccess, navigate]); 
+  }, [isSuccess, navigate]);
 
   const handleLogout = () => sendLogout();
 
@@ -45,17 +45,17 @@ function SideBar() {
         </Drawer.Items>
 
         <Sidebar.Item
-          as={Link}
-          to="/admin/dashboard"
+          as={NavLink}
+          to="/dash"
           icon={FaChartPie}
           className={`${isCollapsed && window.innerWidth > 768 ? "grid" : ""}`}
-          active={location.pathname === "/admin/dashboard"}
+          active={location.pathname === "/dash"}
         >
           {!(isCollapsed && window.innerWidth > 768) && translate("dashboard")}
         </Sidebar.Item>
 
         <Sidebar.Item
-          as={Link}
+          as={NavLink}
           to="/admin/parking"
           icon={FaParking}
           className={`${isCollapsed && window.innerWidth > 768 ? "grid" : ""}`}
@@ -65,7 +65,7 @@ function SideBar() {
         </Sidebar.Item>
 
         <Sidebar.Item
-          as={Link}
+          as={NavLink}
           to="/admin/vehicle"
           icon={FaCar}
           className={`${isCollapsed && window.innerWidth > 768 ? "grid" : ""}`}
@@ -75,7 +75,7 @@ function SideBar() {
         </Sidebar.Item>
 
         <Sidebar.Item
-          as={Link}
+          as={NavLink}
           to="/admin/message"
           icon={TbMessageFilled}
           className={`${isCollapsed && window.innerWidth > 768 ? "grid" : ""}`}
@@ -85,7 +85,7 @@ function SideBar() {
         </Sidebar.Item>
 
         <Sidebar.Item
-          as={Link}
+          as={NavLink}
           to="/admin/payment"
           icon={HiMiniBanknotes}
           className={`${isCollapsed && window.innerWidth > 768 ? "grid" : ""}`}
@@ -96,7 +96,7 @@ function SideBar() {
       </Sidebar.ItemGroup>
       <Sidebar.ItemGroup>
         <Sidebar.Item
-          as={Link}
+          as={NavLink}
           to="/admin/setting"
           icon={IoMdSettings}
           className={`${isCollapsed && window.innerWidth > 768 ? "grid" : ""}`}
@@ -106,7 +106,7 @@ function SideBar() {
         </Sidebar.Item>
 
         <Sidebar.Item
-          as={Link}
+          as={NavLink}
           className={`${isCollapsed && window.innerWidth > 768 ? "grid" : ""}`}
           onClick={handleLogout}
           icon={IoLogIn}
@@ -129,74 +129,84 @@ function SideBar() {
           <Sidebar.Items className="flex flex-col gap-2 ">
             <Sidebar.ItemGroup>
               <Sidebar.Item
-                as={Link}
-                to="/admin/dashboard"
+                as={NavLink}
+                to="/dash"
                 icon={FaChartPie}
                 className={`${isCollapsed ? "grid" : ""}`}
-                active={location.pathname === "/admin/dashboard"}
+                active={location.pathname === "/dash"}
               >
                 {!isCollapsed && translate("dashboard")}
               </Sidebar.Item>
 
               <Sidebar.Item
-                as={Link}
-                to="/admin/parking"
+                as={NavLink}
+                to="/dash/parking"
                 icon={FaParking}
                 className={`${isCollapsed ? "grid" : ""}`}
-                active={location.pathname === "/admin/parking"}
+                active={location.pathname === "/dash/parking"}
               >
                 {!isCollapsed && "Parking Map"}
               </Sidebar.Item>
 
               <Sidebar.Item
-                as={Link}
-                to="/admin/vehicle"
+                as={NavLink}
+                to="/dash/vehicle"
                 icon={FaCar}
                 className={`${isCollapsed ? "grid" : ""}`}
-                active={location.pathname === "/admin/vehicle"}
+                active={location.pathname === "/dash/vehicle"}
               >
                 {!isCollapsed && translate("vehicle")}
               </Sidebar.Item>
 
               <Sidebar.Item
-                as={Link}
-                to="/admin/message"
-                icon={TbMessageFilled}
+                as={NavLink}
+                to="/dash/users"
+                icon={FaUsers}
                 className={`${isCollapsed ? "grid" : ""}`}
-                active={location.pathname === "/admin/message"}
+                active={location.pathname === "/dash/users"}
               >
-                {!isCollapsed && translate("message")}
+                {!isCollapsed && "Users"}
               </Sidebar.Item>
 
               <Sidebar.Item
-                as={Link}
-                to="/admin/payment"
+                as={NavLink}
+                to="/dash/message"
+                icon={TbMessageFilled}
+                className={`${isCollapsed ? "grid" : ""}`}
+                active={location.pathname === "/dash/message"}
+              >
+                {!isCollapsed && "Message"}
+              </Sidebar.Item>
+
+              <Sidebar.Item
+                as={NavLink}
+                to="/dash/payment"
                 icon={HiMiniBanknotes}
                 className={`${isCollapsed ? "grid" : ""}`}
-                active={location.pathname === "/admin/payment"}
+                active={location.pathname === "/dash/payment"}
               >
-                {!isCollapsed && translate("payment")}
+                {!isCollapsed && "Payment"}
               </Sidebar.Item>
             </Sidebar.ItemGroup>
 
             <Sidebar.ItemGroup>
               <Sidebar.Item
-                as={Link}
-                to="/admin/setting"
+                as={NavLink}
+                to="/dash/setting"
                 icon={IoMdSettings}
                 className={`${isCollapsed ? "grid" : ""}`}
-                active={location.pathname === "/admin/setting"}
+                active={location.pathname === "/dash/setting"}
               >
-                {!isCollapsed && translate("setting")}
+                {!isCollapsed && "Setting"}
               </Sidebar.Item>
 
               <Sidebar.Item
-                as={Link}
+                as={NavLink}
                 className={`${isCollapsed ? "grid" : ""}`}
                 onClick={handleLogout}
                 icon={IoLogIn}
               >
-                {!isCollapsed && translate("logout")}
+                {!isCollapsed && "Logout"}
               </Sidebar.Item>
             </Sidebar.ItemGroup>
           </Sidebar.Items>

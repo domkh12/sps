@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { selectUserById } from "../../../redux/feature/users/userApiSlice";
+import { selectUserById } from "../../redux/feature/users/userApiSlice";
 import EditUserForm from "./EditUserForm";
 
 function EditUser() {

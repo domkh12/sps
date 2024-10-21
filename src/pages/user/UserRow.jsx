@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import {
   selectUserById,
   useDeleteUserMutation,
-} from "../../../redux/feature/users/userApiSlice";
+} from "../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
 import {
   Avatar,
@@ -17,15 +17,15 @@ import {
   TextInput,
   Tooltip,
 } from "flowbite-react";
-import AvartarCustom from "../../../components/util/AvartarCustom";
+import AvartarCustom from "../../components/util/AvartarCustom";
 import {
   getContrastingTextColor,
   stringToColor,
-} from "../../../redux/feature/utils/colorUtils";
+} from "../../redux/feature/utils/colorUtils";
 import { FaEdit } from "react-icons/fa";
 import { BsTrash3Fill } from "react-icons/bs";
-import DeleteConfirmComponent from "../../../components/DeleteConfirmComponent";
 import { toast } from "react-toastify";
+import DeleteConfirmComponent from "../../components/DeleteConfirmComponent";
 
 function UserRow({ userId }) {
   const navigate = useNavigate();
@@ -39,14 +39,14 @@ function UserRow({ userId }) {
     if (isSuccess) {
       setOpen(false);
       toast.success("Delete Successful", {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: true,
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: false,
-        draggable: false,
+        pauseOnHover: true,
+        draggable: true,
         progress: undefined,
-        theme: "dark",
+        theme: "colored",
       });
     }
   }, [isSuccess]);

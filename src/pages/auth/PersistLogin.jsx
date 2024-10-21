@@ -3,7 +3,7 @@ import usePersist from "../../hook/usePersist";
 import { useSelector } from "react-redux";
 import { selectCurrentToekn } from "../../redux/feature/auth/authSlice";
 import { useRefreshMutation } from "../../redux/feature/auth/authApiSlice";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 function PersistLogin() {
   const [persist] = usePersist();
@@ -46,9 +46,7 @@ function PersistLogin() {
     // persist: yes , token: yes
     console.log("Success");
     content = <Outlet />;
-  } else if (token && isUninitialized) {
-    console.log("Token and uninit");
-    console.log("isUninitialized", isUninitialized);
+  } else if (token && isUninitialized) {    
     content = <Outlet />;
   }
 

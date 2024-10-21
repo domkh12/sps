@@ -5,13 +5,15 @@ import { useLoginMutation } from "../../redux/feature/auth/authApiSlice";
 import { setCredentials } from "../../redux/feature/auth/authSlice";
 import { Button, Card, FloatingLabel, Flowbite, Spinner } from "flowbite-react";
 import { toast } from "react-toastify";
-import { Formik } from "formik";
+import { Form, Formik } from "formik";
 import * as Yup from "yup";
+import { IoEyeOffSharp, IoEyeSharp } from "react-icons/io5";
 
 export default function Login() {
   const userRef = useRef();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [toggleEye, setToggleEye] = useState(false);
 
   useEffect(() => {
     userRef.current.focus();
@@ -24,8 +26,7 @@ export default function Login() {
 
   const [login, { isLoading }] = useLoginMutation();
   const handleSubmit = async (values, { setSubmitting }) => {
-    try {
-      console.log(values);
+    try {      
       const { accessToken } = await login({
         email: values.email,
         password: values.password,
@@ -43,9 +44,10 @@ export default function Login() {
         theme: "colored",
       });
     } catch (error) {
-      if (!error.status) {
+      console.log(error)
+      if (error.status === "FETCH_ERROR") {
         toast.error(
-          "No Server Response, please check your network connection."
+          "Something went wrong!"
         );
       } else if (error.status === 400) {
         toast.error("Email or Password is incorrect.", {
@@ -97,6 +99,10 @@ export default function Login() {
     }
   };
 
+  const handleToggleEye = () => {
+    setToggleEye(!toggleEye);
+  };
+
   const content = (
     <Flowbite className="bg-white">
       <Formik
@@ -107,14 +113,11 @@ export default function Login() {
         {({
           values,
           touched,
-          errors,
-          isSubmitting,
+          errors,          
           handleChange,
-          handleBlur,
-          handleSubmit,
+          handleBlur,          
         }) => (
-          <form
-            onSubmit={handleSubmit}
+          <Form            
             className="grid grid-cols-12 md:grid-cols-1 grid-flow-row justify-center items-center min-h-screen gap-10"
           >
             <section className="md:hidden col-start-2 col-end-6">
@@ -157,9 +160,9 @@ export default function Login() {
                   <small className="text-red-600">{errors.email}</small>
                 )}
               </div>
-              <div>
+              <div className="relative">
                 <FloatingLabel
-                  type="password"
+                  type={!toggleEye ? "password" : "text"}
                   id="password"
                   name="password"
                   value={values.password}
@@ -171,6 +174,18 @@ export default function Login() {
                   variant="outlined"
                   label="Password"
                 />
+                {toggleEye ? (
+                  <IoEyeSharp
+                    className="absolute top-3 right-2 text-xl hover:cursor-pointer"
+                    onClick={handleToggleEye}
+                  />
+                ) : (
+                  <IoEyeOffSharp
+                    className="absolute top-3 right-2 text-xl hover:cursor-pointer"
+                    onClick={handleToggleEye}
+                  />
+                )}
+
                 {errors.password && touched.password && (
                   <small className="text-red-600">{errors.password}</small>
                 )}
@@ -187,7 +202,7 @@ export default function Login() {
                 )}
               </Button>
             </Card>
-          </form>
+          </Form>
         )}
       </Formik>
     </Flowbite>

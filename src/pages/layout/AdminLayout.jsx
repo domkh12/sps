@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import SideBar from "../../components/dashboard/SideBar.jsx";
-import NavBarDashboard from "../../components/dashboard/NavBarDashboard.jsx";
 import { Flowbite } from "flowbite-react";
 import { useSelector } from "react-redux";
+import NavBarDashboard from "./NavBarDashboard";
+import SideBar from "./SideBar";
 function AdminLayout() {
   const isCollapsed = useSelector((state) => state.action.isCollapsed);  
   return (

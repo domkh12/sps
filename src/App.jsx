@@ -2,15 +2,15 @@ import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import AdminLayout from "./pages/layout/AdminLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
-import UserList from "./pages/dashboard/user/UserList";
-import AddNewUser from "./pages/dashboard/user/AddNewUser";
-import EditUser from "./pages/dashboard/user/EditUser";
 import Test from "./components/Test";
 import Prefetch from "./pages/auth/Prefetch";
 import Login from "./pages/auth/Login";
 import PersistLogin from "./pages/auth/PersistLogin";
 import NotFound from "./pages/not_found/NotFound";
 import MessagesList from "./pages/messages/MessagesList";
+import EditUser from './pages/user/EditUser';
+import UserList from './pages/user/UserList';
+import AddNewUser from './pages/user/AddNewUser';
 
 function App() {
   return (

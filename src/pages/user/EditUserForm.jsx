@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import {
   useDeleteUserMutation,
   useUpdateUserMutation,
-} from "../../../redux/feature/users/userApiSlice";
+} from "../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
 import { boolean } from "yup";
 import { Button, Checkbox, Label, TextInput } from "flowbite-react";
-import { ROLES } from "../../../config/roles";
+import { ROLES } from "../../config/roles";
 import { toast } from "react-toastify";
 
 function EditUserForm({user}) {
