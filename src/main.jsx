@@ -8,8 +8,6 @@ import { Provider } from "react-redux";
 import store from "./redux/app/store.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-<<<<<<< HEAD
-
 import Useradmin from "./pages/dashboard/Useradmin.jsx";
 import ListParking from "./components/dashboard/ListParking.jsx";
 import Parking2dView from "./components/dashboard/parking/Parking2dView.jsx";
@@ -102,9 +100,6 @@ const router = createBrowserRouter(
   //   },
   // ]
 );
-=======
-import App from "./App.jsx";
->>>>>>> 18f71def2c7c7f8a393859c47589c1bdec4a7875
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
