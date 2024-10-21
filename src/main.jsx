@@ -32,6 +32,7 @@ import UserList from "./pages/dashboard/user/UserList.jsx";
 import VehicleList from "./pages/dashboard/vehicle/VehicleList.jsx";
 import EditUser from "./pages/dashboard/user/EditUser.jsx";
 import AddNewUser from "./pages/dashboard/user/AddNewUser.jsx";
+import Profile from "./pages/dashboard/profile/Profile.jsx";
 const router = createBrowserRouter(
   [
     {
@@ -50,6 +51,10 @@ const router = createBrowserRouter(
       //   {
       //     element: <AdminLayout />,
       children: [
+        {
+          path: "profile",
+          element: <Profile />,
+        },
         {
           path: "dashboard",
           element: <Dashboard />,
