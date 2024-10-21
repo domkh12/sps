@@ -8,9 +8,10 @@ import Login from "./pages/auth/Login";
 import PersistLogin from "./pages/auth/PersistLogin";
 import NotFound from "./pages/not_found/NotFound";
 import MessagesList from "./pages/messages/MessagesList";
-import EditUser from './pages/user/EditUser';
-import UserList from './pages/user/UserList';
-import AddNewUser from './pages/user/AddNewUser';
+import EditUser from "./pages/user/EditUser";
+import UserList from "./pages/user/UserList";
+import AddNewUser from "./pages/user/AddNewUser";
+import Profile from "./pages/dashboard/profile/Profile";
 
 function App() {
   return (
@@ -30,6 +31,9 @@ function App() {
             </Route>
             <Route path="messages">
               <Route index element={<MessagesList />} />
+            </Route>
+            <Route path="profiles">
+              <Route index element={<Profile />} />
             </Route>
           </Route>
           {/* End dash */}

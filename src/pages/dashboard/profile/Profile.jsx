@@ -17,7 +17,7 @@ import { BiTask } from "react-icons/bi";
 import { Dropdown } from "flowbite-react";
 import { Banner } from "flowbite-react";
 import { FcLeave } from "react-icons/fc";
-export function profile() {
+export function Profile() {
   return (
   <>
       <Card className="max-w-sm float-start ">
@@ -507,4 +507,4 @@ export function profile() {
 
   
 }
-export default profile;
+export default Profile;
