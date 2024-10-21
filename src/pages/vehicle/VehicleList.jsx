@@ -1,7 +1,7 @@
 import React from "react";
-import { useGetVehicleQuery } from "../../../redux/feature/vehicles/vehicleApiSlice";
 import { Checkbox, Table } from "flowbite-react";
 import VehicleRow from "./VehicleRow";
+import { useGetVehicleQuery } from "../../redux/feature/vehicles/vehicleApiSlice";
 
 function VehicleList() {
   const {

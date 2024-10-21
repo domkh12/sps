@@ -2,28 +2,13 @@ import "./init.js";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import {
-  createBrowserRouter,
-  Navigate,
-  RouterProvider,
-} from "react-router-dom";
-import ErrorPage from "./pages/error-page/ErrorPage.jsx";
-import LoginPage from "./pages/auth/LoginPage.jsx";
+import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { Provider } from "react-redux";
 import store from "./redux/app/store.js";
-import Dashboard from "./pages/dashboard/Dashboard.jsx";
-import AdminLayout from "./pages/layout/AdminLayout.jsx";
-import Parking from "./pages/dashboard/Parking.jsx";
-import Vehicle from "./pages/dashboard/Vehicle.jsx";
-import User from "./pages/dashboard/User.jsx";
-import Message from "./pages/dashboard/Message.jsx";
-import Payment from "./pages/dashboard/Payment.jsx";
-import Setting from "./pages/dashboard/Setting.jsx";
-import ProtectedRoute from "./pages/auth/ProtectedRoute.jsx";
-import Usermanager from "./pages/dashboard/Usermanager.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+<<<<<<< HEAD
 
 import Useradmin from "./pages/dashboard/Useradmin.jsx";
 import ListParking from "./components/dashboard/ListParking.jsx";
@@ -117,14 +102,19 @@ const router = createBrowserRouter(
   //   },
   // ]
 );
+=======
+import App from "./App.jsx";
+>>>>>>> 18f71def2c7c7f8a393859c47589c1bdec4a7875
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <HelmetProvider>
-      <Provider store={store}>
-        <ToastContainer />
-        <RouterProvider router={router} />
-      </Provider>
-    </HelmetProvider>
+    <BrowserRouter>
+      <HelmetProvider>
+        <Provider store={store}>
+          <ToastContainer stacked/>
+          <App />
+        </Provider>
+      </HelmetProvider>
+    </BrowserRouter>
   </StrictMode>
 );

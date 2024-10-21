@@ -2,7 +2,7 @@ import { Checkbox, TableCell, TableRow } from 'flowbite-react'
 import React from 'react'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { selectVehicleById } from '../../../redux/feature/vehicles/vehicleApiSlice';
+import { selectVehicleById } from '../../redux/feature/vehicles/vehicleApiSlice';
 
 function VehicleRow({vehicleId}) {
     const vehicle = useSelector((state) => selectVehicleById(state, vehicleId));

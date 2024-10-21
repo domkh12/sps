@@ -10,6 +10,7 @@ export default {
       transparent: 'transparent',
       current: 'currentColor',
       'primary': '#2C3092',
+      'primary-hover': '#4A4FB3',
       'secondary': '#F0BA37',
     },
     screens: {
@@ -28,7 +29,12 @@ export default {
       sm: { max: "639px" },
       // => @media (max-width: 639px) { ... }
     },
-    extend: {},
+    extend: {
+      fontSize: {
+        clamp: "clamp(0.5rem, 5vw, 1.5rem)",
+        clampSmall: "clamp(0.5rem, 5vw, 1rem)",
+      },
+    },
   },
   plugins: [
     flowbite.plugin(),
