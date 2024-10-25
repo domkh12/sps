@@ -52,6 +52,10 @@ function AddNewUser() {
       .required("Email is required"),
     password: Yup.string()
       .min(8, "Password must be at least 8 characters")
+      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+      .matches(/[0-9]/, "Password must contain at least one number")
+      .matches(/[\W_]/, "Password must contain at least one special character")
       .required("Password is required"),
     confirmPassword: Yup.string()
       .oneOf([Yup.ref("password"), null], "Passwords must match")
@@ -78,7 +82,7 @@ function AddNewUser() {
   }, []);
 
   useEffect(() => {
-    if (isSuccess) {      
+    if (isSuccess) {
       navigate("/dash/users");
 
       toast.success("Success", {
@@ -197,10 +201,11 @@ function AddNewUser() {
               : [...values.roleName, role]; // Add role if not selected
 
             setFieldValue("roleName", updatedRoleName);
-            
+
             if (values.roleName.includes(role)) {
               setRolesPlaceHolder(
-                values.roleName.filter((r) => r !== role).join(", ") || "Select Roles"
+                values.roleName.filter((r) => r !== role).join(", ") ||
+                  "Select Roles"
               );
             } else {
               setRolesPlaceHolder([...values.roleName, role].join(", "));
@@ -213,20 +218,21 @@ function AddNewUser() {
                   setProfileImageFile={setProfileImageFile}
                 />
               </div>
-              <div className="flex justify-center items-center gap-3">
-                <div className="w-10 h-[1px] bg-gray-600"></div>
+              <div className="flex justify-center items-center gap-1">
+                <div className="w-4 h-[1px] bg-gray-600"></div>
                 <p className="whitespace-nowrap dark:text-gray-200">
                   User Information
                 </p>
                 <div className="w-full h-[1px] bg-gray-600"></div>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-1 gap-5 gap-x-10 px-5">
-                <div >
+                <div>
                   <Label className="flex gap-2 mb-2">
                     <TbUser />
                     First Name <span className="text-red-600">*</span>
                   </Label>
                   <TextInput
+                    placeholder="Enter first name"
                     style={{
                       backgroundColor: mode === "dark" ? "#1f2937" : "",
                       color: mode === "dark" ? "white" : "",
@@ -248,12 +254,13 @@ function AddNewUser() {
                     <small className="text-red-600">{errors.firstName}</small>
                   )}
                 </div>
-                <div >
+                <div>
                   <Label className="flex gap-2 mb-2">
                     <TbUser />
                     Last Name <span className="text-red-600">*</span>
                   </Label>
                   <TextInput
+                    placeholder="Enter last name"
                     style={{
                       backgroundColor: mode === "dark" ? "#1f2937" : "",
                       color: mode === "dark" ? "white" : "",
@@ -275,12 +282,13 @@ function AddNewUser() {
                     <small className="text-red-600">{errors.lastName}</small>
                   )}
                 </div>
-                <div >
+                <div>
                   <Label className="flex gap-2 mb-2">
                     <TbUser />
                     Full Name <span className="text-red-600">*</span>
                   </Label>
                   <TextInput
+                    placeholder="Enter full name"
                     style={{
                       backgroundColor: mode === "dark" ? "#1f2937" : "",
                       color: mode === "dark" ? "white" : "",
@@ -302,7 +310,7 @@ function AddNewUser() {
                     <small className="text-red-600">{errors.fullName}</small>
                   )}
                 </div>
-                <div >
+                <div>
                   <Label className="flex gap-2 mb-2">
                     <LuCalendarDays />
                     Date of Birth <span className="text-red-600">*</span>
@@ -316,18 +324,21 @@ function AddNewUser() {
                       setFieldValue("dateOfBirth", newDate);
                     }}
                     style={{
+                      backgroundColor: mode === "dark" ? "#1f2937" : "",
                       border:
                         errors.dateOfBirth && touched.dateOfBirth
                           ? "0.0625rem solid red"
-                          : "",
-                      height: "2.6rem",
+                          : mode === "dark"
+                          ? "0.0625rem solid #6b7280"
+                          : "0.0625rem solid #374151",
+                      height: "2.7rem",
                     }}
                   />
                   {errors.dateOfBirth && touched.dateOfBirth && (
                     <small className="text-red-600">{errors.dateOfBirth}</small>
                   )}
                 </div>
-                <div >
+                <div>
                   <Label htmlFor="genderName">Gender</Label>
                   <div className="flex gap-4">
                     {Object.values(GENDERS).map((gender) => (
@@ -355,12 +366,13 @@ function AddNewUser() {
                     <small className="text-red-600">{errors.gender}</small>
                   )}
                 </div>
-                <div >
+                <div>
                   <Label className="flex gap-2 mb-2">
                     <IoCallOutline />
                     Phone Number <span className="text-red-600">*</span>
                   </Label>
                   <TextInput
+                    placeholder="Enter phone number"
                     style={{
                       backgroundColor: mode === "dark" ? "#1f2937" : "",
                       color: mode === "dark" ? "white" : "",
@@ -383,8 +395,8 @@ function AddNewUser() {
                   )}
                 </div>
               </div>
-              <div className="flex justify-center items-center gap-3">
-                <div className="w-10 h-[1px] bg-gray-600"></div>
+              <div className="flex justify-center items-center gap-1">
+                <div className="w-4 h-[1px] bg-gray-600"></div>
                 <p className="whitespace-nowrap dark:text-gray-200">
                   User Account
                 </p>
@@ -398,6 +410,7 @@ function AddNewUser() {
                     Email <span className="text-red-600">*</span>
                   </Label>
                   <TextInput
+                    placeholder="Enter email"
                     style={{
                       backgroundColor: mode === "dark" ? "#1f2937" : "",
                       color: mode === "dark" ? "white" : "",
@@ -424,7 +437,9 @@ function AddNewUser() {
                   </Label>
                   <div
                     onClick={handleToggleRoleCbo}
-                    className=" flex justify-between text-sm cursor-pointer dark:bg-gray-800 items-center border border-gray-500 dark:border-gray-500 px-2 py-[0.60rem] rounded-lg text-gray-500"
+                    className={`flex justify-between text-sm cursor-pointer dark:bg-gray-800 items-center border border-gray-500 dark:border-gray-500 px-2 py-[0.60rem] rounded-lg text-gray-800 dark:text-gray-200 ${
+                      errors.roleName && "border-red-600 text-red-600"
+                    }`}
                   >
                     {rolesPlaceHolder} <IoIosArrowDown className="text-xl" />
                   </div>
@@ -434,7 +449,7 @@ function AddNewUser() {
                     } flex-col gap-3`}
                   >
                     {Object.values(ROLES).map((role) => (
-                      <div key={role} className="flex items-center gap-2">
+                      <div key={role} className="flex items-center gap-2 ">
                         <Checkbox
                           id={role}
                           name="roleName"
@@ -459,12 +474,15 @@ function AddNewUser() {
                     Password <span className="text-red-600">*</span>
                   </Label>
                   <TextInput
+                    placeholder="Enter password"
                     style={{
                       backgroundColor: mode === "dark" ? "#1f2937" : "",
                       color: mode === "dark" ? "white" : "",
                     }}
                     name="password"
                     id="password"
+                    onCopy={(e) => e.preventDefault()}
+                    onPaste={(e) => e.preventDefault()}
                     type={!toggleEye ? "password" : "text"}
                     value={values.password}
                     onChange={handleChange}
@@ -496,14 +514,17 @@ function AddNewUser() {
                     Confirm Password <span className="text-red-600">*</span>
                   </Label>
                   <TextInput
+                    placeholder="Confirm password"
                     style={{
                       backgroundColor: mode === "dark" ? "#1f2937" : "",
-                      color: mode === "dark" ? "white" : "",                    
+                      color: mode === "dark" ? "white" : "",
                     }}
                     name="confirmPassword"
                     id="confirmPassword"
                     type={!toggleEye ? "password" : "text"}
                     value={values.confirmPassword}
+                    onCopy={(e) => e.preventDefault()}
+                    onPaste={(e) => e.preventDefault()}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     color={
