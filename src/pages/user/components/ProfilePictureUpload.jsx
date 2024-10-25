@@ -49,8 +49,8 @@ function ProfilePictureUpload({ setProfileImageFile }) {
   };
 
   const content = (
-    <div className="flex flex-col items-start justify-start">
-      <div className="relative rounded-full w-36 h-36 overflow-hidden mb-5 flex justify-start items-start">
+    <div className="flex flex-col items-start justify-start sm:items-center sm:justify-center">
+      <div className="relative rounded-full w-36 h-36 overflow-hidden mb-5 flex justify-start items-start sm:items-center sm:justify-center">
         <img
           id="profilePic"
           className="w-full h-full object-cover"

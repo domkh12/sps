@@ -220,8 +220,8 @@ function AddNewUser() {
                 </p>
                 <div className="w-full h-[1px] bg-gray-600"></div>
               </div>
-              <div className="grid grid-cols-2 grid-rows-3 gap-x-10 gap-y-5 px-5">
-                <div>
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-5 gap-x-10 px-5">
+                <div >
                   <Label className="flex gap-2 mb-2">
                     <TbUser />
                     First Name <span className="text-red-600">*</span>
@@ -248,7 +248,7 @@ function AddNewUser() {
                     <small className="text-red-600">{errors.firstName}</small>
                   )}
                 </div>
-                <div>
+                <div >
                   <Label className="flex gap-2 mb-2">
                     <TbUser />
                     Last Name <span className="text-red-600">*</span>
@@ -275,7 +275,7 @@ function AddNewUser() {
                     <small className="text-red-600">{errors.lastName}</small>
                   )}
                 </div>
-                <div>
+                <div >
                   <Label className="flex gap-2 mb-2">
                     <TbUser />
                     Full Name <span className="text-red-600">*</span>
@@ -302,7 +302,7 @@ function AddNewUser() {
                     <small className="text-red-600">{errors.fullName}</small>
                   )}
                 </div>
-                <div>
+                <div >
                   <Label className="flex gap-2 mb-2">
                     <LuCalendarDays />
                     Date of Birth <span className="text-red-600">*</span>
@@ -327,7 +327,7 @@ function AddNewUser() {
                     <small className="text-red-600">{errors.dateOfBirth}</small>
                   )}
                 </div>
-                <div>
+                <div >
                   <Label htmlFor="genderName">Gender</Label>
                   <div className="flex gap-4">
                     {Object.values(GENDERS).map((gender) => (
@@ -355,7 +355,7 @@ function AddNewUser() {
                     <small className="text-red-600">{errors.gender}</small>
                   )}
                 </div>
-                <div>
+                <div >
                   <Label className="flex gap-2 mb-2">
                     <IoCallOutline />
                     Phone Number <span className="text-red-600">*</span>
@@ -391,7 +391,7 @@ function AddNewUser() {
                 <div className="w-full h-[1px] bg-gray-600"></div>
               </div>
 
-              <div className="grid grid-cols-2 grid-rows-2 gap-x-10 gap-y-5 px-5">
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-x-10 gap-5 px-5">
                 <div>
                   <Label className="flex gap-2 mb-2">
                     <IoMailOutline />
