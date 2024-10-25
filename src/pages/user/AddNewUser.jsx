@@ -1,36 +1,52 @@
-import React, { useEffect, useState } from "react";
-import {
-  useAddNewUserMutation,
-  useUploadImageMutation,
-} from "../../redux/feature/users/userApiSlice";
+import React, { useEffect, useRef, useState } from "react";
+import { useAddNewUserMutation } from "../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
 import { ROLES } from "./../../config/roles";
 import {
   Button,
   Checkbox,
   Datepicker,
-  FloatingLabel,
+  Flowbite,
   Label,
   Spinner,
+  TextInput,
+  useThemeMode,
 } from "flowbite-react";
 import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
-import { IoEyeOffSharp, IoEyeSharp } from "react-icons/io5";
+import {
+  IoCallOutline,
+  IoEyeOffSharp,
+  IoEyeSharp,
+  IoMailOutline,
+} from "react-icons/io5";
 import { GENDERS } from "../../config/genders";
+import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
+import ProfilePictureUpload from "./components/ProfilePictureUpload";
+import { GrUserAdmin } from "react-icons/gr";
+import { IoIosArrowDown } from "react-icons/io";
+import { TbUser } from "react-icons/tb";
+import { LuCalendarDays } from "react-icons/lu";
+import { RiLockPasswordLine } from "react-icons/ri";
 
 function AddNewUser() {
   const [addNewUser, { isLoading, isSuccess, isError, error }] =
     useAddNewUserMutation();
   const [uploadImage] = useUploadImageMutation();
   const navigate = useNavigate();
-  const [roleName, setRoleName] = useState(["STAFF"]);
   const [toggleEye, setToggleEye] = useState(false);
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [cboRolesToggle, setCboRolesToggle] = useState(false);
+  const { mode } = useThemeMode();
+  const dropdownRef = useRef(null);
+  const [rolesPlaceHolder, setRolesPlaceHolder] = useState("STAFF");
 
   const validationSchema = Yup.object().shape({
     firstName: Yup.string().required("First name is required"),
     lastName: Yup.string().required("Last name is required"),
     fullName: Yup.string().required("Full name is required"),
+    dateOfBirth: Yup.date().required("Date of birth is required"),
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),
@@ -43,21 +59,26 @@ function AddNewUser() {
     phoneNumber: Yup.string()
       .matches(/^\d+$/, "Phone number must numbers")
       .required("Phone number is required"),
-    image: Yup.mixed()
-      .nullable()
-      .test("fileSize", "File size is too large", (value) => {
-        return value && value.size <= 2000000; // Limit to 2MB
-      })
-      .test("fileType", "Unsupported File Format", (value) => {
-        return (
-          value && ["image/jpeg", "image/png", "image/gif"].includes(value.type)
-        );
-      }),
+    roleName: Yup.array()
+      .min(1, "At least one role must be selected")
+      .required("Role is required"),
   });
 
   useEffect(() => {
-    if (isSuccess) {
-      setRoleName([]);
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setCboRolesToggle(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isSuccess) {      
       navigate("/dash/users");
 
       toast.success("Success", {
@@ -88,22 +109,16 @@ function AddNewUser() {
     }
   }, [isError]);
 
-  const onRoleNameChanged = (role) => {
-    if (roleName.includes(role)) {
-      // If the role is already in the array, remove it
-      setRoleName(roleName.filter((r) => r !== role));
-    } else {
-      // If the role is not in the array, add it
-      setRoleName([...roleName, role]);
-    }
-  };
-
   const handleSubmit = async (values, { setSubmitting }) => {
-    console.log(values);
     try {
       const formData = new FormData();
-      formData.append("file", values.image);
-      await uploadImage(formData);
+      let profileImageUri = null;
+      if (profileImageFile) {
+        formData.append("file", profileImageFile);
+        const uploadResponse = await uploadImage(formData).unwrap();
+        profileImageUri = uploadResponse.uri;
+      }
+
       await addNewUser({
         firstName: values.firstName,
         lastName: values.lastName,
@@ -113,8 +128,8 @@ function AddNewUser() {
         email: values.email,
         password: values.password,
         phoneNumber: values.phoneNumber,
-        roleName: roleName,
-        
+        roleName: values.roleName,
+        profileImage: profileImageUri,
       });
     } catch (error) {
     } finally {
@@ -142,8 +157,15 @@ function AddNewUser() {
     },
   };
 
+  const handleToggleRoleCbo = () => {
+    setCboRolesToggle(!cboRolesToggle);
+  };
+
   const content = (
     <>
+      <h2 className="text-2xl font-medium dark:text-gray-100 p-5">
+        Create User
+      </h2>
       <Formik
         initialValues={{
           firstName: "",
@@ -154,8 +176,9 @@ function AddNewUser() {
           password: "",
           confirmPassword: "",
           phoneNumber: "",
-          image: null,
+          profileImage: "",
           dateOfBirth: null,
+          roleName: ["STAFF"],
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -167,256 +190,370 @@ function AddNewUser() {
           handleChange,
           handleBlur,
           setFieldValue,
-        }) => (
-          <Form className="p-4">
-            <h2 className="text-2xl font-bold">New User</h2>
-            <div>
-              <FloatingLabel
-                id="firstName"
-                name="firstName"
-                type="text"
-                autoComplete="off"
-                value={values.firstName}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                variant="outlined"
-                label="First Name"
-                color={
-                  errors.firstName && touched.firstName ? "error" : "default"
-                }
-              />
-              {errors.firstName && touched.firstName && (
-                <small className="text-red-600">{errors.firstName}</small>
-              )}
-            </div>
-            <div>
-              <FloatingLabel
-                id="lastName"
-                name="lastName"
-                type="text"
-                autoComplete="off"
-                value={values.lastName}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                variant="outlined"
-                label="Last Name"
-                color={
-                  errors.lastName && touched.lastName ? "error" : "default"
-                }
-              />
-              {errors.lastName && touched.lastName && (
-                <small className="text-red-600">{errors.lastName}</small>
-              )}
-            </div>
-            <div>
-              <FloatingLabel
-                id="fullName"
-                name="fullName"
-                type="text"
-                autoComplete="off"
-                value={values.fullName}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                variant="outlined"
-                label="Full Name"
-                color={
-                  errors.fullName && touched.fullName ? "error" : "default"
-                }
-              />
-              {errors.fullName && touched.fullName && (
-                <small className="text-red-600">{errors.fullName}</small>
-              )}
-            </div>
-            <div>
-              <Datepicker
-                theme={customTheme}
-                showTodayButton={false}
-                onChange={(date) => {
-                  const newDate = new Date(date);
-                  newDate.setDate(newDate.getDate() + 1);
-                  setFieldValue("dateOfBirth", newDate);
-                }}
-              />
-            </div>
-            <div>
-              <Label htmlFor="genderName">Gender</Label>
-              <div className="flex gap-4">
-                {Object.values(GENDERS).map((gender) => (
-                  <div key={gender} className="flex items-center">
-                    <input
-                      type="radio"
-                      id={gender}
-                      name="genderName"
-                      value={gender}
-                      checked={values.genderName === gender}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                    />
-                    <Label htmlFor={gender} className="ml-2">
-                      {gender}
-                    </Label>
-                  </div>
-                ))}
+        }) => {
+          const onRoleNameChanged = (role) => {
+            const updatedRoleName = values.roleName.includes(role)
+              ? values.roleName.filter((r) => r !== role) // Remove role if already selected
+              : [...values.roleName, role]; // Add role if not selected
+
+            setFieldValue("roleName", updatedRoleName);
+            
+            if (values.roleName.includes(role)) {
+              setRolesPlaceHolder(
+                values.roleName.filter((r) => r !== role).join(", ") || "Select Roles"
+              );
+            } else {
+              setRolesPlaceHolder([...values.roleName, role].join(", "));
+            }
+          };
+          return (
+            <Form className="flex flex-col gap-5 pb-8">
+              <div className="px-5">
+                <ProfilePictureUpload
+                  setProfileImageFile={setProfileImageFile}
+                />
               </div>
-              {errors.gender && touched.gender && (
-                <small className="text-red-600">{errors.gender}</small>
-              )}
-            </div>
-            <div>
-              <FloatingLabel
-                type="email"
-                name="email"
-                id="email"
-                autoComplete="off"
-                value={values.email}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                variant="outlined"
-                label="Email"
-                color={errors.email && touched.email ? "error" : "default"}
-              />
-              {errors.email && touched.email && (
-                <small className="text-red-600">{errors.email}</small>
-              )}
-            </div>
-            <div className="relative">
-              <FloatingLabel
-                name="password"
-                id="password"
-                type={!toggleEye ? "password" : "text"}
-                value={values.password}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                variant="outlined"
-                label="Password"
-                color={
-                  errors.password && touched.password ? "error" : "default"
-                }
-              />
-              {toggleEye ? (
-                <IoEyeSharp
-                  className="absolute top-3 right-2 text-xl hover:cursor-pointer"
-                  onClick={handleToggleEye}
-                />
-              ) : (
-                <IoEyeOffSharp
-                  className="absolute top-3 right-2 text-xl hover:cursor-pointer"
-                  onClick={handleToggleEye}
-                />
-              )}
-              {errors.password && touched.password && (
-                <small className="text-red-600">{errors.password}</small>
-              )}
-            </div>
-            <div className="relative">
-              <FloatingLabel
-                name="confirmPassword"
-                id="confirmPassword"
-                type={!toggleEye ? "password" : "text"}
-                value={values.confirmPassword}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                variant="outlined"
-                label="Confirm Password"
-                color={
-                  errors.confirmPassword && touched.confirmPassword
-                    ? "error"
-                    : "default"
-                }
-              />
-              {toggleEye ? (
-                <IoEyeSharp
-                  className="absolute top-3 right-2 text-xl hover:cursor-pointer"
-                  onClick={handleToggleEye}
-                />
-              ) : (
-                <IoEyeOffSharp
-                  className="absolute top-3 right-2 text-xl hover:cursor-pointer"
-                  onClick={handleToggleEye}
-                />
-              )}
-              {errors.confirmPassword && touched.confirmPassword && (
-                <small className="text-red-600">{errors.confirmPassword}</small>
-              )}
-            </div>
-            <div>
-              <FloatingLabel
-                id="phoneNumber"
-                name="phoneNumber"
-                type="text"
-                autoComplete="off"
-                value={values.phoneNumber}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                variant="outlined"
-                label="Phone Number"
-                color={
-                  errors.phoneNumber && touched.phoneNumber
-                    ? "error"
-                    : "default"
-                }
-              />
-              {errors.phoneNumber && touched.phoneNumber && (
-                <small className="text-red-600">{errors.phoneNumber}</small>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="roles">Roles</Label>
-              <div>
-                {Object.values(ROLES).map((role) => (
-                  <div key={role} className="flex items-center">
-                    <Checkbox
-                      id={role}
-                      name="roleName"
-                      value={role}
-                      checked={roleName.includes(role)}
-                      onChange={() => onRoleNameChanged(role)}
-                    />
-                    <Label htmlFor={role} className="ml-2">
-                      {role}
-                    </Label>
-                  </div>
-                ))}
+              <div className="flex justify-center items-center gap-3">
+                <div className="w-10 h-[1px] bg-gray-600"></div>
+                <p className="whitespace-nowrap dark:text-gray-200">
+                  User Information
+                </p>
+                <div className="w-full h-[1px] bg-gray-600"></div>
               </div>
-            </div>
-            <div>
-              <Label htmlFor="image">Upload Image</Label>
-              <input
-                type="file"
-                id="image"
-                name="image"
-                accept="image/*"
-                onChange={(event) => {
-                  setFieldValue("image", event.currentTarget.files[0]); // Set the image in Formik
-                }}
-                onBlur={handleBlur}
-              />
-              {errors.image && touched.image && (
-                <small className="text-red-600">{errors.image}</small>
-              )}
-            </div>
-            <div className="flex gap-4">
-              <Button
-                className="bg-transparent ring-1 ring-offset-primary text-primary"
-                onClick={handleBtnBackClicked}
-              >
-                Back
-              </Button>
-              <Button
-                type="submit"
-                className="bg-primary"
-                title="Save"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Spinner color="purple" aria-label="loading" size="xs" />
-                ) : (
-                  "Save"
-                )}
-              </Button>
-            </div>
-          </Form>
-        )}
+              <div className="grid grid-cols-2 grid-rows-3 gap-x-10 gap-y-5 px-5">
+                <div>
+                  <Label className="flex gap-2 mb-2">
+                    <TbUser />
+                    First Name <span className="text-red-600">*</span>
+                  </Label>
+                  <TextInput
+                    style={{
+                      backgroundColor: mode === "dark" ? "#1f2937" : "",
+                      color: mode === "dark" ? "white" : "",
+                    }}
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    autoComplete="off"
+                    value={values.firstName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    color={
+                      errors.firstName && touched.firstName
+                        ? "failure"
+                        : "default"
+                    }
+                  />
+                  {errors.firstName && touched.firstName && (
+                    <small className="text-red-600">{errors.firstName}</small>
+                  )}
+                </div>
+                <div>
+                  <Label className="flex gap-2 mb-2">
+                    <TbUser />
+                    Last Name <span className="text-red-600">*</span>
+                  </Label>
+                  <TextInput
+                    style={{
+                      backgroundColor: mode === "dark" ? "#1f2937" : "",
+                      color: mode === "dark" ? "white" : "",
+                    }}
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    autoComplete="off"
+                    value={values.lastName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    color={
+                      errors.lastName && touched.lastName
+                        ? "failure"
+                        : "default"
+                    }
+                  />
+                  {errors.lastName && touched.lastName && (
+                    <small className="text-red-600">{errors.lastName}</small>
+                  )}
+                </div>
+                <div>
+                  <Label className="flex gap-2 mb-2">
+                    <TbUser />
+                    Full Name <span className="text-red-600">*</span>
+                  </Label>
+                  <TextInput
+                    style={{
+                      backgroundColor: mode === "dark" ? "#1f2937" : "",
+                      color: mode === "dark" ? "white" : "",
+                    }}
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    autoComplete="off"
+                    value={values.fullName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    color={
+                      errors.fullName && touched.fullName
+                        ? "failure"
+                        : "default"
+                    }
+                  />
+                  {errors.fullName && touched.fullName && (
+                    <small className="text-red-600">{errors.fullName}</small>
+                  )}
+                </div>
+                <div>
+                  <Label className="flex gap-2 mb-2">
+                    <LuCalendarDays />
+                    Date of Birth <span className="text-red-600">*</span>
+                  </Label>
+                  <Datepicker
+                    theme={customTheme}
+                    showTodayButton={false}
+                    onChange={(date) => {
+                      const newDate = new Date(date);
+                      newDate.setDate(newDate.getDate() + 1);
+                      setFieldValue("dateOfBirth", newDate);
+                    }}
+                    style={{
+                      border:
+                        errors.dateOfBirth && touched.dateOfBirth
+                          ? "0.0625rem solid red"
+                          : "",
+                      height: "2.6rem",
+                    }}
+                  />
+                  {errors.dateOfBirth && touched.dateOfBirth && (
+                    <small className="text-red-600">{errors.dateOfBirth}</small>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="genderName">Gender</Label>
+                  <div className="flex gap-4">
+                    {Object.values(GENDERS).map((gender) => (
+                      <div key={gender} className="flex items-center">
+                        <input
+                          style={{
+                            backgroundColor: mode === "dark" ? "#1f2937" : "",
+                            color: mode === "dark" ? "white" : "",
+                          }}
+                          type="radio"
+                          id={gender}
+                          name="genderName"
+                          value={gender}
+                          checked={values.genderName === gender}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <Label htmlFor={gender} className="ml-2">
+                          {gender}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                  {errors.gender && touched.gender && (
+                    <small className="text-red-600">{errors.gender}</small>
+                  )}
+                </div>
+                <div>
+                  <Label className="flex gap-2 mb-2">
+                    <IoCallOutline />
+                    Phone Number <span className="text-red-600">*</span>
+                  </Label>
+                  <TextInput
+                    style={{
+                      backgroundColor: mode === "dark" ? "#1f2937" : "",
+                      color: mode === "dark" ? "white" : "",
+                    }}
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    type="text"
+                    autoComplete="off"
+                    value={values.phoneNumber}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    color={
+                      errors.phoneNumber && touched.phoneNumber
+                        ? "failure"
+                        : "default"
+                    }
+                  />
+                  {errors.phoneNumber && touched.phoneNumber && (
+                    <small className="text-red-600">{errors.phoneNumber}</small>
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-center items-center gap-3">
+                <div className="w-10 h-[1px] bg-gray-600"></div>
+                <p className="whitespace-nowrap dark:text-gray-200">
+                  User Account
+                </p>
+                <div className="w-full h-[1px] bg-gray-600"></div>
+              </div>
+
+              <div className="grid grid-cols-2 grid-rows-2 gap-x-10 gap-y-5 px-5">
+                <div>
+                  <Label className="flex gap-2 mb-2">
+                    <IoMailOutline />
+                    Email <span className="text-red-600">*</span>
+                  </Label>
+                  <TextInput
+                    style={{
+                      backgroundColor: mode === "dark" ? "#1f2937" : "",
+                      color: mode === "dark" ? "white" : "",
+                    }}
+                    type="email"
+                    name="email"
+                    id="email"
+                    autoComplete="off"
+                    value={values.email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    color={
+                      errors.email && touched.email ? "failure" : "default"
+                    }
+                  />
+                  {errors.email && touched.email && (
+                    <small className="text-red-600">{errors.email}</small>
+                  )}
+                </div>
+                <div className="relative" ref={dropdownRef}>
+                  <Label htmlFor="roles" className="flex gap-2 mb-2">
+                    <GrUserAdmin />
+                    Roles <span className="text-red-600">*</span>
+                  </Label>
+                  <div
+                    onClick={handleToggleRoleCbo}
+                    className=" flex justify-between text-sm cursor-pointer dark:bg-gray-800 items-center border border-gray-500 dark:border-gray-500 px-2 py-[0.60rem] rounded-lg text-gray-500"
+                  >
+                    {rolesPlaceHolder} <IoIosArrowDown className="text-xl" />
+                  </div>
+                  <div
+                    className={`w-full border border-gray-300 p-2 rounded-lg mt-2 absolute z-50 bg-gray-50 dark:bg-gray-800 ${
+                      cboRolesToggle ? "flex" : "hidden"
+                    } flex-col gap-3`}
+                  >
+                    {Object.values(ROLES).map((role) => (
+                      <div key={role} className="flex items-center gap-2">
+                        <Checkbox
+                          id={role}
+                          name="roleName"
+                          value={role}
+                          checked={values.roleName.includes(role)}
+                          onChange={() => onRoleNameChanged(role)}
+                        />
+                        <Label htmlFor={role} className="ml-2">
+                          {role}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                  {errors.roleName && (
+                    <small className="text-red-600">{errors.roleName}</small>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <Label className="flex gap-2 mb-2">
+                    <RiLockPasswordLine />
+                    Password <span className="text-red-600">*</span>
+                  </Label>
+                  <TextInput
+                    style={{
+                      backgroundColor: mode === "dark" ? "#1f2937" : "",
+                      color: mode === "dark" ? "white" : "",
+                    }}
+                    name="password"
+                    id="password"
+                    type={!toggleEye ? "password" : "text"}
+                    value={values.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    color={
+                      errors.password && touched.password
+                        ? "failure"
+                        : "default"
+                    }
+                  />
+                  {toggleEye ? (
+                    <IoEyeSharp
+                      className="absolute top-[2.4rem] right-2 text-xl hover:cursor-pointer dark:text-gray-100"
+                      onClick={handleToggleEye}
+                    />
+                  ) : (
+                    <IoEyeOffSharp
+                      className="absolute top-[2.4rem] right-2 text-xl hover:cursor-pointer dark:text-gray-100"
+                      onClick={handleToggleEye}
+                    />
+                  )}
+                  {errors.password && touched.password && (
+                    <small className="text-red-600">{errors.password}</small>
+                  )}
+                </div>
+                <div className="relative">
+                  <Label className="flex gap-2 mb-2">
+                    <RiLockPasswordLine />
+                    Confirm Password <span className="text-red-600">*</span>
+                  </Label>
+                  <TextInput
+                    style={{
+                      backgroundColor: mode === "dark" ? "#1f2937" : "",
+                      color: mode === "dark" ? "white" : "",
+                      color: mode === "dark" ? "white" : "",
+                    }}
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    type={!toggleEye ? "password" : "text"}
+                    value={values.confirmPassword}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    color={
+                      errors.confirmPassword && touched.confirmPassword
+                        ? "failure"
+                        : "default"
+                    }
+                  />
+                  {toggleEye ? (
+                    <IoEyeSharp
+                      className="absolute top-[2.4rem] right-2 text-xl hover:cursor-pointer dark:text-gray-100"
+                      onClick={handleToggleEye}
+                    />
+                  ) : (
+                    <IoEyeOffSharp
+                      className="absolute top-[2.4rem] right-2 text-xl hover:cursor-pointer dark:text-gray-100"
+                      onClick={handleToggleEye}
+                    />
+                  )}
+                  {errors.confirmPassword && touched.confirmPassword && (
+                    <small className="text-red-600">
+                      {errors.confirmPassword}
+                    </small>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-4 px-5">
+                <Button
+                  className="bg-transparent focus:ring-0 border border-primary text-primary dark:text-gray-50"
+                  onClick={handleBtnBackClicked}
+                >
+                  Back
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-primary hover:bg-primary-hover focus:ring-0 w-20"
+                  title="Save"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Spinner color="purple" aria-label="loading" size="xs" />
+                  ) : (
+                    "Save"
+                  )}
+                </Button>
+              </div>
+            </Form>
+          );
+        }}
       </Formik>
     </>
   );

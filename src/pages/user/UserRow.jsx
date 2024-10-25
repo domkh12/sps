@@ -17,7 +17,6 @@ import {
   TextInput,
   Tooltip,
 } from "flowbite-react";
-import AvartarCustom from "../../components/util/AvartarCustom";
 import {
   getContrastingTextColor,
   stringToColor,
@@ -26,12 +25,12 @@ import { FaEdit } from "react-icons/fa";
 import { BsTrash3Fill } from "react-icons/bs";
 import { toast } from "react-toastify";
 import DeleteConfirmComponent from "../../components/DeleteConfirmComponent";
+import AvartarCustom from "./components/AvartarCustom";
 
 function UserRow({ userId }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const user = useSelector((state) => selectUserById(state, userId));
-
+  const user = useSelector((state) => selectUserById(state, userId));  
   const [deleteUser, { isLoading, isSuccess, isError, error }] =
     useDeleteUserMutation();
 
@@ -89,12 +88,20 @@ function UserRow({ userId }) {
       <TableCell className="p-4">
         <Checkbox />
       </TableCell>
-      <TableCell className="flex justify-start items-center gap-2">
-        <AvartarCustom
-          placeholderInitials={firstLetterOfFullName}
-          bgColor={avatarColor}
-          textColor={textColor}
-        />
+      <TableCell className="flex justify-start items-center gap-2 underline underline-offset-2 cursor-pointer">
+        {user.profileImage ? (
+          <img
+            src={user.profileImage}
+            className="w-10 h-10 object-cover rounded-full"
+          />
+        ) : (
+          <AvartarCustom
+            placeholderInitials={firstLetterOfFullName}
+            bgColor={avatarColor}
+            textColor={textColor}
+          />
+        )}
+
         {user.fullName ? user.fullName : "N/A"}
       </TableCell>
       <TableCell>{user.email ? user.email : "N/A"}</TableCell>
@@ -105,7 +112,10 @@ function UserRow({ userId }) {
       <TableCell>{createdAtResult ? createdAtResult : "N/A"}</TableCell>
       <TableCell className="flex gap-2">
         <Tooltip content="Edit" trigger="hover">
-          <Button onClick={handleEdit} className="bg-primary hover:bg-primary-hover ring-transparent">
+          <Button
+            onClick={handleEdit}
+            className="bg-primary hover:bg-primary-hover ring-transparent"
+          >
             <FaEdit />
           </Button>
         </Tooltip>
