@@ -107,11 +107,14 @@ function UserRow({ userId }) {
       </TableCell>
       <TableCell>{user.email ? user.email : "N/A"}</TableCell>
       <TableCell>{user.phoneNumber ? user.phoneNumber : "N/A"}</TableCell>
-      <TableCell className="flex justify-start items-center gap-2">
+      <TableCell className="">
+        <div className="flex gap-2">
         {userRolesString ? userRolesString : "N/A"}
+        </div>
       </TableCell>
       <TableCell>{createdAtResult ? createdAtResult : "N/A"}</TableCell>
-      <TableCell className="flex gap-2">
+      <TableCell >
+        <div className="flex gap-2">
         <Tooltip content="Edit" trigger="hover">
           <Button
             onClick={handleEdit}
@@ -125,6 +128,7 @@ function UserRow({ userId }) {
             <BsTrash3Fill />
           </Button>
         </Tooltip>
+        </div>
         <DeleteConfirmComponent
           isOpen={open}
           onClose={handleCloseModal}
