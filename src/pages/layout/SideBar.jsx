@@ -76,6 +76,16 @@ function SideBar() {
 
         <Sidebar.Item
           as={NavLink}
+          to="/dash/users"
+          icon={FaUsers}
+          className={`${isCollapsed && window.innerWidth > 768 ? "grid" : ""}`}
+          active={location.pathname === "/dash/users"}
+        >
+          {!(isCollapsed && window.innerWidth > 768) && "Users"}          
+        </Sidebar.Item>
+
+        <Sidebar.Item
+          as={NavLink}
           to="/admin/message"
           icon={TbMessageFilled}
           className={`${isCollapsed && window.innerWidth > 768 ? "grid" : ""}`}

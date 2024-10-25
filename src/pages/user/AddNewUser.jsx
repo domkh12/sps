@@ -498,8 +498,7 @@ function AddNewUser() {
                   <TextInput
                     style={{
                       backgroundColor: mode === "dark" ? "#1f2937" : "",
-                      color: mode === "dark" ? "white" : "",
-                      color: mode === "dark" ? "white" : "",
+                      color: mode === "dark" ? "white" : "",                    
                     }}
                     name="confirmPassword"
                     id="confirmPassword"
