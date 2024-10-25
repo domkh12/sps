@@ -30,7 +30,7 @@ import AvartarCustom from "./components/AvartarCustom";
 function UserRow({ userId }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const user = useSelector((state) => selectUserById(state, userId));  
+  const user = useSelector((state) => selectUserById(state, userId));
   const [deleteUser, { isLoading, isSuccess, isError, error }] =
     useDeleteUserMutation();
 
@@ -91,8 +91,9 @@ function UserRow({ userId }) {
       <TableCell className="flex justify-start items-center gap-2 underline underline-offset-2 cursor-pointer">
         {user.profileImage ? (
           <img
-            src="https://www.sps-api-npic.site/file/915d66e6-4df5-4702-a74c-e8c079e2a224.svg"
-            className="w-10 h-10 object-cover rounded-full"
+            src={user.profileImage}
+            alt={user.profileImage}
+            className="w-10 h-10 rounded-full"
           />
         ) : (
           <AvartarCustom
