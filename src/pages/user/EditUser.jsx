@@ -5,8 +5,7 @@ import { selectUserById } from "../../redux/feature/users/userApiSlice";
 import EditUserForm from "./EditUserForm";
 
 function EditUser() {
-  const { id } = useParams();
-
+  const { id } = useParams();  
   const user = useSelector((state) => selectUserById(state, id));
   console.log("user", user);
   if (!user) {

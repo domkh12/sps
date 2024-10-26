@@ -6,7 +6,7 @@ import { userApiSlice } from "../../redux/feature/users/userApiSlice";
 function Prefetch() {
   useEffect(() => {
     console.log("subscribing...");
-    const users = store.dispatch(userApiSlice.endpoints.getUsers.initiate());
+    const users = store.dispatch(userApiSlice.endpoints.getUsers.initiate());    
 
     return () => {
       users.unsubscribe();

@@ -8,16 +8,19 @@ const initialState = usersAdapter.getInitialState();
 export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUsers: builder.query({
-      query: () => "/users",
+      query: () => `/users`,
       validateStatus: (response, result) => {
         return response.status === 200 && !result.isError;
       },
       transformResponse: (responseData) => {
-        const loadedUsers = responseData.map((user) => {
+        const loadedUsers = responseData.content.map((user) => {
           user.id = user.uuid;
           return user;
         });
-        return usersAdapter.setAll(initialState, loadedUsers);
+        return {
+          ...usersAdapter.setAll(initialState, loadedUsers),
+          totalPages: responseData.page.totalPages,
+        };
       },
       providesTags: (result, error, arg) => {
         if (result?.ids) {
@@ -58,6 +61,38 @@ export const userApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
     }),
+    paginationUser: builder.mutation({
+      query: ({ pageNo, pageSize = 20 }) => ({
+        url: `/users?pageNo=${pageNo}&pageSize=${pageSize}`,
+        method: "GET",
+      }),
+      transformResponse: (responseData) => {
+        const loadedUsers = responseData.content.map((user) => ({
+          ...user,
+          id: user.uuid,
+        }));
+        return { users: loadedUsers, totalPages: responseData.page.totalPages };
+      },
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const { users: newUsers } = data;
+
+          // Replace existing data with the new paginated data
+          dispatch(
+            userApiSlice.util.updateQueryData(
+              "getUsers",
+              undefined,
+              (draft) => {
+                usersAdapter.setAll(draft, newUsers);
+              }
+            )
+          );
+        } catch (error) {
+          console.error("Failed to fetch paginated users:", error);
+        }
+      },
+    }),
   }),
 });
 
@@ -66,11 +101,11 @@ export const {
   useAddNewUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,
+  usePaginationUserMutation,
 } = userApiSlice;
 
 // return the query result object
 export const selectUserResult = userApiSlice.endpoints.getUsers.select();
-
 // create momorized selector
 const selectUserData = createSelector(
   selectUserResult,

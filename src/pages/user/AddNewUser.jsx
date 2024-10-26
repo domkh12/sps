@@ -6,7 +6,6 @@ import {
   Button,
   Checkbox,
   Datepicker,
-  Flowbite,
   Label,
   Spinner,
   TextInput,
@@ -17,8 +16,6 @@ import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import {
   IoCallOutline,
-  IoEyeOffSharp,
-  IoEyeSharp,
   IoMailOutline,
 } from "react-icons/io5";
 import { GENDERS } from "../../config/genders";
@@ -26,7 +23,7 @@ import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadIm
 import ProfilePictureUpload from "./components/ProfilePictureUpload";
 import { GrUserAdmin } from "react-icons/gr";
 import { IoIosArrowDown } from "react-icons/io";
-import { TbUser } from "react-icons/tb";
+import { TbEye, TbEyeClosed, TbUser } from "react-icons/tb";
 import { LuCalendarDays } from "react-icons/lu";
 import { RiLockPasswordLine } from "react-icons/ri";
 
@@ -319,9 +316,9 @@ function AddNewUser() {
                     theme={customTheme}
                     showTodayButton={false}
                     onChange={(date) => {
-                      const newDate = new Date(date);
-                      newDate.setDate(newDate.getDate() + 1);
-                      setFieldValue("dateOfBirth", newDate);
+                      const newDate = new Date(date);                        
+                      newDate.setDate(newDate.getDate() + 1);                                          
+                      setFieldValue("dateOfBirth", newDate.toISOString().split('T')[0]);
                     }}
                     style={{
                       backgroundColor: mode === "dark" ? "#1f2937" : "",
@@ -330,7 +327,7 @@ function AddNewUser() {
                           ? "0.0625rem solid red"
                           : mode === "dark"
                           ? "0.0625rem solid #6b7280"
-                          : "0.0625rem solid #374151",
+                          : "0.0625rem solid #6b7280",
                       height: "2.7rem",
                     }}
                   />
@@ -494,12 +491,12 @@ function AddNewUser() {
                     }
                   />
                   {toggleEye ? (
-                    <IoEyeSharp
+                    <TbEye
                       className="absolute top-[2.4rem] right-2 text-xl hover:cursor-pointer dark:text-gray-100"
                       onClick={handleToggleEye}
                     />
                   ) : (
-                    <IoEyeOffSharp
+                    <TbEyeClosed
                       className="absolute top-[2.4rem] right-2 text-xl hover:cursor-pointer dark:text-gray-100"
                       onClick={handleToggleEye}
                     />
@@ -534,12 +531,12 @@ function AddNewUser() {
                     }
                   />
                   {toggleEye ? (
-                    <IoEyeSharp
+                    <TbEye
                       className="absolute top-[2.4rem] right-2 text-xl hover:cursor-pointer dark:text-gray-100"
                       onClick={handleToggleEye}
                     />
                   ) : (
-                    <IoEyeOffSharp
+                    <TbEyeClosed
                       className="absolute top-[2.4rem] right-2 text-xl hover:cursor-pointer dark:text-gray-100"
                       onClick={handleToggleEye}
                     />

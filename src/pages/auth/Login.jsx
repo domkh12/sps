@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import { IoEyeOffSharp, IoEyeSharp } from "react-icons/io5";
+import { TbEye, TbEyeClosed } from "react-icons/tb";
 
 export default function Login() {
   const userRef = useRef();
@@ -175,12 +176,12 @@ export default function Login() {
                   label="Password"
                 />
                 {toggleEye ? (
-                  <IoEyeSharp
+                  <TbEye
                     className="absolute top-3 right-2 text-xl hover:cursor-pointer"
                     onClick={handleToggleEye}
                   />
                 ) : (
-                  <IoEyeOffSharp
+                  <TbEyeClosed
                     className="absolute top-3 right-2 text-xl hover:cursor-pointer"
                     onClick={handleToggleEye}
                   />

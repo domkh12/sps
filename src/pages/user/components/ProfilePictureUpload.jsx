@@ -3,8 +3,8 @@ import { FaCamera } from "react-icons/fa";
 import userPlaceHolder from "/images/userPlaceHolder.svg";
 import { Button, Spinner } from "flowbite-react";
 
-function ProfilePictureUpload({ setProfileImageFile }) {
-  const [image, setImage] = useState(userPlaceHolder);
+function ProfilePictureUpload({ setProfileImageFile, imageUri }) {
+  const [image, setImage] = useState(imageUri || userPlaceHolder);
   const [uploading, setUploading] = useState(false);
   const [alert, setAlert] = useState("");
 
@@ -26,7 +26,7 @@ function ProfilePictureUpload({ setProfileImageFile }) {
       reader.onloadend = () => {
         setUploading(true);
         setImage(reader.result);
-        setProfileImageFile(files[0]);
+        setProfileImageFile(files[0]);        
 
         setTimeout(() => {
           setUploading(false);

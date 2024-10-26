@@ -6,15 +6,12 @@ import {
 } from "../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
 import {
-  Avatar,
   Badge,
   Button,
   Checkbox,
-  Label,
-  Popover,
   TableCell,
   TableRow,
-  TextInput,
+  ToggleSwitch,
   Tooltip,
 } from "flowbite-react";
 import {
@@ -30,7 +27,12 @@ import AvartarCustom from "./components/AvartarCustom";
 function UserRow({ userId }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const user = useSelector((state) => selectUserById(state, userId));
+
+  const user = useSelector((state) =>
+    selectUserById(state, userId)
+  );
+  
+  const [toggleDisabled, setToggleDisabled] = useState(false);
   const [deleteUser, { isLoading, isSuccess, isError, error }] =
     useDeleteUserMutation();
 
@@ -88,12 +90,12 @@ function UserRow({ userId }) {
       <TableCell className="p-4">
         <Checkbox />
       </TableCell>
-      <TableCell className="flex justify-start items-center gap-2 underline underline-offset-2 cursor-pointer">
+      <TableCell className="flex justify-start items-center gap-2 underline underline-offset-2 cursor-pointer text-nowrap text-primary">
         {user.profileImage ? (
           <img
             src={user.profileImage}
-            alt={user.profileImage}
-            className="w-10 h-10 rounded-full"
+            alt={user.fullName}
+            className="w-10 h-10 rounded-full object-cover"
           />
         ) : (
           <AvartarCustom
@@ -109,25 +111,40 @@ function UserRow({ userId }) {
       <TableCell>{user.phoneNumber ? user.phoneNumber : "N/A"}</TableCell>
       <TableCell className="">
         <div className="flex gap-2">
-        {userRolesString ? userRolesString : "N/A"}
+          {userRolesString ? userRolesString : "N/A"}
         </div>
       </TableCell>
       <TableCell>{createdAtResult ? createdAtResult : "N/A"}</TableCell>
-      <TableCell >
+      <TableCell>
+        <ToggleSwitch
+          checked={toggleDisabled}
+          onChange={() => setToggleDisabled(!toggleDisabled)}
+          color="green"
+          theme={{
+            toggle: {
+              base: "relative rounded-full border after:absolute after:rounded-full after:bg-white after:transition-all group-focus:ring-0 group-focus:ring-cyan-500/25",
+            },
+          }}
+        />
+      </TableCell>
+      <TableCell>
         <div className="flex gap-2">
-        <Tooltip content="Edit" trigger="hover">
-          <Button
-            onClick={handleEdit}
-            className="bg-primary hover:bg-primary-hover ring-transparent"
-          >
-            <FaEdit />
-          </Button>
-        </Tooltip>
-        <Tooltip content="Delete" trigger="hover">
-          <Button className="bg-red-600" onClick={handleBtnDeleteClicked}>
-            <BsTrash3Fill />
-          </Button>
-        </Tooltip>
+          <Tooltip content="Edit" trigger="hover">
+            <Button
+              onClick={handleEdit}
+              className="bg-primary hover:bg-primary-hover ring-transparent"
+            >
+              <FaEdit />
+            </Button>
+          </Tooltip>
+          <Tooltip content="Delete" trigger="hover">
+            <Button
+              className="bg-red-600 ring-transparent"
+              onClick={handleBtnDeleteClicked}
+            >
+              <BsTrash3Fill />
+            </Button>
+          </Tooltip>
         </div>
         <DeleteConfirmComponent
           isOpen={open}
