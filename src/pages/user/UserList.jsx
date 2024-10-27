@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useGetUsersQuery,
-  usePaginationUserMutation,
+  usePaginationUsersMutation,
+  useSearchUsersMutation,
 } from "../../redux/feature/users/userApiSlice";
-import { Button, Checkbox, Pagination, Table, TextInput } from "flowbite-react";
+import { Button, Checkbox, Pagination, Spinner, Table, TextInput } from "flowbite-react";
 import UserRow from "./UserRow";
 import { useNavigate } from "react-router-dom";
 import { FaPlus, FaSearch } from "react-icons/fa";
 
 function UserList() {
   const navigator = useNavigate();
-  const [pageNo, setPageNo] = useState(1);  
- 
+  const [pageNo, setPageNo] = useState(1);
+  const [search, setSearch] = useState(""); 
+  const [totalPages, setTotalPages] = useState(0); 
+  
   const {
     data: users,
     isLoading,
@@ -19,8 +22,18 @@ function UserList() {
     isError,
     error,
   } = useGetUsersQuery();
-  const [paginationUser, {}] = usePaginationUserMutation();
+
+  const [paginationUsers, {}] = usePaginationUsersMutation();
+  const [searchUsers, { isLoading: isSearching }] = useSearchUsersMutation();
+
+  useEffect(() => {
+    if (isSuccess) {
+      setTotalPages(users.totalPages);
+    }
+  }, [isSuccess]);
+
   let content;
+
 
   if (isLoading) content = <p>Loading...</p>;
 
@@ -29,7 +42,8 @@ function UserList() {
   }
 
   if (isSuccess) {
-    const { ids, totalPages } = users;
+    const { ids } = users;
+
     const tableContent = ids?.length
       ? ids.map((userId) => <UserRow key={userId} userId={userId} />)
       : null;
@@ -37,19 +51,43 @@ function UserList() {
     const handleBtnAddNewClicked = () => {
       navigator("/dash/users/new");
     };
-    const handlePageChange = async (page) => {      
-      setPageNo(page)      
-      await paginationUser({ pageNo: page });
+
+    const handlePageChange = async (page) => {
+      setPageNo(page);
+      await paginationUsers({ pageNo: page });
+    };
+
+    const handleBtnSearch = async () => {
+      if (search.trim()) {
+        const result = await searchUsers({ query: search });
+        if (result.data) {
+          setTotalPages(result.data.totalPages);
+        }
+      } else {
+        const result = await paginationUsers({ pageNo });
+        console.log("result",result)
+        console.log("New totalPages from pagination:", result.data.totalPages); 
+        if (result.data) {
+          setTotalPages(result.data.totalPages);
+        }
+      }
     };
 
     content = (
       <div className="overflow-x-auto p-4 flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <div className="flex gap-2 justify-center items-center">
-            <TextInput placeholder="ID, Name, Email, Phone" />
-            <Button className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10">
-              <FaSearch className="mr-2 sm:mr-0" />
-              <span className="sm:hidden">Search</span>
+            <TextInput
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="ID, Name, Email, Phone"
+            />
+            <Button
+              onClick={handleBtnSearch}
+              className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
+            >
+              {
+                isSearching ? <Spinner color="purple" size="xs"/> : <> <FaSearch className="mr-2 sm:mr-0" /> <span className="sm:hidden">Search</span> </>
+              }
             </Button>
           </div>
 
@@ -78,13 +116,15 @@ function UserList() {
             <Table.Body className="divide-y">{tableContent}</Table.Body>
           </Table>
         </div>
-        <div className="flex justify-center items-center">
-          <Pagination
-            currentPage={pageNo}
-            onPageChange={handlePageChange}
-            totalPages={totalPages}
-          />
-        </div>
+        {totalPages > 0 && (
+          <div className={`flex justify-center items-center`}>
+            <Pagination
+              currentPage={pageNo}
+              onPageChange={handlePageChange}
+              totalPages={totalPages}            
+            />
+          </div>
+        )}
       </div>
     );
   }

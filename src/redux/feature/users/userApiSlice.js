@@ -61,10 +61,9 @@ export const userApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
     }),
-    paginationUser: builder.mutation({
+    paginationUsers: builder.mutation({
       query: ({ pageNo, pageSize = 20 }) => ({
         url: `/users?pageNo=${pageNo}&pageSize=${pageSize}`,
-        method: "GET",
       }),
       transformResponse: (responseData) => {
         const loadedUsers = responseData.content.map((user) => ({
@@ -77,7 +76,6 @@ export const userApiSlice = apiSlice.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
           const { users: newUsers } = data;
-
           // Replace existing data with the new paginated data
           dispatch(
             userApiSlice.util.updateQueryData(
@@ -85,6 +83,40 @@ export const userApiSlice = apiSlice.injectEndpoints({
               undefined,
               (draft) => {
                 usersAdapter.setAll(draft, newUsers);
+              }
+            )
+          );
+        } catch (error) {
+          console.error("Failed to fetch paginated users:", error);
+        }
+      },
+    }),
+    searchUsers: builder.mutation({
+      query: ({ query }) => ({
+        url: `/users/search?q=${query}`,
+      }),
+
+      transformResponse: (responseData) => {
+        console.log(responseData);
+        const loadedUsers = responseData.content.map((user) => ({
+          ...user,
+          id: user.uuid,
+        }));
+        return { users: loadedUsers, totalPages: responseData.page.totalPages };
+      },
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          console.log("data", data);
+          const { users: newUsers, totalPages: newTotalPages } = data;
+        
+          dispatch(
+            userApiSlice.util.updateQueryData(
+              "getUsers",
+              undefined,
+              (draft) => {
+                usersAdapter.setAll(draft, newUsers);
+                draft.totalPages = newTotalPages;
               }
             )
           );
@@ -101,7 +133,8 @@ export const {
   useAddNewUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,
-  usePaginationUserMutation,
+  usePaginationUsersMutation,
+  useSearchUsersMutation,
 } = userApiSlice;
 
 // return the query result object
