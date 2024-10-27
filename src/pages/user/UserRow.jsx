@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import {
-  selectUserById,
-  useDeleteUserMutation,
-} from "../../redux/feature/users/userApiSlice";
+import { selectUserById } from "../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
 import {
   Badge,
@@ -18,42 +15,19 @@ import {
   getContrastingTextColor,
   stringToColor,
 } from "../../redux/feature/utils/colorUtils";
-import { FaEdit } from "react-icons/fa";
-import { BsTrash3Fill } from "react-icons/bs";
-import { toast } from "react-toastify";
-import DeleteConfirmComponent from "../../components/DeleteConfirmComponent";
+import { FaEdit, FaEye } from "react-icons/fa";
 import AvartarCustom from "./components/AvartarCustom";
 
 function UserRow({ userId }) {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
 
-  const user = useSelector((state) =>
-    selectUserById(state, userId)
-  );
-  
+  const user = useSelector((state) => selectUserById(state, userId));
+
   const [toggleDisabled, setToggleDisabled] = useState(false);
-  const [deleteUser, { isLoading, isSuccess, isError, error }] =
-    useDeleteUserMutation();
-
-  useEffect(() => {
-    if (isSuccess) {
-      setOpen(false);
-      toast.success("Delete Successful", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
-    }
-  }, [isSuccess]);
 
   if (user) {
     var handleEdit = () => navigate(`/dash/users/${userId}`);
+    var handleView = () => navigate(`/dash/users/${userId}/view`);
 
     var fullName = user.fullName;
     var firstLetterOfFullName = fullName.substring(0, 1);
@@ -72,18 +46,6 @@ function UserRow({ userId }) {
   } else {
     return null;
   }
-
-  const handleBtnDeleteClicked = () => {
-    setOpen(!open);
-  };
-
-  const handleConfirmDelete = async () => {
-    await deleteUser({ id: userId });
-  };
-
-  const handleCloseModal = () => {
-    setOpen(false);
-  };
 
   return (
     <TableRow>
@@ -137,9 +99,12 @@ function UserRow({ userId }) {
               <FaEdit />
             </Button>
           </Tooltip>
-          
+          <Tooltip content="View" trigger="hover">
+            <Button onClick={handleView} className="bg-secondary hover:bg-secondary-hover ring-transparent">
+              <FaEye />
+            </Button>
+          </Tooltip>
         </div>
-        
       </TableCell>
     </TableRow>
   );

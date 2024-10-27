@@ -12,6 +12,7 @@ import EditUser from "./pages/user/EditUser";
 import UserList from "./pages/user/UserList";
 import AddNewUser from "./pages/user/AddNewUser";
 import Profile from "./pages/dashboard/profile/Profile";
+import ViewUser from "./pages/user/ViewUser";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
               <Route index element={<UserList />} />
               <Route path="new" element={<AddNewUser />} />
               <Route path=":id" element={<EditUser />} />
+              <Route element={<ViewUser />} path=":id/view" />
             </Route>
             <Route path="messages">
               <Route index element={<MessagesList />} />

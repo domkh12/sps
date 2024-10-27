@@ -21,9 +21,8 @@ import { IoIosArrowDown } from "react-icons/io";
 import { ROLES } from "./../../config/roles";
 import * as Yup from "yup";
 import { GENDERS } from "../../config/genders";
-import {
-  useUploadImageMutation,
-} from "../../redux/feature/uploadImage/uploadImageApiSlice";
+import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
+import { BsGenderAmbiguous } from "react-icons/bs";
 
 function EditUserForm({ user }) {
   const navigate = useNavigate();
@@ -309,9 +308,12 @@ function EditUserForm({ user }) {
                     theme={customTheme}
                     showTodayButton={false}
                     onChange={(date) => {
-                      const newDate = new Date(date);                        
-                      newDate.setDate(newDate.getDate() + 1);                                          
-                      setFieldValue("dateOfBirth", newDate.toISOString().split('T')[0]);
+                      const newDate = new Date(date);
+                      newDate.setDate(newDate.getDate() + 1);
+                      setFieldValue(
+                        "dateOfBirth",
+                        newDate.toISOString().split("T")[0]
+                      );
                     }}
                     style={{
                       backgroundColor: mode === "dark" ? "#1f2937" : "",
@@ -329,7 +331,10 @@ function EditUserForm({ user }) {
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="genderName">Gender</Label>
+                  <Label htmlFor="genderName" className="flex gap-2 mb-2">
+                    <BsGenderAmbiguous />
+                    <span>Gender</span>
+                  </Label>
                   <div className="flex gap-4">
                     {Object.values(GENDERS).map((gender) => (
                       <div key={gender} className="flex items-center">
