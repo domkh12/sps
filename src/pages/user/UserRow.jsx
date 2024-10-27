@@ -137,20 +137,9 @@ function UserRow({ userId }) {
               <FaEdit />
             </Button>
           </Tooltip>
-          <Tooltip content="Delete" trigger="hover">
-            <Button
-              className="bg-red-600 ring-transparent"
-              onClick={handleBtnDeleteClicked}
-            >
-              <BsTrash3Fill />
-            </Button>
-          </Tooltip>
+          
         </div>
-        <DeleteConfirmComponent
-          isOpen={open}
-          onClose={handleCloseModal}
-          handleConfirmDelete={handleConfirmDelete}
-        />
+        
       </TableCell>
     </TableRow>
   );

@@ -4,7 +4,14 @@ import {
   usePaginationUsersMutation,
   useSearchUsersMutation,
 } from "../../redux/feature/users/userApiSlice";
-import { Button, Checkbox, Pagination, Spinner, Table, TextInput } from "flowbite-react";
+import {
+  Button,
+  Checkbox,
+  Pagination,
+  Spinner,
+  Table,
+  TextInput,
+} from "flowbite-react";
 import UserRow from "./UserRow";
 import { useNavigate } from "react-router-dom";
 import { FaPlus, FaSearch } from "react-icons/fa";
@@ -12,8 +19,8 @@ import { FaPlus, FaSearch } from "react-icons/fa";
 function UserList() {
   const navigator = useNavigate();
   const [pageNo, setPageNo] = useState(1);
-  const [search, setSearch] = useState(""); 
-  const [totalPages, setTotalPages] = useState(0); 
+  const [search, setSearch] = useState("");
+  const [totalPages, setTotalPages] = useState(0);
   
   const {
     data: users,
@@ -30,10 +37,9 @@ function UserList() {
     if (isSuccess) {
       setTotalPages(users.totalPages);
     }
-  }, [isSuccess]);
+  }, [users]);
 
   let content;
-
 
   if (isLoading) content = <p>Loading...</p>;
 
@@ -60,16 +66,11 @@ function UserList() {
     const handleBtnSearch = async () => {
       if (search.trim()) {
         const result = await searchUsers({ query: search });
-        if (result.data) {
-          setTotalPages(result.data.totalPages);
-        }
+
+        setTotalPages(result.data.totalPages);
       } else {
         const result = await paginationUsers({ pageNo });
-        console.log("result",result)
-        console.log("New totalPages from pagination:", result.data.totalPages); 
-        if (result.data) {
-          setTotalPages(result.data.totalPages);
-        }
+        setTotalPages(result.data.totalPages);
       }
     };
 
@@ -85,9 +86,15 @@ function UserList() {
               onClick={handleBtnSearch}
               className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
             >
-              {
-                isSearching ? <Spinner color="purple" size="xs"/> : <> <FaSearch className="mr-2 sm:mr-0" /> <span className="sm:hidden">Search</span> </>
-              }
+              {isSearching ? (
+                <Spinner color="purple" size="xs" />
+              ) : (
+                <>
+                  {" "}
+                  <FaSearch className="mr-2 sm:mr-0" />{" "}
+                  <span className="sm:hidden">Search</span>{" "}
+                </>
+              )}
             </Button>
           </div>
 
@@ -121,7 +128,7 @@ function UserList() {
             <Pagination
               currentPage={pageNo}
               onPageChange={handlePageChange}
-              totalPages={totalPages}            
+              totalPages={totalPages}
             />
           </div>
         )}
