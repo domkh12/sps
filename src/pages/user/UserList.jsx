@@ -10,18 +10,21 @@ import {
   Pagination,
   Spinner,
   Table,
+  TableCell,
+  TableRow,
   TextInput,
 } from "flowbite-react";
 import UserRow from "./UserRow";
 import { useNavigate } from "react-router-dom";
 import { FaPlus, FaSearch } from "react-icons/fa";
+import UserNotFound from "./components/UserNotFound";
 
 function UserList() {
   const navigator = useNavigate();
   const [pageNo, setPageNo] = useState(1);
   const [search, setSearch] = useState("");
   const [totalPages, setTotalPages] = useState(0);
-  
+
   const {
     data: users,
     isLoading,
@@ -49,11 +52,10 @@ function UserList() {
 
   if (isSuccess) {
     const { ids } = users;
-
+    console.log("users", users);
     const tableContent = ids?.length
       ? ids.map((userId) => <UserRow key={userId} userId={userId} />)
       : null;
-
     const handleBtnAddNewClicked = () => {
       navigator("/dash/users/new");
     };
@@ -65,12 +67,9 @@ function UserList() {
 
     const handleBtnSearch = async () => {
       if (search.trim()) {
-        const result = await searchUsers({ query: search });
-
-        setTotalPages(result.data.totalPages);
+        await searchUsers({ query: search });
       } else {
-        const result = await paginationUsers({ pageNo });
-        setTotalPages(result.data.totalPages);
+        await paginationUsers({ pageNo });
       }
     };
 
@@ -120,7 +119,11 @@ function UserList() {
               <Table.HeadCell>Disabled</Table.HeadCell>
               <Table.HeadCell>Action</Table.HeadCell>
             </Table.Head>
-            <Table.Body className="divide-y">{tableContent}</Table.Body>
+            {tableContent ? (
+              <Table.Body className="divide-y">{tableContent}</Table.Body>
+            ) : (
+              <UserNotFound />
+            )}
           </Table>
         </div>
         {totalPages > 0 && (

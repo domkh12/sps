@@ -3,7 +3,11 @@ import { Button, Card, Label, Modal } from "flowbite-react";
 import { TbUser } from "react-icons/tb";
 import { LuCalendarDays, LuEye } from "react-icons/lu";
 import { BsGenderAmbiguous } from "react-icons/bs";
-import { IoCallOutline } from "react-icons/io5";
+import {
+  IoCallOutline,
+  IoMailOutline,
+  IoReturnDownBackOutline,
+} from "react-icons/io5";
 import userPlaceHolder from "/images/userPlaceHolder.svg";
 import { FaCamera, FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -12,20 +16,24 @@ function ViewDetailUser({ user }) {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
+  const [roles, setRoles] = useState(user.roleNames);
 
   const handleImageClick = () => {
     setSelectedImage(user.profileImage || userPlaceHolder);
     setIsModalOpen(true);
   };
-  console.log("selectedImage", selectedImage);
+
   const handleEdit = () => navigate(`/dash/users/${user.uuid}`);
+  const handleBack = () => navigate(`/dash/users`);
   return (
     <>
-      <h1>User Details</h1>
-      <div className="flex justify-center items-center"> 
-        <Card className="h-full">
+      <h1 className="text-2xl font-medium dark:text-gray-100 p-5">
+        User Details
+      </h1>
+      <div className="grid grid-cols-4 gap-x-5 mx-5 md:grid-cols-1 md:gap-y-5">
+        <Card className="flex justify-center items-center md:col-span-4 ">
           <div
-            className="relative rounded-full w-36 h-36 overflow-hidden mb-5 flex justify-start items-start sm:items-center sm:justify-center"
+            className="relative rounded-full w-36 h-36 overflow-hidden mb-5 flex justify-start items-start sm:items-center sm:justify-center mx-auto"
             onClick={handleImageClick}
           >
             <img
@@ -47,9 +55,45 @@ function ViewDetailUser({ user }) {
               </div>
             </label>
           </div>
+          <Label className="flex gap-2 mb-2 justify-start items-center">
+            <span className="flex gap-2">
+              <TbUser />
+              Username :
+            </span>
+            <span className="text-primary font-medium text-base">
+              {user.fullName}
+            </span>
+          </Label>
+
+          <Label className="flex gap-2 mb-2 justify-start items-center">
+            <span className="flex gap-2">
+              <IoMailOutline />
+              Email :
+            </span>
+            <span className="text-primary font-medium text-base">
+              {user.email}
+            </span>
+          </Label>
+
+          <Label className="flex gap-2 mb-2 justify-start items-center">
+            <span className="flex gap-2">
+              <TbUser />
+              Role :
+            </span>
+            <span className="text-primary font-medium text-base">
+              {roles.join(", ")}
+            </span>
+          </Label>
         </Card>
-        <Card>
-          <div className="flex justify-between items-center">
+        <Card className="col-span-3 relative md:col-span-4"> 
+          <div className= "flex gap-5 absolute top-5 right-5">
+            <Button
+              onClick={handleBack}
+              className="border border-primary text-primary ring-transparent"
+            >
+              <IoReturnDownBackOutline className="mr-2" />
+              <span>Back</span>
+            </Button>
             <Button
               onClick={handleEdit}
               className="bg-primary hover:bg-primary-hover ring-transparent"
@@ -67,14 +111,25 @@ function ViewDetailUser({ user }) {
               </Modal.Body>
             </Modal>
           </div>
-
+        <div className="absolute top-[4.5rem] left-0 w-full">
           <div className="flex justify-center items-center gap-1">
-            <div className="w-4 h-[1px] bg-gray-600"></div>
+            <div className="w-10 h-[0.5px] bg-gray-600"></div>
             <p className="whitespace-nowrap dark:text-gray-200">
               Contact Information
             </p>
-            <div className="w-full h-[1px] bg-gray-600"></div>
+            <div className="w-full h-[0.5px] bg-gray-600"></div>
           </div>
+
+          
+          <Label className="flex gap-2 mb-2 justify-start items-center">
+            <span className="flex gap-2">
+              <IoMailOutline />
+              Email :
+            </span>
+            <span className="text-primary font-medium text-base">
+              {user.email}
+            </span>
+          </Label>
 
           <Label className="flex gap-2 mb-2 justify-start items-center">
             <span className="flex gap-2">
@@ -86,12 +141,14 @@ function ViewDetailUser({ user }) {
             </span>
           </Label>
 
+
+
           <div className="flex justify-center items-center gap-1">
-            <div className="w-4 h-[1px] bg-gray-600"></div>
+            <div className="w-4 h-[0.5px] bg-gray-600"></div>
             <p className="whitespace-nowrap dark:text-gray-200">
               Personal Information
             </p>
-            <div className="w-full h-[1px] bg-gray-600"></div>
+            <div className="w-full h-[0.5px] bg-gray-600"></div>
           </div>
 
           <Label className="flex gap-2 mb-2 justify-start items-center">
@@ -143,6 +200,7 @@ function ViewDetailUser({ user }) {
               {user.gender}
             </span>
           </Label>
+          </div>
         </Card>
       </div>
     </>

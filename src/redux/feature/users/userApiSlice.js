@@ -75,7 +75,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          const { users: newUsers } = data;
+          const { users: newUsers, totalPages: newTotalPages } = data;
           // Replace existing data with the new paginated data
           dispatch(
             userApiSlice.util.updateQueryData(
@@ -83,6 +83,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
               undefined,
               (draft) => {
                 usersAdapter.setAll(draft, newUsers);
+                draft.totalPages = newTotalPages;
               }
             )
           );
@@ -96,8 +97,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         url: `/users/search?q=${query}`,
       }),
 
-      transformResponse: (responseData) => {
-        console.log(responseData);
+      transformResponse: (responseData) => {     
         const loadedUsers = responseData.content.map((user) => ({
           ...user,
           id: user.uuid,

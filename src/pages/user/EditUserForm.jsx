@@ -154,9 +154,9 @@ function EditUserForm({ user }) {
 
   const content = (
     <>
-      <h2 className="text-2xl font-medium dark:text-gray-100 p-5">
+      <h1 className="text-2xl font-medium dark:text-gray-100 p-5">
         Create User
-      </h2>
+      </h1>
       <Formik
         initialValues={{
           firstName: user.firstName,

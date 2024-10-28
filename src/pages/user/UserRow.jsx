@@ -22,7 +22,6 @@ function UserRow({ userId }) {
   const navigate = useNavigate();
 
   const user = useSelector((state) => selectUserById(state, userId));
-
   const [toggleDisabled, setToggleDisabled] = useState(false);
 
   if (user) {
