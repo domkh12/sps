@@ -50,7 +50,7 @@ function ViewDetailUser({ user }) {
       <h1 className="text-2xl font-medium dark:text-gray-100 p-5">
         User Details
       </h1>
-      <div className="flex md:flex-col pb-5 gap-5 mx-5">
+      <div className="flex [@media(max-width:1150px)]:flex-col pb-5 gap-5 mx-5">
         <Card className="flex justify-center items-center grow-0 shrink-0">
           <div
             className="relative rounded-full w-36 h-36 overflow-hidden mb-5 flex justify-start items-start sm:items-center sm:justify-center mx-auto"
@@ -126,7 +126,7 @@ function ViewDetailUser({ user }) {
             </Modal.Body>
           </Modal>
         </Card>
-        <Card className="grow" theme={Cardtheme}>
+        <Card className="grow overflow-auto" theme={Cardtheme}>
           <div className="flex gap-5 justify-end items-center pt-5 px-5">
             <Button
               onClick={handleBack}
@@ -152,7 +152,7 @@ function ViewDetailUser({ user }) {
               <div className="w-full h-[0.5px] bg-gray-600"></div>
             </div>
 
-            <div className="grid grid-cols-2 place-content-stretch px-10 py-5 items-center gap-3">
+            <div className="grid grid-cols-2 [@media(max-width:1150px)]:grid-cols-1 place-content-stretch px-10 py-5 items-center gap-3">
               <Label className="flex gap-2 justify-start items-center text-nowrap">
                 <span className="flex gap-2 text-nowrap">
                   <IoMailOutline />
@@ -182,7 +182,7 @@ function ViewDetailUser({ user }) {
               <div className="w-full h-[0.5px] bg-gray-600"></div>
             </div>
 
-            <div className="grid grid-cols-2 place-content-stretch gap-3 px-10 py-5 items-center">
+            <div className="grid grid-cols-2 [@media(max-width:1150px)]:grid-cols-1 place-content-stretch gap-3 px-10 py-5 items-center">
               <Label className="flex gap-2 justify-start items-center">
                 <span className="flex gap-2 text-nowrap">
                   <TbUser />
@@ -216,7 +216,7 @@ function ViewDetailUser({ user }) {
               <Label className="flex gap-2 justify-start items-center text-nowrap">
                 <span className="flex gap-2 text-nowrap">
                   <LuCalendarDays />
-                  Full Name :
+                  Date of Birth :
                 </span>
                 <span className="text-primary font-medium text-base">
                   {user.dateOfBirth}

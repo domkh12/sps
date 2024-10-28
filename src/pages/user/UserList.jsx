@@ -10,8 +10,6 @@ import {
   Pagination,
   Spinner,
   Table,
-  TableCell,
-  TableRow,
   TextInput,
 } from "flowbite-react";
 import UserRow from "./UserRow";
@@ -52,8 +50,7 @@ function UserList() {
   }
 
   if (isSuccess) {
-    const { ids } = users;
-    console.log("users", users);
+    const { ids } = users;   
     const tableContent = ids?.length
       ? ids.map((userId) => <UserRow key={userId} userId={userId} />)
       : null;
