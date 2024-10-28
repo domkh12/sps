@@ -214,11 +214,16 @@ function EditUserForm({ user }) {
             );
           };
 
+          const handleImageChange = (file) => {
+            setProfileImageFile(file);
+            setIsDataChanged(checkDataChanged({ ...values, profileImage: file })); // Check if data has changed
+          };
+
           return (
             <Form className="flex flex-col gap-5 pb-8">
               <div className="px-5">
                 <ProfilePictureUpload
-                  setProfileImageFile={setProfileImageFile}
+                  setProfileImageFile={handleImageChange}
                   imageUri={user.profileImage}
                 />
               </div>
