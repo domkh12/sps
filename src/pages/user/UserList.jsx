@@ -16,8 +16,9 @@ import {
 } from "flowbite-react";
 import UserRow from "./UserRow";
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaSearch } from "react-icons/fa";
+import { FaPlus, FaSearch, FaTimes } from "react-icons/fa";
 import UserNotFound from "./components/UserNotFound";
+import { IoClose } from "react-icons/io5";
 
 function UserList() {
   const navigator = useNavigate();
@@ -74,14 +75,28 @@ function UserList() {
       }
     };
 
+    const handleClearSearch = async() => {
+      setSearch("");
+      await paginationUsers({ pageNo });
+    };
+
     content = (
       <div className="overflow-x-auto p-4 flex flex-col gap-4">
         <div className="flex justify-between items-center">
-          <div className="flex gap-2 justify-center items-center">
+          <div className="flex gap-2 justify-center items-center relative">
             <TextInput
+              value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="ID, Name, Email, Phone"
             />
+            {search && (
+              <button
+                onClick={handleClearSearch}
+                className="absolute right-32 top-5 transform -translate-y-1/2"
+              >
+                <IoClose />
+              </button>
+            )}
             <Button
               onClick={handleBtnSearch}
               className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"

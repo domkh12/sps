@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Card, Label, Modal } from "flowbite-react";
+import { Button, Card, Label, Modal, ModalHeader } from "flowbite-react";
 import { TbUser } from "react-icons/tb";
 import { LuCalendarDays, LuEye } from "react-icons/lu";
 import { BsGenderAmbiguous } from "react-icons/bs";
@@ -25,13 +25,33 @@ function ViewDetailUser({ user }) {
 
   const handleEdit = () => navigate(`/dash/users/${user.uuid}`);
   const handleBack = () => navigate(`/dash/users`);
+
+  const Cardtheme = {
+    root: {
+      base: "flex rounded-lg border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800",
+      children: "flex h-full flex-col justify-center gap-4 p-0", // Changed p-6 to p-0
+      horizontal: {
+        off: "flex-col",
+        on: "flex-col md:max-w-xl md:flex-row",
+      },
+      href: "hover:bg-gray-100 dark:hover:bg-gray-700",
+    },
+    img: {
+      base: "",
+      horizontal: {
+        off: "rounded-t-lg",
+        on: "h-96 w-full rounded-t-lg object-cover md:h-auto md:w-48 md:rounded-none md:rounded-l-lg",
+      },
+    },
+  };
+
   return (
     <>
       <h1 className="text-2xl font-medium dark:text-gray-100 p-5">
         User Details
       </h1>
-      <div className="grid grid-cols-4 md:grid-rows-2 pb-5 gap-x-5 mx-5 md:grid-cols-1 md:gap-y-5">
-        <Card className="flex justify-center items-center md:col-span-4 ">
+      <div className="flex md:flex-col pb-5 gap-5 mx-5">
+        <Card className="flex justify-center items-center grow-0 shrink-0">
           <div
             className="relative rounded-full w-36 h-36 overflow-hidden mb-5 flex justify-start items-start sm:items-center sm:justify-center mx-auto"
             onClick={handleImageClick}
@@ -56,7 +76,7 @@ function ViewDetailUser({ user }) {
             </label>
           </div>
           <Label className="flex gap-2 mb-2 justify-start items-center">
-            <span className="flex gap-2">
+            <span className="flex gap-2 text-nowrap">
               <TbUser />
               Username :
             </span>
@@ -66,7 +86,7 @@ function ViewDetailUser({ user }) {
           </Label>
 
           <Label className="flex gap-2 mb-2 justify-start items-center">
-            <span className="flex gap-2">
+            <span className="flex gap-2 text-nowrap">
               <IoMailOutline />
               Email :
             </span>
@@ -76,7 +96,7 @@ function ViewDetailUser({ user }) {
           </Label>
 
           <Label className="flex gap-2 mb-2 justify-start items-center">
-            <span className="flex gap-2">
+            <span className="flex gap-2 text-nowrap">
               <TbUser />
               Role :
             </span>
@@ -84,9 +104,30 @@ function ViewDetailUser({ user }) {
               {roles.join(", ")}
             </span>
           </Label>
+          <Modal
+            show={isModalOpen}
+            onClick={() => setIsModalOpen(false)}
+            popup
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Modal.Header />
+            <Modal.Body>
+              <div onClick={(e) => e.stopPropagation()}>
+                <img
+                  src={selectedImage}
+                  alt="Preview"
+                  className="w-full h-auto"
+                />
+              </div>
+            </Modal.Body>
+          </Modal>
         </Card>
-        <Card className="col-span-3 relative md:col-span-4">
-          <div className="flex gap-5 absolute top-5 right-5">
+        <Card className="grow" theme={Cardtheme}>
+          <div className="flex gap-5 justify-end items-center pt-5 px-5">
             <Button
               onClick={handleBack}
               className="border border-primary text-primary ring-transparent"
@@ -101,17 +142,8 @@ function ViewDetailUser({ user }) {
               <FaEdit className="mr-2" />
               <span>Edit</span>
             </Button>
-            <Modal show={isModalOpen} onClick={() => setIsModalOpen(false)}>
-              <Modal.Body onClick={(e) => e.stopPropagation()}>
-                <img
-                  src={selectedImage}
-                  alt="Preview"
-                  className="w-full h-auto"
-                />
-              </Modal.Body>
-            </Modal>
           </div>
-          <div className="absolute top-[4.5rem] left-0 w-full">
+          <div className="w-full">
             <div className="flex justify-center items-center gap-1">
               <div className="w-10 h-[0.5px] bg-gray-600"></div>
               <p className="whitespace-nowrap dark:text-gray-200">
@@ -120,9 +152,9 @@ function ViewDetailUser({ user }) {
               <div className="w-full h-[0.5px] bg-gray-600"></div>
             </div>
 
-            <div className="grid grid-cols-2 px-10 py-5 items-center justify-center gap-y-3">
-              <Label className="flex gap-2 justify-start items-center">
-                <span className="flex gap-2">
+            <div className="grid grid-cols-2 place-content-stretch px-10 py-5 items-center gap-3">
+              <Label className="flex gap-2 justify-start items-center text-nowrap">
+                <span className="flex gap-2 text-nowrap">
                   <IoMailOutline />
                   Email :
                 </span>
@@ -131,8 +163,8 @@ function ViewDetailUser({ user }) {
                 </span>
               </Label>
 
-              <Label className="flex gap-2 justify-start items-center">
-                <span className="flex gap-2">
+              <Label className="flex gap-2 justify-start items-center text-nowrap">
+                <span className="flex gap-2 text-nowrap">
                   <IoCallOutline />
                   Phone Number :
                 </span>
@@ -150,9 +182,9 @@ function ViewDetailUser({ user }) {
               <div className="w-full h-[0.5px] bg-gray-600"></div>
             </div>
 
-            <div className="grid grid-cols-2 px-10 py-5 items-center justify-center gap-y-3">
+            <div className="grid grid-cols-2 place-content-stretch gap-3 px-10 py-5 items-center">
               <Label className="flex gap-2 justify-start items-center">
-                <span className="flex gap-2">
+                <span className="flex gap-2 text-nowrap">
                   <TbUser />
                   First Name :
                 </span>
@@ -162,7 +194,7 @@ function ViewDetailUser({ user }) {
               </Label>
 
               <Label className="flex gap-2 justify-start items-center">
-                <span className="flex gap-2">
+                <span className="flex gap-2 text-nowrap">
                   <TbUser />
                   Last Name :
                 </span>
@@ -171,8 +203,8 @@ function ViewDetailUser({ user }) {
                 </span>
               </Label>
 
-              <Label className="flex gap-2 justify-start items-center">
-                <span className="flex gap-2">
+              <Label className="flex gap-2 justify-start items-center text-nowrap">
+                <span className="flex gap-2 text-nowrap">
                   <TbUser />
                   Full Name :
                 </span>
@@ -181,8 +213,8 @@ function ViewDetailUser({ user }) {
                 </span>
               </Label>
 
-              <Label className="flex gap-2 justify-start items-center">
-                <span className="flex gap-2">
+              <Label className="flex gap-2 justify-start items-center text-nowrap">
+                <span className="flex gap-2 text-nowrap">
                   <LuCalendarDays />
                   Full Name :
                 </span>
@@ -191,8 +223,8 @@ function ViewDetailUser({ user }) {
                 </span>
               </Label>
 
-              <Label className="flex gap-2 justify-start items-center">
-                <span className="flex gap-2">
+              <Label className="flex gap-2 justify-start items-center text-nowrap">
+                <span className="flex gap-2 text-nowrap">
                   <BsGenderAmbiguous />
                   Gender :
                 </span>
