@@ -63,6 +63,7 @@ function UserList() {
     const handlePageChange = async (page) => {
       setPageNo(page);
       await paginationUsers({ pageNo: page });
+      window.scrollTo(0, 0);
     };
 
     const handleBtnSearch = async () => {
