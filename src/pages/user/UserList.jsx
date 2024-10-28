@@ -75,7 +75,7 @@ function UserList() {
       }
     };
 
-    const handleClearSearch = async() => {
+    const handleClearSearch = async () => {
       setSearch("");
       await paginationUsers({ pageNo });
     };
@@ -83,20 +83,22 @@ function UserList() {
     content = (
       <div className="overflow-x-auto p-4 flex flex-col gap-4">
         <div className="flex justify-between items-center">
-          <div className="flex gap-2 justify-center items-center relative">
-            <TextInput
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="ID, Name, Email, Phone"
-            />
-            {search && (
-              <button
-                onClick={handleClearSearch}
-                className="absolute right-32 top-5 transform -translate-y-1/2"
-              >
-                <IoClose />
-              </button>
-            )}
+          <div className="flex gap-2 justify-center items-center">
+            <div className="relative">
+              <TextInput
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="ID, Name, Email, Phone"
+              />
+              {search && (
+                <button
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-5 transform -translate-y-1/2"
+                >
+                  <IoClose />
+                </button>
+              )}
+            </div>
             <Button
               onClick={handleBtnSearch}
               className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
