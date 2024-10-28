@@ -51,7 +51,7 @@ function UserRow({ userId }) {
       <TableCell className="p-4">
         <Checkbox />
       </TableCell>
-      <TableCell className="flex justify-start items-center gap-2 underline underline-offset-2 cursor-pointer text-nowrap text-primary">
+      <TableCell className="flex justify-start items-center gap-2 underline underline-offset-2 cursor-pointer text-nowrap text-blue-600">
         {user.profileImage ? (
           <img
             src={user.profileImage}
