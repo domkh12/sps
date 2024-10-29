@@ -21,7 +21,7 @@ function AdminLayout() {
           <div
             className={`${
               isCollapsed ? "ml-20 md:ml-0" : "ml-56 md:ml-0"
-            } flex-grow overflow-auto dark:bg-gray-900 z-0`}
+            } flex-grow overflow-auto  dark:bg-gray-900 z-0`}
           >
             <Outlet />
           </div>

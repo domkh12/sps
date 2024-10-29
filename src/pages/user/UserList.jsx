@@ -4,17 +4,26 @@ import {
   usePaginationUsersMutation,
   useSearchUsersMutation,
 } from "../../redux/feature/users/userApiSlice";
-import { Button, Checkbox, Pagination, Spinner, Table, TextInput } from "flowbite-react";
+import {
+  Button,
+  Checkbox,
+  Pagination,
+  Spinner,
+  Table,
+  TextInput,
+} from "flowbite-react";
 import UserRow from "./UserRow";
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaSearch } from "react-icons/fa";
+import { FaPlus, FaSearch, FaTimes } from "react-icons/fa";
+import UserNotFound from "./components/UserNotFound";
+import { IoClose } from "react-icons/io5";
 
 function UserList() {
   const navigator = useNavigate();
   const [pageNo, setPageNo] = useState(1);
-  const [search, setSearch] = useState(""); 
-  const [totalPages, setTotalPages] = useState(0); 
-  
+  const [search, setSearch] = useState("");
+  const [totalPages, setTotalPages] = useState(0);
+
   const {
     data: users,
     isLoading,
@@ -30,10 +39,9 @@ function UserList() {
     if (isSuccess) {
       setTotalPages(users.totalPages);
     }
-  }, [isSuccess]);
+  }, [users]);
 
   let content;
-
 
   if (isLoading) content = <p>Loading...</p>;
 
@@ -42,12 +50,10 @@ function UserList() {
   }
 
   if (isSuccess) {
-    const { ids } = users;
-
+    const { ids } = users;   
     const tableContent = ids?.length
       ? ids.map((userId) => <UserRow key={userId} userId={userId} />)
       : null;
-
     const handleBtnAddNewClicked = () => {
       navigator("/dash/users/new");
     };
@@ -55,39 +61,54 @@ function UserList() {
     const handlePageChange = async (page) => {
       setPageNo(page);
       await paginationUsers({ pageNo: page });
+      window.scrollTo(0, 0);
     };
 
     const handleBtnSearch = async () => {
       if (search.trim()) {
-        const result = await searchUsers({ query: search });
-        if (result.data) {
-          setTotalPages(result.data.totalPages);
-        }
+        await searchUsers({ query: search });
       } else {
-        const result = await paginationUsers({ pageNo });
-        console.log("result",result)
-        console.log("New totalPages from pagination:", result.data.totalPages); 
-        if (result.data) {
-          setTotalPages(result.data.totalPages);
-        }
+        await paginationUsers({ pageNo });
       }
+    };
+
+    const handleClearSearch = async () => {
+      setSearch("");
+      await paginationUsers({ pageNo });
     };
 
     content = (
       <div className="overflow-x-auto p-4 flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <div className="flex gap-2 justify-center items-center">
-            <TextInput
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="ID, Name, Email, Phone"
-            />
+            <div className="relative">
+              <TextInput
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="ID, Name, Email, Phone"
+              />
+              {search && (
+                <button
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-5 transform -translate-y-1/2"
+                >
+                  <IoClose />
+                </button>
+              )}
+            </div>
             <Button
               onClick={handleBtnSearch}
               className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
             >
-              {
-                isSearching ? <Spinner color="purple" size="xs"/> : <> <FaSearch className="mr-2 sm:mr-0" /> <span className="sm:hidden">Search</span> </>
-              }
+              {isSearching ? (
+                <Spinner color="purple" size="xs" />
+              ) : (
+                <>
+                  {" "}
+                  <FaSearch className="mr-2 sm:mr-0" />{" "}
+                  <span className="sm:hidden">Search</span>{" "}
+                </>
+              )}
             </Button>
           </div>
 
@@ -113,7 +134,11 @@ function UserList() {
               <Table.HeadCell>Disabled</Table.HeadCell>
               <Table.HeadCell>Action</Table.HeadCell>
             </Table.Head>
-            <Table.Body className="divide-y">{tableContent}</Table.Body>
+            {tableContent ? (
+              <Table.Body className="divide-y">{tableContent}</Table.Body>
+            ) : (
+              <UserNotFound />
+            )}
           </Table>
         </div>
         {totalPages > 0 && (
@@ -121,7 +146,7 @@ function UserList() {
             <Pagination
               currentPage={pageNo}
               onPageChange={handlePageChange}
-              totalPages={totalPages}            
+              totalPages={totalPages}
             />
           </div>
         )}

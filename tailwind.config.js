@@ -11,7 +11,8 @@ export default {
       current: 'currentColor',
       'primary': '#2C3092',
       'primary-hover': '#4A4FB3',
-      'secondary': '#F0BA37',
+      'secondary': '#ff8a4c',
+      'secondary-hover': '#ff5a1f',
     },
     screens: {
       "2xl": { max: "1535px" },

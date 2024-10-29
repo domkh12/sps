@@ -31,9 +31,13 @@ function NavBarDashboard() {
     >
       <Navbar.Brand className="flex items-center justify-between w-full">
         <div className="flex items-center">
-          <Button onClick={handleToggleCollapse} className="w-10 h-10 mr-2">
-            <HiMenuAlt2 className="h-5 w-5 text-black" />
+          <Tooltip  content={"Collapse Menu"}>
+
+
+          <Button onClick={handleToggleCollapse} className="w-10 h-10 mr-2 ring-transparent hover:bg-gray-200">
+            <HiMenuAlt2 className="h-5 w-5 text-black  dark:text-gray-100" />
           </Button>
+          </Tooltip>
           <img
             src="/logo/logo.png"
             className="mr-3 h-10 sm:h-9"
@@ -56,7 +60,9 @@ function NavBarDashboard() {
           >
             <IoSearch className="h-5 w-5 text-gray-700" />
           </Button>
+          <Tooltip content="Dark Mode">
           <DarkThemeToggle />
+          </Tooltip>
           <Notification />
           <Dropdown
             arrowIcon={false}

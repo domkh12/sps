@@ -21,13 +21,11 @@ import { IoIosArrowDown } from "react-icons/io";
 import { ROLES } from "./../../config/roles";
 import * as Yup from "yup";
 import { GENDERS } from "../../config/genders";
-import {
-  useUploadImageMutation,
-} from "../../redux/feature/uploadImage/uploadImageApiSlice";
+import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
+import { BsGenderAmbiguous } from "react-icons/bs";
 
 function EditUserForm({ user }) {
   const navigate = useNavigate();
-  const [toggleEye, setToggleEye] = useState(false);
   const [profileImageFile, setProfileImageFile] = useState(null);
   const [cboRolesToggle, setCboRolesToggle] = useState(false);
   const { mode } = useThemeMode();
@@ -35,6 +33,7 @@ function EditUserForm({ user }) {
   const [rolesPlaceHolder, setRolesPlaceHolder] = useState(
     user.roleNames.join(", ")
   );
+  const [isDataChanged, setIsDataChanged] = useState(false);
 
   const [updateUser, { isSuccess, isLoading, isError, error }] =
     useUpdateUserMutation();
@@ -133,10 +132,6 @@ function EditUserForm({ user }) {
     navigate("/dash/users");
   };
 
-  const handleToggleEye = () => {
-    setToggleEye(!toggleEye);
-  };
-
   const customTheme = {
     views: {
       days: {
@@ -153,25 +148,29 @@ function EditUserForm({ user }) {
     setCboRolesToggle(!cboRolesToggle);
   };
 
+  const initialValues = {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    fullName: user.fullName,
+    genderName: user.gender,
+    email: user.email,
+    phoneNumber: user.phoneNumber,
+    profileImage: "",
+    dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : new Date(),
+    roleName: user.roleNames,
+  };
+
+  const checkDataChanged = (values) => {
+    return JSON.stringify(values) !== JSON.stringify(initialValues);
+  };
+
   const content = (
     <>
-      <h2 className="text-2xl font-medium dark:text-gray-100 p-5">
+      <h1 className="text-2xl font-medium dark:text-gray-100 p-5">
         Create User
-      </h2>
+      </h1>
       <Formik
-        initialValues={{
-          firstName: user.firstName,
-          lastName: user.lastName,
-          fullName: user.fullName,
-          genderName: user.gender,
-          email: user.email,
-          phoneNumber: user.phoneNumber,
-          profileImage: "",
-          dateOfBirth: user.dateOfBirth
-            ? new Date(user.dateOfBirth)
-            : new Date(),
-          roleName: user.roleNames,
-        }}
+        initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
@@ -183,27 +182,48 @@ function EditUserForm({ user }) {
           handleBlur,
           setFieldValue,
         }) => {
+          const onFieldChange = (e) => {
+            handleChange(e);
+            setIsDataChanged(
+              checkDataChanged({ ...values, [e.target.name]: e.target.value })
+            ); // Check if data has changed
+          };
+
+          const onDateChange = (date) => {
+            const newDate = new Date(date);
+            newDate.setDate(newDate.getDate() + 1); // Adjust date if necessary
+            setFieldValue("dateOfBirth", newDate.toISOString().split("T")[0]); // Update Formik's state
+            setIsDataChanged(
+              checkDataChanged({
+                ...values,
+                dateOfBirth: newDate.toISOString().split("T")[0],
+              })
+            );
+          };
+
           const onRoleNameChanged = (role) => {
             const updatedRoleName = values.roleName.includes(role)
-              ? values.roleName.filter((r) => r !== role) // Remove role if already selected
-              : [...values.roleName, role]; // Add role if not selected
+              ? values.roleName.filter((r) => r !== role)
+              : [...values.roleName, role];
 
             setFieldValue("roleName", updatedRoleName);
+            setRolesPlaceHolder(updatedRoleName.join(", ") || "Select Roles");
 
-            if (values.roleName.includes(role)) {
-              setRolesPlaceHolder(
-                values.roleName.filter((r) => r !== role).join(", ") ||
-                  "Select Roles"
-              );
-            } else {
-              setRolesPlaceHolder([...values.roleName, role].join(", "));
-            }
+            setIsDataChanged(
+              checkDataChanged({ ...values, roleName: updatedRoleName })
+            );
           };
+
+          const handleImageChange = (file) => {
+            setProfileImageFile(file);
+            setIsDataChanged(checkDataChanged({ ...values, profileImage: file })); // Check if data has changed
+          };
+
           return (
             <Form className="flex flex-col gap-5 pb-8">
               <div className="px-5">
                 <ProfilePictureUpload
-                  setProfileImageFile={setProfileImageFile}
+                  setProfileImageFile={handleImageChange}
                   imageUri={user.profileImage}
                 />
               </div>
@@ -231,7 +251,7 @@ function EditUserForm({ user }) {
                     type="text"
                     autoComplete="off"
                     value={values.firstName}
-                    onChange={handleChange}
+                    onChange={onFieldChange}
                     onBlur={handleBlur}
                     color={
                       errors.firstName && touched.firstName
@@ -259,7 +279,7 @@ function EditUserForm({ user }) {
                     type="text"
                     autoComplete="off"
                     value={values.lastName}
-                    onChange={handleChange}
+                    onChange={onFieldChange}
                     onBlur={handleBlur}
                     color={
                       errors.lastName && touched.lastName
@@ -287,7 +307,7 @@ function EditUserForm({ user }) {
                     type="text"
                     autoComplete="off"
                     value={values.fullName}
-                    onChange={handleChange}
+                    onChange={onFieldChange}
                     onBlur={handleBlur}
                     color={
                       errors.fullName && touched.fullName
@@ -308,11 +328,7 @@ function EditUserForm({ user }) {
                     value={values.dateOfBirth}
                     theme={customTheme}
                     showTodayButton={false}
-                    onChange={(date) => {
-                      const newDate = new Date(date);                        
-                      newDate.setDate(newDate.getDate() + 1);                                          
-                      setFieldValue("dateOfBirth", newDate.toISOString().split('T')[0]);
-                    }}
+                    onChange={onDateChange}
                     style={{
                       backgroundColor: mode === "dark" ? "#1f2937" : "",
                       border:
@@ -329,7 +345,10 @@ function EditUserForm({ user }) {
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="genderName">Gender</Label>
+                  <Label htmlFor="genderName" className="flex gap-2 mb-2">
+                    <BsGenderAmbiguous />
+                    <span>Gender</span>
+                  </Label>
                   <div className="flex gap-4">
                     {Object.values(GENDERS).map((gender) => (
                       <div key={gender} className="flex items-center">
@@ -343,7 +362,7 @@ function EditUserForm({ user }) {
                           name="genderName"
                           value={gender}
                           checked={values.genderName === gender}
-                          onChange={handleChange}
+                          onChange={onFieldChange}
                           onBlur={handleBlur}
                         />
                         <Label htmlFor={gender} className="ml-2">
@@ -372,7 +391,7 @@ function EditUserForm({ user }) {
                     type="text"
                     autoComplete="off"
                     value={values.phoneNumber}
-                    onChange={handleChange}
+                    onChange={onFieldChange}
                     onBlur={handleBlur}
                     color={
                       errors.phoneNumber && touched.phoneNumber
@@ -410,7 +429,7 @@ function EditUserForm({ user }) {
                     id="email"
                     autoComplete="off"
                     value={values.email}
-                    onChange={handleChange}
+                    onChange={onFieldChange}
                     onBlur={handleBlur}
                     color={
                       errors.email && touched.email ? "failure" : "default"
@@ -469,7 +488,7 @@ function EditUserForm({ user }) {
                   type="submit"
                   className="bg-primary hover:bg-primary-hover focus:ring-0 w-20"
                   title="Save"
-                  disabled={isLoading}
+                  disabled={isLoading || !isDataChanged}
                 >
                   {isLoading ? (
                     <Spinner color="purple" aria-label="loading" size="xs" />
