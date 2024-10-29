@@ -3,6 +3,8 @@ import { Tabs,Checkbox, Table ,Button} from "flowbite-react";
 import { HiAdjustments, HiClipboardList, HiUserCircle } from "react-icons/hi";
 import { MdDashboard } from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
+import { FaEdit } from "react-icons/fa";
+import { BsTrash3Fill } from "react-icons/bs";
 
 function MessagesList() {
   return (
@@ -23,6 +25,9 @@ function MessagesList() {
           <Tabs.Item title="Dashboard" icon={MdDashboard}></Tabs.Item>
           <Tabs.Item title="Settings" icon={HiAdjustments}></Tabs.Item>
           <Tabs.Item title="Contacts" icon={HiClipboardList}></Tabs.Item>
+          <Tabs.Item disabled title="Disabled">
+            Disabled content
+          </Tabs.Item>
         </Tabs>
       </div>
       {/* //table information */}
@@ -40,8 +45,10 @@ function MessagesList() {
             </Table.Cell>
           </Table.Row>
           <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-            <Table.Cell className="p-4"><Checkbox /></Table.Cell>
-            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">Magic Mouse 2</Table.Cell><Table.Cell>
+            <Table.Cell className="p-4"><Checkbox />
+            </Table.Cell>
+            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">Magic Mouse 2</Table.Cell>
+            <Table.Cell>
               <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
                 Edit
               </a>
@@ -50,6 +57,7 @@ function MessagesList() {
         </Table.Body>
       </Table>
     </div>
+
     </>
   )
 }
