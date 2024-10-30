@@ -21,13 +21,13 @@ import { STATUS } from "../../config/status";
 function UserRow({ userId, uuid, status }) {
   const navigate = useNavigate();
   const user = useSelector((state) => selectUserById(state, userId));
-  const [updatedUser , setUpdatedUser] = useState('');
+  const [updatedUser, setUpdatedUser] = useState("");
   useEffect(() => {
     if (user && user.uuid == uuid) {
       setUpdatedUser({ ...user, status: status });
     }
   }, [user, uuid, status]);
- 
+
   if (user) {
     var handleEdit = () => navigate(`/dash/users/${userId}`);
     var handleView = () => navigate(`/dash/users/${userId}/view`);
@@ -39,7 +39,7 @@ function UserRow({ userId, uuid, status }) {
       <Badge key={index} color="success">
         {role}
       </Badge>
-    ));    
+    ));
 
     var createdAt = user.createdAt;
     var createdAtResult = createdAt.substring(0, createdAt.indexOf("T"));
@@ -80,9 +80,31 @@ function UserRow({ userId, uuid, status }) {
         </div>
       </TableCell>
       <TableCell>{createdAtResult ? createdAtResult : "N/A"}</TableCell>
-      <TableCell>{updatedUser? 
-      <Badge className="flex justify-center items-center" color={updatedUser.status === STATUS.ONLINE ? "success" : "failure"}> {updatedUser.status} </Badge>
-      : <Badge className="flex justify-center items-center" color={user.status === STATUS.ONLINE ? "success" : "failure"}> {user.status} </Badge>}</TableCell>
+      <TableCell>
+        {updatedUser ? (
+          <Badge
+          className="flex justify-center "
+          color={updatedUser.status === STATUS.ONLINE ? "success" : "failure"}
+        >
+          {" "}
+          <div className="flex justify-start items-center gap-2">
+            <span className={updatedUser.status === STATUS.ONLINE ? "w-2 h-2 bg-green-600 rounded-full flex" : "w-2 h-2 bg-red-600 rounded-full flex"}></span>
+            <span>{updatedUser.status}</span>
+          </div>
+        </Badge>
+        ) : (
+          <Badge
+            className="flex justify-center "
+            color={user.status === STATUS.ONLINE ? "success" : "failure"}
+          >
+            {" "}
+            <div className="flex justify-start items-center gap-2">
+              <span className={user.status === STATUS.ONLINE ? "w-2 h-2 bg-green-600 rounded-full flex" : "w-2 h-2 bg-red-600 rounded-full flex"}></span>
+              <span>{user.status}</span>
+            </div>
+          </Badge>
+        )}
+      </TableCell>
       <TableCell>
         <div className="flex gap-2">
           <Tooltip content="Edit" trigger="hover">
