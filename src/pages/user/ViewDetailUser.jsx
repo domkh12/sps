@@ -50,8 +50,8 @@ function ViewDetailUser({ user }) {
       <h1 className="text-2xl font-medium dark:text-gray-100 p-5">
         User Details
       </h1>
-      <div className="flex [@media(max-width:1150px)]:flex-col pb-5 gap-5 mx-5">
-        <Card className="flex justify-center items-center grow-0 shrink-0">
+      <div className="flex [@media(max-width:1150px)]:flex-col pb-5 gap-5 mx-5 overflow-auto">
+        <Card className="flex justify-center items-center grow-0 shrink-0 overflow-auto"  theme={Cardtheme}>
           <div
             className="relative rounded-full w-36 h-36 overflow-hidden mb-5 flex justify-start items-start sm:items-center sm:justify-center mx-auto"
             onClick={handleImageClick}
@@ -75,6 +75,7 @@ function ViewDetailUser({ user }) {
               </div>
             </label>
           </div>
+          <div>
           <Label className="flex gap-2 mb-2 justify-start items-center">
             <span className="flex gap-2 text-nowrap">
               <TbUser />
@@ -104,6 +105,7 @@ function ViewDetailUser({ user }) {
               {roles.join(", ")}
             </span>
           </Label>
+       </div>
           <Modal
             show={isModalOpen}
             onClick={() => setIsModalOpen(false)}
