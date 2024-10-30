@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectUserById } from "../../redux/feature/users/userApiSlice";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Badge,
   Button,
@@ -51,30 +51,34 @@ function UserRow({ userId, uuid, status }) {
   }
 
   return (
-    <TableRow>
-      <TableCell className="p-4">
-        <Checkbox />
-      </TableCell>
-      <TableCell className="flex justify-start items-center gap-2 underline underline-offset-2 cursor-pointer text-nowrap text-blue-600">
-        {user.profileImage ? (
-          <img
-            src={user.profileImage}
-            alt={user.fullName}
-            className="w-10 h-10 rounded-full object-cover"
-          />
-        ) : (
-          <AvartarCustom
-            placeholderInitials={firstLetterOfFullName}
-            bgColor={avatarColor}
-            textColor={textColor}
-          />
-        )}
-
-        {user.fullName ? user.fullName : "N/A"}
+    <TableRow className="text-center">      
+      <TableCell>
+        <Link
+          to={`/dash/users/${userId}/view`}
+          onClick={handleView}
+          className="flex justify-center items-center gap-2 cursor-pointer"
+        >
+          {user.profileImage ? (
+            <img
+              src={user.profileImage}
+              alt={user.fullName}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          ) : (
+            <AvartarCustom
+              placeholderInitials={firstLetterOfFullName}
+              bgColor={avatarColor}
+              textColor={textColor}
+            />
+          )}
+          <span className="text-blue-600 underline-offset-2 underline">
+            {user.fullName ? user.fullName : "N/A"}
+          </span>
+        </Link>
       </TableCell>
       <TableCell>{user.email ? user.email : "N/A"}</TableCell>
       <TableCell>{user.phoneNumber ? user.phoneNumber : "N/A"}</TableCell>
-      <TableCell className="">
+      <TableCell className="flex justify-center">
         <div className="flex gap-2">
           {userRolesString ? userRolesString : "N/A"}
         </div>
@@ -82,30 +86,46 @@ function UserRow({ userId, uuid, status }) {
       <TableCell>{createdAtResult ? createdAtResult : "N/A"}</TableCell>
       <TableCell>
         {updatedUser ? (
-          <Badge
-          className="flex justify-center "
-          color={updatedUser.status === STATUS.ONLINE ? "success" : "failure"}
-        >
-          {" "}
-          <div className="flex justify-start items-center gap-2">
-            <span className={updatedUser.status === STATUS.ONLINE ? "w-2 h-2 bg-green-600 rounded-full flex" : "w-2 h-2 bg-red-600 rounded-full flex"}></span>
-            <span>{updatedUser.status}</span>
+          <div className="flex justify-center items-center gap-2">
+            <span
+              className={
+                updatedUser.status === STATUS.ONLINE
+                  ? "w-2 h-2 bg-green-600 rounded-full"
+                  : "w-2 h-2 bg-red-600 rounded-full"
+              }
+            ></span>
+            <span
+              className={
+                updatedUser.status === STATUS.ONLINE
+                  ? "text-green-600"
+                  : "text-red-600"
+              }
+            >
+              {updatedUser.status}
+            </span>
           </div>
-        </Badge>
         ) : (
-          <Badge
-            className="flex justify-center "
-            color={user.status === STATUS.ONLINE ? "success" : "failure"}
-          >
-            {" "}
-            <div className="flex justify-start items-center gap-2">
-              <span className={user.status === STATUS.ONLINE ? "w-2 h-2 bg-green-600 rounded-full flex" : "w-2 h-2 bg-red-600 rounded-full flex"}></span>
-              <span>{user.status}</span>
-            </div>
-          </Badge>
+          <div className="flex justify-center items-center gap-2">
+            <span
+              className={
+                user.status === STATUS.ONLINE
+                  ? "w-2 h-2 bg-green-600 rounded-full"
+                  : "w-2 h-2 bg-red-600 rounded-full"
+              }
+            ></span>
+            <span
+              className={
+                user.status === STATUS.ONLINE
+                  ? "text-green-600"
+                  : "text-red-600"
+              }
+            >
+              {user.status}
+            </span>
+          </div>
         )}
       </TableCell>
-      <TableCell>
+      <TableCell className="flex justify-center items-center">
         <div className="flex gap-2">
           <Tooltip content="Edit" trigger="hover">
             <Button

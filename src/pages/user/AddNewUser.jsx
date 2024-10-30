@@ -14,14 +14,18 @@ import {
 import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
-import { IoCallOutline, IoMailOutline } from "react-icons/io5";
+import {
+  IoCallOutline,
+  IoMailOutline,
+  IoReturnDownBackOutline,
+} from "react-icons/io5";
 import { GENDERS } from "../../config/genders";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import ProfilePictureUpload from "./components/ProfilePictureUpload";
 import { GrUserAdmin } from "react-icons/gr";
 import { IoIosArrowDown } from "react-icons/io";
 import { TbEye, TbEyeClosed, TbUser } from "react-icons/tb";
-import { LuCalendarDays } from "react-icons/lu";
+import { LuCalendarDays, LuSave } from "react-icons/lu";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { BsGenderAmbiguous } from "react-icons/bs";
 
@@ -557,18 +561,21 @@ function AddNewUser() {
                   className="bg-transparent focus:ring-0 border border-primary text-primary dark:text-gray-50"
                   onClick={handleBtnBackClicked}
                 >
-                  Back
+                  <IoReturnDownBackOutline className="mr-2" /> Back
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-primary hover:bg-primary-hover focus:ring-0 w-20"
+                  className="bg-primary hover:bg-primary-hover focus:ring-0 w-24"
                   title="Save"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <Spinner color="purple" aria-label="loading" size="xs" />
                   ) : (
-                    "Save"
+                    <>
+                      <LuSave className="mr-2"/>
+                      Save
+                    </>
                   )}
                 </Button>
               </div>

@@ -27,8 +27,6 @@ function UserList() {
   const [totalPages, setTotalPages] = useState(0);
   const uuid = useSelector((state) => state.users.uuid);
   const status = useSelector((state) => state.users.status);
-  console.log(uuid);
-  console.log(status);
 
   const {
     data: users,
@@ -58,7 +56,9 @@ function UserList() {
   if (isSuccess) {
     const { ids } = users;
     const tableContent = ids?.length
-      ? ids.map((userId) => <UserRow key={userId} userId={userId} uuid={uuid} status={status}/>)
+      ? ids.map((userId) => (
+          <UserRow key={userId} userId={userId} uuid={uuid} status={status} />
+        ))
       : null;
     const handleBtnAddNewClicked = () => {
       navigator("/dash/users/new");
@@ -81,6 +81,12 @@ function UserList() {
     const handleClearSearch = async () => {
       setSearch("");
       await paginationUsers({ pageNo });
+    };
+
+    const spinnerTheme = {
+      color: {
+        primary: "fill-primary",
+      },
     };
 
     content = (
@@ -107,7 +113,7 @@ function UserList() {
               className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
             >
               {isSearching ? (
-                <Spinner color="purple" size="xs" />
+                <Spinner theme={spinnerTheme} color="primary" size="xs" />
               ) : (
                 <>
                   {" "}
@@ -128,10 +134,7 @@ function UserList() {
         </div>
         <div className="overflow-x-auto">
           <Table striped>
-            <Table.Head>
-              <Table.HeadCell className="p-4">
-                <Checkbox />
-              </Table.HeadCell>
+            <Table.Head className="text-center">
               <Table.HeadCell>FullName</Table.HeadCell>
               <Table.HeadCell>Email</Table.HeadCell>
               <Table.HeadCell>Phone_Number</Table.HeadCell>

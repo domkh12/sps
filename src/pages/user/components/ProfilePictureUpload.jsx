@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaCamera } from "react-icons/fa";
 import userPlaceHolder from "/images/userPlaceHolder.svg";
 import { Button, Spinner } from "flowbite-react";
+import { WiCloudUp } from "react-icons/wi";
 
 function ProfilePictureUpload({ setProfileImageFile, imageUri }) {
   const [image, setImage] = useState(imageUri || userPlaceHolder);
@@ -91,7 +92,7 @@ function ProfilePictureUpload({ setProfileImageFile, imageUri }) {
         className="mt-2 bg-primary hover:bg-primary-hover focus:ring-0 text-white"
         onClick={() => document.getElementById('newProfilePhoto').click()}
       >
-        Upload Profile
+        <p className="flex justify-start items-center gap-2"><WiCloudUp className="text-2xl"/><span> Upload Profile</span></p>
       </Button>
     </div>
   );

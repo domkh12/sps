@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Card, Label, Modal, ModalHeader } from "flowbite-react";
-import { TbUser } from "react-icons/tb";
+import { TbAccessibleOff, TbUser } from "react-icons/tb";
 import { LuCalendarDays, LuEye } from "react-icons/lu";
 import { BsGenderAmbiguous } from "react-icons/bs";
 import {
@@ -9,7 +9,7 @@ import {
   IoReturnDownBackOutline,
 } from "react-icons/io5";
 import userPlaceHolder from "/images/userPlaceHolder.svg";
-import { FaCamera, FaEdit } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 function ViewDetailUser({ user }) {
@@ -51,7 +51,10 @@ function ViewDetailUser({ user }) {
         User Details
       </h1>
       <div className="flex [@media(max-width:1150px)]:flex-col pb-5 gap-5 mx-5 overflow-auto">
-        <Card className="flex justify-center items-center grow-0 shrink-0 overflow-auto"  theme={Cardtheme}>
+        <Card
+          className="flex p-5 justify-center items-center grow-0 shrink-0 overflow-auto"
+          theme={Cardtheme}
+        >
           <div
             className="relative rounded-full w-36 h-36 overflow-hidden mb-5 flex justify-start items-start sm:items-center sm:justify-center mx-auto"
             onClick={handleImageClick}
@@ -76,36 +79,36 @@ function ViewDetailUser({ user }) {
             </label>
           </div>
           <div>
-          <Label className="flex gap-2 mb-2 justify-start items-center">
-            <span className="flex gap-2 text-nowrap">
-              <TbUser />
-              Username :
-            </span>
-            <span className="text-primary font-medium text-base">
-              {user.fullName}
-            </span>
-          </Label>
+            <Label className="flex gap-2 mb-2 justify-start items-center">
+              <span className="flex gap-2 text-nowrap">
+                <TbUser />
+                Username :
+              </span>
+              <span className="text-primary font-medium text-base">
+                {user.fullName}
+              </span>
+            </Label>
 
-          <Label className="flex gap-2 mb-2 justify-start items-center">
-            <span className="flex gap-2 text-nowrap">
-              <IoMailOutline />
-              Email :
-            </span>
-            <span className="text-primary font-medium text-base">
-              {user.email}
-            </span>
-          </Label>
+            <Label className="flex gap-2 mb-2 justify-start items-center">
+              <span className="flex gap-2 text-nowrap">
+                <IoMailOutline />
+                Email :
+              </span>
+              <span className="text-primary font-medium text-base">
+                {user.email}
+              </span>
+            </Label>
 
-          <Label className="flex gap-2 mb-2 justify-start items-center">
-            <span className="flex gap-2 text-nowrap">
-              <TbUser />
-              Role :
-            </span>
-            <span className="text-primary font-medium text-base">
-              {roles.join(", ")}
-            </span>
-          </Label>
-       </div>
+            <Label className="flex gap-2 mb-2 justify-start items-center">
+              <span className="flex gap-2 text-nowrap">
+                <TbUser />
+                Role :
+              </span>
+              <span className="text-primary font-medium text-base">
+                {roles.join(", ")}
+              </span>
+            </Label>
+          </div>
           <Modal
             show={isModalOpen}
             onClick={() => setIsModalOpen(false)}
@@ -232,6 +235,16 @@ function ViewDetailUser({ user }) {
                 </span>
                 <span className="text-primary font-medium text-base">
                   {user.gender}
+                </span>
+              </Label>
+
+              <Label className="flex gap-2 justify-start items-center text-nowrap">
+                <span className="flex gap-2 text-nowrap">
+                  <TbAccessibleOff />
+                  Deleted :
+                </span>
+                <span className="text-primary font-medium text-base">
+                {user.isDeleted ? "Yes" : "No"}
                 </span>
               </Label>
             </div>

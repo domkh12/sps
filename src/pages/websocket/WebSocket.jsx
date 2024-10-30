@@ -13,7 +13,7 @@ function WebSocket() {
   const socketClient = useRef(null);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
   const status = STATUS.ONLINE;
   const [
     connectedUser,
@@ -33,7 +33,7 @@ function WebSocket() {
     );
 
     socketClient.current.connect(
-      { Authorization: `Bearer ${token}` },
+      { Authorization: `Bearer ${token}`, uuid: uuid },
       onConnected,
       onError
     );

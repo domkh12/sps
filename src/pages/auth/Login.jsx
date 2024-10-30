@@ -32,10 +32,10 @@ export default function Login() {
         email: values.email,
         password: values.password,
       }).unwrap();
-      console.log(typeof accessToken)
-      console.log(typeof uuid)
+      console.log(typeof accessToken);
+      console.log(typeof uuid);
       dispatch(setCredentials({ accessToken }));
-      dispatch(setUuid( uuid ));
+      dispatch(setUuid(uuid));
       navigate("/dash");
       toast.success("Login Successfully", {
         position: "top-right",
@@ -103,6 +103,12 @@ export default function Login() {
 
   const handleToggleEye = () => {
     setToggleEye(!toggleEye);
+  };
+
+  const spinnerTheme = {
+    color: {
+      primary: "fill-primary",
+    },
   };
 
   const content = (
@@ -190,7 +196,12 @@ export default function Login() {
                 className="bg-primary w-full hover:bg-primary-hover"
               >
                 {isLoading ? (
-                  <Spinner color="purple" aria-label="loading" size="xs" />
+                  <Spinner
+                    theme={spinnerTheme}
+                    color="primary"
+                    aria-label="loading"
+                    size="xs"
+                  />
                 ) : (
                   "Login"
                 )}
