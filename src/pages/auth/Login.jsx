@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useLoginMutation } from "../../redux/feature/auth/authApiSlice";
-import { setCredentials } from "../../redux/feature/auth/authSlice";
+import { setCredentials, setUuid } from "../../redux/feature/auth/authSlice";
 import { Button, Card, FloatingLabel, Flowbite, Spinner } from "flowbite-react";
 import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
@@ -27,12 +27,15 @@ export default function Login() {
 
   const [login, { isLoading }] = useLoginMutation();
   const handleSubmit = async (values, { setSubmitting }) => {
-    try {      
-      const { accessToken } = await login({
+    try {
+      const { accessToken, uuid } = await login({
         email: values.email,
         password: values.password,
       }).unwrap();
+      console.log(typeof accessToken)
+      console.log(typeof uuid)
       dispatch(setCredentials({ accessToken }));
+      dispatch(setUuid( uuid ));
       navigate("/dash");
       toast.success("Login Successfully", {
         position: "top-right",
@@ -45,11 +48,9 @@ export default function Login() {
         theme: "colored",
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       if (error.status === "FETCH_ERROR") {
-        toast.error(
-          "Something went wrong!"
-        );
+        toast.error("Something went wrong!");
       } else if (error.status === 400) {
         toast.error("Email or Password is incorrect.", {
           position: "top-right",
@@ -111,16 +112,8 @@ export default function Login() {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({
-          values,
-          touched,
-          errors,          
-          handleChange,
-          handleBlur,          
-        }) => (
-          <Form            
-            className="grid grid-cols-12 md:grid-cols-1 grid-flow-row justify-center items-center min-h-screen gap-10"
-          >
+        {({ values, touched, errors, handleChange, handleBlur }) => (
+          <Form className="grid grid-cols-12 md:grid-cols-1 grid-flow-row justify-center items-center min-h-screen gap-10">
             <section className="md:hidden col-start-2 col-end-6">
               <img src="/images/login.svg" alt="login_image" />
             </section>

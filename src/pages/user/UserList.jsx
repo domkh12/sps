@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  selectAllUsers,
   useGetUsersQuery,
   usePaginationUsersMutation,
   useSearchUsersMutation,
@@ -14,15 +15,20 @@ import {
 } from "flowbite-react";
 import UserRow from "./UserRow";
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaSearch, FaTimes } from "react-icons/fa";
+import { FaPlus, FaSearch } from "react-icons/fa";
 import UserNotFound from "./components/UserNotFound";
 import { IoClose } from "react-icons/io5";
+import { useSelector } from "react-redux";
 
 function UserList() {
   const navigator = useNavigate();
   const [pageNo, setPageNo] = useState(1);
   const [search, setSearch] = useState("");
   const [totalPages, setTotalPages] = useState(0);
+  const uuid = useSelector((state) => state.users.uuid);
+  const status = useSelector((state) => state.users.status);
+  console.log(uuid);
+  console.log(status);
 
   const {
     data: users,
@@ -50,9 +56,9 @@ function UserList() {
   }
 
   if (isSuccess) {
-    const { ids } = users;   
+    const { ids } = users;
     const tableContent = ids?.length
-      ? ids.map((userId) => <UserRow key={userId} userId={userId} />)
+      ? ids.map((userId) => <UserRow key={userId} userId={userId} uuid={uuid} status={status}/>)
       : null;
     const handleBtnAddNewClicked = () => {
       navigator("/dash/users/new");
@@ -131,7 +137,7 @@ function UserList() {
               <Table.HeadCell>Phone_Number</Table.HeadCell>
               <Table.HeadCell>Roles</Table.HeadCell>
               <Table.HeadCell>CreatedAt</Table.HeadCell>
-              <Table.HeadCell>Disabled</Table.HeadCell>
+              <Table.HeadCell>Status</Table.HeadCell>
               <Table.HeadCell>Action</Table.HeadCell>
             </Table.Head>
             {tableContent ? (

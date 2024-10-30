@@ -9,11 +9,10 @@ function Prefetch() {
     const users = store.dispatch(userApiSlice.endpoints.getUsers.initiate());    
 
     return () => {
-      users.unsubscribe();
+      users.unsubscribe();      
       console.log("unsubscribing...");
     };
   }, []);
- 
 
   return <Outlet />;
 }

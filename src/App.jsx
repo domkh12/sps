@@ -13,6 +13,7 @@ import UserList from "./pages/user/UserList";
 import AddNewUser from "./pages/user/AddNewUser";
 import Profile from "./pages/dashboard/profile/Profile";
 import ViewUser from "./pages/user/ViewUser";
+import WebSocket from "./pages/websocket/WebSocket";
 
 function App() {
   return (
@@ -22,23 +23,25 @@ function App() {
       <Route path="/test" element={<Test />} />
       <Route element={<PersistLogin />}>
         <Route element={<Prefetch />}>
-          {/* Start dash */}
-          <Route path="/dash" element={<AdminLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="users">
-              <Route index element={<UserList />} />
-              <Route path="new" element={<AddNewUser />} />
-              <Route path=":id" element={<EditUser />} />
-              <Route element={<ViewUser />} path=":id/view" />
+          <Route element={<WebSocket />}>
+            {/* Start dash */}
+            <Route path="/dash" element={<AdminLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="users">
+                <Route index element={<UserList />} />
+                <Route path="new" element={<AddNewUser />} />
+                <Route path=":id" element={<EditUser />} />
+                <Route element={<ViewUser />} path=":id/view" />
+              </Route>
+              <Route path="messages">
+                <Route index element={<MessagesList />} />
+              </Route>
+              <Route path="profiles">
+                <Route index element={<Profile />} />
+              </Route>
             </Route>
-            <Route path="messages">
-              <Route index element={<MessagesList />} />
-            </Route>
-            <Route path="profiles">
-              <Route index element={<Profile />} />
-            </Route>
+            {/* End dash */}
           </Route>
-          {/* End dash */}
         </Route>
       </Route>
       <Route path="*" element={<NotFound />} />

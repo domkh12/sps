@@ -1,14 +1,36 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ColumnChart from "../../components/dashboard/ColumnChart";
 import PieChart from "../../components/dashboard/PieChart";
 import AreaChartProfits from "../../components/dashboard/AreaChartProfits";
 import AreaVehicles from "../../components/dashboard/AreaVehicles";
 import HeatMap from "../../components/dashboard/HeatMap";
 import ParkingMap from "../../components/dashboard/ParkingMap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useConnectedUserMutation, useFindByUuidMutation } from "../../redux/feature/users/userApiSlice";
+import { Stomp } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import { STATUS } from './../../config/status';
 
 function Dashboard() {
-  
+
+  const uuid = useSelector(state => state.auth.uuid)
+  const token = useSelector((state) => state.auth.token);
+
+  const [findByUuid, {
+    data: user,
+    isLoading,
+    isSuccess,
+    isError,
+    error
+  }]= useFindByUuidMutation()
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      await findByUuid( uuid );      
+    };
+    fetchUser();
+  }, []) 
+
   return (
     <div className="grid grid-cols-1 gap-4">
       <AreaChartProfits />

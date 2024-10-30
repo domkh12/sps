@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectUserById } from "../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +8,6 @@ import {
   Checkbox,
   TableCell,
   TableRow,
-  ToggleSwitch,
   Tooltip,
 } from "flowbite-react";
 import {
@@ -17,13 +16,18 @@ import {
 } from "../../redux/feature/utils/colorUtils";
 import { FaEdit, FaEye } from "react-icons/fa";
 import AvartarCustom from "./components/AvartarCustom";
+import { STATUS } from "../../config/status";
 
-function UserRow({ userId }) {
+function UserRow({ userId, uuid, status }) {
   const navigate = useNavigate();
-
   const user = useSelector((state) => selectUserById(state, userId));
-  const [toggleDisabled, setToggleDisabled] = useState(false);
-
+  const [updatedUser , setUpdatedUser] = useState('');
+  useEffect(() => {
+    if (user && user.uuid == uuid) {
+      setUpdatedUser({ ...user, status: status });
+    }
+  }, [user, uuid, status]);
+ 
   if (user) {
     var handleEdit = () => navigate(`/dash/users/${userId}`);
     var handleView = () => navigate(`/dash/users/${userId}/view`);
@@ -35,7 +39,7 @@ function UserRow({ userId }) {
       <Badge key={index} color="success">
         {role}
       </Badge>
-    ));
+    ));    
 
     var createdAt = user.createdAt;
     var createdAtResult = createdAt.substring(0, createdAt.indexOf("T"));
@@ -76,18 +80,9 @@ function UserRow({ userId }) {
         </div>
       </TableCell>
       <TableCell>{createdAtResult ? createdAtResult : "N/A"}</TableCell>
-      <TableCell>
-        <ToggleSwitch
-          checked={toggleDisabled}
-          onChange={() => setToggleDisabled(!toggleDisabled)}
-          color="green"
-          theme={{
-            toggle: {
-              base: "relative rounded-full border after:absolute after:rounded-full after:bg-white after:transition-all group-focus:ring-0 group-focus:ring-cyan-500/25",
-            },
-          }}
-        />
-      </TableCell>
+      <TableCell>{updatedUser? 
+      <Badge className="flex justify-center items-center" color={updatedUser.status === STATUS.ONLINE ? "success" : "failure"}> {updatedUser.status} </Badge>
+      : <Badge className="flex justify-center items-center" color={user.status === STATUS.ONLINE ? "success" : "failure"}> {user.status} </Badge>}</TableCell>
       <TableCell>
         <div className="flex gap-2">
           <Tooltip content="Edit" trigger="hover">
@@ -99,7 +94,10 @@ function UserRow({ userId }) {
             </Button>
           </Tooltip>
           <Tooltip content="View" trigger="hover">
-            <Button onClick={handleView} className="bg-secondary hover:bg-secondary-hover ring-transparent">
+            <Button
+              onClick={handleView}
+              className="bg-secondary hover:bg-secondary-hover ring-transparent"
+            >
               <FaEye />
             </Button>
           </Tooltip>
