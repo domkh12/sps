@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Stomp } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { STATUS } from "./../../config/status";
@@ -12,6 +12,8 @@ function WebSocket() {
   const token = useSelector((state) => state.auth.token);
   const socketClient = useRef(null);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); 
   const status = STATUS.ONLINE;
   const [
     connectedUser,
@@ -19,8 +21,10 @@ function WebSocket() {
   ] = useConnectedUserMutation();
 
   const connect = async () => {
+    setLoading(true);
     if (socketClient.current) {
       console.warn("WebSocket connection already exists.");
+      setLoading(false);
       return;
     }
 
@@ -37,6 +41,7 @@ function WebSocket() {
 
   const onConnected = () => {
     console.log("Connected successfully to WebSocket for user:", uuid);
+    setLoading(false);
     socketClient.current.subscribe(`/topic/update-status`, async (message) => {
       console.log("Received update message:", message);
       const update = JSON.parse(message.body);
@@ -50,6 +55,8 @@ function WebSocket() {
 
   const onError = async (err) => {
     console.log("Failed to connect to WebSocket:", err);
+    setError(err);
+    setLoading(false);
   };
 
   const connectUser = async () => {
@@ -70,7 +77,13 @@ function WebSocket() {
     };
   }, [uuid, token]);
 
-  return <Outlet />;
+  return (
+    <>
+      {loading && <div>Loading...</div>} {/* Display loading message */}
+      {error && <div>Error: {error.message}</div>} {/* Display error message */}
+      <Outlet />
+    </>
+  );
 }
 
 export default WebSocket;
