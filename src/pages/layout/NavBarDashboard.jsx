@@ -8,12 +8,10 @@ import {
   Navbar,
   Tooltip,
 } from "flowbite-react";
-import InputSearch from "../../components/util/InputSearch";
 import Notification from "../../components/util/Notification";
 import { HiMenuAlt2 } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleCollapsed } from "../../redux/feature/actions/actionSlice";
-import { IoSearch } from "react-icons/io5";
 
 function NavBarDashboard() {
   const { translate } = useTranslation();
@@ -53,13 +51,7 @@ function NavBarDashboard() {
           {/* <InputSearch /> */}
         </div>
 
-        <div className="flex md:order-2 gap-4 items-center">
-          <Button
-            onClick={handleToggleCollapse}
-            className="hidden md:flex w-10 h-10"
-          >
-            <IoSearch className="h-5 w-5 text-gray-700" />
-          </Button>
+        <div className="flex md:order-2 gap-4 items-center">          
           <Tooltip content="Dark Mode">
           <DarkThemeToggle />
           </Tooltip>

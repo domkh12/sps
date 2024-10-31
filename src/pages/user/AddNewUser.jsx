@@ -33,7 +33,7 @@ function AddNewUser() {
   const [addNewUser, { isLoading, isSuccess, isError, error }] =
     useAddNewUserMutation();
   const [uploadImage] = useUploadImageMutation();
-  const navigate = useNavigate();
+  const navigator = useNavigate();
   const [toggleEye, setToggleEye] = useState(false);
   const [profileImageFile, setProfileImageFile] = useState(null);
   const [cboRolesToggle, setCboRolesToggle] = useState(false);
@@ -82,7 +82,7 @@ function AddNewUser() {
 
   useEffect(() => {
     if (isSuccess) {
-      navigate("/dash/users");
+      navigator("/dash/users");
 
       toast.success("Success", {
         position: "top-right",
@@ -95,7 +95,7 @@ function AddNewUser() {
         theme: "colored",
       });
     }
-  }, [isSuccess, navigate]);
+  }, [isSuccess, navigator]);
 
   useEffect(() => {
     if (isError) {
@@ -141,7 +141,7 @@ function AddNewUser() {
   };
 
   const handleBtnBackClicked = () => {
-    navigate("/dash/users");
+    navigator("/dash/users");
   };
 
   const handleToggleEye = () => {

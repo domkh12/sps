@@ -37,12 +37,7 @@ function SideBar() {
 
   const sidebarContent = (
     <Sidebar.Items className="flex flex-col gap-2">
-      <Sidebar.ItemGroup>
-        <Drawer.Items>
-          <div className="mb-6 mt-3">
-            <InputSearch />
-          </div>
-        </Drawer.Items>
+      <Sidebar.ItemGroup>       
 
         <Sidebar.Item
           as={NavLink}
@@ -66,7 +61,7 @@ function SideBar() {
 
         <Sidebar.Item
           as={NavLink}
-          to="/admin/vehicle"
+          to="/dash/vehicles"
           icon={FaCar}
           className={`${isCollapsed && window.innerWidth > 768 ? "grid" : ""}`}
           active={location.pathname === "/admin/vehicle"}
@@ -160,7 +155,7 @@ function SideBar() {
 
               <Sidebar.Item
                 as={NavLink}
-                to="/dash/vehicle"
+                to="/dash/vehicles"
                 icon={FaCar}
                 className={`${isCollapsed ? "grid" : ""}`}
                 active={location.pathname === "/dash/vehicle"}

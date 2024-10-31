@@ -51,12 +51,12 @@ function UserRow({ userId, uuid, status }) {
   }
 
   return (
-    <TableRow className="text-center">      
+    <TableRow className="text-left">      
       <TableCell>
         <Link
           to={`/dash/users/${userId}/view`}
           onClick={handleView}
-          className="flex justify-center items-center gap-2 cursor-pointer"
+          className="flex justify-start items-center gap-2 cursor-pointer"
         >
           {user.profileImage ? (
             <img
@@ -78,15 +78,15 @@ function UserRow({ userId, uuid, status }) {
       </TableCell>
       <TableCell>{user.email ? user.email : "N/A"}</TableCell>
       <TableCell>{user.phoneNumber ? user.phoneNumber : "N/A"}</TableCell>
-      <TableCell className="flex justify-center">
+      <TableCell className="flex justify-start">
         <div className="flex gap-2">
           {userRolesString ? userRolesString : "N/A"}
         </div>
       </TableCell>
-      <TableCell>{createdAtResult ? createdAtResult : "N/A"}</TableCell>
+      <TableCell className="text-right">{createdAtResult ? createdAtResult : "N/A"}</TableCell>
       <TableCell>
         {updatedUser ? (
-          <div className="flex justify-center items-center gap-2">
+          <div className="flex justify-end items-center gap-2">
             <span
               className={
                 updatedUser.status === STATUS.ONLINE
@@ -105,7 +105,7 @@ function UserRow({ userId, uuid, status }) {
             </span>
           </div>
         ) : (
-          <div className="flex justify-center items-center gap-2">
+          <div className="flex justify-end items-center gap-2">
             <span
               className={
                 user.status === STATUS.ONLINE
@@ -125,7 +125,7 @@ function UserRow({ userId, uuid, status }) {
           </div>
         )}
       </TableCell>
-      <TableCell className="flex justify-center items-center">
+      <TableCell className="flex justify-end items-center">
         <div className="flex gap-2">
           <Tooltip content="Edit" trigger="hover">
             <Button

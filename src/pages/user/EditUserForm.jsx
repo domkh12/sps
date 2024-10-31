@@ -180,7 +180,7 @@ function EditUserForm({ user }) {
   const content = (
     <>
       <h1 className="text-2xl font-medium dark:text-gray-100 p-5">
-        Create User
+        Update User
       </h1>
       <Formik
         initialValues={initialValues}
