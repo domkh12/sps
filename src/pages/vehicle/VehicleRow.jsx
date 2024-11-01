@@ -18,9 +18,9 @@ function VehicleRow({ vehicleId }) {
     return null;
   }
   return (
-    <TableRow>
-      <TableCell>
-        <div className="flex gap-5">
+    <TableRow >
+      <TableCell className="whitespace-nowrap">
+        <div className="flex gap-3 mr-32">
           <img
             src="/images/vehiclePlaceHolder.png"
             alt="car_Photo"
@@ -30,7 +30,7 @@ function VehicleRow({ vehicleId }) {
             <p className="">
               {vehicle.vehicleModel ? vehicle.vehicleModel : "N/A"}
             </p>
-            <div className="truncate text-pretty">
+            <div className="text-nowrap">
               This is description
             </div>
           </div>

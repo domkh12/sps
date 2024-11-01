@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import usePersist from "../../hook/usePersist";
+import usePersist from "../../hook/usePersist.jsx";
 import { useSelector } from "react-redux";
 import { selectCurrentToekn } from "../../redux/feature/auth/authSlice";
 import { useRefreshMutation } from "../../redux/feature/auth/authApiSlice";

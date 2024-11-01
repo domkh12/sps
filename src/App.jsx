@@ -1,4 +1,3 @@
-import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import AdminLayout from "./pages/layout/AdminLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
