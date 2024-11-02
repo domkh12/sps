@@ -106,8 +106,8 @@ function AddNewVehicle() {
       .min(2, "Plate Number must be at least 2 characters")
       .max(20, "Plate Number cannot exceed 20 characters")
       .required("License Plate Number is required"),
-    // type: Yup.string().required("Vehicle Type is required"),
-    // owner: Yup.string().required("Owner is required"),
+    type: Yup.string().required("Vehicle Type is required"),
+    owner: Yup.string().required("Owner is required"),
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
