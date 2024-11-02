@@ -19,19 +19,15 @@ function VehicleRow({ vehicleId }) {
   }
   return (
     <TableRow>
-      <TableCell className="whitespace-nowrap">
-        <div className="flex items-center gap-5">
-          <img
-            src={vehicle.image || "/images/vehiclePlaceHolder.png"}
-            alt="car_Photo"
-            className="w-32 h-20 object-cover rounded-lg"
-          />
-          <div className=" shrink ">
-            <p>
-              {vehicle.vehicleModel ? vehicle.vehicleModel : "N/A"}
-            </p>            
-          </div>
-        </div>
+      <TableCell className="flex w-72 items-center">        
+        <img
+          src={vehicle.image || "/images/vehiclePlaceHolder.png"}
+          alt="car_Photo"
+          className="w-32 h-20 object-cover rounded-lg"
+        />
+        <p className="text-pretty truncate ml-2">
+          {vehicle.vehicleModel ? vehicle.vehicleModel : "N/A"}
+        </p>
       </TableCell>
       <TableCell>
         <div className="border-2 w-36 h-auto border-blue-600 text-center p-1 rounded-md bg-gray-50">
@@ -53,7 +49,7 @@ function VehicleRow({ vehicleId }) {
       <TableCell className="text-right">
         {vehicle.user.phoneNumber ? vehicle.user.phoneNumber : "N/A"}
       </TableCell>
-      <TableCell className="text-right">
+      <TableCell className="text-right text-nowrap">
         {createdAtResult ? createdAtResult : "N/A"}
       </TableCell>
       <TableCell>

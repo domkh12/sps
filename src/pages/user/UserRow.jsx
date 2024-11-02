@@ -83,7 +83,7 @@ function UserRow({ userId, uuid, status }) {
           {userRolesString ? userRolesString : "N/A"}
         </div>
       </TableCell>
-      <TableCell className="text-right">
+      <TableCell className="text-right text-nowrap">
         {createdAtResult ? createdAtResult : "N/A"}
       </TableCell>
       <TableCell>

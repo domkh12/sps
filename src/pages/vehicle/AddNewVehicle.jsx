@@ -38,7 +38,7 @@ function AddNewVehicle() {
   const [selectedUsers, setSelectedUsers] = useState();
   const [selectedVehicleType, setSelectedVehicleType] = useState();
   const [imageFile, setImageFile] = useState(null);
-  console.log(imageFile)
+  console.log(imageFile);
   const [addNewVehicle, { isSuccess, isLoading, isError, error }] =
     useAddNewVehicleMutation();
 
@@ -140,30 +140,7 @@ function AddNewVehicle() {
   const handleBtnBackClicked = () => {
     navigator("/dash/vehicles");
   };
-
-  const handleUserSelect = (uuid) => {
-    setSelectedUsers(uuid);
-  };
-
-  // Function to get the display value for the input
-  const getSelectedUsersDisplay = () => {
-    const getSelectedUsers = usersState.find(
-      (user) => user.uuid === selectedUsers
-    );
-    return getSelectedUsers ? getSelectedUsers.fullName : "";
-  };
-
-  const handleVehicleTypeSelect = (uuid) => {
-    setSelectedVehicleType(uuid);
-  };
-
-  const getSelectedVehicleTypeName = () => {
-    const selectedType = vehicleTypes.find(
-      (type) => type.uuid === selectedVehicleType
-    );
-    return selectedType ? selectedType.name : "";
-  };
-
+  
   const content = (
     <>
       <h2 className="text-2xl font-medium  dark:text-gray-100 p-5">
@@ -336,7 +313,11 @@ function AddNewVehicle() {
                           <div onClick={() => setToggleOwner(!toggleOwner)}>
                             <TextInput
                               placeholder="Select Owner"
-                              value={getSelectedUsersDisplay() || ""}
+                              value={
+                                usersState.find(
+                                  (user) => user.uuid === values.owner
+                                )?.fullName || ""
+                              }
                               style={{
                                 backgroundColor:
                                   mode === "dark" ? "#1f2937" : "#f9fafb",
@@ -364,7 +345,7 @@ function AddNewVehicle() {
                               <div className="absolute top-0 left-0 w-full rounded-lg z-10 hover:border-black dark:hover:border-gray-400  bg-gray-50 border border-gray-500 dark:bg-gray-800">
                                 <div>
                                   <div className="p-3">
-                                    <input
+                                    <input                                    
                                       style={{
                                         backgroundColor:
                                           mode === "dark"
@@ -382,17 +363,17 @@ function AddNewVehicle() {
                                         key={user.uuid}
                                         className="px-3 flex justify-start hover:bg-gray-300 cursor-pointer items-center py-2 gap-3"
                                         onClick={() =>
-                                          handleUserSelect(user.uuid)
+                                          setFieldValue("owner", user.uuid)
                                         }
                                       >
                                         <Radio
-                                          id={user.fullName}
-                                          name="fullName"
+                                          id={user.owner}
+                                          name={user.owner}
                                           className="focus:ring-transparent"
                                           onChange={() =>
-                                            handleUserSelect(user.uuid)
+                                            setFieldValue("owner", user.uuid)
                                           }
-                                          checked={selectedUsers === user.uuid}
+                                          checked={values.owner === user.uuid}
                                         />
                                         <Label htmlFor={user.fullName}>
                                           {user.fullName}
@@ -432,7 +413,10 @@ function AddNewVehicle() {
                             }
                           >
                             <TextInput
-                              value={getSelectedVehicleTypeName() || ""}
+
+                              value={vehicleTypes.find(
+                                  (type) => type.uuid === values.type
+                                )?.name || ""}
                               placeholder="Select Vehicle Type"
                               style={{
                                 backgroundColor:
@@ -479,19 +463,17 @@ function AddNewVehicle() {
                                         key={type.uuid}
                                         className="px-3 flex justify-start items-center py-2 gap-3 hover:bg-gray-300 cursor-pointer"
                                         onClick={() =>
-                                          handleVehicleTypeSelect(type.uuid)
+                                          setFieldValue("type", type.uuid)
                                         }
                                       >
                                         <Radio
                                           id={type.name}
-                                          name="vehicleType"
+                                          name={type.name}
                                           className="focus:ring-transparent"
                                           onChange={() =>
-                                            handleVehicleTypeSelect(type.uuid)
+                                            setFieldValue("type", type.uuid)
                                           }
-                                          checked={
-                                            selectedVehicleType === type.uuid
-                                          }
+                                          checked={values.type === type.uuid}
                                         />
                                         <Label htmlFor={type.name}>
                                           {type.name}
@@ -597,7 +579,7 @@ function AddNewVehicle() {
                       </div>
                     </div>
                     <div>
-                      <ImageUpload setImageFile={setImageFile}/>
+                      <ImageUpload setImageFile={setImageFile} />
                     </div>
                   </section>
                 </div>
