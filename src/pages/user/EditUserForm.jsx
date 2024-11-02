@@ -8,14 +8,19 @@ import {
   Label,
   Spinner,
   TextInput,
+  ToggleSwitch,
   useThemeMode,
 } from "flowbite-react";
 import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
 import ProfilePictureUpload from "./components/ProfilePictureUpload";
-import { TbUser } from "react-icons/tb";
+import { TbAccessibleOff, TbUser } from "react-icons/tb";
 import { LuCalendarDays } from "react-icons/lu";
-import { IoCallOutline, IoMailOutline } from "react-icons/io5";
+import {
+  IoCallOutline,
+  IoMailOutline,
+  IoReturnDownBackOutline,
+} from "react-icons/io5";
 import { GrUserAdmin } from "react-icons/gr";
 import { IoIosArrowDown } from "react-icons/io";
 import { ROLES } from "./../../config/roles";
@@ -23,6 +28,7 @@ import * as Yup from "yup";
 import { GENDERS } from "../../config/genders";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { BsGenderAmbiguous } from "react-icons/bs";
+import { PiArrowsCounterClockwise } from "react-icons/pi";
 
 function EditUserForm({ user }) {
   const navigate = useNavigate();
@@ -33,8 +39,7 @@ function EditUserForm({ user }) {
   const [rolesPlaceHolder, setRolesPlaceHolder] = useState(
     user.roleNames.join(", ")
   );
-  const [isDataChanged, setIsDataChanged] = useState(false);
-
+  const [isDataChanged, setIsDataChanged] = useState(false);  
   const [updateUser, { isSuccess, isLoading, isError, error }] =
     useUpdateUserMutation();
   const [uploadImage] = useUploadImageMutation();
@@ -120,6 +125,7 @@ function EditUserForm({ user }) {
         phoneNumber: values.phoneNumber,
         roleName: values.roleName,
         profileImage: profileImageUri,
+        isDeleted: values.isDisabled,
       });
     } catch (error) {
       console.error(error);
@@ -158,16 +164,23 @@ function EditUserForm({ user }) {
     profileImage: "",
     dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : new Date(),
     roleName: user.roleNames,
+    isDisabled: user.isDeleted,
   };
 
   const checkDataChanged = (values) => {
     return JSON.stringify(values) !== JSON.stringify(initialValues);
   };
 
+  const toggleTheme = {
+    toggle: {
+      base: "relative rounded-full border after:absolute after:rounded-full after:bg-white after:transition-all",
+    },
+  };
+
   const content = (
     <>
       <h1 className="text-2xl font-medium dark:text-gray-100 p-5">
-        Create User
+        Update User
       </h1>
       <Formik
         initialValues={initialValues}
@@ -186,7 +199,7 @@ function EditUserForm({ user }) {
             handleChange(e);
             setIsDataChanged(
               checkDataChanged({ ...values, [e.target.name]: e.target.value })
-            ); // Check if data has changed
+            );
           };
 
           const onDateChange = (date) => {
@@ -216,7 +229,9 @@ function EditUserForm({ user }) {
 
           const handleImageChange = (file) => {
             setProfileImageFile(file);
-            setIsDataChanged(checkDataChanged({ ...values, profileImage: file })); // Check if data has changed
+            setIsDataChanged(
+              checkDataChanged({ ...values, profileImage: file })
+            ); // Check if data has changed
           };
 
           return (
@@ -476,24 +491,48 @@ function EditUserForm({ user }) {
                     <small className="text-red-600">{errors.roleName}</small>
                   )}
                 </div>
+                <div>
+                <Label htmlFor="roles" className="flex gap-2 mb-2">
+                    <TbAccessibleOff />
+                    Disabled
+                  </Label>
+                  <ToggleSwitch
+                    checked={values.isDisabled}
+                    
+                    name="isDisabled"
+                    onChange={() => {
+                      const newValue = !values.isDisabled;
+                      setFieldValue("isDisabled", newValue);
+                      setIsDataChanged(
+                        checkDataChanged({ ...values, isDisabled: newValue })
+                      );
+                    }}
+                    color="success"
+                    theme={toggleTheme}
+                  />
+                </div>
               </div>
               <div className="flex gap-4 px-5">
                 <Button
                   className="bg-transparent focus:ring-0 border border-primary text-primary dark:text-gray-50"
                   onClick={handleBtnBackClicked}
                 >
+                  <IoReturnDownBackOutline className="mr-2" />
                   Back
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-primary hover:bg-primary-hover focus:ring-0 w-20"
+                  className="bg-primary hover:bg-primary-hover focus:ring-0 w-24"
                   title="Save"
                   disabled={isLoading || !isDataChanged}
                 >
                   {isLoading ? (
                     <Spinner color="purple" aria-label="loading" size="xs" />
                   ) : (
-                    "Update"
+                    <>
+                      <PiArrowsCounterClockwise className="mr-2" />
+                      Update
+                    </>
                   )}
                 </Button>
               </div>

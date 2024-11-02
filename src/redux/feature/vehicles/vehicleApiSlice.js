@@ -32,10 +32,20 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
+    addNewVehicle: builder.mutation({
+      query: (initialState) => ({
+        url: "/vehicles",
+        method: "POST",
+        body: {
+          ...initialState,
+        },
+      }),
+      invalidatesTags: [{ type: "Vehicle", id: "LIST" }],
+    }),
   }),
 });
 
-export const { useGetVehicleQuery } = vehicleApiSlice;
+export const { useGetVehicleQuery, useAddNewVehicleMutation } = vehicleApiSlice;
 
 // return query result object
 

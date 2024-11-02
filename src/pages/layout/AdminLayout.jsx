@@ -14,14 +14,14 @@ function AdminLayout() {
         </div>
         <div className="flex flex-grow pt-16">
           {" "}
-          <div className="fixed top-16 left-0 bottom-0 z-[10]">
+          <div className="fixed top-16 left-0 bottom-0 z-[10] ">
             {" "}
             <SideBar />
           </div>
           <div
             className={`${
               isCollapsed ? "ml-20 md:ml-0" : "ml-56 md:ml-0"
-            } flex-grow overflow-auto  dark:bg-gray-900 z-0`}
+            } flex-grow overflow-auto  dark:bg-gray-900 z-0  transition-all duration-500`}
           >
             <Outlet />
           </div>

@@ -1,6 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import { apiSlice } from "../../app/api/apiSlice";
-import { logOut, setCredentials } from "./authSlice";
+import { logOut, setCredentials, setUuid } from "./authSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -40,7 +39,9 @@ export const authApiSlice = apiSlice.injectEndpoints({
           const { data } = await queryFulfilled;
           console.log(data);
           const { accessToken } = data;
+          const { uuid } = data;
           dispatch(setCredentials({ accessToken }));
+          dispatch(setUuid(uuid));
         } catch (error) {
           console.log(error);
         }

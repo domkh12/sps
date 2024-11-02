@@ -4,12 +4,20 @@ const usersAdapter = createEntityAdapter({});
 const initialState = usersAdapter.getInitialState();
 const userSlice = createSlice({
   name: "users",
-  initialState,
+  initialState: {
+    uuid: "",
+    status: "",
+  },
   reducers: {
-    setUsers: usersAdapter.setAll, 
+    setUuid: (state, action) => {      
+      state.uuid = action.payload;
+    },
+    setStatus: (state, action) => {
+      state.status = action.payload;
+    },
   },
 });
 
-export const { setUsers } = userSlice.actions;
+export const { setUuid, setStatus } = userSlice.actions;
 
 export default userSlice.reducer;

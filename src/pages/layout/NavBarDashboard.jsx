@@ -8,12 +8,10 @@ import {
   Navbar,
   Tooltip,
 } from "flowbite-react";
-import InputSearch from "../../components/util/InputSearch";
 import Notification from "../../components/util/Notification";
 import { HiMenuAlt2 } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleCollapsed } from "../../redux/feature/actions/actionSlice";
-import { IoSearch } from "react-icons/io5";
 
 function NavBarDashboard() {
   const { translate } = useTranslation();
@@ -31,10 +29,10 @@ function NavBarDashboard() {
     >
       <Navbar.Brand className="flex items-center justify-between w-full">
         <div className="flex items-center">
-          <Tooltip  content={"Collapse Menu"}>
+          <Tooltip  content={"Collapse Menu"} trigger={window.innerWidth <= 1024 ? "undefined" : "hover"}>
 
 
-          <Button onClick={handleToggleCollapse} className="w-10 h-10 mr-2 ring-transparent hover:bg-gray-200">
+          <Button onClick={handleToggleCollapse} className="w-10 h-10 mr-2 ring-transparent hover:bg-gray-200 dark:hover:bg-gray-700">
             <HiMenuAlt2 className="h-5 w-5 text-black  dark:text-gray-100" />
           </Button>
           </Tooltip>
@@ -53,14 +51,8 @@ function NavBarDashboard() {
           {/* <InputSearch /> */}
         </div>
 
-        <div className="flex md:order-2 gap-4 items-center">
-          <Button
-            onClick={handleToggleCollapse}
-            className="hidden md:flex w-10 h-10"
-          >
-            <IoSearch className="h-5 w-5 text-gray-700" />
-          </Button>
-          <Tooltip content="Dark Mode">
+        <div className="flex md:order-2 gap-4 items-center">          
+          <Tooltip content="Dark Mode" trigger={window.innerWidth <= 1024 ? "undefined" : "hover"}>
           <DarkThemeToggle />
           </Tooltip>
           <Notification />

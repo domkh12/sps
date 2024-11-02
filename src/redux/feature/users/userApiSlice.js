@@ -97,7 +97,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         url: `/users/search?q=${query}`,
       }),
 
-      transformResponse: (responseData) => {     
+      transformResponse: (responseData) => {
         const loadedUsers = responseData.content.map((user) => ({
           ...user,
           id: user.uuid,
@@ -109,7 +109,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
           const { data } = await queryFulfilled;
           console.log("data", data);
           const { users: newUsers, totalPages: newTotalPages } = data;
-        
+
           dispatch(
             userApiSlice.util.updateQueryData(
               "getUsers",
@@ -125,6 +125,52 @@ export const userApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
+    findByUuid: builder.mutation({
+      query: (uuid) => ({
+        url: `/users/${uuid}`,
+      }),
+      transformResponse: (responseData) => {
+        const loadedUser = {
+          ...responseData,
+          id: responseData.uuid,
+        };
+        return usersAdapter.setAll(initialState, [loadedUser]);
+      },
+    }),
+    connectedUser: builder.mutation({
+      query: ({ uuid, status }) => ({
+        url: `/users/${uuid}/status`,
+        method: "PATCH",
+        body: {
+          status,
+        },
+      }),
+      transformResponse: (responseData) => {
+        console.log("responseData", responseData);
+      },
+      invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.uuid }],
+    }),
+    getFullNameUsers: builder.query({
+      query: () => `/users/full-names`,
+      validateStatus: (response, result) => {
+        return response.status === 200 && !result.isError;
+      },
+      transformResponse: (responseData) => {
+        const loadedUsers = responseData.map((user) => {
+          user.id = user.uuid;
+          return user;
+        });
+        return usersAdapter.setAll(initialState, loadedUsers);
+      },
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [
+            { type: "User", id: "LIST" },
+            ...result.ids.map((id) => ({ type: "User", id })),
+          ];
+        } else return [{ type: "User", id: "LIST" }];
+      },
+    }),
   }),
 });
 
@@ -135,13 +181,28 @@ export const {
   useDeleteUserMutation,
   usePaginationUsersMutation,
   useSearchUsersMutation,
+  useFindByUuidMutation,
+  useConnectedUserMutation,
+  useGetFullNameUsersQuery,
 } = userApiSlice;
 
 // return the query result object
 export const selectUserResult = userApiSlice.endpoints.getUsers.select();
+export const selectUserProfile = userApiSlice.endpoints.findByUuid.select();
+export const selectFullNameUser = userApiSlice.endpoints.getFullNameUsers.select();
 // create momorized selector
 const selectUserData = createSelector(
   selectUserResult,
+  (usersResult) => usersResult.data // normalized state object with ids & entities
+);
+// create momorized selector
+const selectUserProfileData = createSelector(
+  selectUserProfile,
+  (usersResult) => usersResult.data // normalized state object with ids & entities
+);
+// create momorized selector
+const selectFullNameUserData = createSelector(
+  selectFullNameUser,
   (usersResult) => usersResult.data // normalized state object with ids & entities
 );
 
@@ -152,3 +213,21 @@ export const {
   selectIds: selectUserIds,
   // pass the selector that return the users slice of state
 } = usersAdapter.getSelectors((state) => selectUserData(state) ?? initialState);
+
+// getSelector creates these selectors and we rename them with aliase using destructuring
+export const {
+  selectAll: selectAllUserProfile,
+  selectById: selectUserProfileById,
+  selectIds: selectUserProfileIds,
+  // pass the selector that return the users slice of state
+} = usersAdapter.getSelectors(
+  (state) => selectUserProfileData(state) ?? initialState
+);
+
+// getSelector creates these selectors and we rename them with aliase using destructuring
+export const {
+  selectAll: selectAllFullNameUsers,
+  selectById: selectUserFullNameById,
+  selectIds: selectUserFullNameIds,
+  // pass the selector that return the users slice of state
+} = usersAdapter.getSelectors((state) => selectFullNameUserData(state) ?? initialState);

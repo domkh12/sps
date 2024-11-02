@@ -38,12 +38,6 @@ function SideBar() {
   const sidebarContent = (
     <Sidebar.Items className="flex flex-col gap-2">
       <Sidebar.ItemGroup>
-        <Drawer.Items>
-          <div className="mb-6 mt-3">
-            <InputSearch />
-          </div>
-        </Drawer.Items>
-
         <Sidebar.Item
           as={NavLink}
           to="/dash"
@@ -66,7 +60,7 @@ function SideBar() {
 
         <Sidebar.Item
           as={NavLink}
-          to="/admin/vehicle"
+          to="/dash/vehicles"
           icon={FaCar}
           className={`${isCollapsed && window.innerWidth > 768 ? "grid" : ""}`}
           active={location.pathname === "/admin/vehicle"}
@@ -81,7 +75,7 @@ function SideBar() {
           className={`${isCollapsed && window.innerWidth > 768 ? "grid" : ""}`}
           active={location.pathname === "/dash/users"}
         >
-          {!(isCollapsed && window.innerWidth > 768) && "Users"}          
+          {!(isCollapsed && window.innerWidth > 768) && "Users"}
         </Sidebar.Item>
 
         <Sidebar.Item
@@ -134,9 +128,9 @@ function SideBar() {
           aria-label="side bar"
           className={`border-r-[1px] border-gray-200 dark:border-gray-700 py-[10px] h-full bg-gray-50 dark:bg-gray-800 ${
             isCollapsed ? "w-20" : "w-56"
-          }`}
+          }  transition-all duration-500`}
         >
-          <Sidebar.Items className="flex flex-col gap-2 ">
+          <Sidebar.Items className="flex flex-col gap-2">
             <Sidebar.ItemGroup>
               <Sidebar.Item
                 as={NavLink}
@@ -160,7 +154,7 @@ function SideBar() {
 
               <Sidebar.Item
                 as={NavLink}
-                to="/dash/vehicle"
+                to="/dash/vehicles"
                 icon={FaCar}
                 className={`${isCollapsed ? "grid" : ""}`}
                 active={location.pathname === "/dash/vehicle"}
