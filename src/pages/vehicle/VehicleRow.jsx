@@ -18,32 +18,33 @@ function VehicleRow({ vehicleId }) {
     return null;
   }
   return (
-    <TableRow >
+    <TableRow>
       <TableCell className="whitespace-nowrap">
-        <div className="flex gap-3 mr-32">
+        <div className="flex items-center gap-5">
           <img
-            src="/images/vehiclePlaceHolder.png"
+            src={vehicle.image || "/images/vehiclePlaceHolder.png"}
             alt="car_Photo"
             className="w-32 h-20 object-cover rounded-lg"
           />
-          <div className="grid grid-rows-2 col-span-3 shrink ">
-            <p className="">
+          <div className=" shrink ">
+            <p>
               {vehicle.vehicleModel ? vehicle.vehicleModel : "N/A"}
-            </p>
-            <div className="text-nowrap">
-              This is description
-            </div>
+            </p>            
           </div>
         </div>
       </TableCell>
       <TableCell>
-        <div className="border-2 w-36 h-auto border-blue-600 text-center p-1 rounded-md">
-          <p className="text-blue-600 text-sm">ភ្នំពេញ</p>
+        <div className="border-2 w-36 h-auto border-blue-600 text-center p-1 rounded-md bg-gray-50">
+          <p className="text-blue-600 text-sm">
+            {vehicle.licensePlateKhName || "Unknown"}
+          </p>
           <span className="text-blue-600 text-lg">
-            {vehicle.numberPlate ? vehicle.numberPlate : "N/A"}
+            {vehicle.numberPlate ? vehicle.numberPlate : "Unknown"}
           </span>
           <div className="h-[0.2px] mx-1 mb-1 bg-blue-600"></div>
-          <p className="text-red-600 text-xs">Phnom Penh</p>
+          <p className="text-red-600 text-xs">
+            {vehicle.licensePlateEngName || "Unknown"}
+          </p>
         </div>
       </TableCell>
       <TableCell>
@@ -52,7 +53,9 @@ function VehicleRow({ vehicleId }) {
       <TableCell className="text-right">
         {vehicle.user.phoneNumber ? vehicle.user.phoneNumber : "N/A"}
       </TableCell>
-      <TableCell className="text-right">{createdAtResult ? createdAtResult : "N/A"}</TableCell>
+      <TableCell className="text-right">
+        {createdAtResult ? createdAtResult : "N/A"}
+      </TableCell>
       <TableCell>
         <div className="flex gap-2 items-center justify-end">
           <Tooltip content="Edit" trigger="hover">

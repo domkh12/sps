@@ -2,7 +2,7 @@ import { useState } from "react";
 import { RiImageAddLine } from "react-icons/ri";
 import { Label } from "flowbite-react";
 
-function ImageUpload({ setProfileImageFile, imageUri }) {
+function ImageUpload({ setImageFile, imageUri }) {
   const [image, setImage] = useState(imageUri);
   const [uploading, setUploading] = useState(false);
   const [alert, setAlert] = useState("");
@@ -26,7 +26,7 @@ function ImageUpload({ setProfileImageFile, imageUri }) {
       reader.onloadend = () => {
         setUploading(true);
         setImage(reader.result);
-        // setProfileImageFile(files[0]);
+        setImageFile(files[0]);
 
         setTimeout(() => {
           setUploading(false);
@@ -137,7 +137,7 @@ function ImageUpload({ setProfileImageFile, imageUri }) {
               <>
                 <label
                   htmlFor="newProfilePhoto"
-                  className="h-full flex justify-center items-center bg-gray-50"
+                  className="h-full flex justify-center items-center bg-gray-50 rounded-md dark:bg-gray-800"
                 >
                   <div className="text-center text-gray-500">
                     <div className="text-uppercase">

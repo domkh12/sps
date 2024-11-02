@@ -51,7 +51,7 @@ function UserRow({ userId, uuid, status }) {
   }
 
   return (
-    <TableRow className="text-left">      
+    <TableRow className="text-left">
       <TableCell>
         <Link
           to={`/dash/users/${userId}/view`}
@@ -83,7 +83,9 @@ function UserRow({ userId, uuid, status }) {
           {userRolesString ? userRolesString : "N/A"}
         </div>
       </TableCell>
-      <TableCell className="text-right">{createdAtResult ? createdAtResult : "N/A"}</TableCell>
+      <TableCell className="text-right">
+        {createdAtResult ? createdAtResult : "N/A"}
+      </TableCell>
       <TableCell>
         {updatedUser ? (
           <div className="flex justify-end items-center gap-2">
@@ -97,37 +99,37 @@ function UserRow({ userId, uuid, status }) {
             <span
               className={
                 updatedUser.status === STATUS.ONLINE
-                  ? "text-green-600"
-                  : "text-red-600"
+                  ? "text-green-600 pt-1"
+                  : "text-red-600 pt-1"
               }
             >
               {updatedUser.status}
             </span>
           </div>
         ) : (
-          <div className="flex justify-end items-center gap-2">
-            <span
+          <div className="flex items-center justify-end gap-2">
+            <div
               className={
                 user.status === STATUS.ONLINE
                   ? "w-2 h-2 bg-green-600 rounded-full"
                   : "w-2 h-2 bg-red-600 rounded-full"
               }
-            ></span>
-            <span
+            ></div>
+            <div
               className={
                 user.status === STATUS.ONLINE
-                  ? "text-green-600"
-                  : "text-red-600"
+                  ? "text-green-600 pt-1"
+                  : "text-red-600 pt-1"
               }
             >
               {user.status}
-            </span>
+            </div>
           </div>
         )}
       </TableCell>
       <TableCell className="flex justify-end items-center">
         <div className="flex gap-2">
-          <Tooltip content="Edit" trigger="hover">
+          <Tooltip content="Edit" trigger={window.innerWidth <= 1024 ? "undefined" : "hover"}>
             <Button
               onClick={handleEdit}
               className="bg-primary hover:bg-primary-hover ring-transparent"
@@ -135,7 +137,7 @@ function UserRow({ userId, uuid, status }) {
               <FaEdit />
             </Button>
           </Tooltip>
-          <Tooltip content="View" trigger="hover">
+          <Tooltip content="View" trigger={window.innerWidth <= 1024 ? "undefined" : "hover"}>
             <Button
               onClick={handleView}
               className="bg-secondary hover:bg-secondary-hover ring-transparent"

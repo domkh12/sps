@@ -93,7 +93,7 @@ function VehicleList() {
             onClick={handleBtnAddNewClicked}
           >
             <FaPlus className="mr-2 sm:mr-0" />
-            <span className="sm:hidden">Add New</span>
+            <span className="sm:hidden">Add Vehicle</span>
           </Button>
         </div>
         <div className="overflow-x-auto shadow-md">
