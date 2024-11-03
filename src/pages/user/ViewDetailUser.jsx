@@ -234,7 +234,7 @@ function ViewDetailUser({ user }) {
                   Gender :
                 </span>
                 <span className="text-primary font-medium text-base">
-                  {user.gender}
+                  {user.gender.fullNameEnglish}
                 </span>
               </Label>
 

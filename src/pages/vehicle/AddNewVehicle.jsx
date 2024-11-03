@@ -25,6 +25,8 @@ import { selectAllVehicleTypes } from "../../redux/feature/vehicles/vehicleTypeA
 import { useAddNewVehicleMutation } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { toast } from "react-toastify";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
+import { IoMdSearch } from "react-icons/io";
+import AddNewUser from "../user/AddNewUser";
 
 function AddNewVehicle() {
   const navigator = useNavigate();
@@ -38,7 +40,11 @@ function AddNewVehicle() {
   const [selectedUsers, setSelectedUsers] = useState();
   const [selectedVehicleType, setSelectedVehicleType] = useState();
   const [imageFile, setImageFile] = useState(null);
-  console.log(imageFile);
+  const [isModalCreateUserOpen, setIsModalCreateUserOpen] = useState(false);
+  const [isModalCreateVehicleTypeOpen, setIsModalCreateVehicleTypeOpen] =
+    useState(false);
+  const [searchOwner, setSearchOwner] = useState("");
+
   const [addNewVehicle, { isSuccess, isLoading, isError, error }] =
     useAddNewVehicleMutation();
 
@@ -140,7 +146,19 @@ function AddNewVehicle() {
   const handleBtnBackClicked = () => {
     navigator("/dash/vehicles");
   };
-  
+
+  const toggleCreateUserModal = () => {
+    setIsModalCreateUserOpen(!isModalCreateUserOpen);
+  };
+
+  const toggleCreateVehicleTypeModal = () => {
+    setIsModalCreateVehicleTypeOpen(!isModalCreateVehicleTypeOpen);
+  };
+
+  const filteredUsers = usersState.filter((user) =>
+    user.fullName.toLowerCase().includes(searchOwner.toLowerCase())
+  );
+
   const content = (
     <>
       <h2 className="text-2xl font-medium  dark:text-gray-100 p-5">
@@ -226,6 +244,9 @@ function AddNewVehicle() {
                               backgroundColor:
                                 mode === "dark" ? "#1f2937" : "#f9fafb",
                               color: mode === "dark" ? "white" : "#1f2937",
+                              "&:hover": {
+                                backgroundColor: "#e4e4e4",
+                              },
                             }}
                             id="plateNameKh"
                             name="plateNameKh"
@@ -344,48 +365,65 @@ function AddNewVehicle() {
                               {" "}
                               <div className="absolute top-0 left-0 w-full rounded-lg z-10 hover:border-black dark:hover:border-gray-400  bg-gray-50 border border-gray-500 dark:bg-gray-800">
                                 <div>
-                                  <div className="p-3">
-                                    <input                                    
+                                  <div className="p-3 relative">
+                                    <span className="absolute left-3 top-[1.2rem] pl-3 flex items-center pointer-events-none">
+                                      <IoMdSearch className="text-gray-500 text-2xl" />
+                                    </span>
+                                    <input
                                       style={{
                                         backgroundColor:
                                           mode === "dark"
                                             ? "#1f2937"
                                             : "#f9fafb",
                                         cursor: "pointer",
+                                        paddingLeft: "2.5rem",
                                       }}
                                       placeholder="Search"
+                                      value={searchOwner}
+                                      onChange={(e) =>
+                                        setSearchOwner(e.target.value)
+                                      }
                                       className=" hover:border-black dark:hover:border-gray-400 border border-gray-500 focus:outline-blue-600 w-full p-2 rounded-lg"
                                     />
                                   </div>
                                   <div className="overflow-auto h-[18.2rem] w-full">
-                                    {usersState.map((user) => (
-                                      <div
-                                        key={user.uuid}
-                                        className="px-3 flex justify-start hover:bg-gray-300 cursor-pointer items-center py-2 gap-3"
-                                        onClick={() =>
-                                          setFieldValue("owner", user.uuid)
-                                        }
-                                      >
-                                        <Radio
-                                          id={user.owner}
-                                          name={user.owner}
-                                          className="focus:ring-transparent"
-                                          onChange={() =>
+                                    {filteredUsers.length > 0 ? (
+                                      filteredUsers.map((user) => (
+                                        <div
+                                          key={user.uuid}
+                                          className="px-3 flex justify-start hover:bg-gray-300 cursor-pointer items-center py-2 gap-3"
+                                          onClick={() =>
                                             setFieldValue("owner", user.uuid)
                                           }
-                                          checked={values.owner === user.uuid}
-                                        />
-                                        <Label htmlFor={user.fullName}>
-                                          {user.fullName}
-                                        </Label>
+                                        >
+                                          <Radio
+                                            id={user.owner}
+                                            name={user.owner}
+                                            className="focus:ring-transparent"
+                                            onChange={() =>
+                                              setFieldValue("owner", user.uuid)
+                                            }
+                                            checked={values.owner === user.uuid}
+                                          />
+                                          <Label htmlFor={user.fullName}>
+                                            {user.fullName}
+                                          </Label>
+                                        </div>
+                                      ))
+                                    ) : (
+                                      <div className="px-3 py-2 flex justify-center text-gray-500">
+                                        No user available
                                       </div>
-                                    ))}
+                                    )}
                                   </div>
                                   <div className="w-full p-3 border-t border-t-gray-400 ">
                                     <Label className="  text-blue-600">
-                                      <span className="flex  justify-start w-32  gap-3  cursor-pointer hover:underline">
+                                      <span
+                                        className="flex  justify-start w-32  gap-3  cursor-pointer hover:underline"
+                                        onClick={toggleCreateUserModal}
+                                      >
                                         <FiUserPlus />
-                                        Add User
+                                        Create User
                                       </span>
                                     </Label>
                                   </div>
@@ -413,10 +451,11 @@ function AddNewVehicle() {
                             }
                           >
                             <TextInput
-
-                              value={vehicleTypes.find(
+                              value={
+                                vehicleTypes.find(
                                   (type) => type.uuid === values.type
-                                )?.name || ""}
+                                )?.name || ""
+                              }
                               placeholder="Select Vehicle Type"
                               style={{
                                 backgroundColor:
@@ -444,7 +483,10 @@ function AddNewVehicle() {
                               {" "}
                               <div className="absolute top-0 left-0 w-full rounded-lg z-10 hover:border-black dark:hover:border-gray-400  bg-gray-50 border border-gray-500 dark:bg-gray-800">
                                 <div>
-                                  <div className="p-3">
+                                  <div className="p-3 relative">
+                                    <span className="absolute left-3 top-[1.2rem] pl-3 flex items-center pointer-events-none">
+                                      <IoMdSearch className="text-gray-500 text-2xl" />
+                                    </span>
                                     <input
                                       style={{
                                         backgroundColor:
@@ -452,6 +494,7 @@ function AddNewVehicle() {
                                             ? "#1f2937"
                                             : "#f9fafb",
                                         cursor: "pointer",
+                                        paddingLeft: "2.5rem",
                                       }}
                                       placeholder="Search"
                                       className=" hover:border-black dark:hover:border-gray-400 border border-gray-500 focus:outline-blue-600 w-full p-2 rounded-lg"
@@ -482,10 +525,13 @@ function AddNewVehicle() {
                                     ))}
                                   </div>
                                   <div className="w-full p-3 border-t border-t-gray-400 ">
-                                    <Label className="  text-blue-600">
-                                      <span className="flex  justify-start w-40  gap-3  cursor-pointer hover:underline">
+                                    <Label className="text-blue-600">
+                                      <span
+                                        className="flex justify-start w-40 gap-3 cursor-pointer hover:underline"
+                                        onClick={toggleCreateVehicleTypeModal}
+                                      >
                                         <LuCar />
-                                        Add Vehicle Type
+                                        Create Vehicle Type
                                       </span>
                                     </Label>
                                   </div>
@@ -559,7 +605,6 @@ function AddNewVehicle() {
                             style={{
                               backgroundColor:
                                 mode === "dark" ? "#1f2937" : "#f9fafb",
-                              color: values.color,
                               borderColor: values.color,
                             }}
                             color={"default"}
@@ -614,6 +659,36 @@ function AddNewVehicle() {
           );
         }}
       </Formik>
+      <Modal
+        show={isModalCreateUserOpen}
+        onClose={toggleCreateUserModal}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Modal.Header>Create New User</Modal.Header>
+        <Modal.Body>
+          {/* Add your form or content for creating a new user here */}
+          <AddNewUser />
+        </Modal.Body>
+      </Modal>
+
+      <Modal
+        show={isModalCreateVehicleTypeOpen}
+        onClose={toggleCreateVehicleTypeModal}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Modal.Header>Create New Vehicle Type</Modal.Header>
+        <Modal.Body>
+          {/* Add your form or content for creating a new vehicle type here */}
+        </Modal.Body>
+      </Modal>
     </>
   );
 
