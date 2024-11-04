@@ -38,7 +38,8 @@ function EditUserForm({ user }) {
   const dropdownRef = useRef(null);
   const [rolesPlaceHolder, setRolesPlaceHolder] = useState(
     user.roleNames.join(", ")
-  );
+  );  
+  console.log(user)
   const [isDataChanged, setIsDataChanged] = useState(false);  
   const [updateUser, { isSuccess, isLoading, isError, error }] =
     useUpdateUserMutation();
@@ -158,7 +159,7 @@ function EditUserForm({ user }) {
     firstName: user.firstName,
     lastName: user.lastName,
     fullName: user.fullName,
-    genderName: user.gender,
+    genderName: user.gender.fullNameEnglish,
     email: user.email,
     phoneNumber: user.phoneNumber,
     profileImage: "",

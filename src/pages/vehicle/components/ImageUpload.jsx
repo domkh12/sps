@@ -63,7 +63,7 @@ function ImageUpload({ setImageFile, imageUri }) {
               className="uploadProfileInput opacity-0 absolute inset-0 cursor-pointer"
               type="file"
               name="profile_pic"
-              id="newProfilePhoto"
+              id="vehicleImage"
               accept="image/*"
               onChange={handleFileChange}
             />
@@ -149,7 +149,7 @@ function ImageUpload({ setImageFile, imageUri }) {
                     className="uploadProfileInput opacity-0 absolute inset-0 cursor-pointer"
                     type="file"
                     name="profile_pic"
-                    id="newProfilePhoto"
+                    id="vehicleImage"
                     accept="image/*"
                     onChange={handleFileChange}
                   />

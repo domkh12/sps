@@ -13,7 +13,7 @@ import { Form, Formik } from "formik";
 import { IoReturnDownBackOutline } from "react-icons/io5";
 import { LuCar, LuRectangleHorizontal, LuSave } from "react-icons/lu";
 import { MdOutlineColorLens, MdOutlineDelete } from "react-icons/md";
-import { PiCarThin } from "react-icons/pi";
+import { PiCar, PiCarThin } from "react-icons/pi";
 import { TbUser } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
@@ -32,11 +32,15 @@ import { useAddNewVehicleMutation } from "../../redux/feature/vehicles/vehicleAp
 import { toast } from "react-toastify";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { IoMdSearch } from "react-icons/io";
-import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { HiOutlineExclamationCircle, HiShoppingCart } from "react-icons/hi";
 import {
   Cardtheme,
   spinnerTheme,
 } from "./../../redux/feature/utils/customReactFlowbiteTheme";
+import { RiAddCircleLine } from "react-icons/ri";
+import { CgAddR } from "react-icons/cg";
+import { GoPersonAdd } from "react-icons/go";
+import AddNewUser from "../user/AddNewUser";
 
 function AddNewVehicle() {
   const navigator = useNavigate();
@@ -53,6 +57,7 @@ function AddNewVehicle() {
   const [isModalCreateVehicleTypeOpen, setIsModalCreateVehicleTypeOpen] =
     useState(false);
   const [searchOwner, setSearchOwner] = useState("");
+  const [searchVehicleType, setSearchVehicleType] = useState("");
   const [isDeleteConfirmModalOpen, setIsDeleteConfirmModalOpen] =
     useState(false);
   const [vehicleTypeToDelete, setVehicleTypeToDelete] = useState(null);
@@ -172,9 +177,9 @@ function AddNewVehicle() {
 
   const validationSchemaVehicleType = Yup.object().shape({
     name: Yup.string()
-      .min(2, "Vehicle Type Name must be at least 2 characters")
-      .max(20, "Vehicle Type Name cannot exceed 20 characters")
-      .required("Vehicle Type Name is required"),
+      .min(2, "Min 2 chars")
+      .max(20, "Max 20 chars")
+      .required("Required"),
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -269,6 +274,10 @@ function AddNewVehicle() {
 
   const filteredUsers = usersState.filter((user) =>
     user.fullName.toLowerCase().includes(searchOwner.toLowerCase())
+  );
+
+  const filteredVehicleType = vehicleTypes.filter((type) =>
+    type.name.toLowerCase().includes(searchVehicleType.toLowerCase())
   );
 
   const content = (
@@ -450,7 +459,12 @@ function AddNewVehicle() {
                           ref={ownerRef}
                         >
                           <div onClick={() => setToggleOwner(!toggleOwner)}>
-                            <TextInput
+                            <input
+                              className={`border-gray-500 border rounded-lg focus:outline-none px-3 w-full h-[2.6rem] text-sm ${
+                                errors.owner && touched.owner
+                                  ? "border-red-600"
+                                  : ""
+                              }`}
                               placeholder="Select Owner"
                               value={
                                 usersState.find(
@@ -481,10 +495,13 @@ function AddNewVehicle() {
                           {toggleOwner ? (
                             <>
                               {" "}
-                              <div className="absolute top-0 left-0 w-full rounded-lg z-10 hover:border-black dark:hover:border-gray-400  bg-gray-50 border border-gray-500 dark:bg-gray-800">
+                              <Card
+                                theme={Cardtheme}
+                                className="absolute top-0 left-0 w-full rounded-lg z-10 bg-gray-50 dark:bg-gray-800"
+                              >
                                 <div>
-                                  <div className="p-3 relative">
-                                    <span className="absolute left-3 top-[1.2rem] pl-3 flex items-center pointer-events-none">
+                                  <div className="relative mx-5 my-4">
+                                    <span className="absolute left-0 top-2 pl-3 flex items-center pointer-events-none">
                                       <IoMdSearch className="text-gray-500 text-2xl" />
                                     </span>
                                     <input
@@ -534,19 +551,25 @@ function AddNewVehicle() {
                                       </div>
                                     )}
                                   </div>
-                                  <div className="w-full p-3 border-t border-t-gray-400 ">
-                                    <Label className="  text-blue-600">
-                                      <span
-                                        className="flex  justify-start w-32  gap-3  cursor-pointer hover:underline"
-                                        onClick={toggleCreateUserModal}
-                                      >
-                                        <FiUserPlus />
+                                  <div className="w-full px-5 py-4 border-t border-t-gray-400 flex justify-between items-center">
+                                    <Button
+                                      className="text-gray-900 bg-gray-200 hover:bg-gray-300 ring-transparent"
+                                      onClick={toggleCreateUserModal}
+                                    >
+                                      <span className="flex justify-start w-32 gap-3 cursor-pointer">
+                                        <GoPersonAdd className="mt-[0.1rem] h-5 w-5" />
                                         Create User
                                       </span>
-                                    </Label>
+                                    </Button>
+                                    <Button
+                                      className="bg-gray-200 text-gray-900 hover:bg-gray-300 ring-transparent"
+                                      onClick={() => setToggleOwner(false)}
+                                    >
+                                      Done
+                                    </Button>
                                   </div>
                                 </div>
-                              </div>
+                              </Card>
                             </>
                           ) : (
                             <></>
@@ -568,7 +591,8 @@ function AddNewVehicle() {
                               setToggleVehicleType(!toggleVehicleType)
                             }
                           >
-                            <TextInput
+                            <input
+                              className="border-gray-500 border rounded-lg focus:outline-none px-3 w-full h-[2.6rem] text-sm"
                               value={
                                 vehicleTypes.find(
                                   (type) => type.uuid === values.type
@@ -617,53 +641,68 @@ function AddNewVehicle() {
                                         cursor: "pointer",
                                         paddingLeft: "2.5rem",
                                       }}
+                                      onChange={(e) =>
+                                        setSearchVehicleType(e.target.value)
+                                      }
                                       placeholder="Search"
                                       className=" hover:border-black dark:hover:border-gray-400 border border-gray-500 focus:outline-black focus:border-[1px] w-full p-2 rounded-lg"
                                     />
                                   </div>
                                   <div className="overflow-auto h-48 w-full">
-                                    {vehicleTypes.map((type) => (
-                                      <div
-                                        key={type.uuid}
-                                        className="px-5 flex justify-between items-center py-2 gap-3 hover:bg-gray-200 rounded-lg cursor-pointer"
-                                        onClick={() =>
-                                          setFieldValue("type", type.uuid)
-                                        }
-                                      >
-                                        <div className="flex gap-3">
-                                          <Radio
-                                            id={type.name}
-                                            name={type.name}
-                                            className="focus:ring-transparent"
-                                            onChange={() =>
-                                              setFieldValue("type", type.uuid)
-                                            }
-                                            checked={values.type === type.uuid}
-                                          />
-                                          <Label htmlFor={type.name}>
-                                            {type.name}
-                                          </Label>
-                                        </div>
-                                        <Tooltip
-                                          content="Delete"
-                                          trigger={
-                                            window.innerWidth <= 1024
-                                              ? "undefined"
-                                              : "hover"
+                                    {filteredVehicleType.length > 0 ? (
+                                      filteredVehicleType.map((type) => (
+                                        <div
+                                          key={type.uuid}
+                                          className="px-5 flex justify-between items-center py-2 gap-3 hover:bg-gray-200 rounded-lg cursor-pointer"
+                                          onClick={() =>
+                                            setFieldValue("type", type.uuid)
                                           }
                                         >
-                                          <Button
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              openDeleteConfirmModal(type.uuid);
-                                            }}
-                                            className="hover:bg-gray-300 w-10 h-10 rounded-full ring-transparent"
+                                          <div className="flex gap-3">
+                                            <Radio
+                                              id={type.name}
+                                              name={type.name}
+                                              className="focus:ring-transparent"
+                                              onChange={() =>
+                                                setFieldValue("type", type.uuid)
+                                              }
+                                              checked={
+                                                values.type === type.uuid
+                                              }
+                                            />
+                                            <Label htmlFor={type.name}>
+                                              {type.name}
+                                            </Label>
+                                          </div>
+                                          <Tooltip
+                                            content="Delete"
+                                            trigger={
+                                              window.innerWidth <= 1024
+                                                ? "undefined"
+                                                : "hover"
+                                            }
                                           >
-                                            <MdOutlineDelete className="text-red-600 text-xl" />
-                                          </Button>
-                                        </Tooltip>
-                                      </div>
-                                    ))}
+                                            <Button
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                openDeleteConfirmModal(
+                                                  type.uuid
+                                                );
+                                              }}
+                                              className="hover:bg-gray-300 w-10 h-10 rounded-full ring-transparent"
+                                            >
+                                              <MdOutlineDelete className="text-red-600 text-xl" />
+                                            </Button>
+                                          </Tooltip>
+                                        </div>
+                                      ))
+                                    ) : (
+                                      <>
+                                        <span className="flex justify-center items-center text-gray-600">
+                                          No vehicle types available
+                                        </span>
+                                      </>
+                                    )}
                                   </div>
                                   <div className="w-full px-5 py-4 border-t border-t-gray-400 flex justify-between items-center">
                                     <Button
@@ -671,7 +710,7 @@ function AddNewVehicle() {
                                       onClick={toggleCreateVehicleTypeModal}
                                     >
                                       <span className="flex justify-start w-40 gap-3 cursor-pointer">
-                                        <LuCar />
+                                        <PiCar className="mt-[0.1rem]" />
                                         Create Vehicle Type
                                       </span>
                                     </Button>
@@ -819,7 +858,7 @@ function AddNewVehicle() {
       >
         <Modal.Header>Create New User</Modal.Header>
         <Modal.Body>
-          {/* Add your form or content for creating a new user here */}
+          <AddNewUser />
         </Modal.Body>
       </Modal>
 
@@ -866,18 +905,24 @@ function AddNewVehicle() {
                       Vehicle Type Name
                       <span className="text-red-600">*</span>
                     </Label>
-                    <TextInput
-                      name="name"
-                      id="name"
-                      placeholder="Enter Vehicle Type Name"
-                      value={values.name}
-                      onChange={handleChange}
-                      className="w-[25vw] lg:w-full"
-                    />
+                    <div>
+                      <TextInput
+                        name="name"
+                        id="name"
+                        placeholder="Enter Vehicle Type Name"
+                        value={values.name}
+                        onChange={handleChange}
+                        className="w-[25vw] lg:w-full"
+                        color={
+                          errors.name && touched.name ? "failure" : "default"
+                        }
+                      />
+                      {errors.name && touched.name && (
+                        <small className="text-red-600">{errors.name}</small>
+                      )}
+                    </div>
                   </div>
-                  {errors.tynamepe && touched.name && (
-                    <small className="text-red-600">{errors.name}</small>
-                  )}
+
                   <div className="flex justify-end">
                     <Button
                       type="submit"
@@ -892,7 +937,7 @@ function AddNewVehicle() {
                         />
                       ) : (
                         <>
-                          <LuSave className="mr-2" />
+                          <CgAddR className="mr-2 h-5 w-5" />
                           Create
                         </>
                       )}
