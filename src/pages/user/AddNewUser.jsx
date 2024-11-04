@@ -574,7 +574,7 @@ function AddNewUser() {
                   ) : (
                     <>
                       <LuSave className="mr-2"/>
-                      Save
+                      Create
                     </>
                   )}
                 </Button>

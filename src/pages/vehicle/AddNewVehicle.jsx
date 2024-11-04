@@ -1,19 +1,21 @@
 import {
   Button,
-  Checkbox,
+  Card,
   Label,
   Modal,
   Radio,
+  Spinner,
   TextInput,
+  Tooltip,
   useThemeMode,
 } from "flowbite-react";
 import { Form, Formik } from "formik";
 import { IoReturnDownBackOutline } from "react-icons/io5";
 import { LuCar, LuRectangleHorizontal, LuSave } from "react-icons/lu";
-import { MdOutlineColorLens } from "react-icons/md";
+import { MdOutlineColorLens, MdOutlineDelete } from "react-icons/md";
 import { PiCarThin } from "react-icons/pi";
 import { TbUser } from "react-icons/tb";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import ImageUpload from "./components/ImageUpload";
 import { FaChevronDown } from "react-icons/fa";
@@ -21,12 +23,20 @@ import { useSelector } from "react-redux";
 import { selectAllFullNameUsers } from "../../redux/feature/users/userApiSlice";
 import { FiUserPlus } from "react-icons/fi";
 import { useEffect, useRef, useState } from "react";
-import { selectAllVehicleTypes } from "../../redux/feature/vehicles/vehicleTypeApiSlice";
+import {
+  selectAllVehicleTypes,
+  useAddNewVehicleTypeMutation,
+  useDeleteVehicleTypeMutation,
+} from "../../redux/feature/vehicles/vehicleTypeApiSlice";
 import { useAddNewVehicleMutation } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { toast } from "react-toastify";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { IoMdSearch } from "react-icons/io";
-import AddNewUser from "../user/AddNewUser";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
+import {
+  Cardtheme,
+  spinnerTheme,
+} from "./../../redux/feature/utils/customReactFlowbiteTheme";
 
 function AddNewVehicle() {
   const navigator = useNavigate();
@@ -37,21 +47,65 @@ function AddNewVehicle() {
   const [toggleVehicleType, setToggleVehicleType] = useState(false);
   const ownerRef = useRef(null);
   const vehicleTypeRef = useRef(null);
-  const [selectedUsers, setSelectedUsers] = useState();
   const [selectedVehicleType, setSelectedVehicleType] = useState();
   const [imageFile, setImageFile] = useState(null);
   const [isModalCreateUserOpen, setIsModalCreateUserOpen] = useState(false);
   const [isModalCreateVehicleTypeOpen, setIsModalCreateVehicleTypeOpen] =
     useState(false);
   const [searchOwner, setSearchOwner] = useState("");
+  const [isDeleteConfirmModalOpen, setIsDeleteConfirmModalOpen] =
+    useState(false);
+  const [vehicleTypeToDelete, setVehicleTypeToDelete] = useState(null);
 
   const [addNewVehicle, { isSuccess, isLoading, isError, error }] =
     useAddNewVehicleMutation();
 
+  const [
+    addNewVehicleType,
+    {
+      isSuccess: isSuccessVehicleType,
+      isLoading: isLoadingVehicleType,
+      isError: isErrorVehicleType,
+      error: errorVehicleType,
+    },
+  ] = useAddNewVehicleTypeMutation();
+
+  const [deleteVehicleType, {}] = useDeleteVehicleTypeMutation();
+
   const [uploadImage] = useUploadImageMutation();
+
+  const isAnyModalOpen = (modalStates) => {
+    return Object.values(modalStates).some((isOpen) => isOpen);
+  };
+
+  const modalStates = {
+    isModalCreateUserOpen,
+    isModalCreateVehicleTypeOpen,
+    isDeleteConfirmModalOpen,
+    // Add more modals here as needed
+  };
+
+  useEffect(() => {
+    if (isErrorVehicleType) {
+      toast.error(`${errorVehicleType?.data?.error?.description}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+  }, [isErrorVehicleType]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      if (isAnyModalOpen(modalStates)) {
+        return; // Skip closing dropdowns if any modal is open
+      }
+
       if (ownerRef.current && !ownerRef.current.contains(event.target)) {
         setToggleOwner(false);
       }
@@ -67,7 +121,7 @@ function AddNewVehicle() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [modalStates]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -116,6 +170,13 @@ function AddNewVehicle() {
     owner: Yup.string().required("Owner is required"),
   });
 
+  const validationSchemaVehicleType = Yup.object().shape({
+    name: Yup.string()
+      .min(2, "Vehicle Type Name must be at least 2 characters")
+      .max(20, "Vehicle Type Name cannot exceed 20 characters")
+      .required("Vehicle Type Name is required"),
+  });
+
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const formData = new FormData();
@@ -133,14 +194,65 @@ function AddNewVehicle() {
         vehicleMake: values.make,
         vehicleModel: values.model,
         color: values.color,
-        userId: selectedUsers,
-        vehicleTypeId: selectedVehicleType,
+        userId: values.owner,
+        vehicleTypeId: values.type,
         image: profileImageUri,
       });
     } catch (error) {
+      console.log(error);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleSubmitVehicleType = async (values) => {
+    try {
+      const response = await addNewVehicleType({
+        name: values.name,
+        alias: values.name,
+      }).unwrap();
+      setSelectedVehicleType(response.uuid);
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
+  };
+
+  const handleDeleteVehicleType = async () => {
+    if (!vehicleTypeToDelete) return;
+    try {
+      await deleteVehicleType(vehicleTypeToDelete).unwrap();
+      toast.success("Vehicle type deleted successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete vehicle type", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    } finally {
+      setIsDeleteConfirmModalOpen(false);
+      setVehicleTypeToDelete(null);
+    }
+  };
+
+  const openDeleteConfirmModal = (uuid) => {
+    setVehicleTypeToDelete(uuid);
+    setIsDeleteConfirmModalOpen(true);
   };
 
   const handleBtnBackClicked = () => {
@@ -186,6 +298,12 @@ function AddNewVehicle() {
           handleBlur,
           setFieldValue,
         }) => {
+          useEffect(() => {
+            if (isSuccessVehicleType) {
+              setIsModalCreateVehicleTypeOpen(false);
+              setFieldValue("type", selectedVehicleType);
+            }
+          }, [isSuccessVehicleType, selectedVehicleType, setFieldValue]);
           return (
             <Form className="flex flex-col gap-y-5 pb-8">
               <div className="flex justify-center items-center gap-1">
@@ -481,10 +599,13 @@ function AddNewVehicle() {
                           {toggleVehicleType ? (
                             <>
                               {" "}
-                              <div className="absolute top-0 left-0 w-full rounded-lg z-10 hover:border-black dark:hover:border-gray-400  bg-gray-50 border border-gray-500 dark:bg-gray-800">
+                              <Card
+                                theme={Cardtheme}
+                                className="absolute top-0 left-0 w-full rounded-lg z-10 bg-gray-50 dark:bg-gray-800"
+                              >
                                 <div>
-                                  <div className="p-3 relative">
-                                    <span className="absolute left-3 top-[1.2rem] pl-3 flex items-center pointer-events-none">
+                                  <div className="relative mx-5 my-4">
+                                    <span className="absolute left-0 top-2 pl-3 flex items-center pointer-events-none">
                                       <IoMdSearch className="text-gray-500 text-2xl" />
                                     </span>
                                     <input
@@ -497,46 +618,74 @@ function AddNewVehicle() {
                                         paddingLeft: "2.5rem",
                                       }}
                                       placeholder="Search"
-                                      className=" hover:border-black dark:hover:border-gray-400 border border-gray-500 focus:outline-blue-600 w-full p-2 rounded-lg"
+                                      className=" hover:border-black dark:hover:border-gray-400 border border-gray-500 focus:outline-black focus:border-[1px] w-full p-2 rounded-lg"
                                     />
                                   </div>
                                   <div className="overflow-auto h-48 w-full">
                                     {vehicleTypes.map((type) => (
                                       <div
                                         key={type.uuid}
-                                        className="px-3 flex justify-start items-center py-2 gap-3 hover:bg-gray-300 cursor-pointer"
+                                        className="px-5 flex justify-between items-center py-2 gap-3 hover:bg-gray-200 rounded-lg cursor-pointer"
                                         onClick={() =>
                                           setFieldValue("type", type.uuid)
                                         }
                                       >
-                                        <Radio
-                                          id={type.name}
-                                          name={type.name}
-                                          className="focus:ring-transparent"
-                                          onChange={() =>
-                                            setFieldValue("type", type.uuid)
+                                        <div className="flex gap-3">
+                                          <Radio
+                                            id={type.name}
+                                            name={type.name}
+                                            className="focus:ring-transparent"
+                                            onChange={() =>
+                                              setFieldValue("type", type.uuid)
+                                            }
+                                            checked={values.type === type.uuid}
+                                          />
+                                          <Label htmlFor={type.name}>
+                                            {type.name}
+                                          </Label>
+                                        </div>
+                                        <Tooltip
+                                          content="Delete"
+                                          trigger={
+                                            window.innerWidth <= 1024
+                                              ? "undefined"
+                                              : "hover"
                                           }
-                                          checked={values.type === type.uuid}
-                                        />
-                                        <Label htmlFor={type.name}>
-                                          {type.name}
-                                        </Label>
+                                        >
+                                          <Button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              openDeleteConfirmModal(type.uuid);
+                                            }}
+                                            className="hover:bg-gray-300 w-10 h-10 rounded-full ring-transparent"
+                                          >
+                                            <MdOutlineDelete className="text-red-600 text-xl" />
+                                          </Button>
+                                        </Tooltip>
                                       </div>
                                     ))}
                                   </div>
-                                  <div className="w-full p-3 border-t border-t-gray-400 ">
-                                    <Label className="text-blue-600">
-                                      <span
-                                        className="flex justify-start w-40 gap-3 cursor-pointer hover:underline"
-                                        onClick={toggleCreateVehicleTypeModal}
-                                      >
+                                  <div className="w-full px-5 py-4 border-t border-t-gray-400 flex justify-between items-center">
+                                    <Button
+                                      className="text-gray-900 bg-gray-200 hover:bg-gray-300 ring-transparent"
+                                      onClick={toggleCreateVehicleTypeModal}
+                                    >
+                                      <span className="flex justify-start w-40 gap-3 cursor-pointer">
                                         <LuCar />
                                         Create Vehicle Type
                                       </span>
-                                    </Label>
+                                    </Button>
+                                    <Button
+                                      className="bg-gray-200 text-gray-900 hover:bg-gray-300 ring-transparent"
+                                      onClick={() =>
+                                        setToggleVehicleType(false)
+                                      }
+                                    >
+                                      Done
+                                    </Button>
                                   </div>
                                 </div>
-                              </div>
+                              </Card>
                             </>
                           ) : (
                             <></>
@@ -652,7 +801,7 @@ function AddNewVehicle() {
                     </>
                   )} */}
                   <LuSave className="mr-2" />
-                  Save
+                  Create
                 </Button>
               </div>
             </Form>
@@ -671,7 +820,6 @@ function AddNewVehicle() {
         <Modal.Header>Create New User</Modal.Header>
         <Modal.Body>
           {/* Add your form or content for creating a new user here */}
-          <AddNewUser />
         </Modal.Body>
       </Modal>
 
@@ -684,9 +832,113 @@ function AddNewVehicle() {
           alignItems: "center",
         }}
       >
-        <Modal.Header>Create New Vehicle Type</Modal.Header>
+        <Modal.Header
+          className="flex"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <span className="text-lg">Create New Vehicle Type</span>
+        </Modal.Header>
         <Modal.Body>
-          {/* Add your form or content for creating a new vehicle type here */}
+          <Formik
+            initialValues={{
+              name: "",
+            }}
+            validationSchema={validationSchemaVehicleType}
+            onSubmit={handleSubmitVehicleType}
+          >
+            {({
+              values,
+              touched,
+              errors,
+              handleChange,
+              handleBlur,
+              setFieldValue,
+            }) => {
+              return (
+                <Form className="flex flex-col gap-5">
+                  <div>
+                    <Label className="flex gap-2 mb-2">
+                      <PiCarThin />
+                      Vehicle Type Name
+                      <span className="text-red-600">*</span>
+                    </Label>
+                    <TextInput
+                      name="name"
+                      id="name"
+                      placeholder="Enter Vehicle Type Name"
+                      value={values.name}
+                      onChange={handleChange}
+                      className="w-[25vw] lg:w-full"
+                    />
+                  </div>
+                  {errors.tynamepe && touched.name && (
+                    <small className="text-red-600">{errors.name}</small>
+                  )}
+                  <div className="flex justify-end">
+                    <Button
+                      type="submit"
+                      className="bg-primary ring-transparent hover:bg-primary-hover w-24"
+                    >
+                      {isLoadingVehicleType ? (
+                        <Spinner
+                          theme={spinnerTheme}
+                          color="primary"
+                          aria-label="loading"
+                          size="xs"
+                        />
+                      ) : (
+                        <>
+                          <LuSave className="mr-2" />
+                          Create
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </Form>
+              );
+            }}
+          </Formik>
+        </Modal.Body>
+      </Modal>
+
+      {/* confirm delete */}
+      <Modal
+        show={isDeleteConfirmModalOpen}
+        onClose={() => setIsDeleteConfirmModalOpen(false)}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        popup
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete this vehicle type?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button
+                className="ring-transparent bg-red-600 hover:bg-red-700"
+                onClick={handleDeleteVehicleType}
+              >
+                {"Yes, I'm sure"}
+              </Button>
+              <Button
+                color="gray"
+                className="ring-transparent"
+                onClick={() => setIsDeleteConfirmModalOpen(false)}
+              >
+                No, cancel
+              </Button>
+            </div>
+          </div>
         </Modal.Body>
       </Modal>
     </>

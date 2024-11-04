@@ -32,10 +32,36 @@ export const vehicleTypeTypeApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
+    addNewVehicleType: builder.mutation({
+      query: (initialState) => ({
+        url: "/vehicle-types",
+        method: "POST",
+        body: {
+          ...initialState,
+        },
+      }),
+      invalidatesTags: [{ type: "VehicleType", id: "LIST" }],
+    }),
+    deleteVehicleType: builder.mutation({
+      query: (uuid) => ({
+        url: `/vehicle-types/${uuid}`,
+        method: "DELETE",
+        body: {
+          uuid,
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "VehicleType", id: arg.uuid },
+      ],
+    }),
   }),
 });
 
-export const { useGetVehicleTypeQuery } = vehicleTypeTypeApiSlice;
+export const {
+  useGetVehicleTypeQuery,
+  useAddNewVehicleTypeMutation,
+  useDeleteVehicleTypeMutation,
+} = vehicleTypeTypeApiSlice;
 
 // return query result object
 

@@ -14,6 +14,7 @@ function Prefetch() {
     return () => {
       users.unsubscribe();      
       fullNameUsers.unsubscribe();
+      VehicleTypes.unsubscribe();
       console.log("unsubscribing...");
     };
   }, []);

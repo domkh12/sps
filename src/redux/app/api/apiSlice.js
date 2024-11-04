@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { logOut, setCredentials } from "../../feature/auth/authSlice";
+import { setCredentials } from "../../feature/auth/authSlice";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: `${import.meta.env.VITE_API_BASE_URL}`,
@@ -8,38 +8,49 @@ const baseQuery = fetchBaseQuery({
     const token = getState().auth.token;
 
     if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
+      headers.set("authorization", `Bearer ${token}`);
+      console.log("headers", headers);
     }
     return headers;
   },
 });
 
+const refreshBaseQuery = fetchBaseQuery({
+  baseUrl: `${import.meta.env.VITE_API_BASE_URL}`,
+  credentials: "include",
+});
+
 const baseQueryWithReauth = async (args, api, extraOptions) => {
-  //  console.log(args) // request URL, method, body
-  //  console.log(api) // signal , dispatch, getState()
-  //  console.log(extraOptions) // custom like {shout: true}
+  // console.log(args); // request URL, method, body
+  // console.log(api); // signal , dispatch, getState()
+  // console.log(extraOptions); // custom like {shout: true}
 
   let result = await baseQuery(args, api, extraOptions);
-  
+
   console.log(result);
   // handle other status code:
-  if (result?.error?.status === 401) {
+  if (result?.error?.status === "FETCH_ERROR") {
     console.log("sending refresh token");
 
     // send refresh token to get new access token
-    const refreshResult = await baseQuery("/auth/refresh", api, extraOptions);    
+    const refreshResult = await refreshBaseQuery(
+      { url: "/auth/refresh", method: "GET" },
+      api,
+      extraOptions
+    );
     if (refreshResult?.data) {
+      console.log("refreshResult", refreshResult);
       // store new accessToken
       api.dispatch(setCredentials({ ...refreshResult.data }));
 
       result = await baseQuery(args, api, extraOptions);
     } else {
-      api.dispatch(logOut())
-      // if (refreshResult?.error?.status === 401) {
-      //   refreshResult.error.data.message = "Your login are expired.";        
-      // }
+      // api.dispatch(logOut())
+      if (refreshResult?.error?.status === 401) {
+        refreshResult.error.data.message = "Your login are expired.";
+      }
 
-      // return refreshResult;
+      return refreshResult;
     }
   }
   return result;

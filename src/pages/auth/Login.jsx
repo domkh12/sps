@@ -7,8 +7,8 @@ import { Button, Card, FloatingLabel, Flowbite, Spinner } from "flowbite-react";
 import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
-import { IoEyeOffSharp, IoEyeSharp } from "react-icons/io5";
 import { TbEye, TbEyeClosed } from "react-icons/tb";
+import { spinnerTheme } from './../../redux/feature/utils/customReactFlowbiteTheme';
 
 export default function Login() {
   const userRef = useRef();
@@ -103,12 +103,6 @@ export default function Login() {
 
   const handleToggleEye = () => {
     setToggleEye(!toggleEye);
-  };
-
-  const spinnerTheme = {
-    color: {
-      primary: "fill-primary",
-    },
   };
 
   const content = (

@@ -60,7 +60,7 @@ function ImageUpload({ setImageFile, imageUri }) {
               alt="Profile"
             />
             <input
-              className="uploadProfileInput opacity-0 absolute inset-0"
+              className="uploadProfileInput opacity-0 absolute inset-0 cursor-pointer"
               type="file"
               name="profile_pic"
               id="newProfilePhoto"
@@ -146,7 +146,7 @@ function ImageUpload({ setImageFile, imageUri }) {
                     </div>
                   </div>
                   <input
-                    className="uploadProfileInput opacity-0 absolute inset-0"
+                    className="uploadProfileInput opacity-0 absolute inset-0 cursor-pointer"
                     type="file"
                     name="profile_pic"
                     id="newProfilePhoto"
