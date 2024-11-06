@@ -25,7 +25,7 @@ function NavBarDashboard() {
     <Navbar
       fluid
       rounded
-      className=" border-b-[1px] border-gray-200 dark:border-gray-700 px-4"
+      className=" border-b-[1px] border-gray-200 dark:border-gray-700 px-4 dark:bg-[#282828]"
     >
       <Navbar.Brand className="flex items-center justify-between w-full">
         <div className="flex items-center">

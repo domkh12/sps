@@ -39,14 +39,10 @@ import {
   useDeleteVehicleTypeMutation,
   useUpdateVehicleTypeMutation,
 } from "../../redux/feature/vehicles/vehicleTypeApiSlice";
-import {
-  useAddNewVehicleMutation,
-  useUpdateVehicleMutation,
-} from "../../redux/feature/vehicles/vehicleApiSlice";
+import { useUpdateVehicleMutation } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { toast } from "react-toastify";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { IoIosArrowDown, IoMdSearch } from "react-icons/io";
-import { HiOutlineExclamationCircle } from "react-icons/hi";
 import {
   Cardtheme,
   spinnerTheme,
@@ -63,7 +59,6 @@ import { CiEdit } from "react-icons/ci";
 import { setIsLoadingBar } from "../../redux/feature/actions/actionSlice";
 
 function EditUserForm({ vehicle }) {
-  console.log("vehicle", vehicle);
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const { mode } = useThemeMode();
@@ -74,7 +69,6 @@ function EditUserForm({ vehicle }) {
   const ownerRef = useRef(null);
   const vehicleTypeRef = useRef(null);
   const [selectedVehicleType, setSelectedVehicleType] = useState();
-  const [selectedUser, setSelectedUser] = useState();
   const [imageFile, setImageFile] = useState(null);
   const [isModalCreateUserOpen, setIsModalCreateUserOpen] = useState(false);
   const [isModalEditUserOpen, setIsModalEditUserOpen] = useState(false);
@@ -92,11 +86,10 @@ function EditUserForm({ vehicle }) {
   const [toggleEye, setToggleEye] = useState(false);
   const [profileImageFile, setProfileImageFile] = useState(null);
   const [isDataChanged, setIsDataChanged] = useState(false);
+  const [isDataChangedOfVehicle, setIsDataChangedOfVehicle] = useState(false);
   const [profileImageFileUpdateUser, setProfileImageFileUpdateUser] = useState(
     userToEdit ? userToEdit.profileImage : ""
   );
-  console.log("isDataChanged", isDataChanged);
-  console.log("profileImageFileUpdateUser", profileImageFileUpdateUser);
   const [rolesPlaceHolderUpdate, setRolesPlaceHolderUpdate] = useState("");
   const dropdownRef = useRef(null);
   const [rolesPlaceHolder, setRolesPlaceHolder] = useState("STAFF");
@@ -165,6 +158,37 @@ function EditUserForm({ vehicle }) {
     isModalEditUserOpen,
     // Add more modals here as needed
   };
+
+  useEffect(()=>{
+    if(isSuccessUser){
+      setIsModalCreateUserOpen(false)
+      toast.success("Created User!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+  },[isSuccessUser])
+
+  useEffect(()=>{
+    if(isErrorUser){
+      toast.error(`${errorUser?.data?.error?.description}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+  },[isErrorUser])
 
   useEffect(() => {
     if (isLoadingFindUserByUuid) {
@@ -570,6 +594,24 @@ function EditUserForm({ vehicle }) {
     roleName: userToEdit ? userToEdit.roleNames : [],
   };
 
+  const initialValuesUpdateVehicle = {
+    plateNumber: vehicle.numberPlate,
+    plateNameKh: vehicle.licensePlateKhName,
+    plateNameEng: vehicle.licensePlateEngName,
+    color: vehicle.color,
+    make: vehicle.vehicleMake,
+    model: vehicle.vehicleModel,
+    type: vehicle.vehicleType.uuid,
+    owner: vehicle.user.uuid,
+    image: vehicle.image,
+  };
+
+  const checkDataChangedOfVehicle = (values) => {
+    return (
+      JSON.stringify(values) !== JSON.stringify(initialValuesUpdateVehicle)
+    );
+  };
+
   const checkDataChanged = (values) => {
     console.log("JSON.stringify(values)", JSON.stringify(values));
     console.log(
@@ -585,17 +627,7 @@ function EditUserForm({ vehicle }) {
         Update Vehicle
       </h2>
       <Formik
-        initialValues={{
-          plateNumber: vehicle.numberPlate,
-          plateNameKh: vehicle.licensePlateKhName,
-          plateNameEng: vehicle.licensePlateEngName,
-          color: vehicle.color,
-          make: vehicle.vehicleMake,
-          model: vehicle.vehicleModel,
-          type: vehicle.vehicleType.uuid,
-          owner: vehicle.user.uuid,
-          image: vehicle.image
-        }}
+        initialValues={initialValuesUpdateVehicle}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
@@ -607,6 +639,43 @@ function EditUserForm({ vehicle }) {
           handleBlur,
           setFieldValue,
         }) => {
+          const onFieldChange = (e) => {
+            handleChange(e);
+            setIsDataChangedOfVehicle(
+              checkDataChangedOfVehicle({
+                ...values,
+                [e.target.name]: e.target.value,
+              })
+            );
+          };
+
+          const onOwnerChange = (uuid) => {
+            setFieldValue("owner", uuid);
+            setIsDataChangedOfVehicle(
+              checkDataChangedOfVehicle({
+                ...values,
+                owner: uuid,
+              })
+            );
+          };
+
+          const onVehicleTypeChange = (uuid) => {
+            setFieldValue("type", uuid);
+            setIsDataChangedOfVehicle(
+              checkDataChangedOfVehicle({
+                ...values,
+                type: uuid,
+              })
+            );
+          };
+
+          const handleImageChange = (file) => {
+            setImageFile(file);
+            setIsDataChangedOfVehicle(
+              checkDataChangedOfVehicle({ ...values, profileImage: file.name })
+            );
+          };
+
           useEffect(() => {
             if (isSuccessVehicleType) {
               setIsModalCreateVehicleTypeOpen(false);
@@ -644,7 +713,7 @@ function EditUserForm({ vehicle }) {
                           type="text"
                           autoComplete="off"
                           value={values.plateNumber}
-                          onChange={handleChange}
+                          onChange={onFieldChange}
                           onBlur={handleBlur}
                           color={
                             errors.plateNumber && touched.plateNumber
@@ -680,7 +749,7 @@ function EditUserForm({ vehicle }) {
                             type="text"
                             autoComplete="off"
                             value={values.plateNameKh}
-                            onChange={handleChange}
+                            onChange={onFieldChange}
                             onBlur={handleBlur}
                             color={
                               errors.plateNameKh && touched.plateNameKh
@@ -712,7 +781,7 @@ function EditUserForm({ vehicle }) {
                             type="text"
                             autoComplete="off"
                             value={values.plateNameEng}
-                            onChange={handleChange}
+                            onChange={onFieldChange}
                             onBlur={handleBlur}
                             color={
                               errors.plateNameEng && touched.plateNameEng
@@ -829,9 +898,7 @@ function EditUserForm({ vehicle }) {
                                       <div
                                         key={user.uuid}
                                         className="px-5 flex justify-between hover:bg-gray-200 cursor-pointer items-center py-2 gap-3 h-12"
-                                        onClick={() =>
-                                          setFieldValue("owner", user.uuid)
-                                        }
+                                        onClick={() => onOwnerChange(user.uuid)}
                                       >
                                         <div>
                                           <Radio
@@ -985,7 +1052,7 @@ function EditUserForm({ vehicle }) {
                                           key={type.uuid}
                                           className="px-5 flex justify-between items-center py-2 h-12 gap-3 hover:bg-gray-200 cursor-pointer group"
                                           onClick={() =>
-                                            setFieldValue("type", type.uuid)
+                                            onVehicleTypeChange(type.uuid)
                                           }
                                         >
                                           <div className="flex gap-3">
@@ -1088,7 +1155,7 @@ function EditUserForm({ vehicle }) {
                           type="text"
                           autoComplete="off"
                           value={values.make}
-                          onChange={handleChange}
+                          onChange={onFieldChange}
                           onBlur={handleBlur}
                           color="default"
                         />
@@ -1110,7 +1177,7 @@ function EditUserForm({ vehicle }) {
                           type="text"
                           autoComplete="off"
                           value={values.model}
-                          onChange={handleChange}
+                          onChange={onFieldChange}
                           onBlur={handleBlur}
                           color="default"
                         />
@@ -1128,7 +1195,7 @@ function EditUserForm({ vehicle }) {
                             placeholder="Select Color"
                             className="w-full"
                             value={values.color}
-                            onChange={handleChange}
+                            onChange={onFieldChange}
                             onBlur={handleBlur}
                             style={{
                               backgroundColor:
@@ -1153,7 +1220,7 @@ function EditUserForm({ vehicle }) {
                     </div>
                     <div>
                       <ImageUpload
-                        setImageFile={setImageFile}
+                        setImageFile={handleImageChange}
                         imageUri={vehicle.image}
                       />
                     </div>
@@ -1172,7 +1239,7 @@ function EditUserForm({ vehicle }) {
                   type="submit"
                   className="bg-primary hover:bg-primary-hover focus:ring-0 w-24"
                   title="Save"
-                  // disabled={isLoading}
+                  disabled={isLoading || !isDataChangedOfVehicle}
                 >
                   {/* {isLoading ? (
                       <Spinner color="purple" aria-label="loading" size="xs" />

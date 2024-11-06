@@ -36,7 +36,7 @@ function SideBar() {
   };
 
   const sidebarContent = (
-    <Sidebar.Items className="flex flex-col gap-2">
+    <Sidebar.Items className="flex flex-col gap-2 dark:bg-[#282828]">
       <Sidebar.ItemGroup>
         <Sidebar.Item
           as={NavLink}
@@ -126,7 +126,7 @@ function SideBar() {
       <div className="flex h-full md:hidden">
         <Sidebar
           aria-label="side bar"
-          className={`border-r-[1px] border-gray-200 dark:border-gray-700 py-[10px] h-full bg-gray-50 dark:bg-gray-800 ${
+          className={`border-r-[1px] border-gray-200 dark:bg-[#282828] dark:border-gray-700 py-[10px] h-full bg-gray-50 ${
             isCollapsed ? "w-20" : "w-56"
           }  transition-all duration-500`}
         >

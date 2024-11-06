@@ -88,43 +88,47 @@ function UserList() {
         <div>
           <h1 className="text-2xl font-medium dark:text-gray-100 py-4 px-8">
             Users List
-          </h1>         
+          </h1>
         </div>
         <table>
-          <thead className="w-full">
+          <thead className="w-full dark:bg-[#282828]">
             <tr className="p-0 w-full">
               <th colSpan={7} className="h-20">
                 <div className="flex justify-between items-center">
                   <div className="flex justify-start items-center gap-3">
-                  <div className="relative">
-                    <TextInput
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      placeholder="ID, Name, Email, Phone"
-                    />
-                    {search && (
-                      <button
-                        onClick={handleClearSearch}
-                        className="absolute right-3 top-5 transform -translate-y-1/2"
-                      >
-                        <IoClose />
-                      </button>
-                    )}
-                  </div>
-                  <Button
-                    onClick={handleBtnSearch}
-                    className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
-                  >
-                    {isSearching ? (
-                      <Spinner theme={spinnerTheme} color="primary" size="xs" />
-                    ) : (
-                      <>
-                        {" "}
-                        <FaSearch className="mr-2 sm:mr-0" />{" "}
-                        <span className="sm:hidden">Search</span>{" "}
-                      </>
-                    )}
-                  </Button>
+                    <div className="relative">
+                      <TextInput
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="ID, Name, Email, Phone"
+                      />
+                      {search && (
+                        <button
+                          onClick={handleClearSearch}
+                          className="absolute right-3 top-5 transform -translate-y-1/2"
+                        >
+                          <IoClose />
+                        </button>
+                      )}
+                    </div>
+                    <Button
+                      onClick={handleBtnSearch}
+                      className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
+                    >
+                      {isSearching ? (
+                        <Spinner
+                          theme={spinnerTheme}
+                          color="primary"
+                          size="xs"
+                        />
+                      ) : (
+                        <>
+                          {" "}
+                          <FaSearch className="mr-2 sm:mr-0" />{" "}
+                          <span className="sm:hidden">Search</span>{" "}
+                        </>
+                      )}
+                    </Button>
                   </div>
 
                   <Button
@@ -137,7 +141,7 @@ function UserList() {
                 </div>
               </th>
             </tr>
-            <tr>
+            <tr className="border-0 dark:text-white text-gray-500">
               <th>FullName</th>
               <th>Email</th>
               <th>Phone</th>

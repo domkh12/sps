@@ -17,7 +17,7 @@ function VehicleRow({ vehicleId }) {
     return null;
   }
   return (
-    <tr>
+    <tr className="dark:text-white">
       <td>
         <div className="flex w-72 items-center">
           <img

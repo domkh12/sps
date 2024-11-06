@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Table, TextInput } from "flowbite-react";
+import { Button, Table, TextInput, useThemeMode } from "flowbite-react";
 import VehicleRow from "./VehicleRow";
 import { useGetVehicleQuery } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { IoClose } from "react-icons/io5";
@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 function VehicleList() {
   const [search, setSearch] = useState("");
   const navigator = useNavigate();
+  const { mode } = useThemeMode();
 
   const {
     data: vehicles,
@@ -60,12 +61,12 @@ function VehicleList() {
 
     content = (
       <div className="flex flex-col w-full">
-        <h1 className="text-2xl font-medium dark:text-gray-100 py-4 px-8">
+        <h1 className="text-2xl font-medium dark:text-gray-50 py-4 px-8">
           Vehicles List
         </h1>
 
         <table className="w-full">
-          <thead>
+          <thead className="dark:bg-[#282828]">
             <tr className="p-0 w-full">
               <th className="h-20" colSpan={6}>
                 <div className="flex justify-between">
@@ -75,13 +76,18 @@ function VehicleList() {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="PlateNumber, Owner, Owner Phone"
+                        style={{
+                          backgroundColor: mode === "dark" ? "#161616" : "",
+                          color: mode === "dark" ? "#f2f2f2" : "#161616",
+                          fontWeight: "400",
+                        }}
                       />
                       {search && (
                         <button
                           onClick={handleClearSearch}
                           className="absolute right-3 top-5 transform -translate-y-1/2"
                         >
-                          <IoClose />
+                          <IoClose className="dark:text-[#f2f2f2] text-lg" />
                         </button>
                       )}
                     </div>
@@ -103,14 +109,16 @@ function VehicleList() {
                 </div>
               </th>
             </tr>
-            <tr className="border-0">
+            <tr
+              className="border-0 dark:text-white text-gray-500"             
+            >
               <th>Vehicle</th>
               <th>License Plate Number</th>
               <th>Owner</th>
               <th className="text-right">Owner PhoneNumber</th>
               <th className="text-right">Date</th>
               <th className="text-right">Action</th>
-            </tr>            
+            </tr>
           </thead>
           <tbody>{tableContent}</tbody>
         </table>

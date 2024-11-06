@@ -24,7 +24,7 @@ function AdminLayout() {
   }, [isPaginationSuccess]);
 
   const content = (
-    <div className="fixed top-0 left-0 w-full h-screen">
+    <div className="fixed top-0 left-0 w-full h-screen dark:bg-[#282828]">
       <header>
         <NavBarDashboard />
         {isLoadingBar ? (
@@ -39,7 +39,7 @@ function AdminLayout() {
       </header>
       <div className="flex h-full">
         <SideBar />
-        <main className="flex flex-grow h-full">
+        <main className="flex flex-grow h-full overflow-auto">
           <div
             className=" flex-grow h-full customScrollBar max-h-[calc(100vh-4rem)]"
             ref={mainContentRef}

@@ -33,6 +33,7 @@ function ImageUpload({ setImageFile, imageUri }) {
 
     if (files[0].size > 2 * 1024 * 1024) {
       setAlert("File size exceeds 2MB.");
+      setToggleImageDropdown(false);
       setTimeout(() => setAlert(""), 3000);
       return;
     }
@@ -44,7 +45,7 @@ function ImageUpload({ setImageFile, imageUri }) {
         setUploading(true);
         setImage(reader.result);
         setImageFile(files[0]);
-
+        setToggleImageDropdown(false);
         setTimeout(() => {
           setUploading(false);
           const random = Math.random();
