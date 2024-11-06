@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ROLES } from "./../../config/roles";
 import {
   Button,
+  Card,
   Checkbox,
   Datepicker,
   Label,
@@ -28,6 +29,7 @@ import { TbEye, TbEyeClosed, TbUser } from "react-icons/tb";
 import { LuCalendarDays, LuSave } from "react-icons/lu";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { BsGenderAmbiguous } from "react-icons/bs";
+import { Cardtheme } from "../../redux/feature/utils/customReactFlowbiteTheme";
 
 function AddNewUser() {
   const [addNewUser, { isLoading, isSuccess, isError, error }] =
@@ -162,6 +164,10 @@ function AddNewUser() {
 
   const handleToggleRoleCbo = () => {
     setCboRolesToggle(!cboRolesToggle);
+  };
+
+  const handleDoneButtonClick = () => {
+    setCboRolesToggle(false);
   };
 
   const content = (
@@ -435,38 +441,45 @@ function AddNewUser() {
                     <small className="text-red-600">{errors.email}</small>
                   )}
                 </div>
-                <div className="relative" ref={dropdownRef}>
+                <div ref={dropdownRef}>
                   <Label htmlFor="roles" className="flex gap-2 mb-2">
                     <GrUserAdmin />
                     Roles <span className="text-red-600">*</span>
                   </Label>
-                  <div
-                    onClick={handleToggleRoleCbo}
-                    className={`flex justify-between text-sm cursor-pointer dark:bg-gray-800 items-center border border-gray-500 dark:border-gray-500 px-2 py-[0.60rem] rounded-lg text-gray-800 dark:text-gray-200 ${
-                      errors.roleName && "border-red-600 text-red-600"
-                    }`}
-                  >
-                    {rolesPlaceHolder} <IoIosArrowDown className="text-xl" />
-                  </div>
-                  <div
-                    className={`w-full border border-gray-300 p-2 rounded-lg mt-2 absolute z-50 bg-gray-50 dark:bg-gray-800 ${
-                      cboRolesToggle ? "flex" : "hidden"
-                    } flex-col gap-3`}
-                  >
-                    {Object.values(ROLES).map((role) => (
-                      <div key={role} className="flex items-center gap-2 ">
-                        <Checkbox
-                          id={role}
-                          name="roleName"
-                          value={role}
-                          checked={values.roleName.includes(role)}
-                          onChange={() => onRoleNameChanged(role)}
-                        />
-                        <Label htmlFor={role} className="ml-2">
-                          {role}
-                        </Label>
+                  <div className="relative">
+                    <div
+                      onClick={handleToggleRoleCbo}
+                      className={`flex justify-between text-sm cursor-pointer dark:bg-gray-800 items-center border border-gray-500 dark:border-gray-500 px-2 py-[0.60rem] rounded-lg text-gray-800 dark:text-gray-200 ${
+                        errors.roleName && "border-red-600 text-red-600"
+                      }`}
+                    >
+                      {rolesPlaceHolder} <IoIosArrowDown className="text-xl" />
+                    </div>
+                    <Card
+                      theme={Cardtheme}
+                      className={`w-full absolute top-0 left-0 bg-gray-50 z-10 ${
+                        cboRolesToggle ? "flex" : "hidden"
+                      }`}
+                    >                         
+                      {Object.values(ROLES).map((role) => (
+                       
+                        <div key={role} className="flex items-center gap-2 py-2 hover:bg-gray-200 cursor-pointer px-5">
+                          <Checkbox
+                            id={role}
+                            name="roleName"
+                            value={role}
+                            checked={values.roleName.includes(role)}
+                            onChange={() => onRoleNameChanged(role)}
+                          />
+                          <Label htmlFor={role} className="ml-2">
+                            {role}
+                          </Label>                          
+                        </div>                                                      
+                      ))}                           
+                      <div className="w-full  flex justify-end items-center border-t border-t-gray-400 p-2">
+                        <Button className="bg-gray-200 text-gray-800 ring-transparent hover:bg-gray-300" onClick={handleDoneButtonClick}>Done</Button>
                       </div>
-                    ))}
+                    </Card>
                   </div>
                   {errors.roleName && (
                     <small className="text-red-600">{errors.roleName}</small>
@@ -558,7 +571,7 @@ function AddNewUser() {
               </div>
               <div className="flex gap-4 px-5">
                 <Button
-                  className="bg-transparent focus:ring-0 border border-primary text-primary dark:text-gray-50"
+                  className="bg-transparent focus:ring-0 border border-primary hover:bg-gray-200 text-primary dark:text-gray-50"
                   onClick={handleBtnBackClicked}
                 >
                   <IoReturnDownBackOutline className="mr-2" /> Back
@@ -573,7 +586,7 @@ function AddNewUser() {
                     <Spinner color="purple" aria-label="loading" size="xs" />
                   ) : (
                     <>
-                      <LuSave className="mr-2"/>
+                      <LuSave className="mr-2" />
                       Create
                     </>
                   )}

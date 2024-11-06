@@ -42,10 +42,22 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Vehicle", id: "LIST" }],
     }),
+    updateVehicle: builder.mutation({
+      query: ({ uuid, ...initialState }) => ({
+        url: `/vehicles/${uuid}`,
+        method: "PATCH",
+        body: {
+          ...initialState,
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "Vehicle", id: arg.uuid },
+      ],
+    }),
   }),
 });
 
-export const { useGetVehicleQuery, useAddNewVehicleMutation } = vehicleApiSlice;
+export const { useGetVehicleQuery, useAddNewVehicleMutation, useUpdateVehicleMutation } = vehicleApiSlice;
 
 // return query result object
 

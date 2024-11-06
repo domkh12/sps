@@ -10,10 +10,12 @@ import { useNavigate } from "react-router-dom";
 import { FaPlus, FaSearch } from "react-icons/fa";
 import UserNotFound from "./components/UserNotFound";
 import { IoClose } from "react-icons/io5";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsPaginationSuccess } from "../../redux/feature/actions/actionSlice";
 
 function UserList() {
   const navigator = useNavigate();
+  const dispatch = useDispatch();
   const [pageNo, setPageNo] = useState(1);
   const [search, setSearch] = useState("");
   const [totalPages, setTotalPages] = useState(0);
@@ -59,7 +61,7 @@ function UserList() {
     const handlePageChange = async (page) => {
       setPageNo(page);
       await paginationUsers({ pageNo: page });
-      window.scrollTo(0, 0);
+      dispatch(setIsPaginationSuccess(true));
     };
 
     const handleBtnSearch = async () => {
@@ -82,70 +84,71 @@ function UserList() {
     };
 
     content = (
-      <div className="overflow-x-auto p-4 flex flex-col gap-4">
+      <div className="flex flex-col ">
         <div>
-          <h1 className="text-2xl font-medium dark:text-gray-100 py-2">
+          <h1 className="text-2xl font-medium dark:text-gray-100 py-4 px-8">
             Users List
-          </h1>
-          <div className="flex justify-between items-center">
-            <div className="flex gap-2 justify-center items-center">
-              <div className="relative">
-                <TextInput
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="ID, Name, Email, Phone"
-                />
-                {search && (
-                  <button
-                    onClick={handleClearSearch}
-                    className="absolute right-3 top-5 transform -translate-y-1/2"
+          </h1>         
+        </div>
+        <table>
+          <thead className="w-full">
+            <tr className="p-0 w-full">
+              <th colSpan={7} className="h-20">
+                <div className="flex justify-between items-center">
+                  <div className="flex justify-start items-center gap-3">
+                  <div className="relative">
+                    <TextInput
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="ID, Name, Email, Phone"
+                    />
+                    {search && (
+                      <button
+                        onClick={handleClearSearch}
+                        className="absolute right-3 top-5 transform -translate-y-1/2"
+                      >
+                        <IoClose />
+                      </button>
+                    )}
+                  </div>
+                  <Button
+                    onClick={handleBtnSearch}
+                    className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
                   >
-                    <IoClose />
-                  </button>
-                )}
-              </div>
-              <Button
-                onClick={handleBtnSearch}
-                className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
-              >
-                {isSearching ? (
-                  <Spinner theme={spinnerTheme} color="primary" size="xs" />
-                ) : (
-                  <>
-                    {" "}
-                    <FaSearch className="mr-2 sm:mr-0" />{" "}
-                    <span className="sm:hidden">Search</span>{" "}
-                  </>
-                )}
-              </Button>
-            </div>
-            <Button
-              className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10"
-              onClick={handleBtnAddNewClicked}
-            >
-              <FaPlus className="mr-2 sm:mr-0" />
-              <span className="sm:hidden">Add New</span>
-            </Button>
-          </div>
-        </div>
-        <div className="overflow-x-auto shadow-md table-container">
-          <Table striped>
-            <Table.Head>
-              <Table.HeadCell>FullName</Table.HeadCell>
-              <Table.HeadCell>Email</Table.HeadCell>
-              <Table.HeadCell>Phone_Number</Table.HeadCell>
-              <Table.HeadCell>Roles</Table.HeadCell>
-              <Table.HeadCell className="text-right">Date</Table.HeadCell>
-              <Table.HeadCell className="text-right">Status</Table.HeadCell>
-              <Table.HeadCell className="text-right">Action</Table.HeadCell>
-            </Table.Head>
-            {tableContent ? (
-              <Table.Body className="divide-y">{tableContent}</Table.Body>
-            ) : (
-              <UserNotFound />
-            )}
-          </Table>
-        </div>
+                    {isSearching ? (
+                      <Spinner theme={spinnerTheme} color="primary" size="xs" />
+                    ) : (
+                      <>
+                        {" "}
+                        <FaSearch className="mr-2 sm:mr-0" />{" "}
+                        <span className="sm:hidden">Search</span>{" "}
+                      </>
+                    )}
+                  </Button>
+                  </div>
+
+                  <Button
+                    className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10"
+                    onClick={handleBtnAddNewClicked}
+                  >
+                    <FaPlus className="mr-2 sm:mr-0" />
+                    <span className="sm:hidden">Add New</span>
+                  </Button>
+                </div>
+              </th>
+            </tr>
+            <tr>
+              <th>FullName</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Roles</th>
+              <th className="text-right">Date</th>
+              <th className="text-right">Status</th>
+              <th className="text-right">Action</th>
+            </tr>
+          </thead>
+          {tableContent ? <tbody>{tableContent}</tbody> : <UserNotFound />}
+        </table>
         {totalPages > 0 && (
           <div className={`flex justify-center items-center`}>
             <Pagination

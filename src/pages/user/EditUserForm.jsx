@@ -3,6 +3,7 @@ import { useUpdateUserMutation } from "../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
+  Card,
   Checkbox,
   Datepicker,
   Label,
@@ -29,6 +30,7 @@ import { GENDERS } from "../../config/genders";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { BsGenderAmbiguous } from "react-icons/bs";
 import { PiArrowsCounterClockwise } from "react-icons/pi";
+import { Cardtheme } from "../../redux/feature/utils/customReactFlowbiteTheme";
 
 function EditUserForm({ user }) {
   const navigate = useNavigate();
@@ -39,7 +41,6 @@ function EditUserForm({ user }) {
   const [rolesPlaceHolder, setRolesPlaceHolder] = useState(
     user.roleNames.join(", ")
   );  
-  console.log(user)
   const [isDataChanged, setIsDataChanged] = useState(false);  
   const [updateUser, { isSuccess, isLoading, isError, error }] =
     useUpdateUserMutation();
@@ -162,7 +163,7 @@ function EditUserForm({ user }) {
     genderName: user.gender.fullNameEnglish,
     email: user.email,
     phoneNumber: user.phoneNumber,
-    profileImage: "",
+    profileImage: user.profileImage,
     dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : new Date(),
     roleName: user.roleNames,
     isDisabled: user.isDeleted,
@@ -170,6 +171,10 @@ function EditUserForm({ user }) {
 
   const checkDataChanged = (values) => {
     return JSON.stringify(values) !== JSON.stringify(initialValues);
+  };
+
+  const handleDoneButtonClick = () => {
+    setCboRolesToggle(false);
   };
 
   const toggleTheme = {
@@ -205,8 +210,8 @@ function EditUserForm({ user }) {
 
           const onDateChange = (date) => {
             const newDate = new Date(date);
-            newDate.setDate(newDate.getDate() + 1); // Adjust date if necessary
-            setFieldValue("dateOfBirth", newDate.toISOString().split("T")[0]); // Update Formik's state
+            newDate.setDate(newDate.getDate() + 1); 
+            setFieldValue("dateOfBirth", newDate.toISOString().split("T")[0]);
             setIsDataChanged(
               checkDataChanged({
                 ...values,
@@ -231,8 +236,8 @@ function EditUserForm({ user }) {
           const handleImageChange = (file) => {
             setProfileImageFile(file);
             setIsDataChanged(
-              checkDataChanged({ ...values, profileImage: file })
-            ); // Check if data has changed
+              checkDataChanged({ ...values, profileImage: file.name })
+            );
           };
 
           return (
@@ -455,11 +460,12 @@ function EditUserForm({ user }) {
                     <small className="text-red-600">{errors.email}</small>
                   )}
                 </div>
-                <div className="relative" ref={dropdownRef}>
+                <div ref={dropdownRef}>
                   <Label htmlFor="roles" className="flex gap-2 mb-2">
                     <GrUserAdmin />
                     Roles <span className="text-red-600">*</span>
                   </Label>
+                  <div className="relative">
                   <div
                     onClick={handleToggleRoleCbo}
                     className={`flex justify-between text-sm cursor-pointer dark:bg-gray-800 items-center border border-gray-500 dark:border-gray-500 px-2 py-[0.60rem] rounded-lg text-gray-800 dark:text-gray-200 ${
@@ -468,26 +474,32 @@ function EditUserForm({ user }) {
                   >
                     {rolesPlaceHolder} <IoIosArrowDown className="text-xl" />
                   </div>
-                  <div
-                    className={`w-full border border-gray-300 p-2 rounded-lg mt-2 absolute z-50 bg-gray-50 dark:bg-gray-800 ${
-                      cboRolesToggle ? "flex" : "hidden"
-                    } flex-col gap-3`}
-                  >
-                    {Object.values(ROLES).map((role) => (
-                      <div key={role} className="flex items-center gap-2 ">
-                        <Checkbox
-                          id={role}
-                          name="roleName"
-                          value={role}
-                          checked={values.roleName.includes(role)}
-                          onChange={() => onRoleNameChanged(role)}
-                        />
-                        <Label htmlFor={role} className="ml-2">
-                          {role}
-                        </Label>
+                  <Card
+                      theme={Cardtheme}
+                      className={`w-full absolute top-0 left-0 bg-gray-50 z-10 ${
+                        cboRolesToggle ? "flex" : "hidden"
+                      }`}
+                    >                         
+                      {Object.values(ROLES).map((role) => (
+                       
+                        <div key={role} className="flex items-center gap-2 py-2 hover:bg-gray-200 cursor-pointer px-5">
+                          <Checkbox                            
+                            id={role}
+                            name="roleName"
+                            value={role}
+                            checked={values.roleName.includes(role)}
+                            onChange={() => onRoleNameChanged(role)}                            
+                          />
+                          <Label htmlFor={role} className="ml-2">
+                            {role}
+                          </Label>                          
+                        </div>                                                      
+                      ))}                           
+                      <div className="w-full  flex justify-end items-center border-t border-t-gray-400 p-2">
+                        <Button className="bg-gray-200 text-gray-800 ring-transparent hover:bg-gray-300" onClick={handleDoneButtonClick}>Done</Button>
                       </div>
-                    ))}
-                  </div>
+                    </Card>
+                    </div>
                   {errors.roleName && (
                     <small className="text-red-600">{errors.roleName}</small>
                   )}
@@ -515,7 +527,7 @@ function EditUserForm({ user }) {
               </div>
               <div className="flex gap-4 px-5">
                 <Button
-                  className="bg-transparent focus:ring-0 border border-primary text-primary dark:text-gray-50"
+                  className="bg-transparent focus:ring-0 border border-primary hover:bg-gray-200 text-primary dark:text-gray-50"
                   onClick={handleBtnBackClicked}
                 >
                   <IoReturnDownBackOutline className="mr-2" />

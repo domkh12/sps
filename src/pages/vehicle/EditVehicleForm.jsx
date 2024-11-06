@@ -39,7 +39,10 @@ import {
   useDeleteVehicleTypeMutation,
   useUpdateVehicleTypeMutation,
 } from "../../redux/feature/vehicles/vehicleTypeApiSlice";
-import { useAddNewVehicleMutation } from "../../redux/feature/vehicles/vehicleApiSlice";
+import {
+  useAddNewVehicleMutation,
+  useUpdateVehicleMutation,
+} from "../../redux/feature/vehicles/vehicleApiSlice";
 import { toast } from "react-toastify";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { IoIosArrowDown, IoMdSearch } from "react-icons/io";
@@ -59,7 +62,8 @@ import { ROLES } from "../../config/roles";
 import { CiEdit } from "react-icons/ci";
 import { setIsLoadingBar } from "../../redux/feature/actions/actionSlice";
 
-function AddNewVehicle() {
+function EditUserForm({ vehicle }) {
+  console.log("vehicle", vehicle);
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const { mode } = useThemeMode();
@@ -97,8 +101,8 @@ function AddNewVehicle() {
   const dropdownRef = useRef(null);
   const [rolesPlaceHolder, setRolesPlaceHolder] = useState("STAFF");
   const [cboRolesToggle, setCboRolesToggle] = useState(false);
-  const [addNewVehicle, { isSuccess, isLoading, isError, error }] =
-    useAddNewVehicleMutation();
+  const [updateVehicle, { isSuccess, isLoading, isError, error }] =
+    useUpdateVehicleMutation();
 
   const [
     updateVehicleType,
@@ -365,7 +369,8 @@ function AddNewVehicle() {
         profileImageUri = uploadResponse.uri;
       }
 
-      await addNewVehicle({
+      await updateVehicle({
+        uuid: vehicle.uuid,
         numberPlate: values.plateNumber,
         licensePlateKhName: values.plateNameKh,
         licensePlateEngName: values.plateNameEng,
@@ -577,18 +582,19 @@ function AddNewVehicle() {
   const content = (
     <>
       <h2 className="text-2xl font-medium  dark:text-gray-100 p-5">
-        Create Vehicle
+        Update Vehicle
       </h2>
       <Formik
         initialValues={{
-          plateNumber: "",
-          plateNameKh: "",
-          plateNameEng: "",
-          color: "#000000",
-          make: "",
-          model: "",
-          type: "",
-          owner: "",
+          plateNumber: vehicle.numberPlate,
+          plateNameKh: vehicle.licensePlateKhName,
+          plateNameEng: vehicle.licensePlateEngName,
+          color: vehicle.color,
+          make: vehicle.vehicleMake,
+          model: vehicle.vehicleModel,
+          type: vehicle.vehicleType.uuid,
+          owner: vehicle.user.uuid,
+          image: vehicle.image
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -1146,7 +1152,10 @@ function AddNewVehicle() {
                       </div>
                     </div>
                     <div>
-                      <ImageUpload setImageFile={setImageFile} />
+                      <ImageUpload
+                        setImageFile={setImageFile}
+                        imageUri={vehicle.image}
+                      />
                     </div>
                   </section>
                 </div>
@@ -1166,15 +1175,15 @@ function AddNewVehicle() {
                   // disabled={isLoading}
                 >
                   {/* {isLoading ? (
-                    <Spinner color="purple" aria-label="loading" size="xs" />
-                  ) : (
-                    <>
-                      <LuSave className="mr-2" />
-                      Save
-                    </>
-                  )} */}
-                  <CgAddR className="mr-2 h-5 w-5" />
-                  Create
+                      <Spinner color="purple" aria-label="loading" size="xs" />
+                    ) : (
+                      <>
+                        <LuSave className="mr-2" />
+                        Save
+                      </>
+                    )} */}
+                  <GrUpdate className="mr-2 h-5 w-5" />
+                  Update
                 </Button>
               </div>
             </Form>
@@ -2193,4 +2202,4 @@ function AddNewVehicle() {
   return content;
 }
 
-export default AddNewVehicle;
+export default EditUserForm;

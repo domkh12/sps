@@ -4,11 +4,6 @@ import { selectUserById } from "../../redux/feature/users/userApiSlice";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Badge,
-  Button,
-  Checkbox,
-  TableCell,
-  TableRow,
-  Tooltip,
 } from "flowbite-react";
 import {
   getContrastingTextColor,
@@ -51,8 +46,8 @@ function UserRow({ userId, uuid, status }) {
   }
 
   return (
-    <TableRow className="text-left">
-      <TableCell>
+    <tr className="text-left">
+      <td>
         <Link
           to={`/dash/users/${userId}/view`}
           onClick={handleView}
@@ -75,18 +70,18 @@ function UserRow({ userId, uuid, status }) {
             {user.fullName ? user.fullName : "N/A"}
           </span>
         </Link>
-      </TableCell>
-      <TableCell>{user.email ? user.email : "N/A"}</TableCell>
-      <TableCell>{user.phoneNumber ? user.phoneNumber : "N/A"}</TableCell>
-      <TableCell className="flex justify-start">
+      </td>
+      <td>{user.email ? user.email : "N/A"}</td>
+      <td>{user.phoneNumber ? user.phoneNumber : "N/A"}</td>
+      <td>
         <div className="flex gap-2">
           {userRolesString ? userRolesString : "N/A"}
         </div>
-      </TableCell>
-      <TableCell className="text-right text-nowrap">
+      </td>
+      <td className="text-right text-nowrap">
         {createdAtResult ? createdAtResult : "N/A"}
-      </TableCell>
-      <TableCell>
+      </td>
+      <td>
         {updatedUser ? (
           <div className="flex justify-end items-center gap-2">
             <span
@@ -126,28 +121,25 @@ function UserRow({ userId, uuid, status }) {
             </div>
           </div>
         )}
-      </TableCell>
-      <TableCell className="flex justify-end items-center">
-        <div className="flex gap-2">
-          <Tooltip content="Edit" trigger={window.innerWidth <= 1024 ? "undefined" : "hover"}>
-            <Button
+      </td>
+      <td>
+        <div className="flex gap-2 justify-end">
+          
+            <button
               onClick={handleEdit}
-              className="bg-primary hover:bg-primary-hover ring-transparent"
+              className="button-squar text-white bg-primary hover:bg-primary-hover ring-transparent"
             >
               <FaEdit />
-            </Button>
-          </Tooltip>
-          <Tooltip content="View" trigger={window.innerWidth <= 1024 ? "undefined" : "hover"}>
-            <Button
+            </button>       
+            <button
               onClick={handleView}
-              className="bg-secondary hover:bg-secondary-hover ring-transparent"
+              className="button-squar text-white bg-secondary hover:bg-secondary-hover"
             >
               <FaEye />
-            </Button>
-          </Tooltip>
+            </button>
         </div>
-      </TableCell>
-    </TableRow>
+      </td>
+    </tr>
   );
 }
 

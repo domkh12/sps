@@ -157,7 +157,7 @@ function SideBar() {
                 to="/dash/vehicles"
                 icon={FaCar}
                 className={`${isCollapsed ? "grid" : ""}`}
-                active={location.pathname === "/dash/vehicle"}
+                active={location.pathname === "/dash/vehicles"}
               >
                 {!isCollapsed && translate("vehicle")}
               </Sidebar.Item>
@@ -174,10 +174,10 @@ function SideBar() {
 
               <Sidebar.Item
                 as={NavLink}
-                to="/dash/message"
+                to="/dash/messages"
                 icon={TbMessageFilled}
                 className={`${isCollapsed ? "grid" : ""}`}
-                active={location.pathname === "/dash/message"}
+                active={location.pathname === "/dash/messages"}
               >
                 {!isCollapsed && "Message"}
               </Sidebar.Item>

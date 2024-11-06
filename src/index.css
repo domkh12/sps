@@ -1,19 +1,91 @@
-@import url('https://fonts.googleapis.com/css2?family=Hanuman:wght@100;300;400;700;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Hanuman:wght@100;300;400;700;900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-    html {
-        @apply scroll-smooth;
-    }
+  html {
+    @apply scroll-smooth;
+  }
 }
 
-
-body{
-    font-family: "Hanuman", serif;
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
-.dark{
-    background-color: #282828;
+body {
+  font-family: "Hanuman", serif;
 }
+
+.dark {
+  background-color: #282828;
+}
+
+.progress {
+  animation: progress 1s infinite linear;
+}
+
+.left-right {
+  transform-origin: 0% 50%;
+}
+@keyframes progress {
+  0% {
+    transform: translateX(0) scaleX(0);
+  }
+  40% {
+    transform: translateX(0) scaleX(0.4);
+  }
+  100% {
+    transform: translateX(100%) scaleX(0.5);
+  }
+}
+
+.customScrollBar {
+  overflow: auto;
+  scrollbar-color: rgb(161, 161, 161) rgb(224, 224, 224);
+  scrollbar-width: thin;
+}
+
+/* table start*/
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+tbody,
+td {
+  border-bottom: 1px solid rgb(204, 204, 204);
+  border-top: 1px solid rgb(204, 204, 204);
+  padding: 1rem 2rem;
+  font-size: 0.9rem;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  background-color: #f9fafb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+table,
+thead,
+tr,
+th {
+  font-size: 0.9rem;
+  padding: 1rem 2rem;
+  color: #696969;
+  font-size: small;
+  text-align: left;
+}
+
+/* table end*/
+
+/* button start */
+.button-squar {
+  padding: 1rem 1rem;
+  border-radius: 25%;
+}
+/* button end */

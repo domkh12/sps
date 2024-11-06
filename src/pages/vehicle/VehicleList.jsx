@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 function VehicleList() {
   const [search, setSearch] = useState("");
-  const navigator = useNavigate()
+  const navigator = useNavigate();
 
   const {
     data: vehicles,
@@ -59,56 +59,61 @@ function VehicleList() {
       : null;
 
     content = (
-      <div className="overflow-x-auto p-4 flex flex-col gap-4">
-        <h1 className="text-2xl font-medium dark:text-gray-100 py-2">
+      <div className="flex flex-col w-full">
+        <h1 className="text-2xl font-medium dark:text-gray-100 py-4 px-8">
           Vehicles List
         </h1>
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2 justify-center items-center">
-            <div className="relative">
-              <TextInput
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="PlateNumber, Owner, Owner Phone"
-              />
-              {search && (
-                <button
-                  onClick={handleClearSearch}
-                  className="absolute right-3 top-5 transform -translate-y-1/2"
-                >
-                  <IoClose />
-                </button>
-              )}
-            </div>
-            <Button
-              onClick={handleBtnSearch}
-              className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
-            >
-              <FaSearch className="mr-2 sm:mr-0" />{" "}
-              <span className="sm:hidden">Search</span>{" "}
-            </Button>
-          </div>
-          <Button
-            className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10"
-            onClick={handleBtnAddNewClicked}
-          >
-            <FaPlus className="mr-2 sm:mr-0" />
-            <span className="sm:hidden">Create Vehicle</span>
-          </Button>
-        </div>
-        <div className="overflow-x-auto shadow-md">
-        <Table striped>
-          <Table.Head>
-            <Table.HeadCell>Vehicle</Table.HeadCell>
-            <Table.HeadCell>License Plate Number</Table.HeadCell>
-            <Table.HeadCell>Owner</Table.HeadCell>
-            <Table.HeadCell className="text-right">Owner PhoneNumber</Table.HeadCell>
-            <Table.HeadCell className="text-right">Date</Table.HeadCell>
-            <Table.HeadCell className="text-right">Action</Table.HeadCell>
-          </Table.Head>
-          <Table.Body className="divide-y">{tableContent}</Table.Body>
-        </Table>
-        </div>
+
+        <table className="w-full">
+          <thead>
+            <tr className="p-0 w-full">
+              <th className="h-20" colSpan={6}>
+                <div className="flex justify-between">
+                  <div className="flex items-center gap-2 justify-start ">
+                    <div className="relative">
+                      <TextInput
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="PlateNumber, Owner, Owner Phone"
+                      />
+                      {search && (
+                        <button
+                          onClick={handleClearSearch}
+                          className="absolute right-3 top-5 transform -translate-y-1/2"
+                        >
+                          <IoClose />
+                        </button>
+                      )}
+                    </div>
+                    <Button
+                      onClick={handleBtnSearch}
+                      className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
+                    >
+                      <FaSearch className="mr-2 sm:mr-0" />{" "}
+                      <span className="sm:hidden">Search</span>{" "}
+                    </Button>
+                  </div>
+                  <Button
+                    className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10"
+                    onClick={handleBtnAddNewClicked}
+                  >
+                    <FaPlus className="mr-2 sm:mr-0" />
+                    <span className="sm:hidden">Create Vehicle</span>
+                  </Button>
+                </div>
+              </th>
+            </tr>
+            <tr className="border-0">
+              <th>Vehicle</th>
+              <th>License Plate Number</th>
+              <th>Owner</th>
+              <th className="text-right">Owner PhoneNumber</th>
+              <th className="text-right">Date</th>
+              <th className="text-right">Action</th>
+            </tr>            
+          </thead>
+          <tbody>{tableContent}</tbody>
+        </table>
       </div>
     );
   }

@@ -25,17 +25,14 @@ function NavBarDashboard() {
     <Navbar
       fluid
       rounded
-      className="border-b-[1px] border-gray-200 dark:border-gray-700 px-4"
+      className=" border-b-[1px] border-gray-200 dark:border-gray-700 px-4"
     >
       <Navbar.Brand className="flex items-center justify-between w-full">
         <div className="flex items-center">
-          <Tooltip  content={"Collapse Menu"} trigger={window.innerWidth <= 1024 ? "undefined" : "hover"}>
-
-
+         
           <Button onClick={handleToggleCollapse} className="w-10 h-10 mr-2 ring-transparent hover:bg-gray-200 dark:hover:bg-gray-700">
             <HiMenuAlt2 className="h-5 w-5 text-black  dark:text-gray-100" />
           </Button>
-          </Tooltip>
           <img
             src="/logo/logo.png"
             className="mr-3 h-10 sm:h-9"
@@ -52,9 +49,9 @@ function NavBarDashboard() {
         </div>
 
         <div className="flex md:order-2 gap-4 items-center">          
-          <Tooltip content="Dark Mode" trigger={window.innerWidth <= 1024 ? "undefined" : "hover"}>
+          
           <DarkThemeToggle />
-          </Tooltip>
+        
           <Notification />
           <Dropdown
             arrowIcon={false}

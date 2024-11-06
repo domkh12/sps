@@ -1,8 +1,15 @@
 import React, { useState } from "react";
-import { FaCamera } from "react-icons/fa";
+import { FaCamera, FaRegUserCircle } from "react-icons/fa";
 import userPlaceHolder from "/images/userPlaceHolder.svg";
 import { Button, Spinner } from "flowbite-react";
 import { WiCloudUp } from "react-icons/wi";
+import { FaRegCircleUser } from "react-icons/fa6";
+import { TbUserCircle } from "react-icons/tb";
+import {
+  PiUserCircleFill,
+  PiUserCircleLight,
+  PiUserCirclePlusLight,
+} from "react-icons/pi";
 
 function ProfilePictureUpload({ setProfileImageFile, imageUri }) {
   const [image, setImage] = useState(imageUri || userPlaceHolder);
@@ -27,7 +34,7 @@ function ProfilePictureUpload({ setProfileImageFile, imageUri }) {
       reader.onloadend = () => {
         setUploading(true);
         setImage(reader.result);
-        setProfileImageFile(files[0]);        
+        setProfileImageFile(files[0]);
 
         setTimeout(() => {
           setUploading(false);
@@ -50,7 +57,7 @@ function ProfilePictureUpload({ setProfileImageFile, imageUri }) {
   };
 
   const content = (
-    <div className="flex flex-col items-start justify-start sm:items-center sm:justify-center">
+    <div className="flex flex-col items-center w-full justify-center sm:items-center sm:justify-center">
       <div className="relative rounded-full w-36 h-36 overflow-hidden mb-5 flex justify-start items-start sm:items-center sm:justify-center">
         <img
           id="profilePic"
@@ -58,6 +65,7 @@ function ProfilePictureUpload({ setProfileImageFile, imageUri }) {
           src={image}
           alt="Profile"
         />
+
         <input
           className="uploadProfileInput opacity-0 absolute inset-0"
           type="file"
@@ -90,9 +98,12 @@ function ProfilePictureUpload({ setProfileImageFile, imageUri }) {
       {alert && <small className="dark:text-gray-50">{alert}</small>}
       <Button
         className="mt-2 bg-primary hover:bg-primary-hover focus:ring-0 text-white"
-        onClick={() => document.getElementById('newProfilePhoto').click()}
+        onClick={() => document.getElementById("newProfilePhoto").click()}
       >
-        <p className="flex justify-start items-center gap-2"><WiCloudUp className="text-2xl"/><span> Upload Profile</span></p>
+        <p className="flex justify-start items-center gap-2">
+          <WiCloudUp className="text-2xl" />
+          <span> Upload Profile</span>
+        </p>
       </Button>
     </div>
   );

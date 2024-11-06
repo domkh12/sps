@@ -14,7 +14,7 @@ function NotFound() {
         </div>
         <img src="/images/not_found.svg" alt="not_found" width={600} height={600} />
         <NavLink to={"/dash"}>
-          <Button className="bg-primary hover:bg-primary-hover">GO HOME</Button>
+          <Button className="bg-primary hover:bg-primary-hover ring-transparent">GO HOME</Button>
         </NavLink>{" "}
       </div>
     </Flowbite>

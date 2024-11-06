@@ -3,9 +3,9 @@ import React from "react";
 
 function UserNotFound() {
   return (
-    <Table.Body>
-      <TableRow>
-        <TableCell colSpan={8} className="w-full h-[75vh] text-center bg-transparent">
+    <tbody>
+      <tr>
+        <td colSpan={8} className="w-full h-[75vh] text-center bg-transparent">
           <img
             src="/images/userNotFound.svg"
             alt="userNotFound"
@@ -15,9 +15,9 @@ function UserNotFound() {
           <p className="text-sm text-gray-500">
             We couldn't find the user you're looking for.
           </p>
-        </TableCell>
-      </TableRow>
-    </Table.Body>
+        </td>
+      </tr>
+    </tbody>
   );
 }
 

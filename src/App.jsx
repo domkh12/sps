@@ -15,6 +15,7 @@ import ViewUser from "./pages/user/ViewUser";
 import WebSocket from "./pages/websocket/WebSocket";
 import VehicleList from "./pages/vehicle/VehicleList";
 import AddNewVehicle from "./pages/vehicle/AddNewVehicle";
+import EditVehicle from "./pages/vehicle/EditVehicle";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
               <Route path="vehicles">
                 <Route index element={<VehicleList />} />
                 <Route path="new" element={<AddNewVehicle />} />
+                <Route path=":id" element={<EditVehicle />} />
               </Route>
               <Route path="messages">
                 <Route index element={<MessagesList />} />
