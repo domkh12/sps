@@ -1,4 +1,3 @@
-import React from "react";
 import Maintenance from "../../components/util/Mauntenance";
 import { Button, Checkbox, Table } from "flowbite-react";
 import { BsPrinterFill } from "react-icons/bs";
@@ -6,7 +5,10 @@ import { BsPrinterFill } from "react-icons/bs";
 function Vehicle() {
   return (
     <div className="overflow-x-auto">
-       <Button color="blue" className="flex justify-center items-center gap-5"><BsPrinterFill className="mr-2 h-5 w-5"/>Print</Button>
+      <Button color="blue" className="flex justify-center items-center gap-5">
+        <BsPrinterFill className="mr-2 h-5 w-5" />
+        Print
+      </Button>
       <Table hoverable>
         <Table.Head className="text-lg">
           <Table.HeadCell className="p-4">
@@ -29,7 +31,7 @@ function Vehicle() {
               <Checkbox />
             </Table.Cell>
             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-              {'TOYOTA'}
+              {"TOYOTA"}
             </Table.Cell>
             <Table.Cell>Black</Table.Cell>
             <Table.Cell>1CT-1217</Table.Cell>
@@ -37,7 +39,10 @@ function Vehicle() {
             <Table.Cell>5:00pm</Table.Cell>
             <Table.Cell>9:00h</Table.Cell>
             <Table.Cell>
-              <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+              <a
+                href="#"
+                className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
+              >
                 Edit
               </a>
             </Table.Cell>
@@ -47,7 +52,7 @@ function Vehicle() {
               <Checkbox />
             </Table.Cell>
             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-            BMW
+              BMW
             </Table.Cell>
             <Table.Cell>White</Table.Cell>
             <Table.Cell>1CT-1218</Table.Cell>
@@ -55,7 +60,10 @@ function Vehicle() {
             <Table.Cell>4:39am</Table.Cell>
             <Table.Cell>7:00h</Table.Cell>
             <Table.Cell>
-              <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+              <a
+                href="#"
+                className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
+              >
                 Edit
               </a>
             </Table.Cell>
@@ -64,14 +72,19 @@ function Vehicle() {
             <Table.Cell className="p-4">
               <Checkbox />
             </Table.Cell>
-            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">lamborghini</Table.Cell>
+            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+              lamborghini
+            </Table.Cell>
             <Table.Cell>Black</Table.Cell>
             <Table.Cell>1CT-1217</Table.Cell>
             <Table.Cell>8:20am</Table.Cell>
             <Table.Cell>3:39am</Table.Cell>
             <Table.Cell>5:00h</Table.Cell>
             <Table.Cell>
-              <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+              <a
+                href="#"
+                className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
+              >
                 Edit
               </a>
             </Table.Cell>
@@ -79,7 +92,6 @@ function Vehicle() {
         </Table.Body>
       </Table>
     </div>
-
   );
 }
 

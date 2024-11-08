@@ -8,9 +8,9 @@ export default defineConfig({
     host: true,
     watch: {
       usePolling: true,
-    },    
+    },
   },
   define: {
     "process.env": {},
-  },  
+  },
 });

@@ -1,38 +1,35 @@
-import React from "react";
-import useTranslation from "../../components/hook/UseTranslation";
 import {
-  Avatar,
-  Button,
+  Avatar,  
   DarkThemeToggle,
   Dropdown,
-  Navbar,
-  Tooltip,
+  Navbar,  
 } from "flowbite-react";
-import Notification from "../../components/util/Notification";
-import { HiMenuAlt2 } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleCollapsed } from "../../redux/feature/actions/actionSlice";
+import { PiListThin } from "react-icons/pi";
+import Notification from "../../components/util/Notification";
 
 function NavBarDashboard() {
-  const { translate } = useTranslation();
   const dispatch = useDispatch();
+  const isLoadingBar = useSelector((state) => state.action.isLoadingBar);
 
   const handleToggleCollapse = () => {
     dispatch(toggleCollapsed());
   };
 
   return (
+    <div className="relative">
     <Navbar
       fluid
       rounded
-      className=" border-b-[1px] border-gray-200 dark:border-gray-700 px-4 dark:bg-[#282828]"
+      className="border-b-[1px] border-gray-200 dark:border-gray-700 dark:bg-[#282828]"
     >
       <Navbar.Brand className="flex items-center justify-between w-full">
         <div className="flex items-center">
          
-          <Button onClick={handleToggleCollapse} className="w-10 h-10 mr-2 ring-transparent hover:bg-gray-200 dark:hover:bg-gray-700">
-            <HiMenuAlt2 className="h-5 w-5 text-black  dark:text-gray-100" />
-          </Button>
+          <button onClick={handleToggleCollapse} className="w-[3rem] h-[3rem] rounded-full flex justify-center items-center mr-2 ring-transparent hover:bg-gray-200 dark:hover:bg-gray-700">
+            <PiListThin className="h-6 w-6 text-black text-xl dark:text-gray-100" />
+          </button>
           <img
             src="/logo/logo.png"
             className="mr-3 h-10 sm:h-9"
@@ -79,6 +76,16 @@ function NavBarDashboard() {
         </div>
       </Navbar.Brand>
     </Navbar>
+    {isLoadingBar ? (
+      <div className="w-full fixed z-10">
+        <div className="h-[2px] w-full bg-pink-100 overflow-hidden">
+          <div className="progress w-full h-full bg-gray-600 left-right"></div>
+        </div>
+      </div>
+    ) : (
+      <></>
+    )}
+    </div>
   );
 }
 

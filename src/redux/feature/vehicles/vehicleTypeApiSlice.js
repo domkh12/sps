@@ -12,9 +12,7 @@ export const vehicleTypeTypeApiSlice = apiSlice.injectEndpoints({
       validateStatus: (response, result) => {
         return response.result === 200 && !result.isError;
       },
-      keepUnusedDataFor: 5,
       transformResponse: (responseData) => {
-        // console.log(responseData)
         const loadVehicleTypes = responseData.map((vehicleType) => {
           vehicleType.id = vehicleType.uuid;
           return vehicleType;

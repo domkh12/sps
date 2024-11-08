@@ -1,5 +1,4 @@
 import { Table, TableCell, TableRow } from "flowbite-react";
-import React from "react";
 
 function UserNotFound() {
   return (

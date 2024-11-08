@@ -75,6 +75,7 @@ function ImageUpload({ setImageFile, imageUri }) {
     if (imageUri) {
       // Open the imageUri in a new tab
       window.open(imageUri, "_blank");
+      setToggleImageDropdown(false);
     } else if (image) {
       // Use the original filename of the uploaded image
       const uploadedFile = fileInputRef.current.files[0];
@@ -85,7 +86,8 @@ function ImageUpload({ setImageFile, imageUri }) {
       link.download = filename; // Specify a default filename for the uploaded image
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      document.body.removeChild(link);    
+      setToggleImageDropdown(false);  
     }
   };
 

@@ -5,11 +5,13 @@ import { useGetVehicleQuery } from "../../redux/feature/vehicles/vehicleApiSlice
 import { IoClose } from "react-icons/io5";
 import { FaPlus, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function VehicleList() {
   const [search, setSearch] = useState("");
   const navigator = useNavigate();
   const { mode } = useThemeMode();
+  const isScrolling = useSelector((state) => state.action.isScrolling);
 
   const {
     data: vehicles,
@@ -66,7 +68,9 @@ function VehicleList() {
         </h1>
 
         <table className="w-full">
-          <thead className="dark:bg-[#282828]">
+          <thead
+            className={`dark:bg-[#282828] ${isScrolling ? "shadow-md" : ""}`}
+          >
             <tr className="p-0 w-full">
               <th className="h-20" colSpan={6}>
                 <div className="flex justify-between">
@@ -109,9 +113,7 @@ function VehicleList() {
                 </div>
               </th>
             </tr>
-            <tr
-              className="border-0 dark:text-white text-gray-500"             
-            >
+            <tr className="border-0 dark:text-white text-gray-500">
               <th>Vehicle</th>
               <th>License Plate Number</th>
               <th>Owner</th>

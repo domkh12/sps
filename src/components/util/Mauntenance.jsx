@@ -1,5 +1,5 @@
 import { Button } from "flowbite-react";
-import React from "react";
+
 import { HiOutlineArrowLeft } from "react-icons/hi";
 
 function Maintenance() {

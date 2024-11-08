@@ -66,8 +66,12 @@ function WebSocket() {
   useEffect(() => {
     connect();
     connectUser();
+    const intervalId = setInterval(() => {
+      connectUser();
+    }, 5 * 60 * 1000);
 
     return () => {
+      clearInterval(intervalId);
       if (socketClient) {
         socketClient.current.disconnect(() => {
           console.log("Disconnected from WebSocket");

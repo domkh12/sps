@@ -6,6 +6,7 @@ const actionSlice = createSlice({
     isCollapsed: false,
     isLoadingBar: false,
     isPaginationSuccess: false,
+    isScrolling: false,
   },
   reducers: {
     toggleCollapsed(state, action) {
@@ -17,9 +18,17 @@ const actionSlice = createSlice({
     setIsPaginationSuccess(state, action) {
       state.isPaginationSuccess = action.payload;
     },
+    setIsScrolling(state, action) {
+      state.isScrolling = action.payload;      
+    },
   },
 });
 
-export const { toggleCollapsed, setIsLoadingBar, setIsPaginationSuccess } =
-  actionSlice.actions;
+export const {
+  toggleCollapsed,
+  setIsLoadingBar,
+  setIsPaginationSuccess,
+  setIsScrolling,
+} = actionSlice.actions;
+
 export default actionSlice.reducer;

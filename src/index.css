@@ -10,7 +10,7 @@
 }
 
 :root {
-  --primary: #2C3092;
+  --primary: #2c3092;
 }
 
 * {
@@ -21,6 +21,8 @@
 
 body {
   font-family: "Hanuman", serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 .dark {
@@ -31,9 +33,6 @@ body {
   animation: progress 1s infinite linear;
 }
 
-.left-right {
-  transform-origin: 0% 50%;
-}
 @keyframes progress {
   0% {
     transform: translateX(0) scaleX(0);
@@ -46,9 +45,13 @@ body {
   }
 }
 
+.left-right {
+  transform-origin: 0% 50%;
+}
+
 .customScrollBar {
   overflow: auto;
-  scrollbar-color: rgb(161, 161, 161) rgb(224, 224, 224);
+  scrollbar-color: rgb(161, 161, 161) #f9fafb;
   scrollbar-width: thin;
 }
 
@@ -71,7 +74,6 @@ thead {
   position: sticky;
   top: 0;
   background-color: #f9fafb;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 table,
@@ -79,7 +81,7 @@ thead,
 tr,
 th {
   font-size: 0.9rem;
-  padding: 1rem 2rem;    
+  padding: 1rem 2rem;
   text-align: left;
   font-weight: 500;
 }
@@ -92,3 +94,71 @@ th {
   border-radius: 25%;
 }
 /* button end */
+
+/* side bar start */
+
+#sidebar a.active {
+  color: black;
+  font-weight: 500;
+  background-color: #e5e7eb;
+}
+
+#sidebar {
+  padding: 1rem 0.5rem;
+  font-weight: 400;
+}
+
+#sidebar a {
+  /* padding: 5px;   */
+  position: relative;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: start;
+  padding: 0.7rem;
+  gap: 1rem;
+  align-items: center;
+}
+
+#sidebar a:hover {
+  background-color: #e5e7eb;  
+}
+
+/* side bar end */
+
+/* button ripple start */
+
+.btn-ripple{
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: gray;
+  width: 0;
+  opacity: 20%;
+  height: 100%;
+  animation-name: btnRipple; 
+  animation-duration: 0.5s;   
+  animation-timing-function: linear;
+  animation-iteration-count: 1;  
+}
+
+.btn-ripple:active::before {
+  animation-name: none;
+}
+
+@keyframes btnRipple {
+  0% {
+    transform: translateX(100%);
+    width: 0%;
+  }
+  100% {
+    transform: translateX(0%);
+    width: 100%;
+  }
+} 
+/* button ripple end */

@@ -12,7 +12,6 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
       validateStatus: (response, result) => {
         return response.result === 200 && !result.isError;
       },
-      keepUnusedDataFor: 5,
       transformResponse: (responseData) => {
         // console.log(responseData.content)
         const loadVehicles = responseData.content.map((vehicle) => {

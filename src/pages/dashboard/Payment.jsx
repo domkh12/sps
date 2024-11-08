@@ -1,4 +1,3 @@
-import React from "react";
 import Maintenance from "../../components/util/Mauntenance";
 
 function Payment() {

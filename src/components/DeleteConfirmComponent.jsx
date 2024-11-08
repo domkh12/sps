@@ -1,5 +1,5 @@
 import { Button, Modal } from "flowbite-react";
-import React from "react";
+
 import { BsTrash3Fill } from "react-icons/bs";
 
 function DeleteConfirmComponent({ isOpen, onClose, handleConfirmDelete }) {

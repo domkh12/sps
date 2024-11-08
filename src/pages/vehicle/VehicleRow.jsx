@@ -1,9 +1,10 @@
 import { Button, Checkbox, TableCell, TableRow, Tooltip } from "flowbite-react";
-import React from "react";
+
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { selectVehicleById } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { FaEdit, FaEye } from "react-icons/fa";
+import { IoMdImages } from "react-icons/io";
 
 function VehicleRow({ vehicleId }) {
   const vehicle = useSelector((state) => selectVehicleById(state, vehicleId));
@@ -11,6 +12,7 @@ function VehicleRow({ vehicleId }) {
 
   if (vehicle) {
     var handleEdit = () => navigate(`/dash/vehicles/${vehicleId}`);
+    var handleView = () => navigate(`/dash/vehicles/${vehicleId}/view`);
     var createdAt = vehicle.createdAt;
     var createdAtResult = createdAt.substring(0, createdAt.indexOf("T"));
   } else {
@@ -19,16 +21,32 @@ function VehicleRow({ vehicleId }) {
   return (
     <tr className="dark:text-white">
       <td>
-        <div className="flex w-72 items-center">
-          <img
-            src={vehicle.image || "/images/vehiclePlaceHolder.png"}
-            alt="car_Photo"
-            className="w-32 h-20 object-cover rounded-lg"
-          />
-          <p className="text-pretty truncate ml-2">
-            {vehicle.vehicleModel ? vehicle.vehicleModel : "N/A"}
-          </p>
-        </div>
+        {vehicle.image ? (
+          <>
+            {" "}
+            <div className="flex w-72 items-center">
+              <img
+                src={vehicle.image || "/images/vehiclePlaceHolder.png"}
+                alt="car_Photo"
+                className="w-32 h-20 object-cover rounded-lg bg-black"
+              />
+              <p className="text-pretty truncate ml-2">
+                {vehicle.vehicleModel ? vehicle.vehicleModel : "N/A"}
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex w-72 items-center">
+              <div className="bg-gray-200 w-32 h-20 rounded-lg">
+                <IoMdImages className="h-14 w-20 text-gray-400 ml-6 mt-3" />
+              </div>
+              <p className="text-pretty truncate ml-2">
+                {vehicle.vehicleModel ? vehicle.vehicleModel : "N/A"}
+              </p>
+            </div>
+          </>
+        )}
       </td>
       <td>
         <div className="border-2 w-36 h-auto border-blue-600 text-center p-1 rounded-md bg-gray-50">
@@ -61,7 +79,7 @@ function VehicleRow({ vehicleId }) {
           </button>
 
           <button
-            // onClick={handleView}
+            onClick={handleView}
             className="button-squar text-white bg-secondary hover:bg-secondary-hover ring-transparent"
           >
             <FaEye />

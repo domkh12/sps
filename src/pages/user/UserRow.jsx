@@ -17,6 +17,7 @@ function UserRow({ userId, uuid, status }) {
   const navigate = useNavigate();
   const user = useSelector((state) => selectUserById(state, userId));
   const [updatedUser, setUpdatedUser] = useState("");
+  
   useEffect(() => {
     if (user && user.uuid == uuid) {
       setUpdatedUser({ ...user, status: status });

@@ -8,9 +8,16 @@ const initialState = usersAdapter.getInitialState();
 export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUsers: builder.query({
-      query: () => `/users`,
+      query: ({pageNo = 1, pageSize = 20}={}) => `/users?pageNo=${pageNo}&pageSize=${pageSize}`,
       validateStatus: (response, result) => {
         return response.status === 200 && !result.isError;
+      },
+      serializeQueryArgs: ({ pageNo }) => {
+        const newQueryArgs = { ...pageNo };
+        if (newQueryArgs.page) {
+          delete newQueryArgs.page;
+        }
+        return newQueryArgs;
       },
       transformResponse: (responseData) => {
         const loadedUsers = responseData.content.map((user) => {
@@ -60,38 +67,37 @@ export const userApiSlice = apiSlice.injectEndpoints({
         },
       }),
       invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
-    }),
-    paginationUsers: builder.mutation({
-      query: ({ pageNo, pageSize = 20 }) => ({
-        url: `/users?pageNo=${pageNo}&pageSize=${pageSize}`,
-      }),
-      transformResponse: (responseData) => {
-        const loadedUsers = responseData.content.map((user) => ({
-          ...user,
-          id: user.uuid,
-        }));
-        return { users: loadedUsers, totalPages: responseData.page.totalPages };
-      },
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          const { users: newUsers, totalPages: newTotalPages } = data;
-          // Replace existing data with the new paginated data
-          dispatch(
-            userApiSlice.util.updateQueryData(
-              "getUsers",
-              undefined,
-              (draft) => {
-                usersAdapter.setAll(draft, newUsers);
-                draft.totalPages = newTotalPages;
-              }
-            )
-          );
-        } catch (error) {
-          console.error("Failed to fetch paginated users:", error);
-        }
-      },
-    }),
+    }),    
+    //   query: ({ pageNo, pageSize = 20 }) => ({
+    //     url: `/users?pageNo=${pageNo}&pageSize=${pageSize}`,
+    //   }),
+    //   transformResponse: (responseData) => {
+    //     const loadedUsers = responseData.content.map((user) => ({
+    //       ...user,
+    //       id: user.uuid,
+    //     }));
+    //     return { users: loadedUsers, totalPages: responseData.page.totalPages };
+    //   },
+    //   async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+    //     try {
+    //       const { data } = await queryFulfilled;
+    //       const { users: newUsers, totalPages: newTotalPages } = data;
+    //       // Replace existing data with the new paginated data
+    //       dispatch(
+    //         userApiSlice.util.updateQueryData(
+    //           "getUsers",
+    //           undefined,
+    //           (draft) => {
+    //             usersAdapter.setAll(draft, newUsers);
+    //             draft.totalPages = newTotalPages;
+    //           }
+    //         )
+    //       );
+    //     } catch (error) {
+    //       console.error("Failed to fetch paginated users:", error);
+    //     }
+    //   },
+    // }),
     searchUsers: builder.mutation({
       query: ({ query }) => ({
         url: `/users/search?q=${query}`,
@@ -189,7 +195,8 @@ export const {
 // return the query result object
 export const selectUserResult = userApiSlice.endpoints.getUsers.select();
 export const selectUserProfile = userApiSlice.endpoints.findByUuid.select();
-export const selectFullNameUser = userApiSlice.endpoints.getFullNameUsers.select();
+export const selectFullNameUser =
+  userApiSlice.endpoints.getFullNameUsers.select();
 // create momorized selector
 const selectUserData = createSelector(
   selectUserResult,
@@ -230,4 +237,6 @@ export const {
   selectById: selectUserFullNameById,
   selectIds: selectUserFullNameIds,
   // pass the selector that return the users slice of state
-} = usersAdapter.getSelectors((state) => selectFullNameUserData(state) ?? initialState);
+} = usersAdapter.getSelectors(
+  (state) => selectFullNameUserData(state) ?? initialState
+);

@@ -1,6 +1,5 @@
 import { Button, Flowbite } from "flowbite-react";
 
-import React from "react";
 import { NavLink } from "react-router-dom";
 
 function NotFound() {
@@ -12,9 +11,16 @@ function NotFound() {
           <p className="text-xl dark:text-gray-200">Something Went Wrong.</p>
           <small className="dark:text-gray-300">Error 404 Not Found</small>
         </div>
-        <img src="/images/not_found.svg" alt="not_found" width={600} height={600} />
+        <img
+          src="/images/not_found.svg"
+          alt="not_found"
+          width={600}
+          height={600}
+        />
         <NavLink to={"/dash"}>
-          <Button className="bg-primary hover:bg-primary-hover ring-transparent">GO HOME</Button>
+          <Button className="bg-primary hover:bg-primary-hover ring-transparent">
+            GO HOME
+          </Button>
         </NavLink>{" "}
       </div>
     </Flowbite>

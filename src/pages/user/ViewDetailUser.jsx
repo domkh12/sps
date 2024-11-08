@@ -11,12 +11,14 @@ import {
 import userPlaceHolder from "/images/userPlaceHolder.svg";
 import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { PiCellSignalFullThin } from "react-icons/pi";
 
 function ViewDetailUser({ user }) {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
   const [roles, setRoles] = useState(user.roleNames);
+  console.log(user)
 
   const handleImageClick = () => {
     setSelectedImage(user.profileImage || userPlaceHolder);
@@ -245,6 +247,16 @@ function ViewDetailUser({ user }) {
                 </span>
                 <span className="text-primary font-medium text-base">
                 {user.isDeleted ? "Yes" : "No"}
+                </span>
+              </Label>
+
+              <Label className="flex gap-2 justify-start items-center text-nowrap">
+                <span className="flex gap-2 justify-start items-center text-nowrap">
+                  <PiCellSignalFullThin className="h-4 w-4" />
+                  Active :
+                </span>
+                <span className="text-primary font-medium text-base">
+                {user.status}
                 </span>
               </Label>
             </div>

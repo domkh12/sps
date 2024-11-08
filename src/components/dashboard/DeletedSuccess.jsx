@@ -1,5 +1,3 @@
-import React from "react";
-
 function DeletedSuccess() {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
