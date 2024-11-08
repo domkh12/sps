@@ -1,2 +1,2 @@
-https://app.sps-api-npic.site
+https://app.sps-api-npic.site/
 https://app.sps-api-npic.site/login
