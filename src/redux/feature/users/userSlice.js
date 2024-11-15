@@ -25,6 +25,10 @@ const userSlice = createSlice({
     resetPageNo(state, action) {
       state.pageNo = 1;
     },
+    lastPageNo(state, action){
+      console.log(state.totalPages)
+      state.pageNo = state.totalPages
+    },
     setPageSize(state, action){
       state.pageSize = action.payload
     },
@@ -41,7 +45,8 @@ export const {
   decreasePageNo,
   resetPageNo,
   setPageSize,
-  setTotalPages
+  setTotalPages,
+  lastPageNo
 } = userSlice.actions;
 
 export default userSlice.reducer;

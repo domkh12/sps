@@ -32,7 +32,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     refresh: builder.mutation({
       query: () => ({
         url: "/auth/refresh",
-        method: "GET",        
+        method: "GET",
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
@@ -47,8 +47,29 @@ export const authApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
+    oauth2Microsoft: builder.mutation({
+      query: ( initialState ) => ({
+        url: "/auth/microsoft",
+        method: "POST",
+        body: {
+          ...initialState,
+        },
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const result = await queryFulfilled;
+          console.log(result);
+        } catch (err) {
+          console.log(err);
+        }
+      },
+    }),
   }),
 });
 
-export const { useLoginMutation, useSendLogoutMutation, useRefreshMutation } =
-  authApiSlice;
+export const {
+  useLoginMutation,
+  useSendLogoutMutation,
+  useRefreshMutation,
+  useOauth2MicrosoftMutation,
+} = authApiSlice;

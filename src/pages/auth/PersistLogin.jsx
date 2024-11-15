@@ -1,17 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { selectCurrentToekn } from "../../redux/feature/auth/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { logOut, selectCurrentToekn } from "../../redux/feature/auth/authSlice";
 import { useRefreshMutation } from "../../redux/feature/auth/authApiSlice";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Button } from "flowbite-react";
 import { HiArrowRight } from "react-icons/hi";
+import useAuth from "../../hook/useAuth";
 
 function PersistLogin() {
-  // const [persist] = usePersist();
+  const { username, roles } = useAuth();
   const token = useSelector(selectCurrentToekn);
   const [trueSuccess, setTrueSuccess] = useState(false);
   const effectRan = useRef(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLoginRedirect = () => {
     navigate("/login");
@@ -39,10 +41,13 @@ function PersistLogin() {
     return () => (effectRan.current = true);
   }, []);
 
+  // useEffect(() => {
+  //   if (!roles.includes("ROLE_ADMIN")) {      
+  //     handleLoginRedirect();
+  //   }
+  // }, [roles]);
+
   let content;
-  // if (!persist) {
-  //   content = <Outlet />;
-  // } else 
   if (isLoading) {
     // persist: yes , token: no
     console.log("loading");

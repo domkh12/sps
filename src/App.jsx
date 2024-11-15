@@ -17,6 +17,10 @@ import VehicleList from "./pages/vehicle/VehicleList";
 import AddNewVehicle from "./pages/vehicle/AddNewVehicle";
 import EditVehicle from "./pages/vehicle/EditVehicle";
 import ViewVehicle from "./pages/vehicle/ViewVehicle";
+import Parking from "./pages/parking/Parking.jsx";
+import ParkingAreas from "./pages/parking/ParkingAreas.jsx";
+import HistoryParking from "./pages/parking/HistoryParking.jsx";
+import ParkingAreasList from "./pages/parking/ParkingAreasList.jsx";
 
 function App() {
   return (
@@ -48,7 +52,14 @@ function App() {
               <Route path="profiles">
                 <Route index element={<Profile />} />
               </Route>
+              <Route path="parking" element={<Parking />}>
+                <Route path=":id" element={<ParkingAreas />}>
+                  <Route path=":id" element={<ParkingAreasList />} />
+                </Route>
+                <Route path="history" element={<HistoryParking />} />
+              </Route>
             </Route>
+
             {/* End dash */}
           </Route>
         </Route>

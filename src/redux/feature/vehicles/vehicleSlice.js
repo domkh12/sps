@@ -1,7 +1,7 @@
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 
-const userSlice = createSlice({
-  name: "users",
+const vehicleSlice = createSlice({
+  name: "vehicles",
   initialState: {
     uuid: "",
     status: "",
@@ -47,6 +47,6 @@ export const {
   setPageSize,
   setTotalPages,
   lastPageNo
-} = userSlice.actions;
+} = vehicleSlice.actions;
 
-export default userSlice.reducer;
+export default vehicleSlice.reducer;

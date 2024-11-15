@@ -8,7 +8,6 @@ import {
   setIsScrolling,
 } from "../../redux/feature/actions/actionSlice";
 function AdminLayout() {
-  
   const isPaginationSuccess = useSelector(
     (state) => state.action.isPaginationSuccess
   );
@@ -51,13 +50,13 @@ function AdminLayout() {
   const content = (
     <div className="fixed top-0 left-0 w-full h-screen dark:bg-[#282828]">
       <header>
-        <NavBarDashboard />        
+        <NavBarDashboard />
       </header>
       <div className="flex h-full">
         <SideBar />
         <main className="flex flex-grow h-full overflow-auto">
           <div
-            className=" flex-grow h-full customScrollBar max-h-[calc(100vh-4rem)]"
+            className=" flex-grow h-full customScrollBar max-h-[calc(100vh-4rem)] bg-white dark:bg-gray-800"
             ref={mainContentRef}
           >
             <Outlet />

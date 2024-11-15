@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import {  NavLink, useNavigate } from "react-router-dom";
-import {  useDispatch, useSelector } from "react-redux";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { useSendLogoutMutation } from "../../redux/feature/auth/authApiSlice";
 import {
   PiGearFill,
@@ -40,7 +40,9 @@ function SideBar() {
     <>
       <div
         className={`${
-          isCollapsed ? "w-[4rem] transition-all duration-500" : "w-[15rem] transition-all duration-500"
+          isCollapsed
+            ? "w-[4rem] transition-all duration-500"
+            : "w-[15rem] transition-all duration-500"
         }  h-full border-r-[1px] border-r-gray-300 w-[15rem] shrink-0`}
       >
         <nav id="sidebar" className="flex flex-col">
@@ -58,14 +60,16 @@ function SideBar() {
                 ) : (
                   <PiSquaresFourThin className="h-6 w-6" />
                 )}
-                <span className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}>
+                <span
+                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                >
                   Dashboard
                 </span>
               </>
             )}
           </NavLink>
           <NavLink
-            to="/dash/parkings"
+            to="/dash/parking"
             className={`${
               isCollapsed ? "h-[3rem] w-full" : "h-[3rem]"
             } overflow-hidden`}
@@ -77,12 +81,14 @@ function SideBar() {
                 ) : (
                   <PiLetterCirclePThin className="h-6 w-6" />
                 )}
-                <span className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}>
+                <span
+                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                >
                   Parking
                 </span>
               </>
             )}
-          </NavLink>
+          </NavLink>       
           <NavLink
             to="/dash/vehicles"
             className={`${
@@ -96,7 +102,9 @@ function SideBar() {
                 ) : (
                   <PiSteeringWheelThin className="h-6 w-6" />
                 )}
-                <span className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}>
+                <span
+                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                >
                   Vehicle
                 </span>
               </>
@@ -115,7 +123,9 @@ function SideBar() {
                 ) : (
                   <PiUserThin className="h-6 w-6" />
                 )}
-                <span className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}>
+                <span
+                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                >
                   User
                 </span>
               </>
@@ -134,7 +144,9 @@ function SideBar() {
                 ) : (
                   <PiMessengerLogoThin className="h-6 w-6" />
                 )}
-                <span className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}>
+                <span
+                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                >
                   Message
                 </span>
               </>
@@ -153,7 +165,9 @@ function SideBar() {
                 ) : (
                   <PiMoneyWavyThin className="h-6 w-6" />
                 )}
-                <span className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}>
+                <span
+                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                >
                   Payment
                 </span>
               </>
@@ -172,7 +186,9 @@ function SideBar() {
                 ) : (
                   <PiGearThin className="h-6 w-6" />
                 )}
-                <span className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}>
+                <span
+                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                >
                   Setting
                 </span>
               </>
@@ -183,7 +199,11 @@ function SideBar() {
             className="h-[3rem] w-full cursor-pointer overflow-hidden"
           >
             <PiSignInThin className="h-6 w-6" />
-            <span className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}>Logout</span>
+            <span
+              className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+            >
+              Logout
+            </span>
           </a>
         </nav>
       </div>

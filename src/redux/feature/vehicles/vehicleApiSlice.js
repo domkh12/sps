@@ -8,17 +8,29 @@ const initialState = vehicleAdapter.getInitialState();
 export const vehicleApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getVehicle: builder.query({
-      query: () => "/vehicles",
+      query: ({ pageNo = 1, pageSize = 30 } = {}) => `/vehicles?pageNo=${pageNo}&pageSize=${pageSize}`,
       validateStatus: (response, result) => {
         return response.result === 200 && !result.isError;
       },
-      transformResponse: (responseData) => {
-        // console.log(responseData.content)
+      serializeQueryArgs: ({ pageNo }) => {
+        const newQueryArgs = { ...pageNo };
+        if (newQueryArgs.page) {
+          delete newQueryArgs.page;
+        }
+        return newQueryArgs;
+      },
+      transformResponse: (responseData) => {    
         const loadVehicles = responseData.content.map((vehicle) => {
           vehicle.id = vehicle.uuid;
           return vehicle;
         });
-        return vehicleAdapter.setAll(initialState, loadVehicles);
+        return{
+          ...vehicleAdapter.setAll(initialState, loadVehicles),
+          totalPages: responseData.page.totalPages,
+          totalElements: responseData.page.totalElements,
+          pageNo: responseData.page.number,
+          pageSize: responseData.page.size,
+        }
       },
       providesTags: (result, error, arg) => {
         if (result?.ids) {

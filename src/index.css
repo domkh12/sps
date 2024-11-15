@@ -19,6 +19,10 @@
   box-sizing: border-box;
 }
 
+html {
+  overscroll-behavior: none;
+}
+
 body {
   font-family: "Hanuman", serif;
   font-weight: 400;
@@ -120,19 +124,19 @@ th {
 }
 
 #sidebar a:hover {
-  background-color: #e5e7eb;  
+  background-color: #e5e7eb;
 }
 
 /* side bar end */
 
 /* button ripple start */
 
-.btn-ripple{
+.btn-ripple {
   position: relative;
   overflow: hidden;
 }
 
-.btn-ripple::before{
+.btn-ripple::before {
   content: "";
   position: absolute;
   top: 0;
@@ -141,10 +145,10 @@ th {
   width: 0;
   opacity: 20%;
   height: 100%;
-  animation-name: btnRipple; 
-  animation-duration: 0.5s;   
+  animation-name: btnRipple;
+  animation-duration: 0.5s;
   animation-timing-function: linear;
-  animation-iteration-count: 1;  
+  animation-iteration-count: 1;
 }
 
 .btn-ripple:active::before {
@@ -160,5 +164,14 @@ th {
     transform: translateX(0%);
     width: 100%;
   }
-} 
+}
 /* button ripple end */
+
+/* tab start */
+
+.active-tab-class {
+  background-color: #f0f0f0; /* Example background color */
+  font-weight: bold; /* Example font weight */
+}
+
+/* tab end */

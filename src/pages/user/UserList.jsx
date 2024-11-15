@@ -14,11 +14,13 @@ import {
   PiCaretDownThin,
   PiCaretLeftThin,
   PiCaretLineLeftThin,
+  PiCaretLineRightThin,
   PiCaretRightThin,
 } from "react-icons/pi";
 import {
   decreasePageNo,
   increasePageNo,
+  lastPageNo,
   resetPageNo,
   setPageSize,
   setTotalPages,
@@ -29,20 +31,19 @@ import {
 } from "../../redux/feature/actions/actionSlice";
 
 function UserList() {
+
   const navigator = useNavigate();
   const dispatch = useDispatch();
-  const [search, setSearch] = useState("");
-  const totalPages = useSelector((state) => state.users.totalPages);
+  const [search, setSearch] = useState("");  
   const uuid = useSelector((state) => state.users.uuid);
   const status = useSelector((state) => state.users.status);
   const isScrolling = useSelector((state) => state.action.isScrolling);
   const pageNo = useSelector((state) => state.users.pageNo);
   const pageSize = useSelector((state) => state.users.pageSize);
+  const totalPages = useSelector((state) => state.users.totalPages);
   const [isPageSizeOpen, setIsPageSizeOpen] = useState(false);
-  const pageSizeRef = useRef(null);  
-  console.log(
-    "pageNo",pageNo
-  )
+  const pageSizeRef = useRef(null);
+  
   const {
     data: users,
     isLoading,
@@ -58,6 +59,8 @@ function UserList() {
       refetchOnMountOrArgChange: true,
     }
   );
+
+  const [searchUsers, { isLoading: isSearching }] = useSearchUsersMutation();
 
   useEffect(() => {
     if (isFetching) {
@@ -86,19 +89,49 @@ function UserList() {
     };
   }, []);
 
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(setTotalPages(users.totalPages));    
+    }
+  }, [users, totalPages, pageNo]);
+
   const toggleDropdown = () => {
     setIsPageSizeOpen((prev) => !prev);
   };
 
-  console.log("isFetching", isFetching);
+  const handleNextPagination = async () => {
+    dispatch(increasePageNo());
+    dispatch(setIsPaginationSuccess(true));
+  };
 
-  const [searchUsers, { isLoading: isSearching }] = useSearchUsersMutation();
+  const handleBackPagination = async () => {
+    dispatch(decreasePageNo());
+    dispatch(setIsPaginationSuccess(true));
+  };
 
-  useEffect(() => {
-    if (isSuccess) {
-      dispatch(setTotalPages(users.totalPages));
+  const handleResetPagination = async () => {
+    dispatch(resetPageNo());
+    dispatch(setIsPaginationSuccess(true));
+  };
+
+  const handleLastPagination = async () => {
+    dispatch(lastPageNo());
+    dispatch(setIsPaginationSuccess(true));
+  };
+
+  const handleSetPageSize = (size) => {
+    if ([10, 30, 50].includes(size)) {      
+        dispatch(setPageSize(size));       
+    } else {
+      console.error("Invalid page size:", size);
     }
-  }, [users]);
+  };
+
+  const calculateItemRange = () => {
+    const startItem = (pageNo - 1) * pageSize + 1;
+    const endItem = Math.min(pageNo * pageSize, users.totalElements);
+    return `${startItem}-${endItem}`;
+  };
 
   let content;
 
@@ -117,22 +150,7 @@ function UserList() {
       : null;
     const handleBtnAddNewClicked = () => {
       navigator("/dash/users/new");
-    };
-
-    const handleNextPagination = async () => {
-      dispatch(increasePageNo());
-      dispatch(setIsPaginationSuccess(true));
-    };
-
-    const handleBackPagination = async () => {
-      dispatch(decreasePageNo());
-      dispatch(setIsPaginationSuccess(true));
-    };
-
-    const handleResetPagination = async () => {
-      dispatch(resetPageNo());
-      dispatch(setIsPaginationSuccess(true));
-    };
+    };    
 
     const handleBtnSearch = async () => {
       if (search.trim()) {
@@ -230,11 +248,10 @@ function UserList() {
             <tr>
               <td colSpan={7} className="py-2 px-8">
                 <div className="flex justify-end items-center gap-4">
-                <div className="text-gray-500">
-                      <p>Rows per page: </p>
-                    </div>
-                  <div className="relative" ref={pageSizeRef}>    
-                                  
+                  <div className="text-gray-500">
+                    <p>Rows per page: </p>
+                  </div>
+                  <div className="relative" ref={pageSizeRef}>
                     <button
                       className="hover:bg-gray-200 p-2 rounded-lg flex justify-center items-center gap-4"
                       onClick={toggleDropdown}
@@ -246,19 +263,19 @@ function UserList() {
                       <div className="w-full h-28 absolute bottom-0 left-0 rounded-lg bg-gray-50 shadow-md border-[1px] flex flex-col justify-between items-center py-2">
                         <button
                           className="hover:bg-gray-200 w-full py-1 h-full"
-                          onClick={() => dispatch(setPageSize(10))}
+                          onClick={() => handleSetPageSize(10)}
                         >
                           10
                         </button>
                         <button
                           className="hover:bg-gray-200 w-full py-1 h-full"
-                          onClick={() => dispatch(setPageSize(30))}
+                          onClick={() => handleSetPageSize(30)}
                         >
                           30
                         </button>
                         <button
                           className="hover:bg-gray-200 w-full py-1 h-full"
-                          onClick={() => dispatch(setPageSize(50))}
+                          onClick={() => handleSetPageSize(50)}
                         >
                           50
                         </button>
@@ -267,7 +284,7 @@ function UserList() {
                   </div>
 
                   <div className="text-gray-500 text-sm">
-                    <p>of about {totalPages}</p>
+                    <p>{calculateItemRange()} of about {totalPages}</p>
                   </div>
                   <button
                     className={`p-2 rounded-full ${
@@ -293,10 +310,27 @@ function UserList() {
                   </button>
 
                   <button
-                    className="hover:bg-gray-200 p-2 rounded-full"
+                    className={`p-2 rounded-full ${
+                      totalPages === pageNo
+                        ? "opacity-50 cursor-default"
+                        : "hover:bg-gray-200 "
+                    }`}
                     onClick={handleNextPagination}
+                    disabled={totalPages == pageNo}
                   >
                     <PiCaretRightThin className="h-5 w-5" />
+                  </button>
+
+                  <button
+                    className={`p-2 rounded-full ${
+                      totalPages === pageNo
+                        ? "opacity-50 cursor-default"
+                        : "hover:bg-gray-200 "
+                    }`}
+                    onClick={handleLastPagination}
+                    disabled={totalPages == pageNo}
+                  >
+                    <PiCaretLineRightThin className="h-5 w-5" />
                   </button>
                 </div>
               </td>
