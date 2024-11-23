@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectUserById } from "../../redux/feature/users/userApiSlice";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Badge,
-} from "flowbite-react";
+import { Badge } from "flowbite-react";
 import {
   getContrastingTextColor,
   stringToColor,
@@ -13,11 +11,11 @@ import { FaEdit, FaEye } from "react-icons/fa";
 import AvartarCustom from "./components/AvartarCustom";
 import { STATUS } from "../../config/status";
 
-function UserRow({ userId, uuid, status }) {
+function UserRow({ userId, uuid, status, isActionButton }) {
   const navigate = useNavigate();
   const user = useSelector((state) => selectUserById(state, userId));
   const [updatedUser, setUpdatedUser] = useState("");
-  
+
   useEffect(() => {
     if (user && user.uuid == uuid) {
       setUpdatedUser({ ...user, status: status });
@@ -79,6 +77,9 @@ function UserRow({ userId, uuid, status }) {
           {userRolesString ? userRolesString : "N/A"}
         </div>
       </td>
+      <td className="text-left text-nowrap">
+        {user.dateOfBirth ? user.dateOfBirth : "N/A"}
+      </td>
       <td className="text-right text-nowrap">
         {createdAtResult ? createdAtResult : "N/A"}
       </td>
@@ -123,23 +124,24 @@ function UserRow({ userId, uuid, status }) {
           </div>
         )}
       </td>
-      <td>
-        <div className="flex gap-2 justify-end">
-          
+      {isActionButton ? (
+        <td>
+          <div className="flex gap-2 justify-end">
             <button
               onClick={handleEdit}
               className="button-squar text-white bg-primary hover:bg-primary-hover ring-transparent"
             >
               <FaEdit />
-            </button>       
+            </button>
             <button
               onClick={handleView}
               className="button-squar text-white bg-secondary hover:bg-secondary-hover"
             >
               <FaEye />
             </button>
-        </div>
-      </td>
+          </div>
+        </td>
+      ) : null}
     </tr>
   );
 }

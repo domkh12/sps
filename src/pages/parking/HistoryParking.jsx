@@ -1,10 +1,12 @@
 import React from 'react'
+import SEO from '../../components/SEO'
 
 function HistoryParking() {
   return (
-    <div>
-      History
-    </div>
+    <>
+    <SEO title="Parking History" />
+      Parking History
+    </>
   )
 }
 

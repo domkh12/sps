@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Table, TextInput, useThemeMode } from "flowbite-react";
-import VehicleRow from "./VehicleRow";
-import { useGetVehicleQuery } from "../../redux/feature/vehicles/vehicleApiSlice";
-import { IoClose } from "react-icons/io5";
-import { FaPlus, FaSearch } from "react-icons/fa";
+import {
+  useGetUsersQuery,
+  useSearchUsersMutation,
+} from "../../redux/feature/users/userApiSlice";
+import { Button, Spinner, TextInput } from "flowbite-react";
+import UserRow from "./UserRow";
 import { useNavigate } from "react-router-dom";
+import { FaPlus, FaSearch } from "react-icons/fa";
+import UserNotFound from "./components/UserNotFound";
+import { IoClose } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import {
   PiCaretDownThin,
@@ -14,47 +18,53 @@ import {
   PiCaretRightThin,
 } from "react-icons/pi";
 import {
-  setIsLoadingBar,
-  setIsPaginationSuccess,
-} from "../../redux/feature/actions/actionSlice";
-import {
-  increasePageNo,
   decreasePageNo,
+  increasePageNo,
+  lastPageNo,
   resetPageNo,
   setPageSize,
   setTotalPages,
-  lastPageNo,
-} from "../../redux/feature/vehicles/vehicleSlice";
-import { Helmet } from "react-helmet-async";
+} from "../../redux/feature/users/userSlice";
+import {
+  setIsLoadingBar,
+  setIsPaginationSuccess,
+} from "../../redux/feature/actions/actionSlice";
 import SEO from "../../components/SEO";
+import { SIGNUPMETHOD } from "./../../config/signUpMethod";
+import CustomUserListSeketon from "./components/CustomUserListSeketon";
 
-function VehicleList() {
-  const [search, setSearch] = useState("");
-  const dispatch = useDispatch();
+function CustomUserList() {
   const navigator = useNavigate();
-  const { mode } = useThemeMode();
+  const dispatch = useDispatch();
+  const [search, setSearch] = useState("");
+  const uuid = useSelector((state) => state.users.uuid);
+  const status = useSelector((state) => state.users.status);
   const isScrolling = useSelector((state) => state.action.isScrolling);
-  const pageNo = useSelector((state) => state.vehicles.pageNo);
-  const pageSize = useSelector((state) => state.vehicles.pageSize);
-  const totalPages = useSelector((state) => state.vehicles.totalPages);
+  const pageNo = useSelector((state) => state.users.pageNo);
+  const pageSize = useSelector((state) => state.users.pageSize);
+  const totalPages = useSelector((state) => state.users.totalPages);
   const [isPageSizeOpen, setIsPageSizeOpen] = useState(false);
   const pageSizeRef = useRef(null);
+  const [activeTab, setActiveTab] = useState("custom");
+  const [value, setValue] = useState(0);
 
   const {
-    data: vehicles,
+    data: users,
     isLoading,
     isSuccess,
     isError,
+    error,
     refetch,
     isFetching,
-    error,
-  } = useGetVehicleQuery(
-    { pageNo, pageSize },
+  } = useGetUsersQuery(
+    { pageNo, pageSize, signUpMethod: SIGNUPMETHOD.CUSTOM },
     {
       pollingInterval: 300000,
       refetchOnMountOrArgChange: true,
     }
   );
+
+  const [searchUsers, { isLoading: isSearching }] = useSearchUsersMutation();
 
   useEffect(() => {
     if (isFetching) {
@@ -85,22 +95,12 @@ function VehicleList() {
 
   useEffect(() => {
     if (isSuccess) {
-      dispatch(setTotalPages(vehicles.totalPages));
+      dispatch(setTotalPages(users.totalPages));
     }
-  }, [vehicles, totalPages, pageNo]);
+  }, [users, totalPages, pageNo]);
 
   const toggleDropdown = () => {
     setIsPageSizeOpen((prev) => !prev);
-  };
-
-  const handleClearSearch = async () => {
-    setSearch("");
-  };
-
-  const handleBtnSearch = async () => {};
-
-  const handleBtnAddNewClicked = () => {
-    navigator("/dash/vehicles/new");
   };
 
   const handleNextPagination = async () => {
@@ -133,73 +133,80 @@ function VehicleList() {
 
   const calculateItemRange = () => {
     const startItem = (pageNo - 1) * pageSize + 1;
-    const endItem = Math.min(pageNo * pageSize, vehicles.totalElements);
+    const endItem = Math.min(pageNo * pageSize, users.totalElements);
     return `${startItem}-${endItem}`;
   };
 
   let content;
 
-  if (isLoading)
-    content = (
-      <div className="p-5">
-        <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-7"></div>
-
-        <div className="flex justify-between items-center">
-          <div className="flex gap-3">
-            <div className="animate-pulse h-10 bg-gray-200 rounded-lg dark:bg-gray-700 w-48 mb-4"></div>
-            <div className="animate-pulse h-10 bg-gray-200 rounded-lg dark:bg-gray-700 w-32 mb-4"></div>
-          </div>
-          <div className="animate-pulse h-10 bg-gray-200 rounded-lg dark:bg-gray-700 w-48 mb-4"></div>
-        </div>
-      </div>
-    );
+  if (isLoading) content = <CustomUserListSeketon />;
 
   if (isError) {
     content = <p>Error: {error?.data?.message}</p>;
   }
 
   if (isSuccess) {
-    const { ids, totalPages, totalElements } = vehicles;
-
+    const { ids } = users;
     const tableContent = ids?.length
-      ? ids.map((vehicleId) => (
-          <VehicleRow key={vehicleId} vehicleId={vehicleId} />
+      ? ids.map((userId) => (
+          <UserRow
+            key={userId}
+            userId={userId}
+            uuid={uuid}
+            status={status}
+            isActionButton={true}
+          />
         ))
       : null;
+    const handleBtnAddNewClicked = () => {
+      navigator("/dash/users/new");
+    };
+
+    const handleBtnSearch = async () => {
+      if (search.trim()) {
+        await searchUsers({ query: search });
+      } else {
+        refetch();
+      }
+    };
+
+    const handleClearSearch = async () => {
+      setSearch("");
+      refetch();
+    };
+
+    const spinnerTheme = {
+      color: {
+        primary: "fill-primary",
+      },
+    };
 
     content = (
       <>
-        <SEO title={"Vehicles List"}/>
-        <div className="flex flex-col w-full pb-16">
-          <h1 className="text-2xl font-medium dark:text-gray-50 py-4 px-8">
-            Vehicles List
-          </h1>
-
-          <table className="w-full">
+        <SEO title="Users List (Custom)" />
+        <div className="flex flex-col pb-16">
+          <table>
             <thead
-              className={`dark:bg-[#282828] ${isScrolling ? "shadow-md" : ""}`}
+              className={`w-full dark:bg-[#282828] ${
+                isScrolling ? "shadow-md transition-all duration-100" : ""
+              }`}
             >
               <tr className="p-0 w-full">
-                <th className="h-20" colSpan={6}>
-                  <div className="flex justify-between">
-                    <div className="flex items-center gap-2 justify-start ">
+                <th colSpan={8} className="h-20">
+                  <div className="flex justify-between items-center">
+                    <div className="flex justify-start items-center gap-3">
                       <div className="relative">
                         <TextInput
                           value={search}
                           onChange={(e) => setSearch(e.target.value)}
-                          placeholder="PlateNumber, Owner, Owner Phone"
-                          style={{
-                            backgroundColor: mode === "dark" ? "#161616" : "",
-                            color: mode === "dark" ? "#f2f2f2" : "#161616",
-                            fontWeight: "400",
-                          }}
+                          placeholder="ID, Name, Email, Phone"
                         />
                         {search && (
                           <button
                             onClick={handleClearSearch}
                             className="absolute right-3 top-5 transform -translate-y-1/2"
                           >
-                            <IoClose className="dark:text-[#f2f2f2] text-lg" />
+                            <IoClose />
                           </button>
                         )}
                       </div>
@@ -207,33 +214,47 @@ function VehicleList() {
                         onClick={handleBtnSearch}
                         className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
                       >
-                        <FaSearch className="mr-2 sm:mr-0" />{" "}
-                        <span className="sm:hidden">Search</span>{" "}
+                        {isSearching ? (
+                          <Spinner
+                            theme={spinnerTheme}
+                            color="primary"
+                            size="xs"
+                          />
+                        ) : (
+                          <>
+                            {" "}
+                            <FaSearch className="mr-2 sm:mr-0" />{" "}
+                            <span className="sm:hidden">Search</span>{" "}
+                          </>
+                        )}
                       </Button>
                     </div>
+
                     <Button
                       className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10"
                       onClick={handleBtnAddNewClicked}
                     >
                       <FaPlus className="mr-2 sm:mr-0" />
-                      <span className="sm:hidden">Create Vehicle</span>
+                      <span className="sm:hidden">Add New</span>
                     </Button>
                   </div>
                 </th>
               </tr>
               <tr className="border-0 dark:text-white text-gray-500">
-                <th>Vehicle</th>
-                <th>License Plate Number</th>
-                <th>Owner</th>
-                <th className="text-right">Owner PhoneNumber</th>
+                <th>FullName</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Roles</th>
+                <th>Date of Birth</th>
                 <th className="text-right">Date</th>
+                <th className="text-right">Status</th>
                 <th className="text-right">Action</th>
               </tr>
             </thead>
-            <tbody>{tableContent}</tbody>
+            {tableContent ? <tbody>{tableContent}</tbody> : <UserNotFound />}
             <tfoot>
               <tr>
-                <td colSpan={7} className="py-2 px-8">
+                <td colSpan={8} className="py-2 px-8">
                   <div className="flex justify-end items-center gap-4">
                     <div className="text-gray-500">
                       <p>Rows per page: </p>
@@ -334,4 +355,4 @@ function VehicleList() {
   return content;
 }
 
-export default VehicleList;
+export default CustomUserList;

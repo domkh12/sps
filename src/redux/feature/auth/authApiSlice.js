@@ -1,5 +1,6 @@
 import { apiSlice } from "../../app/api/apiSlice";
-import { logOut, setCredentials, setUuid } from "./authSlice";
+import { setUuid } from "../users/userSlice";
+import { logOut, setCredentials, setQrCodeUrl } from "./authSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -37,7 +38,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log(data);
+          console.log("data", data);
           const { accessToken } = data;
           const { uuid } = data;
           dispatch(setCredentials({ accessToken }));
@@ -47,22 +48,42 @@ export const authApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
-    oauth2Microsoft: builder.mutation({
-      query: ( initialState ) => ({
-        url: "/auth/microsoft",
+
+    getQrCode2Fa: builder.mutation({
+      query: () => ({
+        url: "/auth/enable-2fa",
         method: "POST",
-        body: {
-          ...initialState,
-        },
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
-          const result = await queryFulfilled;
-          console.log(result);
-        } catch (err) {
-          console.log(err);
+          const { data } = await queryFulfilled;
+          console.log("data", data);
+          dispatch(setQrCodeUrl({ data }));
+        } catch (error) {
+          console.log(error);
         }
       },
+    }),
+
+    verifyTwoFa: builder.mutation({
+      query: (code) => ({
+        url: `/auth/verify-2fa?code=${code}`,
+        method: "POST",
+      }),
+    }),
+
+    disableTwoFa: builder.mutation({
+      query: () => ({
+        url: `/auth/disable-2fa`,
+        method: "POST",
+      }),
+    }),
+
+    verify2FALogin: builder.mutation({
+      query: ({ code, token }) => ({
+        url: `/auth/verify-2fa-login?code=${code}&token=${token}`,
+        method: "POST",
+      }),
     }),
   }),
 });
@@ -71,5 +92,8 @@ export const {
   useLoginMutation,
   useSendLogoutMutation,
   useRefreshMutation,
-  useOauth2MicrosoftMutation,
+  useGetQrCode2FaMutation,
+  useVerifyTwoFaMutation,
+  useDisableTwoFaMutation,
+  useVerify2FALoginMutation,
 } = authApiSlice;

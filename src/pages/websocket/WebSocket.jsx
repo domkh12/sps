@@ -8,13 +8,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { setStatus, setUuid } from "../../redux/feature/users/userSlice";
 
 function WebSocket() {
-  const uuid = useSelector((state) => state.auth.uuid);
+  const uuid = useSelector((state) => state.users.uuid);
   const token = useSelector((state) => state.auth.token);
   const socketClient = useRef(null);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const status = STATUS.ONLINE;
+  
   const [
     connectedUser,
     { isLoading: isLoadingConnectedUser, error: errorConnectedUser },
@@ -50,7 +51,7 @@ function WebSocket() {
       dispatch(setStatus(update.status));
     });
 
-    socketClient.current.send("/app/user/status", {}, JSON.stringify(uuid));
+    // socketClient.current.send("/app/user/status", {}, JSON.stringify(uuid));
   };
 
   const onError = async (err) => {

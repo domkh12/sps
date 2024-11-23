@@ -1,5 +1,7 @@
 import { createEntityAdapter, createSelector } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
+import { SIGNUPMETHOD } from "./../../../config/signUpMethod";
+import { setIsTwoFAEnabled, setTwoFASecretCode } from "../auth/authSlice";
 
 const usersAdapter = createEntityAdapter({});
 
@@ -8,8 +10,12 @@ const initialState = usersAdapter.getInitialState();
 export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUsers: builder.query({
-      query: ({ pageNo = 1, pageSize = 30 } = {}) =>
-        `/users?pageNo=${pageNo}&pageSize=${pageSize}`,
+      query: ({
+        pageNo = 1,
+        pageSize = 30,
+        signUpMethod = SIGNUPMETHOD.CUSTOM,
+      } = {}) =>
+        `/users?pageNo=${pageNo}&pageSize=${pageSize}&signUpMethod=${signUpMethod}`,
       validateStatus: (response, result) => {
         return response.status === 200 && !result.isError;
       },
@@ -71,7 +77,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         },
       }),
       invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
-    }),   
+    }),
     searchUsers: builder.mutation({
       query: ({ query }) => ({
         url: `/users/search?q=${query}`,
@@ -151,6 +157,38 @@ export const userApiSlice = apiSlice.injectEndpoints({
         } else return [{ type: "User", id: "LIST" }];
       },
     }),
+
+    get2faSecretCode: builder.mutation({
+      query: () => ({
+        url: "/users/2fa-secret-code",
+        method: "GET",
+      }),
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          console.log("data", data);
+          dispatch(setTwoFASecretCode({ data }));
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    }),
+
+    get2faStatus: builder.mutation({
+      query: () => ({
+        url: "/users/2fa-status",
+        method: "GET",
+      }),
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          console.log("data", data);
+          dispatch(setIsTwoFAEnabled({ data }));
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    }),
   }),
 });
 
@@ -159,11 +197,12 @@ export const {
   useAddNewUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,
-  usePaginationUsersMutation,
   useSearchUsersMutation,
   useFindByUuidMutation,
   useConnectedUserMutation,
   useGetFullNameUsersQuery,
+  useGet2faSecretCodeMutation,
+  useGet2faStatusMutation,
 } = userApiSlice;
 
 // return the query result object

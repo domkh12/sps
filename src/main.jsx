@@ -9,16 +9,26 @@ import store from "./redux/app/store.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import App from "./App";
-import AuthProvider from "./pages/auth/useAuthProvider";
 import { createTheme, ThemeProvider } from "@mui/material";
 
 const theme = createTheme({
   typography: {
-    fontFamily: [
-      'Hanuman',
-      'Arial',
-      'sans-serif',
-    ].join(','),
+    fontFamily: ["Roboto","Hanuman", "Arial", "sans-serif"].join(","),
+  },
+  palette: {
+    primary: {
+      light: "#757ce8",
+      main: "#2C3092",
+      dark: '#000',
+      contrastText: "#fff",
+    },
+    secondary: {
+      light: "#ff7961",
+      main: "#f44336",
+      dark: "#000",
+      contrastText: "#000",
+    },
+    mode: "light",
   },
 });
 
@@ -33,11 +43,9 @@ createRoot(document.getElementById("root")).render(
       <HelmetProvider>
         <Provider store={store}>
           <ToastContainer stacked />
-          <AuthProvider>
-            <ThemeProvider theme={theme}>
-              <App />
-              </ThemeProvider>
-          </AuthProvider>
+          <ThemeProvider theme={theme}>
+            <App />
+          </ThemeProvider>
         </Provider>
       </HelmetProvider>
     </BrowserRouter>

@@ -4,7 +4,7 @@ import authReducer from "../feature/auth/authSlice.js";
 import actionReducer from "../feature/actions/actionSlice.js";
 import { apiSlice } from "./api/apiSlice.js";
 import userReducer from "../feature/users/userSlice.js";
-import vehicleReducer from "../feature/vehicles/vehicleSlice.js"
+import vehicleReducer from "../feature/vehicles/vehicleSlice.js";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
 const store = configureStore({
@@ -15,12 +15,11 @@ const store = configureStore({
     users: userReducer,
     action: actionReducer,
     vehicles: vehicleReducer,
-
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(apiSlice.middleware),
-  devTools: true,
+  devTools: false,
 });
 
-setupListeners(store.dispatch)
+setupListeners(store.dispatch);
 export default store;

@@ -1,15 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { logOut, selectCurrentToekn } from "../../redux/feature/auth/authSlice";
+import { logOut, selectCurrentToken } from "../../redux/feature/auth/authSlice";
 import { useRefreshMutation } from "../../redux/feature/auth/authApiSlice";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Button } from "flowbite-react";
 import { HiArrowRight } from "react-icons/hi";
 import useAuth from "../../hook/useAuth";
+import { setUuid } from "../../redux/feature/users/userSlice";
 
 function PersistLogin() {
-  const { username, roles } = useAuth();
-  const token = useSelector(selectCurrentToekn);
+  const { username, roles, uuid } = useAuth();
+  console.log("uuid", uuid);
+  const token = useSelector(selectCurrentToken);
   const [trueSuccess, setTrueSuccess] = useState(false);
   const effectRan = useRef(false);
   const navigate = useNavigate();
@@ -42,7 +44,7 @@ function PersistLogin() {
   }, []);
 
   // useEffect(() => {
-  //   if (!roles.includes("ROLE_ADMIN")) {      
+  //   if (!roles.includes("ROLE_ADMIN")) {
   //     handleLoginRedirect();
   //   }
   // }, [roles]);
@@ -82,6 +84,7 @@ function PersistLogin() {
   } else if (isSuccess && trueSuccess) {
     // persist: yes , token: yes
     console.log("Success");
+    dispatch(setUuid(uuid));
     content = <Outlet />;
   } else if (token && isUninitialized) {
     content = <Outlet />;

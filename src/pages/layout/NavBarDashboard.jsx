@@ -1,91 +1,205 @@
-import {
-  Avatar,  
-  DarkThemeToggle,
-  Dropdown,
-  Navbar,  
-} from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleCollapsed } from "../../redux/feature/actions/actionSlice";
-import { PiListThin } from "react-icons/pi";
-import Notification from "../../components/util/Notification";
+import {
+  AppBar,
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
+import { Badge } from "flowbite-react";
+import { IoMenu } from "react-icons/io5";
+import {
+  PiBellThin,
+  PiEnvelopeThin,
+  PiListThin,
+  PiUserCircleThin,
+} from "react-icons/pi";
 
 function NavBarDashboard() {
   const dispatch = useDispatch();
   const isLoadingBar = useSelector((state) => state.action.isLoadingBar);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
   const handleToggleCollapse = () => {
     dispatch(toggleCollapsed());
   };
 
-  return (
-    <div className="relative">
-    <Navbar
-      fluid
-      rounded
-      className="border-b-[1px] border-gray-200 dark:border-gray-700 dark:bg-[#282828]"
-    >
-      <Navbar.Brand className="flex items-center justify-between w-full">
-        <div className="flex items-center">
-         
-          <button onClick={handleToggleCollapse} className="w-[3rem] h-[3rem] rounded-full flex justify-center items-center mr-2 ring-transparent hover:bg-gray-200 dark:hover:bg-gray-700">
-            <PiListThin className="h-6 w-6 text-black text-xl dark:text-gray-100" />
-          </button>
-          <img
-            src="/logo/logo.png"
-            className="mr-3 h-10 sm:h-9"
-            alt="Flowbite React Logo"
-            draggable="false"
-            onContextMenu={(e) => e.preventDefault()}
-          />
-          <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white sm:hidden">
-            SPS - NPIC
-          </span>
-        </div>
-        <div className="flex-grow flex justify-center md:hidden">
-          {/* <InputSearch /> */}
-        </div>
+  const isMenuOpen = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-        <div className="flex md:order-2 gap-4 items-center">          
-          
-          <DarkThemeToggle />
-        
-          <Notification />
-          <Dropdown
-            arrowIcon={false}
-            inline
-            label={
-              <Avatar
-                alt="User settings"
-                img="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                rounded
-              />
-            }
+  const handleProfileMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileMenuClose = () => {
+    setMobileMoreAnchorEl(null);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    handleMobileMenuClose();
+  };
+
+  const handleMobileMenuOpen = (event) => {
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
+
+  const menuId = "primary-search-account-menu";
+  const renderMenu = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+    >
+      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+    </Menu>
+  );
+
+  const mobileMenuId = "primary-search-account-menu-mobile";
+  const renderMobileMenu = (
+    <Menu
+      anchorEl={mobileMoreAnchorEl}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      id={mobileMenuId}
+      keepMounted
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      open={isMobileMenuOpen}
+      onClose={handleMobileMenuClose}
+    >
+      <MenuItem>
+        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+          <Badge badgecontent={4} color="error">
+            <IoMenu />
+          </Badge>
+        </IconButton>
+        <p>Messages</p>
+      </MenuItem>
+      <MenuItem>
+        <IconButton
+          size="large"
+          aria-label="show 17 new notifications"
+          color="inherit"
+        >
+          <Badge badgecontent={17} color="error">
+            {/* <NotificationsIcon /> */}
+          </Badge>
+        </IconButton>
+        <p>Notifications</p>
+      </MenuItem>
+      <MenuItem onClick={handleProfileMenuOpen}>
+        <IconButton
+          size="large"
+          aria-label="account of current user"
+          aria-controls="primary-search-account-menu"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          {/* <AccountCircle /> */}
+        </IconButton>
+        <p>Profile</p>
+      </MenuItem>
+    </Menu>
+  );
+
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar
+        position="static"
+        color="inherit"
+        sx={{ boxShadow: "none" }}
+        className="border-b-[1px] border-b-gray-300"
+      >
+        <Toolbar>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="open drawer"
+            sx={{ mr: 2 }}
+            onClick={handleToggleCollapse}
           >
-            <Dropdown.Header>
-              <span className="block text-sm">Bonnie Green</span>
-              <span className="block truncate text-sm font-medium">
-                name@flowbite.com
-              </span>
-            </Dropdown.Header>
-            <Dropdown.Item>Dashboard</Dropdown.Item>
-            <Dropdown.Item>Settings</Dropdown.Item>
-            <Dropdown.Item>Earnings</Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item>Sign out</Dropdown.Item>
-          </Dropdown>
-        </div>
-      </Navbar.Brand>
-    </Navbar>
-    {isLoadingBar ? (
-      <div className="w-full fixed z-10">
-        <div className="h-[2px] w-full bg-pink-100 overflow-hidden">
-          <div className="progress w-full h-full bg-gray-600 left-right"></div>
-        </div>
-      </div>
-    ) : (
-      <></>
-    )}
-    </div>
+            <PiListThin className="h-7 w-7" />
+          </IconButton>
+          <Typography
+            variant="h5"
+            noWrap
+            component="div"
+            sx={{
+              display: { xs: "none", sm: "flex" },
+              alignItems: "center",
+              gap: "1rem",
+            }}
+          >
+            <img src="/images/logo.png" alt="logoNpic" className="w-8 h-auto" />
+            <span>SPS - NPIC</span>
+          </Typography>
+          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ display: { xs: "none", md: "flex" } }}>
+            <IconButton
+              size="large"
+              aria-label="show 4 new mails"
+              color="inherit"
+            >
+              <PiEnvelopeThin />
+            </IconButton>
+            <IconButton
+              size="large"
+              aria-label="show 17 new notifications"
+              color="inherit"
+            >
+              <PiBellThin />
+            </IconButton>
+            <IconButton
+              size="large"
+              edge="end"
+              aria-label="account of current user"
+              aria-controls={menuId}
+              aria-haspopup="true"
+              onClick={handleProfileMenuOpen}
+              color="inherit"
+            >
+              <PiUserCircleThin />
+            </IconButton>
+          </Box>
+          <Box sx={{ display: { xs: "flex", md: "none" } }}>
+            <IconButton
+              size="large"
+              aria-label="show more"
+              aria-controls={mobileMenuId}
+              aria-haspopup="true"
+              onClick={handleMobileMenuOpen}
+              color="inherit"
+            >
+              {/* <MoreIcon /> */}
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      {renderMobileMenu}
+      {renderMenu}
+    </Box>
   );
 }
 

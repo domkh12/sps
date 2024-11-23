@@ -19,29 +19,40 @@ import {
   PiUserFill,
   PiUserThin,
 } from "react-icons/pi";
+import Settings from "./../setting/Settings";
 
 function SideBar() {
   const isCollapsed = useSelector((state) => state.action.isCollapsed);
+  const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [sendLogout, { isSuccess, isLoading, isError, error }] =
     useSendLogoutMutation();
 
-  useEffect(() => {
-    if (isSuccess) {
-      console.log(isSuccess);
-      navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await sendLogout().unwrap();
+      setTimeout(() => navigate("/login"), 300);
+    } catch (err) {
+      console.error("Logout failed:", err);
     }
-  }, [isSuccess, navigate]);
+  };
 
-  const handleLogout = () => sendLogout();
+  const handleSettingsClick = () => {
+    setIsSettingModalOpen(true);
+  };
+
+  const handleSettingModalClose = () => {
+    setIsSettingModalOpen(false);
+  };
 
   const content = (
     <>
       <div
         className={`${
           isCollapsed
-            ? "w-[4rem] transition-all duration-500"
+            ? "w-[4.8rem] transition-all duration-500"
             : "w-[15rem] transition-all duration-500"
         }  h-full border-r-[1px] border-r-gray-300 w-[15rem] shrink-0`}
       >
@@ -61,7 +72,11 @@ function SideBar() {
                   <PiSquaresFourThin className="h-6 w-6" />
                 )}
                 <span
-                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                  className={`${
+                    isCollapsed
+                      ? "transition-all opacity-0 absolute left-12 duration-500"
+                      : "transition-all opacity-100 absolute left-12 duration-500"
+                  }`}
                 >
                   Dashboard
                 </span>
@@ -69,7 +84,7 @@ function SideBar() {
             )}
           </NavLink>
           <NavLink
-            to="/dash/parking"
+            to="/dash/parking/parking-areas"
             className={`${
               isCollapsed ? "h-[3rem] w-full" : "h-[3rem]"
             } overflow-hidden`}
@@ -82,13 +97,17 @@ function SideBar() {
                   <PiLetterCirclePThin className="h-6 w-6" />
                 )}
                 <span
-                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                  className={`${
+                    isCollapsed
+                      ? "transition-all opacity-0 absolute left-12 duration-500"
+                      : "transition-all opacity-100 absolute left-12 duration-500"
+                  }`}
                 >
                   Parking
                 </span>
               </>
             )}
-          </NavLink>       
+          </NavLink>
           <NavLink
             to="/dash/vehicles"
             className={`${
@@ -103,7 +122,11 @@ function SideBar() {
                   <PiSteeringWheelThin className="h-6 w-6" />
                 )}
                 <span
-                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                  className={`${
+                    isCollapsed
+                      ? "transition-all opacity-0 absolute left-12 duration-500"
+                      : "transition-all opacity-100 absolute left-12 duration-500"
+                  }`}
                 >
                   Vehicle
                 </span>
@@ -111,7 +134,7 @@ function SideBar() {
             )}
           </NavLink>
           <NavLink
-            to="/dash/users"
+            to="/dash/users/custom"
             className={`${
               isCollapsed ? "h-[3rem] w-full" : "h-[3rem]"
             } overflow-hidden`}
@@ -124,7 +147,11 @@ function SideBar() {
                   <PiUserThin className="h-6 w-6" />
                 )}
                 <span
-                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                  className={`${
+                    isCollapsed
+                      ? "transition-all opacity-0 absolute left-12 duration-500"
+                      : "transition-all opacity-100 absolute left-12 duration-500"
+                  }`}
                 >
                   User
                 </span>
@@ -145,7 +172,11 @@ function SideBar() {
                   <PiMessengerLogoThin className="h-6 w-6" />
                 )}
                 <span
-                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                  className={`${
+                    isCollapsed
+                      ? "transition-all opacity-0 absolute left-12 duration-500"
+                      : "transition-all opacity-100 absolute left-12 duration-500"
+                  }`}
                 >
                   Message
                 </span>
@@ -166,255 +197,63 @@ function SideBar() {
                   <PiMoneyWavyThin className="h-6 w-6" />
                 )}
                 <span
-                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+                  className={`${
+                    isCollapsed
+                      ? "transition-all opacity-0 absolute left-12 duration-500"
+                      : "transition-all opacity-100 absolute left-12 duration-500"
+                  }`}
                 >
                   Payment
                 </span>
               </>
             )}
           </NavLink>
-          <NavLink
-            to="/dash/settings"
+          <a
+            onClick={handleSettingsClick}
             className={`${
               isCollapsed ? "h-[3rem] w-full" : "h-[3rem]"
-            } overflow-hidden`}
+            } overflow-hidden cursor-pointer`}
           >
-            {({ isActive }) => (
-              <>
-                {isActive ? (
-                  <PiGearFill className="h-6 w-6" />
-                ) : (
-                  <PiGearThin className="h-6 w-6" />
-                )}
-                <span
-                  className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
-                >
-                  Setting
-                </span>
-              </>
-            )}
-          </NavLink>
+            <>
+              <PiGearThin className="h-6 w-6" />
+              <span
+                className={`${
+                  isCollapsed
+                    ? "transition-all opacity-0 absolute left-12 duration-500"
+                    : "transition-all opacity-100 absolute left-12 duration-500"
+                }`}
+              >
+                Setting
+              </span>
+            </>
+          </a>
           <a
             onClick={handleLogout}
             className="h-[3rem] w-full cursor-pointer overflow-hidden"
           >
             <PiSignInThin className="h-6 w-6" />
             <span
-              className={`${isCollapsed ? "transition-all opacity-0 absolute left-12 duration-500" : "transition-all opacity-100 absolute left-12 duration-500"}`}
+              className={`${
+                isCollapsed
+                  ? "transition-all opacity-0 absolute left-12 duration-500"
+                  : "transition-all opacity-100 absolute left-12 duration-500"
+              }`}
             >
               Logout
             </span>
           </a>
         </nav>
       </div>
+      {isSettingModalOpen && (
+        <Settings
+          open={isSettingModalOpen}
+          handleClose={handleSettingModalClose}
+        />
+      )}
     </>
   );
 
   return content;
-
-  // const sidebarContent = (
-  //   <Sidebar.Items className="flex flex-col gap-2 dark:bg-[#282828]">
-  //     <Sidebar.ItemGroup>
-  //       <Sidebar.Item
-  //         as={NavLink}
-  //         to="/dash"
-  //         icon={FaChartPie}
-  //         className={`${isCollapsed && window.innerWidth > 768 ? "grid" : "h-[3rem]"}`}
-  //         active={location.pathname === "/dash"}
-  //       >
-  //         {!(isCollapsed && window.innerWidth > 768) && translate("dashboard")}
-  //       </Sidebar.Item>
-
-  //       <Sidebar.Item
-  //         as={NavLink}
-  //         to="/admin/parking"
-  //         icon={FaParking}
-  //         className={`${isCollapsed && window.innerWidth > 768 ? "grid" : "h-[3rem]"}`}
-  //         active={location.pathname === "/admin/parking"}
-  //       >
-  //         {!(isCollapsed && window.innerWidth > 768) && "Parking Map"}
-  //       </Sidebar.Item>
-
-  //       <Sidebar.Item
-  //         as={NavLink}
-  //         to="/dash/vehicles"
-  //         icon={FaCar}
-  //         className={`${isCollapsed && window.innerWidth > 768 ? "grid" : "h-[3rem]"}`}
-  //         active={location.pathname === "/admin/vehicle"}
-  //       >
-  //         {!(isCollapsed && window.innerWidth > 768) && translate("vehicle")}
-  //       </Sidebar.Item>
-
-  //       <Sidebar.Item
-  //         as={NavLink}
-  //         to="/dash/users"
-  //         icon={FaUsers}
-  //         className={`${isCollapsed && window.innerWidth > 768 ? "grid" : "h-[3rem]"}`}
-  //         active={location.pathname === "/dash/users"}
-  //       >
-  //         {!(isCollapsed && window.innerWidth > 768) && "Users"}
-  //       </Sidebar.Item>
-
-  //       <Sidebar.Item
-  //         as={NavLink}
-  //         to="/admin/message"
-  //         icon={TbMessageFilled}
-  //         className={`${isCollapsed && window.innerWidth > 768 ? "grid" : "h-[3rem]"}`}
-  //         active={location.pathname === "/admin/message"}
-  //       >
-  //         {!(isCollapsed && window.innerWidth > 768) && translate("message")}
-  //       </Sidebar.Item>
-
-  //       <Sidebar.Item
-  //         as={NavLink}
-  //         to="/admin/payment"
-  //         icon={HiMiniBanknotes}
-  //         className={`${isCollapsed && window.innerWidth > 768 ? "grid" : "h-[3rem]"}`}
-  //         active={location.pathname === "/admin/payment"}
-  //       >
-  //         {!(isCollapsed && window.innerWidth > 768) && translate("payment")}
-  //       </Sidebar.Item>
-  //     </Sidebar.ItemGroup>
-  //     <Sidebar.ItemGroup>
-  //       <Sidebar.Item
-  //         as={NavLink}
-  //         to="/admin/setting"
-  //         icon={IoMdSettings}
-  //         className={`${isCollapsed && window.innerWidth > 768 ? "grid" : "h-[3rem]"}`}
-  //         active={location.pathname === "/admin/setting"}
-  //       >
-  //         {!(isCollapsed && window.innerWidth > 768) && translate("setting")}
-  //       </Sidebar.Item>
-
-  //       <Sidebar.Item
-  //         as={NavLink}
-  //         className={`${isCollapsed && window.innerWidth > 768 ? "grid" : "h-[3rem]"}`}
-  //         onClick={handleLogout}
-  //         icon={IoLogIn}
-  //       >
-  //         {!(isCollapsed && window.innerWidth > 768) && translate("logout")}
-  //       </Sidebar.Item>
-  //     </Sidebar.ItemGroup>
-  //   </Sidebar.Items>
-  // );
-
-  // return (
-  //   <>
-  //     <div className="flex h-full md:hidden">
-  //       <Sidebar
-  //         aria-label="side bar"
-  //         className={`border-r-[1px] border-gray-200 dark:bg-[#282828] dark:border-gray-700 py-[10px] h-full bg-gray-50 ${
-  //           isCollapsed ? "w-20" : "w-56"
-  //         }  transition-all duration-500`}
-  //       >
-  //         <Sidebar.Items className="flex flex-col gap-2">
-  //           <Sidebar.ItemGroup>
-  //             <Sidebar.Item
-  //               as={NavLink}
-  //               to="/dash"
-  //               icon={FaChartPie}
-  //               className={`${isCollapsed ? "grid" : "h-[3rem]"}`}
-  //               active={location.pathname === "/dash"}
-  //             >
-  //               {!isCollapsed && translate("dashboard")}
-  //             </Sidebar.Item>
-
-  //             <Sidebar.Item
-  //               as={NavLink}
-  //               to="/dash/parking"
-  //               icon={FaParking}
-  //               className={`${isCollapsed ? "grid" : "h-[3rem]"}`}
-  //               active={location.pathname === "/dash/parking"}
-  //             >
-  //               {!isCollapsed && "Parking Map"}
-  //             </Sidebar.Item>
-
-  //             <Sidebar.Item
-  //               as={NavLink}
-  //               to="/dash/vehicles"
-  //               icon={FaCar}
-  //               className={`${isCollapsed ? "grid" : "h-[3rem]"}`}
-  //               active={location.pathname === "/dash/vehicles"}
-  //             >
-  //               {!isCollapsed && translate("vehicle")}
-  //             </Sidebar.Item>
-
-  //             <Sidebar.Item
-  //               as={NavLink}
-  //               to="/dash/users"
-  //               icon={FaUsers}
-  //               className={`${isCollapsed ? "grid" : "h-[3rem]"}`}
-  //               active={location.pathname === "/dash/users"}
-  //             >
-  //               {!isCollapsed && "Users"}
-  //             </Sidebar.Item>
-
-  //             <Sidebar.Item
-  //               as={NavLink}
-  //               to="/dash/messages"
-  //               icon={TbMessageFilled}
-  //               className={`${isCollapsed ? "grid" : "h-[3rem]"}`}
-  //               active={location.pathname === "/dash/messages"}
-  //             >
-  //               {!isCollapsed && "Message"}
-  //             </Sidebar.Item>
-
-  //             <Sidebar.Item
-  //               as={NavLink}
-  //               to="/dash/payment"
-  //               icon={HiMiniBanknotes}
-  //               className={`${isCollapsed ? "grid" : "h-[3rem]"}`}
-  //               active={location.pathname === "/dash/payment"}
-  //             >
-  //               {!isCollapsed && "Payment"}
-  //             </Sidebar.Item>
-  //           </Sidebar.ItemGroup>
-
-  //           <Sidebar.ItemGroup>
-  //             <Sidebar.Item
-  //               as={NavLink}
-  //               to="/dash/setting"
-  //               icon={IoMdSettings}
-  //               className={`${isCollapsed ? "grid" : "h-[3rem]"}`}
-  //               active={location.pathname === "/dash/setting"}
-  //             >
-  //               {!isCollapsed && "Setting"}
-  //             </Sidebar.Item>
-
-  //             <Sidebar.Item
-  //               as={NavLink}
-  //               className={`${isCollapsed ? "grid" : "h-[3rem]"}`}
-  //               onClick={handleLogout}
-  //               icon={IoLogIn}
-  //             >
-  //               {!isCollapsed && "Logout"}
-  //             </Sidebar.Item>
-  //           </Sidebar.ItemGroup>
-  //         </Sidebar.Items>
-  //       </Sidebar>
-  //     </div>
-  //     <div className="hidden md:block">
-  //       <Drawer
-  //         open={isCollapsed}
-  //         onClose={handleToggleCollapse}
-  //         className="fixed inset-y-0 left-0 mt-16"
-  //         backdrop={true}
-  //       >
-  //         <Drawer.Header title="MENU" titleIcon={() => <></>} />
-  //         <Drawer.Items>
-  //           <Sidebar
-  //             aria-label="Sidebar with multi-level dropdown example"
-  //             className="[&>div]:bg-transparent [&>div]:p-0"
-  //           >
-  //             <div className="flex h-full flex-col justify-between py-2">
-  //               {sidebarContent}
-  //             </div>
-  //           </Sidebar>
-  //         </Drawer.Items>
-  //       </Drawer>
-  //     </div>
-  //   </>
-  // );
 }
 
 export default SideBar;

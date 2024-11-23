@@ -97,19 +97,7 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
           console.error("Failed to fetch paginated parking:", error);
         }
       },
-    }),
-    findByUuid: builder.mutation({
-      query: (uuid) => ({
-        url: `/parking/${uuid}`,
-      }),
-      transformResponse: (responseData) => {
-        const loadedParking = {
-          ...responseData,
-          id: responseData.uuid,
-        };
-        return parkingAdapter.setAll(initialState, [loadedParking]);
-      },
-    }),
+    }),   
     connectedParking: builder.mutation({
       query: ({ uuid, status }) => ({
         url: `/parking/${uuid}/status`,

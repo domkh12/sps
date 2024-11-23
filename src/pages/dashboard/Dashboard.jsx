@@ -7,13 +7,10 @@ import HeatMap from "../../components/dashboard/HeatMap";
 import ParkingMap from "../../components/dashboard/ParkingMap";
 import { useDispatch, useSelector } from "react-redux";
 import { useConnectedUserMutation, useFindByUuidMutation } from "../../redux/feature/users/userApiSlice";
-import { Stomp } from "@stomp/stompjs";
-import SockJS from "sockjs-client";
-import { STATUS } from './../../config/status';
 
 function Dashboard() {
 
-  const uuid = useSelector(state => state.auth.uuid)
+  const uuid = useSelector(state => state.users.uuid)
   const token = useSelector((state) => state.auth.token);
 
   const [findByUuid, {

@@ -9,6 +9,7 @@ import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import Slot from "./components/Slot";
+import SEO from "../../components/SEO";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -63,6 +64,7 @@ function ParkingAreas() {
 
   content = (
     <div>
+      <SEO title="Parking Areas" />
       <Box
         sx={{
           maxWidth: { xs: 320, sm: 480 },

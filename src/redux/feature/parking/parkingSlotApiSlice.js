@@ -79,18 +79,7 @@ export const parkingSlotsApiSlice = apiSlice.injectEndpoints({
         return parkingSlotsAdapter.setAll(initialState, [loadedParkingSlots]);
       },
     }),
-    findByUuid: builder.mutation({
-      query: (uuid) => ({
-        url: `/parkingSlots/${uuid}`,
-      }),
-      transformResponse: (responseData) => {
-        const loadedParkingSlots = {
-          ...responseData,
-          id: responseData.uuid,
-        };
-        return parkingSlotsAdapter.setAll(initialState, [loadedParkingSlots]);
-      },
-    }),
+   
     connectedParkingSlots: builder.mutation({
       query: ({ uuid, status }) => ({
         url: `/parkingSlots/${uuid}/status`,
