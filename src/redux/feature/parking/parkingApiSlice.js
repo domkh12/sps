@@ -142,9 +142,7 @@ export const {
   useAddNewParkingMutation,
   useUpdateParkingMutation,
   useDeleteParkingMutation,
-  usePaginationParkingMutation,
   useSearchParkingMutation,
-  useFindByUuidMutation,
   useConnectedParkingMutation,
   useGetFullNameParkingQuery,
 } = parkingApiSlice;

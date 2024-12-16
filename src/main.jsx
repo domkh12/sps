@@ -1,5 +1,5 @@
 import "./config/init.js";
-import { StrictMode } from "react";
+import { StrictMode, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
@@ -9,28 +9,8 @@ import store from "./redux/app/store.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import App from "./App";
-import { createTheme, ThemeProvider } from "@mui/material";
-
-const theme = createTheme({
-  typography: {
-    fontFamily: ["Roboto","Hanuman", "Arial", "sans-serif"].join(","),
-  },
-  palette: {
-    primary: {
-      light: "#757ce8",
-      main: "#2C3092",
-      dark: '#000',
-      contrastText: "#fff",
-    },
-    secondary: {
-      light: "#ff7961",
-      main: "#f44336",
-      dark: "#000",
-      contrastText: "#000",
-    },
-    mode: "light",
-  },
-});
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -43,9 +23,9 @@ createRoot(document.getElementById("root")).render(
       <HelmetProvider>
         <Provider store={store}>
           <ToastContainer stacked />
-          <ThemeProvider theme={theme}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
             <App />
-          </ThemeProvider>
+          </LocalizationProvider>
         </Provider>
       </HelmetProvider>
     </BrowserRouter>

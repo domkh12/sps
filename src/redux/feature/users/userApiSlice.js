@@ -2,6 +2,8 @@ import { createEntityAdapter, createSelector } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
 import { SIGNUPMETHOD } from "./../../../config/signUpMethod";
 import { setIsTwoFAEnabled, setTwoFASecretCode } from "../auth/authSlice";
+import { setStatus, setUser } from "./userSlice";
+import { useSelector } from "react-redux";
 
 const usersAdapter = createEntityAdapter({});
 
@@ -66,6 +68,17 @@ export const userApiSlice = apiSlice.injectEndpoints({
           ...initialUserData,
         },
       }),
+      async onQueryStarted(args, { dispatch, queryFulfilled, getState }) {
+        try {          
+          const { data } = await queryFulfilled;
+          const userUuid = getState().users.uuid;
+          if (userUuid === data.uuid) {
+            dispatch(setUser(data));
+          }
+        } catch (error) {
+          console.error("Failed to fetch user:", error);
+        }
+      },
       invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
     }),
     deleteUser: builder.mutation({
@@ -93,7 +106,6 @@ export const userApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log("data", data);
           const { users: newUsers, totalPages: newTotalPages } = data;
 
           dispatch(
@@ -111,16 +123,17 @@ export const userApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
-    findByUuid: builder.mutation({
+    findUserByUuid: builder.mutation({
       query: (uuid) => ({
         url: `/users/${uuid}`,
       }),
-      transformResponse: (responseData) => {
-        const loadedUser = {
-          ...responseData,
-          id: responseData.uuid,
-        };
-        return usersAdapter.setAll(initialState, [loadedUser]);
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setUser(data));
+        } catch (error) {
+          console.error("Failed to fetch user:", error);
+        }
       },
     }),
     connectedUser: builder.mutation({
@@ -131,8 +144,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
           status,
         },
       }),
-      transformResponse: (responseData) => {
-        console.log("responseData", responseData);
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setStatus(data.status));
+        } catch (error) {
+          console.error("Failed to fetch user:", error);
+        }
       },
       invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.uuid }],
     }),
@@ -166,7 +184,6 @@ export const userApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log("data", data);
           dispatch(setTwoFASecretCode({ data }));
         } catch (error) {
           console.log(error);
@@ -182,7 +199,6 @@ export const userApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log("data", data);
           dispatch(setIsTwoFAEnabled({ data }));
         } catch (error) {
           console.log(error);
@@ -196,18 +212,16 @@ export const {
   useGetUsersQuery,
   useAddNewUserMutation,
   useUpdateUserMutation,
-  useDeleteUserMutation,
   useSearchUsersMutation,
-  useFindByUuidMutation,
+  useFindUserByUuidMutation,
   useConnectedUserMutation,
-  useGetFullNameUsersQuery,
   useGet2faSecretCodeMutation,
   useGet2faStatusMutation,
 } = userApiSlice;
 
 // return the query result object
 export const selectUserResult = userApiSlice.endpoints.getUsers.select();
-export const selectUserProfile = userApiSlice.endpoints.findByUuid.select();
+export const selectUserProfile = userApiSlice.endpoints.findUserByUuid.select();
 export const selectFullNameUser =
   userApiSlice.endpoints.getFullNameUsers.select();
 // create momorized selector

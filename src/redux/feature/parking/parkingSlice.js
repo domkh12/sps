@@ -7,7 +7,8 @@ const userSlice = createSlice({
     status: "",
     pageNo: 1,
     pageSize: 30, 
-    totalPages: 0
+    totalPages: 0,
+    
   },
   reducers: {
     setUuid: (state, action) => {

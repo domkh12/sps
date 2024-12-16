@@ -232,8 +232,7 @@ function AzureUserList() {
                 <th>Phone</th>
                 <th>Roles</th>
                 <th>Date of Birth</th>
-                <th className="text-right">Date</th>
-                <th className="text-right">Status</th>                
+                <th className="text-right">Date</th>                               
               </tr>
             </thead>
             {tableContent ? <tbody>{tableContent}</tbody> : <UserNotFound />}

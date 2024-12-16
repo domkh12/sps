@@ -3,13 +3,14 @@ import { Outlet } from "react-router-dom";
 import {
   selectAllParking,
   useGetParkingQuery,
-} from "../../redux/feature/parking/parkingApiSlice";
-import TabParking from "./TabParking";
-import { Box, Tab, Tabs, Typography } from "@mui/material";
-import { useSelector } from "react-redux";
+} from "../../../redux/feature/parking/parkingApiSlice";
+import { Box, Grid2, Tab, Tabs } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import Slot from "./components/Slot";
-import SEO from "../../components/SEO";
+import Slot from "./Slot";
+import SEO from "../../../components/SEO";
+import useWebSocket from "../../../hook/useWebSocket";
+import { setParkingSlot } from "../../../redux/feature/parking/parkingDetailSlice";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -24,7 +25,9 @@ function TabPanel(props) {
     >
       {value === index && (
         <Box sx={{ p: 3 }}>
-          <div className="grid grid-cols-5">{children}</div>
+          <Grid2 container spacing={2} className="grid grid-cols-5">
+            {children}
+          </Grid2>
         </Box>
       )}
     </div>
@@ -40,7 +43,19 @@ TabPanel.propTypes = {
 function ParkingAreas() {
   const parkingArea = useSelector((state) => selectAllParking(state));
   const [value, setValue] = useState(0);
-  console.log("parkingArea",parkingArea);
+  const dispatch = useDispatch();
+  const {
+    loading,
+    error: errorWebsocker,
+    messages,
+  } = useWebSocket("/topic/slot-update");
+
+  useEffect(() => {
+    if (messages) {
+      dispatch(setParkingSlot({ messages }));
+    }
+  }, [messages]);
+
   const {
     data: parkingAreas,
     isLoading,
@@ -83,10 +98,8 @@ function ParkingAreas() {
           aria-label="tab"
           TabIndicatorProps={{
             sx: {
-              display: "flex",
-              justifyContent: "center",
               width: "100%",
-              background: "linear-gradient(140deg, #2C3092 30%, #1a56db 100%)",
+              backgroundColor: "#2C3092",
               height: "100%",
               zIndex: "0",
               borderRadius: "0.5rem",
@@ -102,11 +115,12 @@ function ParkingAreas() {
                 textTransform: "none",
                 color: "#4b5563",
                 "&.Mui-selected": {
-                  color: "#f9fafb",
+                  color: "white",
                 },
                 paddingX: "1rem",
                 minWidth: "0",
                 zIndex: "1",
+                height: "auto",
               }}
               disableRipple
             />
@@ -117,14 +131,14 @@ function ParkingAreas() {
         <TabPanel value={value} index={index} key={index}>
           {p?.parkingSlots.length > 0
             ? p.parkingSlots.map((slot) => (
-                <div key={slot.uuid}>
+                <Grid2 size={2} key={slot.uuid}>
                   <Slot
                     key={slot.uuid}
                     isAvailable={slot.isAvailable}
                     slotName={slot.slotName}
                     uuid={slot.uuid}
                   />
-                </div>
+                </Grid2>
               ))
             : "No parking slots available"}
         </TabPanel>

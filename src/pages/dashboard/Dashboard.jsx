@@ -6,28 +6,11 @@ import AreaVehicles from "../../components/dashboard/AreaVehicles";
 import HeatMap from "../../components/dashboard/HeatMap";
 import ParkingMap from "../../components/dashboard/ParkingMap";
 import { useDispatch, useSelector } from "react-redux";
-import { useConnectedUserMutation, useFindByUuidMutation } from "../../redux/feature/users/userApiSlice";
 
 function Dashboard() {
 
   const uuid = useSelector(state => state.users.uuid)
   const token = useSelector((state) => state.auth.token);
-
-  const [findByUuid, {
-    data: user,
-    isLoading,
-    isSuccess,
-    isError,
-    error
-  }]= useFindByUuidMutation()
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      await findByUuid( uuid );      
-    };
-    fetchUser();
-  }, []) 
-
   return (
     <div className="grid grid-cols-1 gap-4">
       <AreaChartProfits />

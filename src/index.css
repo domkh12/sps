@@ -8,7 +8,39 @@
   html {
     @apply scroll-smooth;
   }
+
+  .header{
+    @apply h-[70px] bg-white text-white bg-opacity-50 backdrop-blur-md flex justify-between items-center px-[40px];
+  }
+
+  .animate-spin-slow{
+    animation: spin 5s linear infinite;
+  }
+
+  .hover-scale:hover{
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out 0s;
+  }
+
+  .active-scale:active {
+    transform: scale(0.95);
+    transition: transform 0.2s ease-in-out 0s;
+  }
+
+  .active-scale{
+    transition: transform 0.2s ease-in-out 0s;
+  }
+
+  .hover-scale{
+    transition: transform 0.2s ease-in-out 0s;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 }
+
 
 :root {
   --primary: #2c3092;
@@ -119,7 +151,7 @@ th {
   border-radius: 0.5rem;
   display: flex;
   justify-content: start;
-  padding: 0.7rem 0.8rem;
+  padding: 0.5rem 0.6rem;
   gap: 1rem;
   align-items: center;
 }

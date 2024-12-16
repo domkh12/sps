@@ -12,6 +12,9 @@ export default {
       'primary-hover': '#4A4FB3',
       'secondary': '#ff8a4c',
       'secondary-hover': '#ff5a1f',
+      'smallBorder': '#E1E1E1',
+      'gray-cus': "#424242",
+      'light-gray': "#808080"
     },
     screens: {
       "2xl": { max: "1535px" },

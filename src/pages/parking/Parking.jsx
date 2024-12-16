@@ -1,13 +1,14 @@
 import { Box, Tab, Tabs } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { useGetParkingQuery } from "../../redux/feature/parking/parkingApiSlice";
-import TabParking from "./TabParking";
+import useWebSocket from "../../hook/useWebSocket";
 
 function Parking() {
   const navigator = useNavigate();
   const [activeTab, setActiveTab] = useState("parking-areas");
   const [value, setValue] = useState(0);
+ 
+
   useEffect(() => {
     navigator(activeTab);
   }, [activeTab]);

@@ -1,23 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DrawerDetailParking from "./DrawerDetailParking";
-import { Button, IconButton } from "@mui/material";
-import { useGetParkingSlotsByUuidMutation } from "../../../redux/feature/parking/parkingSlotApiSlice";
+import { Button, Card, IconButton } from "@mui/material";
+import { useSelector } from "react-redux";
+import { useGetParkingDetailByUuidMutation } from "../../../redux/feature/parking/parkingDetailApiSlice";
 
 function Slot({ isAvailable, slotName, uuid }) {
   const [open, setOpen] = useState(false);
+  const slotDetails = useSelector((state) => state.parkingDetail.slotDetails);
+  const [isAvailableUpdated, setIsAvailableUpdated] = useState(isAvailable);
 
-  const [getParkingSlotsByUuid, { isSuccess, isLoading, isError, error }] =
-    useGetParkingSlotsByUuidMutation();
+  const [getParkingDetailByUuid, { isSuccess, isLoading, isError, error }] =
+  useGetParkingDetailByUuidMutation();
 
   const toggleDrawer = (newOpen) => async () => {
+    console.log(newOpen);
     setOpen(newOpen);
-    await getParkingSlotsByUuid({ uuid });
+    if (newOpen) {
+      await getParkingDetailByUuid({ uuid });
+    }
   };
+
+  useEffect(() => {
+    if (
+      slotDetails &&
+      slotDetails.messages &&
+      slotDetails.messages.parkingSlotResponse &&
+      slotDetails.messages.parkingSlotResponse.uuid === uuid
+    ) {
+      setIsAvailableUpdated(
+        slotDetails.messages.parkingSlotResponse.isAvailable
+      );
+    }
+  }, [slotDetails]);
 
   return (
     <>
-      <div className="border flex justify-center items-center h-32 w-auto">
-        {isAvailable ? (
+      <Card
+        variant="outlined"
+        className="border flex justify-center items-center h-32 w-auto"
+      >
+        {!isAvailableUpdated ? (
           <Button
             color="#e5e7eb"
             onClick={toggleDrawer(true)}
@@ -36,7 +58,7 @@ function Slot({ isAvailable, slotName, uuid }) {
         ) : (
           <p className="text-lg text-gray-700">{slotName}</p>
         )}
-      </div>
+      </Card>
       <DrawerDetailParking
         open={open}
         toggleDrawer={toggleDrawer}

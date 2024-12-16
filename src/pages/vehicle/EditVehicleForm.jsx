@@ -29,7 +29,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectAllFullNameUsers,
   useAddNewUserMutation,
-  useFindByUuidMutation,
+  useFindUserByUuidMutation,
   useUpdateUserMutation,
 } from "../../redux/feature/users/userApiSlice";
 import { useEffect, useRef, useState } from "react";
@@ -130,7 +130,7 @@ function EditUserForm({ vehicle }) {
   const [
     findByUuid,
     { isSuccess: isSuccessFindUserByUuid, isLoading: isLoadingFindUserByUuid },
-  ] = useFindByUuidMutation();
+  ] = useFindUserByUuidMutation();
 
   const [
     addNewVehicleType,
@@ -159,9 +159,9 @@ function EditUserForm({ vehicle }) {
     // Add more modals here as needed
   };
 
-  useEffect(()=>{
-    if(isSuccessUser){
-      setIsModalCreateUserOpen(false)
+  useEffect(() => {
+    if (isSuccessUser) {
+      setIsModalCreateUserOpen(false);
       toast.success("Created User!", {
         position: "top-right",
         autoClose: 3000,
@@ -173,10 +173,10 @@ function EditUserForm({ vehicle }) {
         theme: "colored",
       });
     }
-  },[isSuccessUser])
+  }, [isSuccessUser]);
 
-  useEffect(()=>{
-    if(isErrorUser){
+  useEffect(() => {
+    if (isErrorUser) {
       toast.error(`${errorUser?.data?.error?.description}`, {
         position: "top-right",
         autoClose: 3000,
@@ -188,7 +188,7 @@ function EditUserForm({ vehicle }) {
         theme: "colored",
       });
     }
-  },[isErrorUser])
+  }, [isErrorUser]);
 
   useEffect(() => {
     if (isLoadingFindUserByUuid) {
@@ -1435,8 +1435,8 @@ function EditUserForm({ vehicle }) {
                             errors.dateOfBirth && touched.dateOfBirth
                               ? "0.0625rem solid red"
                               : mode === "dark"
-                              ? "0.0625rem solid #6b7280"
-                              : "0.0625rem solid #6b7280",
+                                ? "0.0625rem solid #6b7280"
+                                : "0.0625rem solid #6b7280",
                           height: "2.7rem",
                         }}
                       />
@@ -2085,8 +2085,8 @@ function EditUserForm({ vehicle }) {
                             errors.dateOfBirth && touched.dateOfBirth
                               ? "0.0625rem solid red"
                               : mode === "dark"
-                              ? "0.0625rem solid #6b7280"
-                              : "0.0625rem solid #6b7280",
+                                ? "0.0625rem solid #6b7280"
+                                : "0.0625rem solid #6b7280",
                           height: "2.7rem",
                         }}
                       />

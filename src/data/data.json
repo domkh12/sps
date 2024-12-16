@@ -1,0 +1,16 @@
+{
+  "en": {
+    "greeting": "Hello",
+    "welcome": "Welcome to our website",
+    "button.submit": "Submit",
+    "page.title": "My Website",
+    "language.select": "Select Language"
+  },
+  "km": {
+    "greeting": "សួស្តី",
+    "welcome": "សូមស្វាគមន៍មកកាន់គេហទំព័ររបស់យើង",
+    "button.submit": "បញ្ជូន",
+    "page.title": "គេហទំព័ររបស់ខ្ញុំ",
+    "language.select": "ជ្រើសរើសភាសា"
+  }
+}

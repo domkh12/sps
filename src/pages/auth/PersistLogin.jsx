@@ -10,7 +10,6 @@ import { setUuid } from "../../redux/feature/users/userSlice";
 
 function PersistLogin() {
   const { username, roles, uuid } = useAuth();
-  console.log("uuid", uuid);
   const token = useSelector(selectCurrentToken);
   const [trueSuccess, setTrueSuccess] = useState(false);
   const effectRan = useRef(false);
@@ -25,10 +24,9 @@ function PersistLogin() {
     useRefreshMutation();
 
   useEffect(() => {
-    console.log("presistStart");
+   
     if (effectRan.current === true || process.env.NODE_ENV !== "development") {
       const verifyRefreshToken = async () => {
-        console.log("verifying refresh token");
         try {
           await refresh();
           setTrueSuccess(true);
@@ -52,7 +50,6 @@ function PersistLogin() {
   let content;
   if (isLoading) {
     // persist: yes , token: no
-    console.log("loading");
     content = <p>Loading...</p>;
   } else if (isError) {
     content = (
@@ -83,7 +80,6 @@ function PersistLogin() {
     );
   } else if (isSuccess && trueSuccess) {
     // persist: yes , token: yes
-    console.log("Success");
     dispatch(setUuid(uuid));
     content = <Outlet />;
   } else if (token && isUninitialized) {

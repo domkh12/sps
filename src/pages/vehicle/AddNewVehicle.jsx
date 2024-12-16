@@ -29,7 +29,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectAllFullNameUsers,
   useAddNewUserMutation,
-  useFindByUuidMutation,
+  useFindUserByUuidMutation,
   useUpdateUserMutation,
 } from "../../redux/feature/users/userApiSlice";
 import { useEffect, useRef, useState } from "react";
@@ -133,7 +133,7 @@ function AddNewVehicle() {
   const [
     findByUuid,
     { isSuccess: isSuccessFindUserByUuid, isLoading: isLoadingFindUserByUuid },
-  ] = useFindByUuidMutation();
+  ] = useFindUserByUuidMutation();
 
   const [
     addNewVehicleType,
@@ -1363,8 +1363,8 @@ function AddNewVehicle() {
                             errors.dateOfBirth && touched.dateOfBirth
                               ? "0.0625rem solid red"
                               : mode === "dark"
-                              ? "0.0625rem solid #6b7280"
-                              : "0.0625rem solid #6b7280",
+                                ? "0.0625rem solid #6b7280"
+                                : "0.0625rem solid #6b7280",
                           height: "2.7rem",
                         }}
                       />
@@ -1906,7 +1906,7 @@ function AddNewVehicle() {
             };
             return (
               <Form className="flex flex-col overflow-auto">
-                <Modal.Body >
+                <Modal.Body>
                   <div className="px-5 flex justify-center">
                     <ProfilePictureUpload
                       setProfileImageFile={handleImageChange}
@@ -2027,8 +2027,8 @@ function AddNewVehicle() {
                             errors.dateOfBirth && touched.dateOfBirth
                               ? "0.0625rem solid red"
                               : mode === "dark"
-                              ? "0.0625rem solid #6b7280"
-                              : "0.0625rem solid #6b7280",
+                                ? "0.0625rem solid #6b7280"
+                                : "0.0625rem solid #6b7280",
                           height: "2.7rem",
                         }}
                       />

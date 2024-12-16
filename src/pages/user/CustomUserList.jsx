@@ -154,7 +154,7 @@ function CustomUserList() {
             userId={userId}
             uuid={uuid}
             status={status}
-            isActionButton={true}
+            isActionButton={true}          
           />
         ))
       : null;
@@ -187,7 +187,7 @@ function CustomUserList() {
         <div className="flex flex-col pb-16">
           <table>
             <thead
-              className={`w-full dark:bg-[#282828] ${
+              className={`w-full dark:bg-[#282828] z-10 ${
                 isScrolling ? "shadow-md transition-all duration-100" : ""
               }`}
             >
@@ -246,8 +246,7 @@ function CustomUserList() {
                 <th>Phone</th>
                 <th>Roles</th>
                 <th>Date of Birth</th>
-                <th className="text-right">Date</th>
-                <th className="text-right">Status</th>
+                <th className="text-right">Date</th>                
                 <th className="text-right">Action</th>
               </tr>
             </thead>

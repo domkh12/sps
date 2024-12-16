@@ -7,13 +7,53 @@ import {
   setIsPaginationSuccess,
   setIsScrolling,
 } from "../../redux/feature/actions/actionSlice";
+import {
+  useConnectedUserMutation,
+  useFindUserByUuidMutation,
+} from "../../redux/feature/users/userApiSlice";
+import { selectCurrentToken } from "../../redux/feature/auth/authSlice";
+import useWebSocket from "../../hook/useWebSocket";
+import { STATUS } from "../../config/status";
+import {
+  setIsLoadingUser,
+  setUserActive,
+} from "../../redux/feature/users/userSlice";
+import { Grid2 } from "@mui/material";
+
 function AdminLayout() {
   const isPaginationSuccess = useSelector(
     (state) => state.action.isPaginationSuccess
   );
+  const userUuid = useSelector((state) => state.users.uuid);
   const mainContentRef = useRef(null);
   const dispatch = useDispatch();
   const [scrolling, setScrolling] = useState();
+  const dynamicDestination = `/topic/update-status`;
+
+  const { loading, error, messages } = useWebSocket(dynamicDestination);
+
+  const [connectedUser, { isSuccess: isSuccessConnectUser }] =
+    useConnectedUserMutation();
+
+  const [
+    findUserByUuid,
+    { isSuccess: isFindUserByUuidSuccess, isLoading: isFindUserByUuidLoading },
+  ] = useFindUserByUuidMutation();
+
+  useEffect(() => {
+    if (messages) {
+      dispatch(setUserActive(messages));
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (userUuid) {
+        await findUserByUuid(userUuid);
+      }
+    };
+    fetchUser();
+  }, [userUuid]);
 
   useEffect(() => {
     if (isPaginationSuccess) {
@@ -26,6 +66,12 @@ function AdminLayout() {
   }, [isPaginationSuccess]);
 
   useEffect(() => {
+    const connectUser = async () => {
+      await connectedUser({ uuid: userUuid, status: STATUS.ONLINE });
+    };
+
+    connectUser();
+
     const handleScroll = () => {
       if (mainContentRef.current) {
         setScrolling(mainContentRef.current.scrollTop > 0);
@@ -47,21 +93,44 @@ function AdminLayout() {
   useEffect(() => {
     dispatch(setIsScrolling(scrolling));
   }, [scrolling]);
-  const content = (
+  let content;
+
+  useEffect(() => {
+    if (isFindUserByUuidLoading || loading) {
+      content = <div>Loading...</div>;
+      dispatch(setIsLoadingUser(true));
+    }
+  }, [isFindUserByUuidLoading]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+        event.preventDefault(); // Prevent default browser behavior
+        alert('Search Text');
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  content = (
     <div className="fixed top-0 left-0 w-full h-screen dark:bg-[#282828]">
-      <header>
-        <NavBarDashboard />
-      </header>
       <div className="flex h-full">
         <SideBar />
-        <main className="flex flex-grow h-full overflow-auto">
-          <div
-            className=" flex-grow h-full customScrollBar max-h-[calc(100vh-4rem)] bg-white dark:bg-gray-800"
-            ref={mainContentRef}
-          >
+        {/* <main className="flex flex-grow h-full overflow-auto"> */}
+        <div className="flex-grow h-full overflow-auto">
+          <header className="sticky top-0 w-full z-20">
+            <NavBarDashboard />
+          </header>
+          <main ref={mainContentRef} className="px-[40px] pt-[8px] pb-[64px]">
             <Outlet />
-          </div>
-        </main>
+          </main>
+        </div>
+        {/* </main> */}
       </div>
     </div>
   );

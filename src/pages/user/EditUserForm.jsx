@@ -40,8 +40,8 @@ function EditUserForm({ user }) {
   const dropdownRef = useRef(null);
   const [rolesPlaceHolder, setRolesPlaceHolder] = useState(
     user.roleNames.join(", ")
-  );  
-  const [isDataChanged, setIsDataChanged] = useState(false);  
+  );
+  const [isDataChanged, setIsDataChanged] = useState(false);
   const [updateUser, { isSuccess, isLoading, isError, error }] =
     useUpdateUserMutation();
   const [uploadImage] = useUploadImageMutation();
@@ -76,7 +76,7 @@ function EditUserForm({ user }) {
 
   useEffect(() => {
     if (isSuccess) {
-      navigate("/dash/users");
+      navigate("/dash/users/custom");
 
       toast.success("Update Successful", {
         position: "top-right",
@@ -137,7 +137,7 @@ function EditUserForm({ user }) {
   };
 
   const handleBtnBackClicked = () => {
-    navigate("/dash/users");
+    navigate("/dash/users/custom");
   };
 
   const customTheme = {
@@ -210,7 +210,7 @@ function EditUserForm({ user }) {
 
           const onDateChange = (date) => {
             const newDate = new Date(date);
-            newDate.setDate(newDate.getDate() + 1); 
+            newDate.setDate(newDate.getDate() + 1);
             setFieldValue("dateOfBirth", newDate.toISOString().split("T")[0]);
             setIsDataChanged(
               checkDataChanged({
@@ -356,8 +356,8 @@ function EditUserForm({ user }) {
                         errors.dateOfBirth && touched.dateOfBirth
                           ? "0.0625rem solid red"
                           : mode === "dark"
-                          ? "0.0625rem solid #6b7280"
-                          : "0.0625rem solid #6b7280",
+                            ? "0.0625rem solid #6b7280"
+                            : "0.0625rem solid #6b7280",
                       height: "2.7rem",
                     }}
                   />
@@ -466,52 +466,58 @@ function EditUserForm({ user }) {
                     Roles <span className="text-red-600">*</span>
                   </Label>
                   <div className="relative">
-                  <div
-                    onClick={handleToggleRoleCbo}
-                    className={`flex justify-between text-sm cursor-pointer dark:bg-gray-800 items-center border border-gray-500 dark:border-gray-500 px-2 py-[0.60rem] rounded-lg text-gray-800 dark:text-gray-200 ${
-                      errors.roleName && "border-red-600 text-red-600"
-                    }`}
-                  >
-                    {rolesPlaceHolder} <IoIosArrowDown className="text-xl" />
-                  </div>
-                  <Card
+                    <div
+                      onClick={handleToggleRoleCbo}
+                      className={`flex justify-between text-sm cursor-pointer dark:bg-gray-800 items-center border border-gray-500 dark:border-gray-500 px-2 py-[0.60rem] rounded-lg text-gray-800 dark:text-gray-200 ${
+                        errors.roleName && "border-red-600 text-red-600"
+                      }`}
+                    >
+                      {rolesPlaceHolder} <IoIosArrowDown className="text-xl" />
+                    </div>
+                    <Card
                       theme={Cardtheme}
                       className={`w-full absolute top-0 left-0 bg-gray-50 z-10 ${
                         cboRolesToggle ? "flex" : "hidden"
                       }`}
-                    >                         
+                    >
                       {Object.values(ROLES).map((role) => (
-                       
-                        <div key={role} className="flex items-center gap-2 py-2 hover:bg-gray-200 cursor-pointer px-5">
-                          <Checkbox                            
+                        <div
+                          key={role}
+                          className="flex items-center gap-2 py-2 hover:bg-gray-200 cursor-pointer px-5"
+                        >
+                          <Checkbox
                             id={role}
                             name="roleName"
                             value={role}
                             checked={values.roleName.includes(role)}
-                            onChange={() => onRoleNameChanged(role)}                            
+                            onChange={() => onRoleNameChanged(role)}
                           />
                           <Label htmlFor={role} className="ml-2">
                             {role}
-                          </Label>                          
-                        </div>                                                      
-                      ))}                           
+                          </Label>
+                        </div>
+                      ))}
                       <div className="w-full  flex justify-end items-center border-t border-t-gray-400 p-2">
-                        <Button className="bg-gray-200 text-gray-800 ring-transparent hover:bg-gray-300" onClick={handleDoneButtonClick}>Done</Button>
+                        <Button
+                          className="bg-gray-200 text-gray-800 ring-transparent hover:bg-gray-300"
+                          onClick={handleDoneButtonClick}
+                        >
+                          Done
+                        </Button>
                       </div>
                     </Card>
-                    </div>
+                  </div>
                   {errors.roleName && (
                     <small className="text-red-600">{errors.roleName}</small>
                   )}
                 </div>
                 <div>
-                <Label htmlFor="roles" className="flex gap-2 mb-2">
+                  <Label htmlFor="roles" className="flex gap-2 mb-2">
                     <TbAccessibleOff />
                     Disabled
                   </Label>
                   <ToggleSwitch
                     checked={values.isDisabled}
-                    
                     name="isDisabled"
                     onChange={() => {
                       const newValue = !values.isDisabled;
