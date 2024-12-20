@@ -97,7 +97,7 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
           console.error("Failed to fetch paginated parking:", error);
         }
       },
-    }),   
+    }),
     connectedParking: builder.mutation({
       query: ({ uuid, status }) => ({
         url: `/parking/${uuid}/status`,
@@ -112,39 +112,17 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, arg) => [
         { type: "Parking", id: arg.uuid },
       ],
-    }),
-    getFullNameParking: builder.query({
-      query: () => `/parking/full-names`,
-      validateStatus: (response, result) => {
-        return response.status === 200 && !result.isError;
-      },
-      transformResponse: (responseData) => {
-        const loadedParking = responseData.map((parking) => {
-          parking.id = parking.uuid;
-          return parking;
-        });
-        return parkingAdapter.setAll(initialState, loadedParking);
-      },
-      providesTags: (result, error, arg) => {
-        if (result?.ids) {
-          return [
-            { type: "Parking", id: "LIST" },
-            ...result.ids.map((id) => ({ type: "Parking", id })),
-          ];
-        } else return [{ type: "Parking", id: "LIST" }];
-      },
-    }),
+    }),    
   }),
 });
 
-export const {
+export const {  
   useGetParkingQuery,
   useAddNewParkingMutation,
   useUpdateParkingMutation,
   useDeleteParkingMutation,
   useSearchParkingMutation,
-  useConnectedParkingMutation,
-  useGetFullNameParkingQuery,
+  useConnectedParkingMutation,  
 } = parkingApiSlice;
 
 // return the query result object

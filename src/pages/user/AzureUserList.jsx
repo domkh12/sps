@@ -336,7 +336,7 @@ function AzureUserList() {
     );
   }
 
-  return content;
+  return <></>;
 }
 
 export default AzureUserList;

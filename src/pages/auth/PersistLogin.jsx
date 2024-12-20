@@ -7,6 +7,7 @@ import { Button } from "flowbite-react";
 import { HiArrowRight } from "react-icons/hi";
 import useAuth from "../../hook/useAuth";
 import { setUuid } from "../../redux/feature/users/userSlice";
+import LoadingComponent from "../../components/LoadingComponent";
 
 function PersistLogin() {
   const { username, roles, uuid } = useAuth();
@@ -24,7 +25,6 @@ function PersistLogin() {
     useRefreshMutation();
 
   useEffect(() => {
-   
     if (effectRan.current === true || process.env.NODE_ENV !== "development") {
       const verifyRefreshToken = async () => {
         try {
@@ -50,7 +50,7 @@ function PersistLogin() {
   let content;
   if (isLoading) {
     // persist: yes , token: no
-    content = <p>Loading...</p>;
+    content = <LoadingComponent />;
   } else if (isError) {
     content = (
       <>

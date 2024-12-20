@@ -14,10 +14,9 @@ export const userApiSlice = apiSlice.injectEndpoints({
     getUsers: builder.query({
       query: ({
         pageNo = 1,
-        pageSize = 30,
-        signUpMethod = SIGNUPMETHOD.CUSTOM,
+        pageSize = 10,        
       } = {}) =>
-        `/users?pageNo=${pageNo}&pageSize=${pageSize}&signUpMethod=${signUpMethod}`,
+        `/users?pageNo=${pageNo}&pageSize=${pageSize}`,
       validateStatus: (response, result) => {
         return response.status === 200 && !result.isError;
       },
@@ -38,7 +37,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
           totalPages: responseData.page.totalPages,
           totalElements: responseData.page.totalElements,
           pageNo: responseData.page.number,
-          pageSize: responseData.page.size,
+          pageSize: responseData.page.size,          
         };
       },
       providesTags: (result, error, arg) => {
@@ -123,6 +122,38 @@ export const userApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
+    findUserByRole: builder.mutation({
+      query: ({ query }) => ({
+        url: `/users/search?q=${query}`,
+      }),
+
+      transformResponse: (responseData) => {
+        const loadedUsers = responseData.content.map((user) => ({
+          ...user,
+          id: user.uuid,
+        }));
+        return { users: loadedUsers, totalPages: responseData.page.totalPages };
+      },
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const { users: newUsers, totalPages: newTotalPages } = data;
+
+          dispatch(
+            userApiSlice.util.updateQueryData(
+              "getUsers",
+              undefined,
+              (draft) => {
+                usersAdapter.setAll(draft, newUsers);
+                draft.totalPages = newTotalPages;
+              }
+            )
+          );
+        } catch (error) {
+          console.error("Failed to fetch paginated users:", error);
+        }
+      },
+    }),
     findUserByUuid: builder.mutation({
       query: (uuid) => ({
         url: `/users/${uuid}`,
@@ -137,11 +168,11 @@ export const userApiSlice = apiSlice.injectEndpoints({
       },
     }),
     connectedUser: builder.mutation({
-      query: ({ uuid, status }) => ({
+      query: ({ uuid, isOnline }) => ({
         url: `/users/${uuid}/status`,
         method: "PATCH",
         body: {
-          status,
+          isOnline,
         },
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {

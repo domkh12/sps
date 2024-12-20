@@ -5,6 +5,8 @@ import { userApiSlice } from "../../redux/feature/users/userApiSlice";
 import { vehicleTypeTypeApiSlice } from "../../redux/feature/vehicles/vehicleTypeApiSlice";
 import { vehicleApiSlice } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { parkingApiSlice } from "../../redux/feature/parking/parkingApiSlice";
+import { roleApiSlice } from "../../redux/feature/role/roleApiSlice";
+import { signUpMethodApiSlice } from "../../redux/feature/signUpMethod/signUpMethodApiSlice";
 
 function Prefetch() {
   useEffect(() => {
@@ -22,6 +24,12 @@ function Prefetch() {
     const parking = store.dispatch(
       parkingApiSlice.endpoints.getParking.initiate()
     );
+    const role = store.dispatch(
+      roleApiSlice.endpoints.getRole.initiate()
+    );
+    const sighUpMethod = store.dispatch(
+      signUpMethodApiSlice.endpoints.getSignUpMethod.initiate()
+    );
     // const parkingSlots = store.dispatch(
     //   parkingSlotsApiSlice.endpoints.getParkingSlots.initiate()
     // );
@@ -32,6 +40,8 @@ function Prefetch() {
       vehicle.unsubscribe();
       vehicleTypes.unsubscribe();
       parking.unsubscribe();
+      role.unsubscribe();
+      sighUpMethod.unsubscribe();
       // parkingSlots.unsubscribe();
       // console.log("unsubscribing...");
     };

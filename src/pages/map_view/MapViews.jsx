@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   FormControl,
@@ -10,14 +10,17 @@ import {
   InputAdornment,
   Typography,
   Breadcrumbs,
+  MenuList,
 } from "@mui/material";
 import { Gauge } from "@mui/x-charts/Gauge";
-import { cardStyle, textFieldStyle } from "../../assets/style";
+import { cardStyle, selectMenuStyle, textFieldStyle } from "../../assets/style";
 import { selectStyle } from "./../../assets/style";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import SearchIcon from "@mui/icons-material/Search";
 import { BarChart } from "@mui/x-charts";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import MainHeaderComponent from "../../components/MainHeaderComponent";
+import SearchComponent from "../../components/SearchComponent";
 
 function MapViews() {
   const [valueGauge, setValueGauge] = useState(90);
@@ -36,66 +39,65 @@ function MapViews() {
   const valueColor = calculateColor();
 
   const breadcrumbs = [
-    <button className="text-black hover:underline" onClick={() => navitage("/dash")}>
+    <button
+      className="text-black hover:underline"
+      onClick={() => navitage("/dash")}
+      key={1}
+    >
       Dashboard
     </button>,
-    <Typography color="inherit">Map Views</Typography>,
+    <Typography color="inherit" key={2}>
+      Map Views
+    </Typography>,
   ];
 
   return (
     <>
-      <div className="pb-10 pt-1 flex flex-col gap-5">
-        <Typography variant="h5" sx={{ fontSize: "24px", fontWeight: "500" }}>
-          Map Views
-        </Typography>
-        <Breadcrumbs
-          separator={
-            <div className="w-[5px] h-[5px] mx-1 rounded-full bg-light-gray"></div>
-          }
-          aria-label="breadcrumb"
-        >
-          {breadcrumbs}
-        </Breadcrumbs>
-      </div>
-      <div className="flex gap-5">
+      <MainHeaderComponent breadcrumbs={breadcrumbs} title={"Map Views"} />
+
+      <div className="grid gap-5 grid-cols-4">
         <Card
-          minWidth={275}
+          minWidth={270}
           sx={{
             padding: "20px",
             ...cardStyle,
           }}
-          className="flex-1"
+          className="col-span-3"
         >
-          <div className="grid grid-cols-4 gap-4 mb-5">
-            <FormControl fullWidth>
+          <div className="flex gap-5">
+            <FormControl className="w-60 shrink-0">
               <InputLabel id="location_label">Location</InputLabel>
               <Select
                 labelId="location_label"
                 id="location"
                 label="Location"
-                sx={{ ...selectStyle }}
+                sx={{
+                  ...selectStyle,
+                }}
                 IconComponent={() => (
                   <IconButton disableRipple>
                     <KeyboardArrowDownRoundedIcon />
                   </IconButton>
                 )}
+                MenuProps={{
+                  sx: {
+                    ...selectMenuStyle,
+                  },
+                }}
               >
-                <MenuItem value={10}>Ten</MenuItem>
+                <MenuItem
+                  sx={{
+                    borderRadius: "5px",
+                  }}
+                  value={10}
+                >
+                  ក្រោយអគារ IT
+                </MenuItem>
               </Select>
             </FormControl>
-            <FormControl fullWidth className="col-span-3">
-              <OutlinedInput
-                startAdornment={
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                }
-                placeholder="Search..."
-                sx={{ ...textFieldStyle }}
-              />
-            </FormControl>
+            <SearchComponent />
           </div>
-          <div className="grid grid-cols-6">
+          <div className="grid grid-cols-6 py-[20px]">
             <div className="py-5 border border-dashed border-gray-400 flex justify-center items-center flex-col gap-4">
               <span className="border border-dashed px-4 py-1 rounded-xl border-gray-400">
                 D-12
@@ -107,7 +109,7 @@ function MapViews() {
         {/* Data Summary */}
         <div className="grid gap-5">
           <Card
-            minWidth={275}
+            minWidth={400}
             sx={{
               padding: "20px",
               ...cardStyle,

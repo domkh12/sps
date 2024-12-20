@@ -155,9 +155,9 @@ function VehicleList() {
     );
 
   if (isError) {
-    content = <p>Error: {error?.data?.message}</p>;
+    content = <p>Error: {error?.message}</p>;
   }
-
+  
   if (isSuccess) {
     const { ids, totalPages, totalElements } = vehicles;
 
