@@ -48,21 +48,6 @@ function CustomUserList() {
   const [activeTab, setActiveTab] = useState("custom");
   const [value, setValue] = useState(0);
 
-  const {
-    data: users,
-    isLoading,
-    isSuccess,
-    isError,
-    error,
-    refetch,
-    isFetching,
-  } = useGetUsersQuery(
-    { pageNo, pageSize, signUpMethod: SIGNUPMETHOD.CUSTOM },
-    {
-      pollingInterval: 300000,
-      refetchOnMountOrArgChange: true,
-    }
-  );
 
   const [searchUsers, { isLoading: isSearching }] = useSearchUsersMutation();
 
@@ -351,7 +336,7 @@ function CustomUserList() {
     );
   }
 
-  return content;
+  return <></>;
 }
 
 export default CustomUserList;

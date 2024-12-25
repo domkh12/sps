@@ -1,0 +1,17 @@
+{
+  "login": "Login",
+  "login-to-your-account": "Login to your account",
+  "email": "Email",
+  "password": "Password",
+  "rememberMe": "Remember Me",
+  "required": "Required",
+  "noPasswordProvided": "No password provided",
+  "loginWithMicrosoft": "Login with Microsoft",
+  "welcomeBack": "Welcome Back",
+  "readyToTakeControlOfYourParkingSpaces": "Ready to take control of your parking spaces?",
+  "mapView": "Map View",
+  "dashboard": "Dashboard",
+  "location": "Location",
+  "search": "Search",
+  "noData": "No data"
+}

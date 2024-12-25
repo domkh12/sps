@@ -5,32 +5,27 @@ export default {
   darkMode: "class",
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}", flowbite.content()],
   theme: {
-    colors: {
-      transparent: 'transparent',
-      current: 'currentColor',
-      'primary': '#2C3092',
-      'primary-hover': '#4A4FB3',
-      'secondary': '#ff8a4c',
-      'secondary-hover': '#ff5a1f',
-      'smallBorder': '#E1E1E1',
-      'gray-cus': "#424242",
-      'light-gray': "#808080"
-    },
     screens: {
-      "2xl": { max: "1535px" },
-      // => @media (max-width: 1535px) { ... }
-
-      xl: { max: "1279px" },
-      // => @media (max-width: 1279px) { ... }
-
-      lg: { max: "1023px" },
-      // => @media (max-width: 1023px) { ... }
-
-      md: { max: "767px" },
-      // => @media (max-width: 767px) { ... }
-
-      sm: { max: "639px" },
-      // => @media (max-width: 639px) { ... }
+      xxxs: "240px",
+      xxs: "320px",
+      xs: "480px",
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+      custom: "300px",
+    },
+    colors: {
+      transparent: "transparent",
+      current: "currentColor",
+      primary: "#2C3092",
+      "primary-hover": "#4A4FB3",
+      secondary: "#ff8a4c",
+      "secondary-hover": "#ff5a1f",
+      smallBorder: "#E1E1E1",
+      "gray-cus": "#424242",
+      "light-gray": "#808080",
     },
     extend: {
       fontSize: {

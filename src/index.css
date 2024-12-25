@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Hanuman:wght@100;300;400;700;900&display=swap");
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,38 +9,10 @@
     @apply scroll-smooth;
   }
 
-  .header{
-    @apply h-[70px] bg-white text-white bg-opacity-50 backdrop-blur-md flex justify-between items-center px-[40px];
-  }
-
-  .animate-spin-slow{
-    animation: spin 5s linear infinite;
-  }
-
-  .hover-scale:hover{
-    transform: scale(1.05);
-    transition: transform 0.2s ease-in-out 0s;
-  }
-
-  .active-scale:active {
-    transform: scale(0.95);
-    transition: transform 0.2s ease-in-out 0s;
-  }
-
-  .active-scale{
-    transition: transform 0.2s ease-in-out 0s;
-  }
-
-  .hover-scale{
-    transition: transform 0.2s ease-in-out 0s;
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+  .header {
+    @apply h-[70px] bg-white text-white bg-opacity-50 backdrop-blur-md flex justify-between flex-wrap items-center xl:px-[40px] px-[20px];
+  }   
 }
-
 
 :root {
   --primary: #2c3092;
@@ -57,7 +29,7 @@ html {
 }
 
 body {
-  font-family: "Roboto","Hanuman", serif;
+  font-family: "Roboto", "Hanuman", serif;
   font-weight: 400;
   font-style: normal;
 }
@@ -170,3 +142,70 @@ th {
 }
 
 /* tab end */
+
+.hover-scale:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out 0s;
+}
+
+.active-scale:active {
+  transform: scale(0.95);
+  transition: transform 0.2s ease-in-out 0s;
+}
+
+.active-scale {
+  transition: transform 0.2s ease-in-out 0s;
+}
+
+.hover-scale {
+  transition: transform 0.2s ease-in-out 0s;
+}
+
+.animate-spin-slow {
+  animation: spin 5s linear infinite;
+}
+
+.loading-spin1 {
+  animation: loading-spin1 2s linear infinite;    
+}
+
+.loading-spin2 {
+  animation: loading-spin2 2s linear infinite; 
+}
+
+
+@keyframes loading-spin1 {
+  0% {    
+    border-radius: 10%;
+    transform: rotate(0deg);
+  }
+  50% {    
+    transform: rotate(180deg);
+  }
+  100% {    
+    border-radius: 50%;    
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loading-spin2 {
+  0% {    
+    transform: rotate(360deg);
+  }
+  50% {    
+    transform: rotate(180deg);
+  }
+  100% {    
+    border-radius: 50%;
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

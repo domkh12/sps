@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Table, TextInput, useThemeMode } from "flowbite-react";
+import { Button, TextInput, useThemeMode } from "flowbite-react";
 import VehicleRow from "./VehicleRow";
 import { useGetVehicleQuery } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { IoClose } from "react-icons/io5";
@@ -25,8 +25,7 @@ import {
   setTotalPages,
   lastPageNo,
 } from "../../redux/feature/vehicles/vehicleSlice";
-import { Helmet } from "react-helmet-async";
-import SEO from "../../components/SEO";
+import SeoComponent from "../../components/SeoComponent";
 
 function VehicleList() {
   const [search, setSearch] = useState("");
@@ -155,9 +154,9 @@ function VehicleList() {
     );
 
   if (isError) {
-    content = <p>Error: {error?.data?.message}</p>;
+    content = <p>Error: {error?.message}</p>;
   }
-
+  
   if (isSuccess) {
     const { ids, totalPages, totalElements } = vehicles;
 
@@ -169,7 +168,7 @@ function VehicleList() {
 
     content = (
       <>
-        <SEO title={"Vehicles List"}/>
+        <SeoComponent title={"Vehicles List"}/>
         <div className="flex flex-col w-full pb-16">
           <h1 className="text-2xl font-medium dark:text-gray-50 py-4 px-8">
             Vehicles List

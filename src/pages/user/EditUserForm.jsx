@@ -38,9 +38,7 @@ function EditUserForm({ user }) {
   const [cboRolesToggle, setCboRolesToggle] = useState(false);
   const { mode } = useThemeMode();
   const dropdownRef = useRef(null);
-  const [rolesPlaceHolder, setRolesPlaceHolder] = useState(
-    user.roleNames.join(", ")
-  );
+  const [rolesPlaceHolder, setRolesPlaceHolder] = useState("Admin,User,Manager");
   const [isDataChanged, setIsDataChanged] = useState(false);
   const [updateUser, { isSuccess, isLoading, isError, error }] =
     useUpdateUserMutation();
@@ -356,8 +354,8 @@ function EditUserForm({ user }) {
                         errors.dateOfBirth && touched.dateOfBirth
                           ? "0.0625rem solid red"
                           : mode === "dark"
-                            ? "0.0625rem solid #6b7280"
-                            : "0.0625rem solid #6b7280",
+                          ? "0.0625rem solid #6b7280"
+                          : "0.0625rem solid #6b7280",
                       height: "2.7rem",
                     }}
                   />

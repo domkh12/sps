@@ -1,7 +1,7 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
 
-function SEO({ title, description, keywords, image, url }) {
+function SeoComponent({ title, description, keywords, image, url }) {
   return (
     <Helmet>
       <title>{title}</title>
@@ -19,4 +19,4 @@ function SEO({ title, description, keywords, image, url }) {
   );
 }
 
-export default SEO;
+export default SeoComponent;

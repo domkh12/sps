@@ -9,9 +9,9 @@ function Parking() {
   const [value, setValue] = useState(0);
  
 
-  useEffect(() => {
-    navigator(activeTab);
-  }, [activeTab]);
+  // useEffect(() => {
+  //   navigator(activeTab);
+  // }, [activeTab]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -24,7 +24,7 @@ function Parking() {
       <h1 className="text-2xl font-medium dark:text-gray-50 py-4 px-8">
         Parking
       </h1>
-      <Box sx={{ width: "100%" }}>
+      {/* <Box sx={{ width: "100%" }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider", paddingX: "2rem" }}>
           <Tabs
             value={value}
@@ -73,7 +73,7 @@ function Parking() {
       </Box>
       <div>
         <Outlet />
-      </div>
+      </div> */}
     </div>
   );
 }

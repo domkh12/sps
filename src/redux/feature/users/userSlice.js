@@ -6,7 +6,7 @@ const userSlice = createSlice({
     uuid: "",
     status: "",
     pageNo: 1,
-    pageSize: 30,
+    pageSize: 10,
     totalPages: 0,
     user: {},
     userActive: {},
