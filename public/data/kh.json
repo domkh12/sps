@@ -8,5 +8,10 @@
   "noPasswordProvided": "មិនមានលេខសម្ងាត់",
   "loginWithMicrosoft": "ចូលតាមរយៈម៉ៃក្រូសូហ្វ",
   "welcomeBack": "ស្វាគមន៍ត្រលប់មកវិញ",
-  "readyToTakeControlOfYourParkingSpaces": "ត្រៀមខ្លួនដើម្បីគ្រប់គ្រងចំណតរថយន្តរបស់អ្នកហើយឬនៅ?"
+  "readyToTakeControlOfYourParkingSpaces": "ត្រៀមខ្លួនដើម្បីគ្រប់គ្រងចំណតរថយន្តរបស់អ្នកហើយឬនៅ?",
+  "mapView": "មើលទីតាំង",
+  "dashboard": "ផ្ទាំងគ្រប់គ្រង",
+  "location": "ទីតាំង",
+  "search": "ស្វែងរក",
+  "noData": "មិនមានទិន្នន័យ"
 }

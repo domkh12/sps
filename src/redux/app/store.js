@@ -8,6 +8,7 @@ import parkingDetailReducer from "../feature/parking/parkingDetailSlice.js";
 import roleReducer from "../feature/role/roleSlice.js";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import translationReducer from "../feature/translate/translationSlice.js";
+import parkingReducer from "../feature/parking/parkingSlice.js";
 
 const store = configureStore({
   reducer: {
@@ -16,13 +17,14 @@ const store = configureStore({
     users: userReducer,
     action: actionReducer,
     vehicles: vehicleReducer,
+    parking: parkingReducer,
     parkingDetail: parkingDetailReducer,
     role: roleReducer,
     translation: translationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(apiSlice.middleware),
-  devTools: true,
+  devTools: false,
 });
 
 setupListeners(store.dispatch);

@@ -219,7 +219,7 @@ export default function Login() {
             {({ values, touched, errors, handleChange, handleBlur }) => (
               <Form>
                 <nav className="fixed top-0 left-0 w-full">
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center xxs:flex-nowrap flex-wrap">
                     <LogoComponent />
                     <div className="pr-[20px] flex gap-[16px]  items-center">
                       <TranslateComponent />
@@ -231,12 +231,13 @@ export default function Login() {
                   <div className="h-screen shrink-0 w-[480px] hidden lg:block bg-[#f5f5f5]">
                     <div className="px-[20px] h-full text-center flex justify-center items-center flex-col">
                       <Typography
-                        variant="h5"
-                        sx={{ fontWeight: "500", mb: 2 }}
+                        variant="h1"
+                        
+                        sx={{ fontWeight: "500", mb: 2, fontSize: "28px" }}
                       >
                         {t("welcomeBack")}
                       </Typography>
-                      <Typography variant="body1" sx={{ mb: 2 }}>
+                      <Typography variant="h2" sx={{ mb: 2, fontSize:"18px" }}>
                         {t("readyToTakeControlOfYourParkingSpaces")}
                       </Typography>
                       <img src="/images/login_image.png" alt="login_image" />

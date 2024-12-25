@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from "react";
-import SEO from "../../components/SEO";
+import { useState } from "react";
 import { Box, Button, Divider, Modal, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { useSelector } from "react-redux";
-import {
-  selectIsTwoFAEnabled,
+import {  
   selectQrCodeUrl,
 } from "../../redux/feature/auth/authSlice";
 import Google2FAAuthenticator from "./components/Google2FAAuthenticator";
-import { useGet2faStatusMutation } from "../../redux/feature/users/userApiSlice";
+import SeoComponent from "../../components/SeoComponent";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -66,7 +64,7 @@ function Settings({ open, handleClose }) {
   };
   return (
     <>
-      <SEO title={"Settings"} />
+      <SeoComponent title={"Settings"} />
       <Modal
         open={open}
         aria-labelledby="modal-modal-title"

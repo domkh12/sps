@@ -116,7 +116,7 @@ function SidebarDrawerComponent() {
                     ...listItemButtonStyle,
                   }}
                   onClick={() => {
-                    // navigate("/dash")
+                    navigate("/dash")
                     setOpen(false);
                   }}
                   selected={location.pathname === "/dash"}

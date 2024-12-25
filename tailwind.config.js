@@ -6,13 +6,15 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}", flowbite.content()],
   theme: {
     screens: {
+      xxxs: "240px",
+      xxs: "320px",
       xs: "480px",
-      'sm': '640px',
-        'md': '768px',
-        'lg': '1024px',
-        'xl': '1280px',
-        '2xl': '1536px',
-        'custom': '900px', 
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+      custom: "300px",
     },
     colors: {
       transparent: "transparent",

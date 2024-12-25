@@ -27,13 +27,8 @@ import MainHeaderComponent from "../../components/MainHeaderComponent";
 
 import {
   cardStyle,
-  listItemButtonStyle,
   listStyle,
-  selectMenuStyle,
-  selectStyle,
 } from "../../assets/style";
-import SEO from "../../components/SEO";
-import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAllSignUpMethod } from "../../redux/feature/signUpMethod/signUpMethodApiSlice";
 import SearchComponent from "../../components/SearchComponent";
@@ -43,6 +38,8 @@ import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import { useGetUsersQuery } from "../../redux/feature/users/userApiSlice";
 import UserRowComponent from "../../components/UserRowComponent";
 import SelectComponent from "../../components/SelectComponent";
+import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
+import SeoComponent from "../../components/SeoComponent";
 
 function UserList() {
   const navigator = useNavigate();
@@ -135,19 +132,14 @@ function UserList() {
   };
 
   console.log("before onchange method");
-  const handleMethodChange = (method) => {    
+  const handleMethodChange = (method) => {
     console.log("selected method", method);
   };
   console.log("after onchange method");
 
   let content;
 
-  if (isLoading)
-    content = (
-      <div className="h-[80vh] flex justify-center w-[30vw] mx-auto flex-col">
-        <LinearProgress sx={{ borderRadius: "6px" }} />
-      </div>
-    );
+  if (isLoading) content = <LoadingFetchingDataComponent />;
 
   if (isError) {
     content = <p>Error: {error?.message}</p>;
@@ -170,7 +162,7 @@ function UserList() {
 
     content = (
       <>
-        <SEO title="SPS - User Lists" />
+        <SeoComponent title="SPS - User Lists" />
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
           title={"List"}

@@ -1,5 +1,6 @@
 import { createEntityAdapter, createSelector } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
+import { setLabels, setParking } from "./parkingSlice";
 
 const parkingAdapter = createEntityAdapter({});
 
@@ -8,12 +9,13 @@ const initialState = parkingAdapter.getInitialState();
 export const parkingApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getParking: builder.query({
-      query: () => `/parking`,
+      query: ({ pageNo = 1, pageSize = 10 } = {}) =>
+        `/parking?pageNo=${pageNo}&pageSize=${pageSize}`,
       validateStatus: (response, result) => {
         return response.status === 200 && !result.isError;
       },
       transformResponse: (responseData) => {
-        const loadedParking = responseData.map((parking) => {
+        const loadedParking = responseData.content.map((parking) => {
           parking.id = parking.uuid;
           return parking;
         });
@@ -98,31 +100,46 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
-    connectedParking: builder.mutation({
-      query: ({ uuid, status }) => ({
-        url: `/parking/${uuid}/status`,
-        method: "PATCH",
-        body: {
-          status,
-        },
+    findAllLabels: builder.mutation({
+      query: () => ({
+        url: `/parking/labels`,
       }),
-      transformResponse: (responseData) => {
-        console.log("responseData", responseData);
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setLabels({ data }));
+        } catch (error) {
+          console.error("Failed to fetch parking label:", error);
+        }
       },
       invalidatesTags: (result, error, arg) => [
-        { type: "Parking", id: arg.uuid },
+        { type: "Parking", id: "LIST" },
       ],
-    }),    
+    }),
+    findParkingByUuid: builder.mutation({
+      query: (uuid) => ({
+        url: `/parking/${uuid}`,
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;          
+          dispatch(setParking(data));
+        } catch (error) {
+          console.error("Failed to fetch user:", error);
+        }
+      },
+    }),
   }),
 });
 
-export const {  
+export const {
   useGetParkingQuery,
   useAddNewParkingMutation,
   useUpdateParkingMutation,
   useDeleteParkingMutation,
   useSearchParkingMutation,
-  useConnectedParkingMutation,  
+  useFindAllLabelsMutation,
+  useFindParkingByUuidMutation,
 } = parkingApiSlice;
 
 // return the query result object

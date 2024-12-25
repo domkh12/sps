@@ -10,7 +10,7 @@
   }
 
   .header {
-    @apply h-[70px] bg-white text-white bg-opacity-50 backdrop-blur-md flex justify-between items-center xl:px-[40px] px-[20px];
+    @apply h-[70px] bg-white text-white bg-opacity-50 backdrop-blur-md flex justify-between flex-wrap items-center xl:px-[40px] px-[20px];
   }   
 }
 

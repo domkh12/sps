@@ -12,10 +12,7 @@ const initialState = usersAdapter.getInitialState();
 export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUsers: builder.query({
-      query: ({
-        pageNo = 1,
-        pageSize = 10,        
-      } = {}) =>
+      query: ({ pageNo = 1, pageSize = 10 } = {}) =>
         `/users?pageNo=${pageNo}&pageSize=${pageSize}`,
       validateStatus: (response, result) => {
         return response.status === 200 && !result.isError;
@@ -31,13 +28,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
         const loadedUsers = responseData.content.map((user) => {
           user.id = user.uuid;
           return user;
-        });
+        });        
         return {
           ...usersAdapter.setAll(initialState, loadedUsers),
           totalPages: responseData.page.totalPages,
           totalElements: responseData.page.totalElements,
           pageNo: responseData.page.number,
-          pageSize: responseData.page.size,          
+          pageSize: responseData.page.size,
         };
       },
       providesTags: (result, error, arg) => {
@@ -68,7 +65,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         },
       }),
       async onQueryStarted(args, { dispatch, queryFulfilled, getState }) {
-        try {          
+        try {
           const { data } = await queryFulfilled;
           const userUuid = getState().users.uuid;
           if (userUuid === data.uuid) {

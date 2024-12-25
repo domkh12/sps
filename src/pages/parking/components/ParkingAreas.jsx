@@ -8,9 +8,9 @@ import { Box, Grid2, Tab, Tabs } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import Slot from "./Slot";
-import SEO from "../../../components/SEO";
 import useWebSocket from "../../../hook/useWebSocket";
 import { setParkingSlot } from "../../../redux/feature/parking/parkingDetailSlice";
+import SeoComponent from "../../../components/SeoComponent";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -79,7 +79,7 @@ function ParkingAreas() {
 
   content = (
     <div>
-      <SEO title="Parking Areas" />
+      <SeoComponent title="Parking Areas" />
       <Box
         sx={{
           maxWidth: { xs: 320, sm: 480 },

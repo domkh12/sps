@@ -74,7 +74,7 @@ function NavBarDashboard() {
           </div>
         </div>
 
-        <div className="flex gap-2 items-center">
+        <div className="flex lg:gap-2 items-center flex-wrap">
           <button className="hidden  bg-black bg-opacity-5 hover:bg-opacity-10 w-[100px] h-[40px] rounded-xl gap-2 xl:flex justify-evenly items-center px-[7px] mr-[8px] shadow-inner">
             <SearchTwoToneIcon className="w-5 h-5 text-black text-opacity-50" />
             <span className="text-black bg-white px-[7px] py-[2px] rounded-lg shadow-sm">
