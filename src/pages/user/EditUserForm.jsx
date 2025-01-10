@@ -1,36 +1,35 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useUpdateUserMutation } from "../../redux/feature/users/userApiSlice";
+import {
+  useFindAllGenderMutation,
+  useGetAllRolesMutation,
+  useUpdateUserMutation,
+} from "../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
 import {
-  Button,
-  Card,
-  Checkbox,
-  Datepicker,
-  Label,
-  Spinner,
-  TextInput,
-  ToggleSwitch,
   useThemeMode,
 } from "flowbite-react";
 import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
-import ProfilePictureUpload from "./components/ProfilePictureUpload";
-import { TbAccessibleOff, TbUser } from "react-icons/tb";
-import { LuCalendarDays } from "react-icons/lu";
 import {
-  IoCallOutline,
-  IoMailOutline,
-  IoReturnDownBackOutline,
+  IoEye,
+  IoEyeOff,
 } from "react-icons/io5";
-import { GrUserAdmin } from "react-icons/gr";
-import { IoIosArrowDown } from "react-icons/io";
-import { ROLES } from "./../../config/roles";
 import * as Yup from "yup";
-import { GENDERS } from "../../config/genders";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
-import { BsGenderAmbiguous } from "react-icons/bs";
-import { PiArrowsCounterClockwise } from "react-icons/pi";
-import { Cardtheme } from "../../redux/feature/utils/customReactFlowbiteTheme";
+import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice";
+import useAuth from "../../hook/useAuth";
+import useTranslate from "../../hook/useTranslate";
+import { Card, FormControl, FormHelperText, Grid2, IconButton, InputAdornment, InputLabel, OutlinedInput, styled, Switch, TextField, Typography } from "@mui/material";
+import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
+import SeoComponent from "../../components/SeoComponent";
+import MainHeaderComponent from "../../components/MainHeaderComponent";
+import { cardStyle } from "../../assets/style";
+import ProfileUploadComponent from "../../components/ProfileUploadComponent";
+import SelectSingleComponent from "../../components/SelectSingleComponent";
+import { DatePicker } from "@mui/x-date-pickers";
+import { useSelector } from "react-redux";
+import SelectComponent from "../../components/SelectComponent";
+import ButtonComponent from "../../components/ButtonComponent";
 
 function EditUserForm({ user }) {
   const navigate = useNavigate();
@@ -38,11 +37,81 @@ function EditUserForm({ user }) {
   const [cboRolesToggle, setCboRolesToggle] = useState(false);
   const { mode } = useThemeMode();
   const dropdownRef = useRef(null);
-  const [rolesPlaceHolder, setRolesPlaceHolder] = useState("Admin,User,Manager");
+  const [rolesPlaceHolder, setRolesPlaceHolder] =
+    useState("Admin,User,Manager");
   const [isDataChanged, setIsDataChanged] = useState(false);
-  const [updateUser, { isSuccess, isLoading, isError, error }] =
-    useUpdateUserMutation();
+  const { t } = useTranslate();
+  const { isManager, isAdmin } = useAuth();
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const genderFetched = useSelector((state) => state.users.genders);
+  const rolesFetched = useSelector((state) => state.users.roles);
+  const companyData = useSelector((state) => state.companies.companiesData);
+  const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [
+    updateUser,
+    {
+      isSuccess,
+      isLoading: isLoadingUpdateUser,
+      isError,
+      error: errorUpdateUser,
+    },
+  ] = useUpdateUserMutation();
   const [uploadImage] = useUploadImageMutation();
+
+  const [
+    findAllGender,
+    {
+      isSuccess: isFindAllGenderSuccess,
+      isLoading: isFindAllGenderLoading,
+      isError: isFindAllGenderError,
+      error: findAllGenderError,
+    },
+  ] = useFindAllGenderMutation();
+
+  const [
+    getAllCompanies,
+    {
+      isSuccess: isGetAllCompaniesSuccess,
+      isLoading: isGetAllCompaniesLoading,
+      isError: isGetAllCompaniesError,
+      error: getAllCompaniesError,
+    },
+  ] = useGetAllCompaniesMutation();
+
+  const [
+    getAllRoles,
+    {
+      isSuccess: isGetAllRolesSuccess,
+      isLoading: isGetAllRolesLoading,
+      isError: isGetAllRolesError,
+      error: getAllRolesError,
+    },
+  ] = useGetAllRolesMutation();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const promises = [];
+        if (isManager) {
+          promises.push(getAllRoles());
+          promises.push(getAllCompanies());
+        }
+        promises.push(findAllGender());
+
+        await Promise.all(promises);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [isManager, getAllRoles, getAllCompanies, findAllGender]);
+
   const validationSchema = Yup.object().shape({
     firstName: Yup.string().required("First name is required"),
     lastName: Yup.string().required("Last name is required"),
@@ -154,18 +223,16 @@ function EditUserForm({ user }) {
     setCboRolesToggle(!cboRolesToggle);
   };
 
-  const initialValues = {
-    firstName: user.firstName,
-    lastName: user.lastName,
-    fullName: user.fullName,
-    genderName: user.gender.fullNameEnglish,
-    email: user.email,
-    phoneNumber: user.phoneNumber,
-    profileImage: user.profileImage,
-    dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : new Date(),
-    roleName: user.roleNames,
-    isDisabled: user.isDeleted,
-  };
+  // const initialValues = {
+  //   fullName: user.fullName,
+  //   genderName: user.gender.fullNameEnglish,
+  //   email: user.email,
+  //   phoneNumber: user.phoneNumber,
+  //   profileImage: user.profileImage,
+  //   dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : new Date(),
+  //   roleName: user.roleNames,
+  //   isDisabled: user.isDeleted,
+  // };
 
   const checkDataChanged = (values) => {
     return JSON.stringify(values) !== JSON.stringify(initialValues);
@@ -175,390 +242,502 @@ function EditUserForm({ user }) {
     setCboRolesToggle(false);
   };
 
-  const toggleTheme = {
-    toggle: {
-      base: "relative rounded-full border after:absolute after:rounded-full after:bg-white after:transition-all",
+  const AntSwitch = styled(Switch)(({ theme }) => ({
+    width: 36,
+    height: 20,
+    padding: 0,
+    display: "flex",
+    "&:active": {
+      "& .MuiSwitch-thumb": {
+        width: 17,
+      },
+      "& .MuiSwitch-switchBase.Mui-checked": {
+        transform: "translateX(15px)",
+      },
     },
+    "& .MuiSwitch-switchBase": {
+      padding: 2,
+      "&.Mui-checked": {
+        transform: "translateX(17px)",
+        color: "#fff",
+        "& + .MuiSwitch-track": {
+          opacity: 1,
+          backgroundColor: "#1890ff",
+          ...theme.applyStyles("dark", {
+            backgroundColor: "#177ddc",
+          }),
+        },
+      },
+    },
+    "& .MuiSwitch-thumb": {
+      boxShadow: "0 2px 4px 0 rgb(0 35 11 / 20%)",
+      width: 15,
+      height: 15,
+      borderRadius: 10,
+      transition: theme.transitions.create(["width"], {
+        duration: 200,
+      }),
+    },
+    "& .MuiSwitch-track": {
+      borderRadius: 32 / 2,
+      opacity: 1,
+      backgroundColor: "rgba(0,0,0,.25)",
+      boxSizing: "border-box",
+      ...theme.applyStyles("dark", {
+        backgroundColor: "rgba(255,255,255,.35)",
+      }),
+    },
+  }));
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
   };
+  const handleMouseUpPassword = (event) => {
+    event.preventDefault();
+  };
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownConfirmPassword = (event) => {
+    event.preventDefault();
+  };
+  const handleMouseUpConfirmPassword = (event) => {
+    event.preventDefault();
+  };
+  const handleClickShowConfirmPassword = () =>
+    setShowConfirmPassword((show) => !show);
+  
 
-  const content = (
-    <>
-      <h1 className="text-2xl font-medium dark:text-gray-100 p-5">
-        Update User
-      </h1>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {({
-          values,
-          touched,
-          errors,
-          handleChange,
-          handleBlur,
-          setFieldValue,
-        }) => {
-          const onFieldChange = (e) => {
-            handleChange(e);
-            setIsDataChanged(
-              checkDataChanged({ ...values, [e.target.name]: e.target.value })
-            );
-          };
+  const breadcrumbs = [
+    <button
+      className="text-black hover:underline"
+      onClick={() => navigate("/dash")}
+      key={1}
+    >
+      {t("dashboard")}
+    </button>,
+    <Typography color="inherit" key={2}>
+      {t("user")}
+    </Typography>,
+    <Typography color="inherit" key={3}>
+      {t("newUser")}
+    </Typography>,
+  ];
 
-          const onDateChange = (date) => {
-            const newDate = new Date(date);
-            newDate.setDate(newDate.getDate() + 1);
-            setFieldValue("dateOfBirth", newDate.toISOString().split("T")[0]);
-            setIsDataChanged(
-              checkDataChanged({
-                ...values,
-                dateOfBirth: newDate.toISOString().split("T")[0],
-              })
-            );
-          };
+  let content;
 
-          const onRoleNameChanged = (role) => {
-            const updatedRoleName = values.roleName.includes(role)
-              ? values.roleName.filter((r) => r !== role)
-              : [...values.roleName, role];
+  if (isLoading) content = <LoadingFetchingDataComponent />;
 
-            setFieldValue("roleName", updatedRoleName);
-            setRolesPlaceHolder(updatedRoleName.join(", ") || "Select Roles");
+  if (error) {
+    content = "Error";
+  }
+  console.log("user", user)
+  if (
+    !isLoading &&
+    !error &&
+    (isManager
+      ? isFindAllGenderSuccess &&
+        isGetAllRolesSuccess &&
+        isGetAllCompaniesSuccess
+      : isFindAllGenderSuccess)
+  ) {
+    content = (
+      <div data-aos="fade-left">
+        <SeoComponent title={"Create a new user"} />
+        <MainHeaderComponent
+          breadcrumbs={breadcrumbs}
+          title={t("createANewUser")}
+        />
+        <Formik
+          initialValues={{
+            fullName: user.fullName,
+            genderId: user.gender.uuid,
+            email: "",
+            password: "",
+            confirmPassword: "",
+            address: "",
+            phoneNumber: "",
+            profileImage: "",
+            dateOfBirth: null,
+            roleId: [],
+            branchId: [],
+            isVerified: true,
+          }}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({
+            values,
+            touched,
+            errors,
+            handleChange,
+            handleBlur,
+            setFieldValue,
+          }) => {
+            const errorDateOfBirth = errors.dateOfBirth && touched.dateOfBirth;
 
-            setIsDataChanged(
-              checkDataChanged({ ...values, roleName: updatedRoleName })
-            );
-          };
+            const handleRoleChange = (value) => {
+              setFieldValue("roleId", value);
+            };
 
-          const handleImageChange = (file) => {
-            setProfileImageFile(file);
-            setIsDataChanged(
-              checkDataChanged({ ...values, profileImage: file.name })
-            );
-          };
+            const handleBranchChange = (value) => {
+              setFieldValue("branchId", value);
+            };
 
-          return (
-            <Form className="flex flex-col gap-5 pb-8">
-              <div className="px-5">
-                <ProfilePictureUpload
-                  setProfileImageFile={handleImageChange}
-                  imageUri={user.profileImage}
-                />
-              </div>
-              <div className="flex justify-center items-center gap-1">
-                <div className="w-4 h-[1px] bg-gray-600"></div>
-                <p className="whitespace-nowrap dark:text-gray-200">
-                  User Information
-                </p>
-                <div className="w-full h-[1px] bg-gray-600"></div>
-              </div>
-              <div className="grid grid-cols-2 lg:grid-cols-1 gap-5 gap-x-10 px-5">
-                <div>
-                  <Label className="flex gap-2 mb-2">
-                    <TbUser />
-                    First Name <span className="text-red-600">*</span>
-                  </Label>
-                  <TextInput
-                    placeholder="Enter first name"
-                    style={{
-                      backgroundColor: mode === "dark" ? "#1f2937" : "",
-                      color: mode === "dark" ? "white" : "",
-                    }}
-                    id="firstName"
-                    name="firstName"
-                    type="text"
-                    autoComplete="off"
-                    value={values.firstName}
-                    onChange={onFieldChange}
-                    onBlur={handleBlur}
-                    color={
-                      errors.firstName && touched.firstName
-                        ? "failure"
-                        : "default"
-                    }
-                  />
-                  {errors.firstName && touched.firstName && (
-                    <small className="text-red-600">{errors.firstName}</small>
-                  )}
-                </div>
-                <div>
-                  <Label className="flex gap-2 mb-2">
-                    <TbUser />
-                    Last Name <span className="text-red-600">*</span>
-                  </Label>
-                  <TextInput
-                    placeholder="Enter last name"
-                    style={{
-                      backgroundColor: mode === "dark" ? "#1f2937" : "",
-                      color: mode === "dark" ? "white" : "",
-                    }}
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    autoComplete="off"
-                    value={values.lastName}
-                    onChange={onFieldChange}
-                    onBlur={handleBlur}
-                    color={
-                      errors.lastName && touched.lastName
-                        ? "failure"
-                        : "default"
-                    }
-                  />
-                  {errors.lastName && touched.lastName && (
-                    <small className="text-red-600">{errors.lastName}</small>
-                  )}
-                </div>
-                <div>
-                  <Label className="flex gap-2 mb-2">
-                    <TbUser />
-                    Full Name <span className="text-red-600">*</span>
-                  </Label>
-                  <TextInput
-                    placeholder="Enter full name"
-                    style={{
-                      backgroundColor: mode === "dark" ? "#1f2937" : "",
-                      color: mode === "dark" ? "white" : "",
-                    }}
-                    id="fullName"
-                    name="fullName"
-                    type="text"
-                    autoComplete="off"
-                    value={values.fullName}
-                    onChange={onFieldChange}
-                    onBlur={handleBlur}
-                    color={
-                      errors.fullName && touched.fullName
-                        ? "failure"
-                        : "default"
-                    }
-                  />
-                  {errors.fullName && touched.fullName && (
-                    <small className="text-red-600">{errors.fullName}</small>
-                  )}
-                </div>
-                <div>
-                  <Label className="flex gap-2 mb-2">
-                    <LuCalendarDays />
-                    Date of Birth <span className="text-red-600">*</span>
-                  </Label>
-                  <Datepicker
-                    value={values.dateOfBirth}
-                    theme={customTheme}
-                    showTodayButton={false}
-                    onChange={onDateChange}
-                    style={{
-                      backgroundColor: mode === "dark" ? "#1f2937" : "",
-                      border:
-                        errors.dateOfBirth && touched.dateOfBirth
-                          ? "0.0625rem solid red"
-                          : mode === "dark"
-                          ? "0.0625rem solid #6b7280"
-                          : "0.0625rem solid #6b7280",
-                      height: "2.7rem",
-                    }}
-                  />
-                  {errors.dateOfBirth && touched.dateOfBirth && (
-                    <small className="text-red-600">{errors.dateOfBirth}</small>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="genderName" className="flex gap-2 mb-2">
-                    <BsGenderAmbiguous />
-                    <span>Gender</span>
-                  </Label>
-                  <div className="flex gap-4">
-                    {Object.values(GENDERS).map((gender) => (
-                      <div key={gender} className="flex items-center">
-                        <input
-                          style={{
-                            backgroundColor: mode === "dark" ? "#1f2937" : "",
-                            color: mode === "dark" ? "white" : "",
-                          }}
-                          type="radio"
-                          id={gender}
-                          name="genderName"
-                          value={gender}
-                          checked={values.genderName === gender}
-                          onChange={onFieldChange}
-                          onBlur={handleBlur}
-                        />
-                        <Label htmlFor={gender} className="ml-2">
-                          {gender}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                  {errors.gender && touched.gender && (
-                    <small className="text-red-600">{errors.gender}</small>
-                  )}
-                </div>
-                <div>
-                  <Label className="flex gap-2 mb-2">
-                    <IoCallOutline />
-                    Phone Number <span className="text-red-600">*</span>
-                  </Label>
-                  <TextInput
-                    placeholder="Enter phone number"
-                    style={{
-                      backgroundColor: mode === "dark" ? "#1f2937" : "",
-                      color: mode === "dark" ? "white" : "",
-                    }}
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    type="text"
-                    autoComplete="off"
-                    value={values.phoneNumber}
-                    onChange={onFieldChange}
-                    onBlur={handleBlur}
-                    color={
-                      errors.phoneNumber && touched.phoneNumber
-                        ? "failure"
-                        : "default"
-                    }
-                  />
-                  {errors.phoneNumber && touched.phoneNumber && (
-                    <small className="text-red-600">{errors.phoneNumber}</small>
-                  )}
-                </div>
-              </div>
-              <div className="flex justify-center items-center gap-1">
-                <div className="w-4 h-[1px] bg-gray-600"></div>
-                <p className="whitespace-nowrap dark:text-gray-200">
-                  User Account
-                </p>
-                <div className="w-full h-[1px] bg-gray-600"></div>
-              </div>
+            const handleGenderChange = (value) => {
+              console.log("value", value);
+              setFieldValue("genderId", value);
+            };
 
-              <div className="grid grid-cols-2 lg:grid-cols-1 gap-x-10 gap-5 px-5">
-                <div>
-                  <Label className="flex gap-2 mb-2">
-                    <IoMailOutline />
-                    Email <span className="text-red-600">*</span>
-                  </Label>
-                  <TextInput
-                    placeholder="Enter email"
-                    style={{
-                      backgroundColor: mode === "dark" ? "#1f2937" : "",
-                      color: mode === "dark" ? "white" : "",
-                    }}
-                    type="email"
-                    name="email"
-                    id="email"
-                    autoComplete="off"
-                    value={values.email}
-                    onChange={onFieldChange}
-                    onBlur={handleBlur}
-                    color={
-                      errors.email && touched.email ? "failure" : "default"
-                    }
-                  />
-                  {errors.email && touched.email && (
-                    <small className="text-red-600">{errors.email}</small>
-                  )}
-                </div>
-                <div ref={dropdownRef}>
-                  <Label htmlFor="roles" className="flex gap-2 mb-2">
-                    <GrUserAdmin />
-                    Roles <span className="text-red-600">*</span>
-                  </Label>
-                  <div className="relative">
-                    <div
-                      onClick={handleToggleRoleCbo}
-                      className={`flex justify-between text-sm cursor-pointer dark:bg-gray-800 items-center border border-gray-500 dark:border-gray-500 px-2 py-[0.60rem] rounded-lg text-gray-800 dark:text-gray-200 ${
-                        errors.roleName && "border-red-600 text-red-600"
-                      }`}
-                    >
-                      {rolesPlaceHolder} <IoIosArrowDown className="text-xl" />
-                    </div>
+            const handleIsVerifiedChange = (event) => {
+              setFieldValue("isVerified", event.target.checked);
+            };
+
+            return (
+              <Form className="pb-8">
+                <Grid2 container spacing={3}>
+                  <Grid2 size={{ xs: 12, md: 4 }}>
                     <Card
-                      theme={Cardtheme}
-                      className={`w-full absolute top-0 left-0 bg-gray-50 z-10 ${
-                        cboRolesToggle ? "flex" : "hidden"
-                      }`}
+                      sx={{
+                        ...cardStyle,
+                      }}
+                      className=" gap-5 pt-[80px] px-[24px] pb-[40px] "
                     >
-                      {Object.values(ROLES).map((role) => (
-                        <div
-                          key={role}
-                          className="flex items-center gap-2 py-2 hover:bg-gray-200 cursor-pointer px-5"
-                        >
-                          <Checkbox
-                            id={role}
-                            name="roleName"
-                            value={role}
-                            checked={values.roleName.includes(role)}
-                            onChange={() => onRoleNameChanged(role)}
-                          />
-                          <Label htmlFor={role} className="ml-2">
-                            {role}
-                          </Label>
+                      <div className="flex justify-center items-center flex-col gap-5">
+                        <ProfileUploadComponent
+                          setProfileImageFile={setProfileImageFile}
+                          profileImageFile={profileImageFile}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between gap-7 mt-5">
+                        <div className="flex flex-col gap-2">
+                          <Typography
+                            variant="body1"
+                            sx={{ fontWeight: "500" }}
+                          >
+                            {t("emailVerified")}
+                          </Typography>
+                          <Typography variant="body2">
+                            {t(
+                              "disabling-this-will-automatically-send-the-user-a-verification-email"
+                            )}
+                          </Typography>
                         </div>
-                      ))}
-                      <div className="w-full  flex justify-end items-center border-t border-t-gray-400 p-2">
-                        <Button
-                          className="bg-gray-200 text-gray-800 ring-transparent hover:bg-gray-300"
-                          onClick={handleDoneButtonClick}
-                        >
-                          Done
-                        </Button>
+                        <AntSwitch
+                          checked={values.isVerified}
+                          onChange={handleIsVerifiedChange}
+                          inputProps={{ "aria-label": "ant design" }}
+                        />
                       </div>
                     </Card>
-                  </div>
-                  {errors.roleName && (
-                    <small className="text-red-600">{errors.roleName}</small>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="roles" className="flex gap-2 mb-2">
-                    <TbAccessibleOff />
-                    Disabled
-                  </Label>
-                  <ToggleSwitch
-                    checked={values.isDisabled}
-                    name="isDisabled"
-                    onChange={() => {
-                      const newValue = !values.isDisabled;
-                      setFieldValue("isDisabled", newValue);
-                      setIsDataChanged(
-                        checkDataChanged({ ...values, isDisabled: newValue })
-                      );
-                    }}
-                    color="success"
-                    theme={toggleTheme}
-                  />
-                </div>
-              </div>
-              <div className="flex gap-4 px-5">
-                <Button
-                  className="bg-transparent focus:ring-0 border border-primary hover:bg-gray-200 text-primary dark:text-gray-50"
-                  onClick={handleBtnBackClicked}
-                >
-                  <IoReturnDownBackOutline className="mr-2" />
-                  Back
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-primary hover:bg-primary-hover focus:ring-0 w-24"
-                  title="Save"
-                  disabled={isLoading || !isDataChanged}
-                >
-                  {isLoading ? (
-                    <Spinner color="purple" aria-label="loading" size="xs" />
-                  ) : (
-                    <>
-                      <PiArrowsCounterClockwise className="mr-2" />
-                      Update
-                    </>
-                  )}
-                </Button>
-              </div>
-            </Form>
-          );
-        }}
-      </Formik>
-    </>
-  );
+                  </Grid2>
+
+                  <Grid2 size={{ xs: 12, md: 8 }}>
+                    <Card
+                      sx={{
+                        ...cardStyle,
+                        padding: "24px",
+                      }}
+                      className="flex-auto w-full"
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <TextField
+                          label={t("fullName")}
+                          variant="outlined"
+                          sx={{
+                            "& .MuiInputBase-input": {
+                              boxShadow: "none",
+                            },
+                            borderRadius: "6px",
+                          }}
+                          type="text"
+                          id="fullName"
+                          name="fullName"
+                          fullWidth
+                          value={values.fullName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          autoComplete="off"
+                          error={errors.fullName && touched.fullName}
+                          helperText={
+                            errors.fullName && touched.fullName
+                              ? errors.fullName
+                              : null
+                          }
+                          size="medium"
+                        />
+
+                        <TextField
+                          label={t("email")}
+                          variant="outlined"
+                          sx={{
+                            "& .MuiInputBase-input": {
+                              boxShadow: "none",
+                            },
+                            borderRadius: "6px",
+                          }}
+                          type="email"
+                          id="email"
+                          name="email"
+                          fullWidth
+                          value={values.email}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          autoComplete="off"
+                          error={errors.email && touched.email}
+                          helperText={
+                            errors.email && touched.email ? errors.email : null
+                          }
+                          size="medium"
+                        />
+
+                        <SelectSingleComponent
+                          label={t("gender")}
+                          options={genderFetched.data}
+                          onChange={handleGenderChange}
+                          fullWidth={true}
+                          error={errors.genderId}
+                          touched={touched.genderId}
+                          optionLabelKey="gender"
+                          selectFistValue={values.genderId}
+                        />
+
+                        <TextField
+                          label={`${t("address")} (${t("optional")})`}
+                          variant="outlined"
+                          sx={{
+                            "& .MuiInputBase-input": {
+                              boxShadow: "none",
+                            },
+                            borderRadius: "6px",
+                          }}
+                          type="text"
+                          id="address"
+                          name="address"
+                          fullWidth
+                          value={values.address}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          autoComplete="off"
+                          error={errors.address && touched.address}
+                          helperText={
+                            errors.address && touched.address
+                              ? errors.address
+                              : null
+                          }
+                          size="medium"
+                        />
+
+                        <TextField
+                          label={t("phoneNumber")}
+                          variant="outlined"
+                          sx={{
+                            "& .MuiInputBase-input": {
+                              boxShadow: "none",
+                            },
+                            borderRadius: "6px",
+                          }}
+                          type="text"
+                          id="phoneNumber"
+                          name="phoneNumber"
+                          fullWidth
+                          value={values.phoneNumber}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          autoComplete="off"
+                          error={errors.phoneNumber && touched.phoneNumber}
+                          helperText={
+                            errors.phoneNumber && touched.phoneNumber
+                              ? errors.phoneNumber
+                              : null
+                          }
+                          size="medium"
+                        />
+
+                        <FormControl
+                          sx={{ width: "100%" }}
+                          variant="outlined"
+                          size="medium"
+                          error={errors.dateOfBirth && touched.dateOfBirth}
+                        >
+                          <DatePicker
+                            sx={{
+                              "& .MuiInputBase-input": {
+                                boxShadow: "none",
+                              },
+                              ...(errorDateOfBirth && {
+                                "& .MuiOutlinedInput-notchedOutline": {
+                                  borderColor: "#f44336",
+                                  color: "white",
+                                },
+                              }),
+                              "& .MuiInputLabel-root ": {
+                                ...(errorDateOfBirth && { color: "#f44336" }),
+                              },
+                            }}
+                            label={t("dateOfBirth")}
+                            value={values.dateOfBirth}
+                            id="dateOfBirth"
+                            name="dateOfBirth"
+                            onChange={(value) => {
+                              setFieldValue("dateOfBirth", value);
+                            }}
+                            format="DD-MM-YYYY"
+                          />
+                          <FormHelperText>
+                            {errors.dateOfBirth && touched.dateOfBirth
+                              ? errors.dateOfBirth
+                              : null}
+                          </FormHelperText>
+                        </FormControl>
+
+                        <FormControl
+                          sx={{ width: "100%" }}
+                          variant="outlined"
+                          size="medium"
+                          error={errors.password && touched.password}
+                        >
+                          <InputLabel htmlFor="password">
+                            {t("password")}
+                          </InputLabel>
+                          <OutlinedInput
+                            sx={{
+                              "& .MuiInputBase-input": {
+                                boxShadow: "none",
+                              },
+                              borderRadius: "6px",
+                            }}
+                            id="password"
+                            name="password"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            autoComplete="off"
+                            value={values.password}
+                            type={showPassword ? "text" : "password"}
+                            endAdornment={
+                              <InputAdornment position="end">
+                                <IconButton
+                                  aria-label={
+                                    showPassword
+                                      ? "hide the password"
+                                      : "display the password"
+                                  }
+                                  onClick={handleClickShowPassword}
+                                  onMouseDown={handleMouseDownPassword}
+                                  onMouseUp={handleMouseUpPassword}
+                                  edge="end"
+                                >
+                                  {showPassword ? <IoEye /> : <IoEyeOff />}
+                                </IconButton>
+                              </InputAdornment>
+                            }
+                            label="Password"
+                          />
+                          <FormHelperText>
+                            {errors.password && touched.password
+                              ? errors.password
+                              : null}
+                          </FormHelperText>
+                        </FormControl>
+
+                        <FormControl
+                          sx={{ width: "100%" }}
+                          variant="outlined"
+                          size="medium"
+                          error={
+                            errors.confirmPassword && touched.confirmPassword
+                          }
+                        >
+                          <InputLabel htmlFor="confirmPassword">
+                            {t("confirmPassword")}
+                          </InputLabel>
+                          <OutlinedInput
+                            sx={{
+                              "& .MuiInputBase-input": {
+                                boxShadow: "none",
+                              },
+                              borderRadius: "6px",
+                            }}
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            autoComplete="off"
+                            value={values.confirmPassword}
+                            type={showConfirmPassword ? "text" : "password"}
+                            endAdornment={
+                              <InputAdornment position="end">
+                                <IconButton
+                                  aria-label={
+                                    showConfirmPassword
+                                      ? "hide the confirmPassword"
+                                      : "display the confirmPassword"
+                                  }
+                                  onClick={handleClickShowConfirmPassword}
+                                  onMouseDown={handleMouseDownConfirmPassword}
+                                  onMouseUp={handleMouseUpConfirmPassword}
+                                  edge="end"
+                                >
+                                  {showConfirmPassword ? (
+                                    <IoEye />
+                                  ) : (
+                                    <IoEyeOff />
+                                  )}
+                                </IconButton>
+                              </InputAdornment>
+                            }
+                            label="Confirm Password"
+                          />
+                          <FormHelperText>
+                            {errors.confirmPassword && touched.confirmPassword
+                              ? errors.confirmPassword
+                              : null}
+                          </FormHelperText>
+                        </FormControl>
+
+                        {isManager && (
+                          <SelectComponent
+                            label={t("role")}
+                            options={rolesFetched.data}
+                            onChange={handleRoleChange}
+                            fullWidth={true}
+                            error={errors.roleId}
+                            touched={touched.roleId}
+                            optionLabelKey="name"
+                          />
+                        )}
+
+                        {isManager && (
+                          <SelectComponent
+                            label={t("branch")}
+                            options={companyData.data}
+                            onChange={handleBranchChange}
+                            fullWidth={true}
+                            error={errors.roleId}
+                            touched={touched.roleId}
+                            itemsLabelKey="sites"
+                            optionLabelKey="siteName"
+                            groupLabelKey="companyName"
+                          />
+                        )}
+                      </div>
+
+                      <div className="col-span-2 flex justify-end mt-[20px]">
+                        <ButtonComponent
+                          btnTitle={t("saveChanges")}
+                          type={"submit"}
+                          loadingCaption={t("pleaseWait")}
+                          isLoading={isLoadingUpdateUser}
+                        />
+                      </div>
+                    </Card>
+                  </Grid2>
+                </Grid2>
+              </Form>
+            );
+          }}
+        </Formik>
+      </div>
+    );
+  }
 
   return content;
 }

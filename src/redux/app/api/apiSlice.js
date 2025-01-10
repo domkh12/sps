@@ -26,9 +26,9 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 
   let result = await baseQuery(args, api, extraOptions);
 
-  console.log(result);
+  console.log("result", result);
   // handle other status code:
-  if (result?.error?.status === "FETCH_ERROR") {
+  if (result?.error?.status === 401) {
     console.log("sending refresh token");
 
     // send refresh token to get new access token
@@ -65,6 +65,7 @@ export const apiSlice = createApi({
     "ParkingDetail",
     "Role",
     "SignUpMethod",
+    "Site"
   ],
   endpoints: (builder) => ({}),
 });

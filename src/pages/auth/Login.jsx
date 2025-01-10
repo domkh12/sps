@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
   useLoginMutation,
   useSendLogoutMutation,
   useVerify2FALoginMutation,
+  useVerifySitesMutation,
 } from "../../redux/feature/auth/authApiSlice";
 import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
-import { Helmet } from "react-helmet-async";
 import { jwtDecode } from "jwt-decode";
 import LoadingButton from "@mui/lab/LoadingButton";
 
@@ -19,10 +19,7 @@ import {
   Button,
   Card,
   CardContent,
-  Checkbox,
-  Collapse,
   FormControl,
-  FormControlLabel,
   FormHelperText,
   Grid2,
   IconButton,
@@ -34,48 +31,42 @@ import {
 } from "@mui/material";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { setUuid } from "../../redux/feature/users/userSlice";
-import { useFindUserByUuidMutation } from "../../redux/feature/users/userApiSlice";
 import LogoComponent from "../../components/LogoComponent";
 import TranslateComponent from "../../components/TranslateComponent";
 import SettingComponent from "../../components/SettingComponent";
 import useTranslate from "../../hook/useTranslate";
+import usePersist from "../../hook/usePersist";
+import SelectSingleComponent from "../../components/SelectSingleComponent";
+import { ROLES } from "../../config/roles";
+import SeoComponent from "../../components/SeoComponent";
+import { useGetSitesListMutation } from "../../redux/feature/site/siteApiSlice";
 
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [toggleEye, setToggleEye] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [open, setOpen] = useState(false);
   const [token, setToken] = useState("");
   const [step, setStep] = useState(1);
+  const [persist, setPersist] = usePersist();
+  const [rememberMe, setRememberMe] = useState(
+    localStorage.getItem("isRemember")
+  );
+  const [sitesUuid, setSitesUuid] = useState([]);
   const { t } = useTranslate();
-
-  const [
-    findUserByUuid,
-    { isSuccess: isFindUserByUuidSuccess, isLoading: isFindUserByUuidLoading },
-  ] = useFindUserByUuidMutation();
   const [login, { isSuccess, isLoading }] = useLoginMutation();
+  const [brachCount, setBranchCount] = useState(0);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => {
-        setOpen(false);
-      }, 3000);
-    }
-  }, [open]);
-  const closeAlert = () => {
-    setErrorMessage(null);
-  };
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
-  const handleMouseUpPassword = (event) => {
-    event.preventDefault();
-  };
+  const [
+    getSitesList,
+    {
+      isSuccess: isGetSitesSuccess,
+      isLoading: isGetSitesLoading,
+      isError: isGetSitesError,
+      error: errorGetSites,
+    },
+  ] = useGetSitesListMutation();
 
   const [
     verify2FALogin,
@@ -87,14 +78,46 @@ export default function Login() {
   ] = useVerify2FALoginMutation();
 
   const [
+    verifySites,
+    {
+      isSuccess: isVerifySiteSuccess,
+      isLoading: isVerifySiteLoading,
+      isError: isVerifySiteError,
+      error: errorVerifySite,
+    },
+  ] = useVerifySitesMutation();
+
+  const [
     sendLogout,
     { isSuccess: isLogoutSuccess, isLoading: isLoadingLogout, isError, error },
   ] = useSendLogoutMutation();
 
   const handleLogout = () => sendLogout();
 
+  useEffect(() => {
+    if (rememberMe) {
+      navigate("/dash");
+    }
+  }, [rememberMe]);
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        setOpen(false);
+      }, 3000);
+    }
+  }, [open]);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (event) => {
+    event.preventDefault();
+  };
+
   const validationSchema = Yup.object().shape({
-    email: Yup.string().email().required(t("required")),
+    email: Yup.string().email(t("emailNotValid")).required(t("required")),
     password: Yup.string().required(t("noPasswordProvided")),
   });
 
@@ -105,8 +128,14 @@ export default function Login() {
   });
 
   useEffect(() => {
-    if (isVerify2FASuccess) {
+    if (isVerifySiteSuccess) {
       navigate("/dash");
+    }
+  }, [isVerifySiteSuccess]);
+
+  useEffect(() => {
+    if (isVerify2FASuccess) {
+      setStep(3);
     }
   }, [isVerify2FASuccess]);
 
@@ -129,7 +158,19 @@ export default function Login() {
     try {
       console.log(values);
       const { code } = values;
-      await verify2FALogin({ code, token });
+      await verify2FALogin({ uuid });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleSubmitSite = async (values) => {
+    try {
+      await verifySites({
+        uuid: values.siteUuid,
+        token: token,
+      });
+      localStorage.setItem("isRemember", "true");
     } catch (err) {
       console.log(err);
     }
@@ -137,13 +178,15 @@ export default function Login() {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
+      setPersist(true);
       const { accessToken } = await login({
         email: values.email,
         password: values.password,
       }).unwrap();
 
       const decoded = jwtDecode(accessToken);
-      const { jti: email, scope, uuid, isEnabledTwoFA } = decoded;
+      const { jti: email, scope, uuid, isEnabledTwoFA, sites } = decoded;
+
       const roles = scope ? scope.split(" ") : [];
 
       if (isEnabledTwoFA) {
@@ -151,28 +194,43 @@ export default function Login() {
         setToken(accessToken);
         handleLogout();
         resetForm({ values: { code: "" } });
-      } else {
-        dispatch(setUuid(uuid));
-        navigate("/dash");
-        dispatch(setUuid(uuid));
-      }
-
-      if (!roles.includes("ROLE_ADMIN")) {
-        toast.error(
-          "You don't have permission to access this feature. Please contact an administrator.",
-          {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
+        localStorage.setItem("isRemember", "true");
+      } else if (sites && sites?.length > 1) {
+        if (roles.includes(ROLES.ROLE_ADMIN)) {
+          try {
+            const response = await getSitesList().unwrap();
+            setBranchCount(response.length);
+            setSitesUuid(response);
+            setStep(3);
+            setToken(accessToken);
+            handleLogout();
+            resetForm({ values: { uuid: "" } });
+          } catch (err) {
+            console.log(err);
           }
-        );
-        handleLogout();
-        return;
+        }
+      } else if (sites && sites?.length === 1) {
+        if (roles.includes(ROLES.ROLE_ADMIN)) {
+          try {
+            await verifySites({ uuid: sites });
+            dispatch(setUuid(uuid));
+            localStorage.setItem("isRemember", "true");
+            navigate("/dash");
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      } else if (sites) {
+        if (roles.includes(ROLES.ROLE_MANAGER)) {
+          try {
+            await verifySites({ uuid: sites });
+            dispatch(setUuid(uuid));
+            localStorage.setItem("isRemember", "true");
+            navigate("/dash");
+          } catch (err) {
+            console.log(err);
+          }
+        }
       }
     } catch (error) {
       console.log(error);
@@ -196,13 +254,22 @@ export default function Login() {
     }
   };
 
-  const content = (
-    <>
-      <Helmet>
-        <title>Login</title>
-      </Helmet>
+  let content;
 
-      {step === 1 ? (
+  if (step === 1) {
+    content = (
+      <>
+        <SeoComponent title="Login" />
+        <nav className="fixed top-0 left-0 w-full bg-white bg-opacity-5 lg:bg-opacity-0 z-20 backdrop-blur-3xl lg:backdrop-blur-0">
+          <div className="flex justify-between items-center xxs:flex-nowrap flex-wrap">
+            <LogoComponent />
+            <div className="pr-[20px] flex gap-[16px]  items-center">
+              <TranslateComponent />
+              <SettingComponent />
+            </div>
+          </div>
+        </nav>
+
         <Box
           component="div"
           sx={{
@@ -218,29 +285,14 @@ export default function Login() {
           >
             {({ values, touched, errors, handleChange, handleBlur }) => (
               <Form>
-                <nav className="fixed top-0 left-0 w-full">
-                  <div className="flex justify-between items-center xxs:flex-nowrap flex-wrap">
-                    <LogoComponent />
-                    <div className="pr-[20px] flex gap-[16px]  items-center">
-                      <TranslateComponent />
-                      <SettingComponent />
-                    </div>
-                  </div>
-                </nav>
                 <section className="flex h-screen">
                   <div className="h-screen shrink-0 w-[480px] hidden lg:block bg-[#f5f5f5]">
                     <div className="px-[20px] h-full text-center flex justify-center items-center flex-col">
-                      <Typography
-                        variant="h1"
-                        
-                        sx={{ fontWeight: "500", mb: 2, fontSize: "28px" }}
-                      >
-                        {t("welcomeBack")}
-                      </Typography>
-                      <Typography variant="h2" sx={{ mb: 2, fontSize:"18px" }}>
-                        {t("readyToTakeControlOfYourParkingSpaces")}
-                      </Typography>
-                      <img src="/images/login_image.png" alt="login_image" />
+                      <img
+                        src="/images/login_image.png"
+                        alt="login_image"
+                        className="w-full h-auto"
+                      />
                     </div>
                   </div>
                   <Box
@@ -340,23 +392,6 @@ export default function Login() {
                         </FormHelperText>
                       </FormControl>
 
-                      <FormControlLabel
-                        sx={{ mb: 2 }}
-                        control={
-                          <Checkbox
-                            sx={{ py: 0 }}
-                            onChange={(event) => {
-                              localStorage.setItem(
-                                "isRemember",
-                                event.target.checked.toString()
-                              );
-                            }}
-                            disableRipple
-                          />
-                        }
-                        label={t("rememberMe")}
-                      />
-
                       <LoadingButton
                         variant="contained"
                         size="large"
@@ -365,7 +400,7 @@ export default function Login() {
                           borderRadius: "6px",
                           mb: 2,
                         }}
-                        loading={isLoading || isFindUserByUuidLoading}
+                        loading={isLoading}
                         type="submit"
                         loadingIndicator="Logging..."
                         className="w-full "
@@ -379,7 +414,8 @@ export default function Login() {
                         onClick={() =>
                           (window.location.href = `${
                             import.meta.env.VITE_API_BACKEND_URL
-                          }/oauth2/authorization/azure`)
+                          }/import SeoComponent from './../../components/SeoComponent';
+oauth2/authorization/azure`)
                         }
                       >
                         <svg
@@ -406,94 +442,210 @@ export default function Login() {
             )}
           </Formik>
         </Box>
-      ) : (
-        <Formik
-          initialValues={{ code: "" }}
-          validationSchema={validationSchemaForVerifyForm}
-          onSubmit={handleSubmiteVerifyCode}
-        >
-          {({ values, touched, errors, handleChange, handleBlur }) => (
-            <Form className="grid grid-cols-12 md:grid-cols-1 grid-flow-row justify-center items-center min-h-screen gap-10">
-              <section className="md:hidden col-start-2 col-end-6">
-                <img src="/images/login.svg" alt="login_image" />
-              </section>
-              <hr className="w-1 h-[30rem] bg-primary col-span-1 mx-auto md:hidden" />
-              <Card
-                sx={{ maxWidth: "100%" }}
-                className="col-start-7 col-end-12 md:col-span-12"
-              >
-                <CardContent>
-                  <div className="flex gap-5 items-center justify-start mb-3">
-                    <div className="col-span-2 row-span-2">
-                      <img
-                        src="/images/logo.png"
-                        alt="logo"
-                        width={50}
-                        height={50}
-                      />
-                    </div>
-                    <Grid2 container>
-                      <Grid2
-                        size={12}
-                        className="font-semibold subpixel-antialiased tracking-wide text-nowrap text-clamp truncate col-span-10"
-                      >
-                        ប្រព័ន្ធចតរថយន្តឆ្លាតវៃ
-                      </Grid2>
-                      <Grid2
-                        size={12}
-                        className="subpixel-antialiased text-nowrap text-clampSmall col-start-3 col-end-13 row-start-2 truncate"
-                      >
-                        Smart Parking System
-                      </Grid2>
-                    </Grid2>
-                  </div>
-
-                  <div className="flex flex-col gap-5">
-                    <TextField
-                      label="Verificaiton Code"
-                      variant="outlined"
-                      sx={{
-                        "& .MuiInputBase-input": {
-                          boxShadow: "none",
-                        },
-                      }}
-                      type="text"
-                      id="code"
-                      name="code"
-                      // autoFocus
-                      fullWidth
-                      value={values.code}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      autoComplete="off"
-                      error={errors.code && touched.code}
-                      helperText={
-                        errors.code && touched.code ? errors.code : null
-                      }
-                      size="medium"
+      </>
+    );
+  } else if (step === 2) {
+    content = (
+      <Formik
+        initialValues={{ code: "" }}
+        validationSchema={validationSchemaForVerifyForm}
+        onSubmit={handleSubmiteVerifyCode}
+      >
+        {({ values, touched, errors, handleChange, handleBlur }) => (
+          <Form className="grid grid-cols-12 md:grid-cols-1 grid-flow-row justify-center items-center min-h-screen gap-10">
+            <section className="md:hidden col-start-2 col-end-6">
+              <img src="/images/login.svg" alt="login_image" />
+            </section>
+            <hr className="w-1 h-[30rem] bg-primary col-span-1 mx-auto md:hidden" />
+            <Card
+              sx={{ maxWidth: "100%" }}
+              className="col-start-7 col-end-12 md:col-span-12"
+            >
+              <CardContent>
+                <div className="flex gap-5 items-center justify-start mb-3">
+                  <div className="col-span-2 row-span-2">
+                    <img
+                      src="/images/logo.png"
+                      alt="logo"
+                      width={50}
+                      height={50}
                     />
-
-                    <LoadingButton
-                      variant="contained"
-                      size="large"
-                      sx={{
-                        textTransform: "none",
-                      }}
-                      loading={isVerify2FALoading}
-                      type="submit"
-                      className="bg-primary w-full hover:bg-primary-hover"
-                    >
-                      Verify
-                    </LoadingButton>
                   </div>
-                </CardContent>
-              </Card>
-            </Form>
-          )}
-        </Formik>
-      )}
-    </>
-  );
+                  <Grid2 container>
+                    <Grid2
+                      size={12}
+                      className="font-semibold subpixel-antialiased tracking-wide text-nowrap text-clamp truncate col-span-10"
+                    >
+                      ប្រព័ន្ធចតរថយន្តឆ្លាតវៃ
+                    </Grid2>
+                    <Grid2
+                      size={12}
+                      className="subpixel-antialiased text-nowrap text-clampSmall col-start-3 col-end-13 row-start-2 truncate"
+                    >
+                      Smart Parking System
+                    </Grid2>
+                  </Grid2>
+                </div>
+
+                <div className="flex flex-col gap-5">
+                  <TextField
+                    label="Verificaiton Code"
+                    variant="outlined"
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        boxShadow: "none",
+                      },
+                    }}
+                    type="text"
+                    id="code"
+                    name="code"
+                    // autoFocus
+                    fullWidth
+                    value={values.code}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    autoComplete="off"
+                    error={errors.code && touched.code}
+                    helperText={
+                      errors.code && touched.code ? errors.code : null
+                    }
+                    size="medium"
+                  />
+
+                  <LoadingButton
+                    variant="contained"
+                    size="large"
+                    sx={{
+                      textTransform: "none",
+                    }}
+                    loading={isVerify2FALoading}
+                    type="submit"
+                    className="bg-primary w-full hover:bg-primary-hover"
+                  >
+                    Verify
+                  </LoadingButton>
+                </div>
+              </CardContent>
+            </Card>
+          </Form>
+        )}
+      </Formik>
+    );
+  } else if (step === 3) {
+    content = (
+      <>
+        <SeoComponent title="Select a branch" />
+        <nav className="fixed top-0 left-0 w-full bg-white bg-opacity-5 lg:bg-opacity-0 z-20 backdrop-blur-3xl lg:backdrop-blur-0">
+          <div className="flex justify-between items-center xxs:flex-nowrap flex-wrap">
+            <LogoComponent />
+            <div className="pr-[20px] flex gap-[16px]  items-center">
+              <TranslateComponent />
+              <SettingComponent />
+            </div>
+          </div>
+        </nav>
+
+        <Box
+          component="div"
+          sx={{
+            bgcolor: "background.default",
+            color: "text.primary",
+            height: "100%",
+          }}
+        >
+          <Formik
+            initialValues={{ siteUuid: "" }}
+            // validationSchema={validationSchema}
+            onSubmit={handleSubmitSite}
+          >
+            {({
+              values,
+              touched,
+              errors,
+              handleChange,
+              handleBlur,
+              setFieldValue,
+            }) => {
+              const handleSiteChange = (value) => {
+                console.log("value", value);
+                setFieldValue("siteUuid", value);
+              };
+              return (
+                <Form>
+                  <section className="flex h-screen">
+                    <div className="h-screen shrink-0 w-[480px] hidden lg:block bg-[#f5f5f5]">
+                      <div className="px-[20px] h-full text-center flex justify-center items-center flex-col">
+                        <img
+                          src="/images/login_image.png"
+                          alt="login_image"
+                          className="w-full h-auto"
+                        />
+                      </div>
+                    </div>
+                    <Box
+                      sx={{
+                        width: "100%",
+                        px: "20px",
+                        py: 15,
+                      }}
+                      className="flex flex-col justify-start items-center lg:justify-center"
+                    >
+                      <Box
+                        sx={{ maxWidth: "500px" }}
+                        className="w-full flex flex-col justify-center items-center"
+                      >
+                        <img
+                          src="/images/building.png"
+                          alt="branch_image"
+                          className="w-20 h-auto mb-5"
+                        />
+                        <Typography variant="h6" sx={{ mb: "30px" }}>
+                          {t("selectBranch")}
+                        </Typography>
+                        <Typography variant="body1" color="gray">
+                          {t("your-account-have")} {brachCount}{" "}
+                          {t("branch-to-select")}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          sx={{ mb: "30px" }}
+                          color="gray"
+                        >
+                          {t("please-select-branch")}
+                        </Typography>
+                        <SelectSingleComponent
+                          label={t("Select-branch")}
+                          fullWidth={true}
+                          options={sitesUuid}
+                          optionLabelKey="siteName"
+                          onChange={handleSiteChange}
+                        />
+                        <LoadingButton
+                          variant="contained"
+                          size="large"
+                          sx={{
+                            textTransform: "none",
+                            borderRadius: "6px",
+                            mt: 2,
+                          }}
+                          loading={isVerifySiteLoading}
+                          type="submit"
+                          loadingIndicator={t("choosing")}
+                          className="w-full "
+                        >
+                          {t("select")}
+                        </LoadingButton>
+                      </Box>
+                    </Box>
+                  </section>
+                </Form>
+              );
+            }}
+          </Formik>
+        </Box>
+      </>
+    );
+  }
 
   return content;
 }

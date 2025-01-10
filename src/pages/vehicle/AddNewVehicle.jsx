@@ -29,7 +29,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectAllFullNameUsers,
   useAddNewUserMutation,
-  useFindUserByUuidMutation,
+  useFindUserByUuidQuery,
   useUpdateUserMutation,
 } from "../../redux/feature/users/userApiSlice";
 import { useEffect, useRef, useState } from "react";
@@ -43,7 +43,6 @@ import { useAddNewVehicleMutation } from "../../redux/feature/vehicles/vehicleAp
 import { toast } from "react-toastify";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { IoIosArrowDown, IoMdSearch } from "react-icons/io";
-import { HiOutlineExclamationCircle } from "react-icons/hi";
 import {
   Cardtheme,
   spinnerTheme,
@@ -63,7 +62,7 @@ function AddNewVehicle() {
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const { mode } = useThemeMode();
-  const usersState = useSelector((state) => selectAllFullNameUsers(state));
+  // const usersState = useSelector((state) => selectAllFullNameUsers(state));
   const vehicleTypes = useSelector((state) => selectAllVehicleTypes(state));
   const [toggleOwner, setToggleOwner] = useState(false);
   const [toggleVehicleType, setToggleVehicleType] = useState(false);
@@ -129,11 +128,6 @@ function AddNewVehicle() {
       error: errorUpdatedUser,
     },
   ] = useUpdateUserMutation();
-
-  const [
-    findByUuid,
-    { isSuccess: isSuccessFindUserByUuid, isLoading: isLoadingFindUserByUuid },
-  ] = useFindUserByUuidMutation();
 
   const [
     addNewVehicleType,

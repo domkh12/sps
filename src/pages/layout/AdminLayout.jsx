@@ -7,53 +7,58 @@ import {
   setIsPaginationSuccess,
   setIsScrolling,
 } from "../../redux/feature/actions/actionSlice";
-import {
-  useConnectedUserMutation,
-  useFindUserByUuidMutation,
-} from "../../redux/feature/users/userApiSlice";
-import { selectCurrentToken } from "../../redux/feature/auth/authSlice";
+import { useConnectedUserMutation } from "../../redux/feature/users/userApiSlice";
 import useWebSocket from "../../hook/useWebSocket";
-import { STATUS } from "../../config/status";
-import {
-  setIsLoadingUser,
-  setUserActive,
-} from "../../redux/feature/users/userSlice";
-import { Grid2 } from "@mui/material";
+import { setIsOnlineUser } from "../../redux/feature/users/userSlice";
+import SnackBarComponent from "../../components/SnackBarComponent";
+import { DESTINATION } from "../../config/destination";
+import { useGetUserProfileMutation } from "../../redux/feature/auth/authApiSlice";
+import LoadingFetchingDataComponent from "./../../components/LoadingFetchingDataComponent";
+import { setSites, setSitesForChange } from "../../redux/feature/site/siteSlice";
+import { useGetSitesListMutation } from "../../redux/feature/site/siteApiSlice";
 
 function AdminLayout() {
   const isPaginationSuccess = useSelector(
     (state) => state.action.isPaginationSuccess
   );
-  const userUuid = useSelector((state) => state.users.uuid);
+  const user = useSelector((state) => state.users.user);
   const mainContentRef = useRef(null);
   const dispatch = useDispatch();
   const [scrolling, setScrolling] = useState();
-  const dynamicDestination = `/topic/online-status`;
-
-  const { loading, error, messages } = useWebSocket(dynamicDestination);
-
-  const [connectedUser, { isSuccess: isSuccessConnectUser }] =
-    useConnectedUserMutation();
+  const { loading, error, messages } = useWebSocket(DESTINATION.isOnline);
+  const isErrorSnackbar = useSelector((state) => state.action.isErrorSnackbar);
+  const isLoadingSnackbar = useSelector(
+    (state) => state.action.isLoadingSnackbar
+  );
+  const changedSite = useSelector((state) => state.sites.changedSite);
+  const isOpenSnackBar = useSelector((state) => state.action.isOpenSnackBar);
+  const captionSnackBar = useSelector((state) => state.action.captionSnackBar);
 
   const [
-    findUserByUuid,
-    { isSuccess: isFindUserByUuidSuccess, isLoading: isFindUserByUuidLoading },
-  ] = useFindUserByUuidMutation();
+    getSitesList,
+    {
+      isSuccess: isGetSitesSuccess,
+      isLoading: isGetSitesLoading,
+      isError: isGetSitesError,
+      error: errorGetSites,
+    },
+  ] = useGetSitesListMutation();
+
+  const [
+    connectedUser,
+    { isSuccess: isSuccessConnectUser, isLoading: isLoadingConnectUser },
+  ] = useConnectedUserMutation();
+
+  const [
+    getUserProfile,
+    { isSuccess: isSuccessGetUserProfile, isLoading: isLoadingGetUserProfile },
+  ] = useGetUserProfileMutation();
 
   useEffect(() => {
     if (messages) {
-      dispatch(setUserActive(messages));
+      dispatch(setIsOnlineUser(messages));
     }
   }, [messages]);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      if (userUuid) {
-        await findUserByUuid(userUuid);
-      }
-    };
-    fetchUser();
-  }, [userUuid]);
 
   useEffect(() => {
     if (isPaginationSuccess) {
@@ -66,11 +71,25 @@ function AdminLayout() {
   }, [isPaginationSuccess]);
 
   useEffect(() => {
-    const connectUser = async () => {
-      await connectedUser({ uuid: userUuid, isOnline: true });
-    };
+    if (isSuccessGetUserProfile) {
+      const connectUser = async () => {
+        await connectedUser({ uuid: user?.uuid, isOnline: true });
+      };
+      connectUser();
+    }
+  }, [isSuccessGetUserProfile]);
 
-    connectUser();
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      await getUserProfile();
+    };
+    const fetchSite = async () => {
+      const response = await getSitesList().unwrap();
+      console.log("response: ", response)
+      dispatch(setSitesForChange({ response }));
+    };
+    fetchSite();
+    fetchUserProfile();
 
     const handleScroll = () => {
       if (mainContentRef.current) {
@@ -83,57 +102,65 @@ function AdminLayout() {
       currentRef.addEventListener("scroll", handleScroll);
     }
 
+    const handleKeyDown = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "k") {
+        event.preventDefault();
+        alert("Search Text");
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
     return () => {
       if (currentRef) {
         currentRef.removeEventListener("scroll", handleScroll);
       }
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [dispatch]);
 
+  useEffect(() => {
+    if (changedSite) window.location.reload(true);
+  }, [changedSite]);
+  
   useEffect(() => {
     dispatch(setIsScrolling(scrolling));
   }, [scrolling]);
+
   let content;
 
-  useEffect(() => {
-    if (isFindUserByUuidLoading || loading) {
-      content = <div>Loading...</div>;
-      dispatch(setIsLoadingUser(true));
-    }
-  }, [isFindUserByUuidLoading]);
+  if (isLoadingGetUserProfile || loading || isLoadingConnectUser) {
+    content = <LoadingFetchingDataComponent />;
+  }
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
-        event.preventDefault(); // Prevent default browser behavior
-        alert('Search Text');
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
-  content = (
-    <div className="fixed top-0 left-0 w-full h-screen dark:bg-[#282828]">
-      <div className="flex h-full bg-white">
-        <SideBar />
-        {/* <main className="flex flex-grow h-full overflow-auto"> */}
-        <div className="flex-grow h-full overflow-auto">
-          <header className="sticky top-0 w-full z-20">
-            <NavBarDashboard />
-          </header>
-          <main ref={mainContentRef} className="xl:px-[40px] px-[20px] pt-[8px] pb-[64px]">
-            <Outlet />
-          </main>
+  if (isSuccessGetUserProfile || isSuccessConnectUser) {
+    content = (
+      <div className="fixed top-0 left-0 w-full h-screen dark:bg-[#282828]">
+        <div className="flex h-full bg-white">
+          <SideBar />
+          {/* <main className="flex flex-grow h-full overflow-auto"> */}
+          <div className="flex-grow h-full overflow-auto">
+            <header className="sticky top-0 w-full z-20">
+              <NavBarDashboard />
+            </header>
+            <main
+              ref={mainContentRef}
+              className="xl:px-[40px] px-[10px] sm:px-[20px] pt-[8px] pb-[64px] "
+            >
+              <Outlet />
+            </main>
+          </div>
+          {/* </main> */}
         </div>
-        {/* </main> */}
+        <SnackBarComponent
+          isError={isErrorSnackbar}
+          isLoading={isLoadingSnackbar}
+          caption={captionSnackBar}
+          isOpen={isOpenSnackBar}
+        />
       </div>
-    </div>
-  );
+    );
+  }
 
   return content;
 }

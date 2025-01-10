@@ -21,7 +21,7 @@ export const listItemButtonStyle = {
 export const cardStyle = {
   "&.MuiCard-root": {
     borderRadius: "14px",
-    boxShadow: "0px 0px 5px 1px rgba(0,0,0,0.1)",
+    boxShadow: "rgba(0, 0, 0, 0.1) 0px 4px 12px",
   },
 };
 
@@ -76,4 +76,18 @@ export const toolTipStyle = {
       },
     },
   },
+};
+
+export const buttonStyleContained = {
+  textTransform: "none",
+  borderRadius: "10px",
+  boxShadow: "none",
+  ":hover": { boxShadow: "none", backgroundColor: "#333333" },
+};
+
+export const buttonStyleOutlined = {
+  border: "1px solid gray",
+  borderRadius: "10px",
+  fontWeight: "500",
+  textTransform: "none",
 };

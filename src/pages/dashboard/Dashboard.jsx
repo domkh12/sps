@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
-import ColumnChart from "../../components/dashboard/ColumnChart";
-import PieChart from "../../components/dashboard/PieChart";
-import AreaChartProfits from "../../components/dashboard/AreaChartProfits";
-import AreaVehicles from "../../components/dashboard/AreaVehicles";
-import HeatMap from "../../components/dashboard/HeatMap";
-import ParkingMap from "../../components/dashboard/ParkingMap";
+
 import { useDispatch, useSelector } from "react-redux";
+import AreaChartProfits from "../../components/dashboard/AreaChartProfits.jsx";
+import ColumnChart from "../../components/dashboard/ColumnChart.jsx";
+import AreaVehicles from "../../components/dashboard/AreaVehicles.jsx";
+import HeatMap from "../../components/dashboard/HeatMap.jsx";
+import ParkingMap from "../../components/dashboard/ParkingMap.jsx";
+import PieChart from "../../components/dashboard/PieChart.jsx";
 
 function Dashboard() {
 
@@ -13,14 +13,14 @@ function Dashboard() {
   const token = useSelector((state) => state.auth.token);
   return (
     <div className="grid grid-cols-1 gap-4">
-      <AreaChartProfits />
+       <AreaChartProfits />
       <div className="grid grid-cols-3 lg:grid-cols-1 gap-4">
-        <ColumnChart />
-        <AreaVehicles />
-        <PieChart />
+         <ColumnChart />
+         <AreaVehicles />
+         <PieChart />
       </div>
-      <HeatMap />
-      <ParkingMap />
+       <HeatMap />
+       <ParkingMap />
     </div>
   );
 }

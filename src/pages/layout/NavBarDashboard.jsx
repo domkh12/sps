@@ -1,11 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
-import { toggleCollapsed } from "../../redux/feature/actions/actionSlice";
-import { Avatar, Button, Drawer, IconButton, Tooltip } from "@mui/material";
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { CgMenuLeftAlt, CgMenuRightAlt } from "react-icons/cg";
-import UnfoldMoreTwoToneIcon from "@mui/icons-material/UnfoldMoreTwoTone";
-import SettingsTwoToneIcon from "@mui/icons-material/SettingsTwoTone";
+import { Avatar, IconButton } from "@mui/material";
+import { useEffect, useState } from "react";
 import NotificationsNoneTwoToneIcon from "@mui/icons-material/NotificationsNoneTwoTone";
 import SearchTwoToneIcon from "@mui/icons-material/SearchTwoTone";
 import ToolTipButtonComponent from "../../components/ToolTipButtonComponent";
@@ -14,27 +9,41 @@ import { IoSearch } from "react-icons/io5";
 import SettingComponent from "../../components/SettingComponent";
 import TranslateComponent from "../../components/TranslateComponent";
 import ProfileDrawerComponent from "../../components/ProfileDrawerComponent";
+import SelectSiteComponent from "../../components/SelectSiteComponent";
+import useAuth from "../../hook/useAuth";
+import { selectCurrentToken } from "../../redux/feature/auth/authSlice";
+import { useVerifySitesMutation } from "../../redux/feature/auth/authApiSlice";
+import { setChangedSite } from "../../redux/feature/site/siteSlice";
 
 function NavBarDashboard() {
-  const dispatch = useDispatch();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const user = useSelector((state) => state.users.user);  
-  
+  const user = useSelector((state) => state.users.user);
+  const sites = useSelector((state) => state.sites.sitesForChange);
+  const { isAdmin, isManager, sites: currentSite } = useAuth();
+  const dispatch = useDispatch();
+  const token = useSelector(selectCurrentToken);
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
   };
+  const [
+    verifySites,
+    {
+      isSuccess: isVerifySiteSuccess,
+      isLoading: isVerifySiteLoading,
+      isError: isVerifySiteError,
+      error: errorVerifySite,
+    },
+  ] = useVerifySitesMutation();
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
   };
 
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
+  const handleSendLogout = async () => {
+    // await sendLogout();
+    console.log("click");
+    onClose();
   };
-
 
   const listGroup1 = [
     { text: "Inbox" },
@@ -51,30 +60,38 @@ function NavBarDashboard() {
 
   const combinedLists = [listGroup1, listGroup2];
 
+  const handleChange = async (value) => {
+    console.log(value);
+    await verifySites({
+      uuid: value,
+      token: token,
+    });
+  };
+
+  useEffect(() => {
+    if (isVerifySiteSuccess) {
+      dispatch(setChangedSite(true));
+    }
+  }, [isVerifySiteSuccess]);
+
   return (
     <>
-      <div className="header">
+      <div className="h-[70px] bg-white text-white bg-opacity-50 backdrop-blur-md flex justify-between flex-nowrap items-center xl:px-[40px] px-[10px] sm:px-[20px]">
         <div className=" flex items-center gap-[10px]">
           <div className="xl:hidden">
             <SidebarDrawerComponent listGroups={combinedLists} />
           </div>
-
-          <div className="text-black">
-            <div className="flex justify-between w-[60px] xl:w-auto items-center gap-3">
-              <img
-                src="/images/logo.png"
-                alt="company_logo"
-                className="h-auto w-6"
-              />
-              <span className="text-xl hidden sm:block text-nowrap">
-                NPIC 1
-              </span>
-              <UnfoldMoreTwoToneIcon className="w-5 h-5 text-opacity-50 text-black" />
-            </div>
-          </div>
+          {isAdmin && !isManager && (
+            <SelectSiteComponent
+              options={sites?.response}
+              optionLabelKey="siteName"
+              onChange={handleChange}
+              selectFistValue={currentSite}
+            />
+          )}
         </div>
 
-        <div className="flex lg:gap-2 items-center flex-wrap">
+        <div className="flex lg:gap-2 items-center flex-nowrap">
           <button className="hidden  bg-black bg-opacity-5 hover:bg-opacity-10 w-[100px] h-[40px] rounded-xl gap-2 xl:flex justify-evenly items-center px-[7px] mr-[8px] shadow-inner">
             <SearchTwoToneIcon className="w-5 h-5 text-black text-opacity-50" />
             <span className="text-black bg-white px-[7px] py-[2px] rounded-lg shadow-sm">
@@ -96,17 +113,24 @@ function NavBarDashboard() {
           </IconButton>
 
           <SettingComponent />
-
-          <IconButton
-            className="w-auto h-auto hover-scale active-scale flex justify-center items-center"
-            onClick={handleDrawerOpen}
-          >
-            <Avatar alt="Profile" src={user.profileImage} />
-          </IconButton>
+          <div className="relative p-[2px] flex justify-center items-center active-scale hover-scale">
+            <div className="w-full h-full bg-gradient-to-r from-primary to-secondary animate-spin-slow absolute rounded-full "></div>
+            <IconButton
+              sx={{ p: 0 }}
+              className="w-auto h-auto  flex justify-center items-center"
+              onClick={handleDrawerOpen}
+            >
+              <Avatar alt="Profile" src={user.profileImage} />
+            </IconButton>
+          </div>
         </div>
       </div>
 
-      <ProfileDrawerComponent open={drawerOpen} onClose={handleDrawerClose} />
+      <ProfileDrawerComponent
+        open={drawerOpen}
+        onClose={handleDrawerClose}
+        handleSendLogout={handleSendLogout}
+      />
     </>
   );
 }

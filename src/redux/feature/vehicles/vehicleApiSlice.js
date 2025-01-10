@@ -7,8 +7,9 @@ const initialState = vehicleAdapter.getInitialState();
 
 export const vehicleApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getVehicle: builder.query({
-      query: ({ pageNo = 1, pageSize = 30 } = {}) => `/vehicles?pageNo=${pageNo}&pageSize=${pageSize}`,
+    getVehicles: builder.query({
+      query: ({ pageNo = 1, pageSize = 30 } = {}) =>
+        `/vehicles?pageNo=${pageNo}&pageSize=${pageSize}`,
       validateStatus: (response, result) => {
         return response.result === 200 && !result.isError;
       },
@@ -19,18 +20,18 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
         }
         return newQueryArgs;
       },
-      transformResponse: (responseData) => {    
+      transformResponse: (responseData) => {
         const loadVehicles = responseData.content.map((vehicle) => {
           vehicle.id = vehicle.uuid;
           return vehicle;
         });
-        return{
+        return {
           ...vehicleAdapter.setAll(initialState, loadVehicles),
           totalPages: responseData.page.totalPages,
           totalElements: responseData.page.totalElements,
           pageNo: responseData.page.number,
           pageSize: responseData.page.size,
-        }
+        };
       },
       providesTags: (result, error, arg) => {
         if (result?.ids) {
@@ -68,12 +69,16 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetVehicleQuery, useAddNewVehicleMutation, useUpdateVehicleMutation } = vehicleApiSlice;
+export const {
+  useGetVehiclesQuery,
+  useAddNewVehicleMutation,
+  useUpdateVehicleMutation,
+} = vehicleApiSlice;
 
 // return query result object
 
 export const selectVehicleResult =
-  vehicleApiSlice.endpoints.getVehicle.select();
+  vehicleApiSlice.endpoints.getVehicles.select();
 
 // create momorized selector
 

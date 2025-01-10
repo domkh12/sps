@@ -10,7 +10,7 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getParking: builder.query({
       query: ({ pageNo = 1, pageSize = 10 } = {}) =>
-        `/parking?pageNo=${pageNo}&pageSize=${pageSize}`,
+        `/parking-spaces?pageNo=${pageNo}&pageSize=${pageSize}`,
       validateStatus: (response, result) => {
         return response.status === 200 && !result.isError;
       },
@@ -102,7 +102,7 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
     }),
     findAllLabels: builder.mutation({
       query: () => ({
-        url: `/parking/labels`,
+        url: `/parking-spaces/labels`,
       }),
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
@@ -116,9 +116,10 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
         { type: "Parking", id: "LIST" },
       ],
     }),
+
     findParkingByUuid: builder.mutation({
       query: (uuid) => ({
-        url: `/parking/${uuid}`,
+        url: `/parking-spaces/${uuid}`,
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {

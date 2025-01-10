@@ -6,7 +6,7 @@ import {
   Popover,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useTransition } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import { listStyle } from "../assets/style";
@@ -14,23 +14,48 @@ import {
   fetchTranslations,
   setLanguage,
 } from "../redux/feature/translate/translationSlice";
+import SnackBarComponent from "./SnackBarComponent";
+import useTranslate from "./../hook/useTranslate";
 
 function TranslateComponent() {
-  const currenLanguage = useSelector((state) => state.translation.language);
+  const { language, loading, isSuccess } = useSelector(
+    (state) => state.translation
+  );
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [initialFetchDone, setInitialFetchDone] = useState(true);
+  const [caption, setCaption] = useState("");
   const dispatch = useDispatch();
+  const { t } = useTranslate();
 
   useEffect(() => {
-    dispatch(fetchTranslations(currenLanguage));
-  }, [currenLanguage]);
+    if (initialFetchDone) {
+      dispatch(fetchTranslations(language));
+      setInitialFetchDone(false);
+      setOpenSnackBar(false);
+      return;
+    }
 
+    if (loading) {
+      setOpenSnackBar(true);
+      setCaption(t("changingLanguage"));
+    } else if (isSuccess) {
+      setCaption(t("changeLanguage"));
+      setTimeout(() => {
+        setOpenSnackBar(false);
+      }, 3000);
+    }
+  }, [isSuccess, dispatch]);
+
+  useEffect(() => {
+    console.log("TranslateComponent use effect");
+  }, []);
   const handleLanguageChange = (lang) => {
     dispatch(setLanguage(lang));
+    dispatch(fetchTranslations(lang));
   };
 
   const flagImage =
-    currenLanguage === "kh"
-      ? "/images/khmer_flag.png"
-      : "/images/english_flag.png";
+    language === "kh" ? "/images/khmer_flag.png" : "/images/english_flag.png";
 
   return (
     <>
@@ -149,6 +174,13 @@ function TranslateComponent() {
           </div>
         )}
       </PopupState>
+
+      <SnackBarComponent
+        isLoading={loading}
+        caption={caption}
+        isOpen={openSnackBar}
+        onClose={() => setOpenSnackBar(false)}
+      />
     </>
   );
 }

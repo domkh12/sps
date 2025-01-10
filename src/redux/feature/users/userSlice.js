@@ -6,11 +6,24 @@ const userSlice = createSlice({
     uuid: "",
     status: "",
     pageNo: 1,
-    pageSize: 10,
+    pageSize: 5,
     totalPages: 0,
     user: {},
-    userActive: {},
+    isOnlineUser: {},
     isLoadingUser: false,
+    genders: [{}],
+    roles: [{}],
+    signUpMethods: [{}],
+    roleFilter: [],
+    signUpMethodFilter: [],
+    searchQuery: "",
+    statusFilter: "",
+    branchFilter: [],
+    resultFound: "",
+    isFiltered: false,
+    isOpenQuickEdit: false,
+    userForQuickEdit: {},
+    quickEditUserReponse: {},
   },
   reducers: {
     setIsLoadingUser(state, action) {
@@ -19,8 +32,8 @@ const userSlice = createSlice({
     setUuid: (state, action) => {
       state.uuid = action.payload;
     },
-    setUserActive: (state, action) => {
-      state.userActive = action.payload;
+    setIsOnlineUser: (state, action) => {
+      state.isOnlineUser = action.payload;
     },
     setStatus: (state, action) => {
       state.status = action.payload;
@@ -38,6 +51,9 @@ const userSlice = createSlice({
       console.log(state.totalPages);
       state.pageNo = state.totalPages;
     },
+    setPageNo: (state, action) => {
+      state.pageNo = action.payload;
+    },
     setPageSize(state, action) {
       state.pageSize = action.payload;
     },
@@ -47,14 +63,67 @@ const userSlice = createSlice({
     setUser(state, action) {
       state.user = action.payload;
     },
+    setGender(state, action) {
+      state.genders = action.payload;
+    },
+    setRoles(state, action) {
+      state.roles = action.payload;
+    },
+    setSignUpMethods(state, action) {
+      state.signUpMethods = action.payload;
+    },
+    setSearchQuery(state, action) {
+      state.searchQuery = action.payload;
+    },
+    clearFilter(state) {
+      state.searchQuery = "";
+      state.roleFilter = [];
+      state.signUpMethodFilter = [];
+      state.branchFilter = [];
+      state.statusFilter = "";
+    },
+    setRoleFilter(state, action) {
+      state.roleFilter = action.payload;
+    },
+    setStatusFilter(state, action) {
+      state.statusFilter = action.payload;
+    },
+    setSignUpMethodFilter(state, action) {
+      state.signUpMethodFilter = action.payload;
+    },
+    setClearStatusFilter(state, action) {
+      state.statusFilter = "";
+    },
+    setClearSearchQuery(state, action) {
+      state.searchQuery = "";
+    },
+    setBranchFilter(state, action) {
+      state.branchFilter = action.payload;
+    },
+    setResultFound(state, action) {
+      state.resultFound = action.payload;
+    },
+    setIsFiltered(state, action) {
+      state.isFiltered = action.payload;
+    },
+    setIsOpenQuickEdit(state, action) {
+      state.isOpenQuickEdit = action.payload;
+    },
+    setUserForQuickEdit(state, action) {
+      state.userForQuickEdit = action.payload;
+    },
+    setQuickEditUserReponse(state, action) {
+      state.quickEditUserReponse = action.payload;
+    }
   },
 });
 
 export const {
+  clearFilter,
   setIsLoadingUser,
   setUuid,
   setStatus,
-  setUserActive,
+  setIsOnlineUser,
   increasePageNo,
   decreasePageNo,
   resetPageNo,
@@ -62,6 +131,22 @@ export const {
   setTotalPages,
   lastPageNo,
   setUser,
+  setGender,
+  setRoles,
+  setSignUpMethods,
+  setSearchQuery,
+  setRoleFilter,
+  setStatusFilter,
+  setSignUpMethodFilter,
+  setClearStatusFilter,
+  setClearSearchQuery,
+  setPageNo,
+  setBranchFilter,
+  setResultFound,
+  setIsFiltered,
+  setIsOpenQuickEdit,
+  setUserForQuickEdit,
+  setQuickEditUserReponse,
 } = userSlice.actions;
 
 export default userSlice.reducer;

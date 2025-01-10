@@ -1,18 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, TextInput, useThemeMode } from "flowbite-react";
-import VehicleRow from "./VehicleRow";
-import { useGetVehicleQuery } from "../../redux/feature/vehicles/vehicleApiSlice";
-import { IoClose } from "react-icons/io5";
-import { FaPlus, FaSearch } from "react-icons/fa";
+import { useGetVehiclesQuery } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  PiCaretDownThin,
-  PiCaretLeftThin,
-  PiCaretLineLeftThin,
-  PiCaretLineRightThin,
-  PiCaretRightThin,
-} from "react-icons/pi";
 import {
   setIsLoadingBar,
   setIsPaginationSuccess,
@@ -26,18 +15,43 @@ import {
   lastPageNo,
 } from "../../redux/feature/vehicles/vehicleSlice";
 import SeoComponent from "../../components/SeoComponent";
+import MainHeaderComponent from "../../components/MainHeaderComponent";
+import {
+  Card,
+  Checkbox,
+  IconButton,
+  List,
+  ListItemButton,
+  ListItemText,
+  Popover,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
+import SelectComponent from "../../components/SelectComponent";
+import SearchComponent from "../../components/SearchComponent";
+import { cardStyle, listStyle } from "../../assets/style";
+import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
+import { BsFillPrinterFill, BsThreeDotsVertical } from "react-icons/bs";
+import useTranslate from "../../hook/useTranslate";
+import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
+import VehicleRowComponent from "../../components/VehicleRowComponent";
 
 function VehicleList() {
   const [search, setSearch] = useState("");
   const dispatch = useDispatch();
   const navigator = useNavigate();
-  const { mode } = useThemeMode();
   const isScrolling = useSelector((state) => state.action.isScrolling);
   const pageNo = useSelector((state) => state.vehicles.pageNo);
   const pageSize = useSelector((state) => state.vehicles.pageSize);
   const totalPages = useSelector((state) => state.vehicles.totalPages);
   const [isPageSizeOpen, setIsPageSizeOpen] = useState(false);
   const pageSizeRef = useRef(null);
+  const { t } = useTranslate();
 
   const {
     data: vehicles,
@@ -47,13 +61,7 @@ function VehicleList() {
     refetch,
     isFetching,
     error,
-  } = useGetVehicleQuery(
-    { pageNo, pageSize },
-    {
-      pollingInterval: 300000,
-      refetchOnMountOrArgChange: true,
-    }
-  );
+  } = useGetVehiclesQuery("vehiclesList", { pageNo, pageSize });
 
   useEffect(() => {
     if (isFetching) {
@@ -136,40 +144,223 @@ function VehicleList() {
     return `${startItem}-${endItem}`;
   };
 
+  const breadcrumbs = [
+    <button
+      className="text-black hover:underline"
+      onClick={() => navitage("/dash")}
+      key={1}
+    >
+      Dashboard
+    </button>,
+    <Typography color="inherit" key={2}>
+      Vehicle
+    </Typography>,
+    <Typography color="inherit" key={3}>
+      List
+    </Typography>,
+  ];
+
+  const columns = [
+    { id: "model", label: "Model", minWidth: 170, align: "left" },
+    {
+      id: "licensePlateNumber",
+      label: "License\u00a0Plate\u00a0Number",
+      minWidth: 120,
+      align: "left",
+    },
+    {
+      id: "type",
+      label: "Type",
+      minWidth: 120,
+      align: "left",
+      format: (value) => value.toLocaleString("en-US"),
+    },
+    {
+      id: "color",
+      label: "Color",
+      minWidth: 120,
+      align: "left",
+      format: (value) => value.toLocaleString("en-US"),
+    },
+    {
+      id: "createdAt",
+      label: "Created\u00a0At",
+      minWidth: 120,
+      align: "left",
+      format: (value) => value.toFixed(2),
+    },
+    {
+      id: "action",
+      label: "",
+      minWidth: 30,
+      align: "left",
+      format: (value) => value.toFixed(2),
+    },
+  ];
+
   let content;
 
-  if (isLoading)
-    content = (
-      <div className="p-5">
-        <div className="animate-pulse h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-7"></div>
-
-        <div className="flex justify-between items-center">
-          <div className="flex gap-3">
-            <div className="animate-pulse h-10 bg-gray-200 rounded-lg dark:bg-gray-700 w-48 mb-4"></div>
-            <div className="animate-pulse h-10 bg-gray-200 rounded-lg dark:bg-gray-700 w-32 mb-4"></div>
-          </div>
-          <div className="animate-pulse h-10 bg-gray-200 rounded-lg dark:bg-gray-700 w-48 mb-4"></div>
-        </div>
-      </div>
-    );
+  if (isLoading) content = <LoadingFetchingDataComponent />;
 
   if (isError) {
     content = <p>Error: {error?.message}</p>;
   }
-  
+
   if (isSuccess) {
     const { ids, totalPages, totalElements } = vehicles;
 
     const tableContent = ids?.length
       ? ids.map((vehicleId) => (
-          <VehicleRow key={vehicleId} vehicleId={vehicleId} />
+          <VehicleRowComponent key={vehicleId} vehicleId={vehicleId} />
         ))
       : null;
 
     content = (
-      <>
-        <SeoComponent title={"Vehicles List"}/>
-        <div className="flex flex-col w-full pb-16">
+      <div data-aos="fade-left">
+        <SeoComponent title={"Vehicles List"} />
+        <MainHeaderComponent
+          breadcrumbs={breadcrumbs}
+          title={"List"}
+          btnTitle={t("newVehicle")}
+          // onClick={handleAddNewClick}
+        />
+        <div>
+          <Card sx={{ ...cardStyle }}>
+            <div className="p-[20px] flex gap-[16px] flex-col xl:flex-row">
+              <SelectComponent
+                label="Vehicle types"
+                labelId="role_label"
+                id="role"
+                // options={roleFetched.data}
+                // onChange={handleRoleChange}
+                optionLabelKey="name"
+              />
+
+              <SelectComponent
+                label="Vehicle models"
+                labelId="signUpMehod_label"
+                id="sighUpMethod"
+                // options={signUpMethodsFetched.data}
+                // onChange={handleMethodChange}
+                optionLabelKey="name"
+              />
+              <div className="flex items-center gap-3 w-full">
+                <SearchComponent />
+                <PopupState variant="popover" popupId="demo-popup-popover">
+                  {(popupState) => (
+                    <div>
+                      <IconButton
+                        aria-label="more_menu"
+                        {...bindTrigger(popupState)}
+                        size="small"
+                        sx={{ width: "36px", height: "36px" }}
+                      >
+                        <BsThreeDotsVertical className="w-5 h-5" />
+                      </IconButton>
+                      <Popover
+                        {...bindPopover(popupState)}
+                        anchorOrigin={{
+                          vertical: "bottom",
+                          horizontal: "center",
+                        }}
+                        slotProps={{
+                          paper: {
+                            style: {
+                              padding: 10,
+                              backgroundColor: "transparent",
+                              boxShadow: "none",
+                            },
+                          },
+                        }}
+                        transformOrigin={{
+                          vertical: "top",
+                          horizontal: "center",
+                        }}
+                      >
+                        <List
+                          component="div"
+                          disablePadding
+                          dense={true}
+                          sx={{
+                            ...listStyle,
+                          }}
+                        >
+                          <ListItemButton
+                            sx={{
+                              borderRadius: "6px",
+                              color: "#424242",
+                            }}
+                          >
+                            <ListItemText
+                              primary={
+                                <div className="flex items-center gap-3">
+                                  <BsFillPrinterFill className="w-5 h-5" />
+                                  <Typography
+                                    component="span"
+                                    variant="body1"
+                                    sx={{
+                                      color: "#424242",
+                                      display: "inline",
+                                    }}
+                                  >
+                                    Print
+                                  </Typography>
+                                </div>
+                              }
+                            />
+                          </ListItemButton>
+                        </List>
+                      </Popover>
+                    </div>
+                  )}
+                </PopupState>
+              </div>
+            </div>
+
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        sx={{
+                          "&.Mui-checked": {
+                            color: "#2C3092",
+                          },
+                          "&:hover": {
+                            color: "#2C3092",
+                          },
+                        }}
+                        color="primary"
+                      />
+                    </TableCell>
+                    {columns.map((column) => (
+                      <TableCell
+                        key={column.id}
+                        align={column.align}
+                        style={{ minWidth: column.minWidth, color: "gray" }}
+                      >
+                        {column.label}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody sx={{ border: "none" }}>{tableContent}</TableBody>
+              </Table>
+            </TableContainer>
+            {/* <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={totalElements}
+              rowsPerPage={pageSize}
+              page={pageNo}
+              // onPageChange={handleChangePage}
+              // onRowsPerPageChange={handleChangeRowsPerPage}
+            /> */}
+          </Card>
+        </div>
+
+        {/* <div className="flex flex-col w-full pb-16">
           <h1 className="text-2xl font-medium dark:text-gray-50 py-4 px-8">
             Vehicles List
           </h1>
@@ -325,8 +516,8 @@ function VehicleList() {
               </tr>
             </tfoot>
           </table>
-        </div>
-      </>
+        </div> */}
+      </div>
     );
   }
 

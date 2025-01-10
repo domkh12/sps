@@ -1,5 +1,5 @@
 import { apiSlice } from "../../app/api/apiSlice";
-import { setUuid } from "../users/userSlice";
+import { setUser, setUuid } from "../users/userSlice";
 import { logOut, setCredentials, setQrCodeUrl } from "./authSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
@@ -83,6 +83,28 @@ export const authApiSlice = apiSlice.injectEndpoints({
         method: "POST",
       }),
     }),
+
+    verifySites: builder.mutation({
+      query: ({ uuid, token }) => ({
+        url: `/auth/verify-sites?uuid=${uuid}&token=${token}`,
+        method: "POST",
+      }),
+      
+    }),
+
+    getUserProfile: builder.mutation({
+      query: () => ({
+        url: `/auth/profiles`,
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setUser(data));
+        } catch (error) {
+          console.error("Failed to fetch user:", error);
+        }
+      },
+    }),
   }),
 });
 
@@ -94,4 +116,6 @@ export const {
   useVerifyTwoFaMutation,
   useDisableTwoFaMutation,
   useVerify2FALoginMutation,
+  useVerifySitesMutation,
+  useGetUserProfileMutation,
 } = authApiSlice;

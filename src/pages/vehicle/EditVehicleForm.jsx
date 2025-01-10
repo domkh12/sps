@@ -27,9 +27,9 @@ import ImageUpload from "./components/ImageUpload";
 import { FaChevronDown } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectAllFullNameUsers,
+  // selectAllFullNameUsers,
   useAddNewUserMutation,
-  useFindUserByUuidMutation,
+  // useFindUserByUuidMutation,
   useUpdateUserMutation,
 } from "../../redux/feature/users/userApiSlice";
 import { useEffect, useRef, useState } from "react";
@@ -62,7 +62,7 @@ function EditUserForm({ vehicle }) {
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const { mode } = useThemeMode();
-  const usersState = useSelector((state) => selectAllFullNameUsers(state));
+  // const usersState = useSelector((state) => selectAllFullNameUsers(state));
   const vehicleTypes = useSelector((state) => selectAllVehicleTypes(state));
   const [toggleOwner, setToggleOwner] = useState(false);
   const [toggleVehicleType, setToggleVehicleType] = useState(false);
@@ -127,10 +127,10 @@ function EditUserForm({ vehicle }) {
     },
   ] = useUpdateUserMutation();
 
-  const [
-    findByUuid,
-    { isSuccess: isSuccessFindUserByUuid, isLoading: isLoadingFindUserByUuid },
-  ] = useFindUserByUuidMutation();
+  // const [
+  //   findByUuid,
+  //   { isSuccess: isSuccessFindUserByUuid, isLoading: isLoadingFindUserByUuid },
+  // ] = useFindUserByUuidMutation();
 
   const [
     addNewVehicleType,
@@ -546,7 +546,7 @@ function EditUserForm({ vehicle }) {
   };
 
   const openEditUserModal = async (uuid) => {
-    const result = await findByUuid(uuid);
+    // const result = await findByUuid(uuid);
     setUserToEdit(Object.values(result.data.entities)[0]);
     setRolesPlaceHolderUpdate(
       Object.values(result.data.entities)[0].roleNames.join(", ")

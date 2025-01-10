@@ -11,7 +11,7 @@ const useWebSocket = (destination) => {
   const [error, setError] = useState(null);
   const [messages, setMessages] = useState([]);
   const token = useSelector(selectCurrentToken);
-  const uuid = useSelector((state) => state.users.uuid);
+  const user = useSelector((state) => state.users.user);
 
   const connect = async () => {
     setLoading(true);
@@ -29,7 +29,7 @@ const useWebSocket = (destination) => {
     socketClient.current.debug = () => {};
 
     socketClient.current.connect(
-      { Authorization: `Bearer ${token}`, uuid: uuid },
+      { Authorization: `Bearer ${token}`, uuid: user?.uuid },
       () => onConnected(destination),
       onError
     );
@@ -60,7 +60,7 @@ const useWebSocket = (destination) => {
         socketClient.current = null;
       }
     };
-  }, [uuid, token]);
+  }, [user?.uuid , token]);
 
   return { loading, error, messages };
 };

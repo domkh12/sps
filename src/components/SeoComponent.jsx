@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 function SeoComponent({ title, description, keywords, image, url }) {
   return (
     <Helmet>
-      <title>{title}</title>
+      <title>{title + " | SPS"}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       <meta property="og:title" content={title} />

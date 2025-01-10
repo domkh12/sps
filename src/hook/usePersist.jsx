@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
-import secureLocalStorage from "react-secure-storage";
+import { useState, useEffect } from "react";
 
 function usePersist() {
   const [persist, setPersist] = useState(
-    JSON.parse(secureLocalStorage.getItem("persist")) || true
+    JSON.parse(localStorage.getItem("persist")) || false
   );
 
   useEffect(() => {
-    secureLocalStorage.setItem("persist", JSON.parse(persist));
+    localStorage.setItem("persist", JSON.stringify(persist));
   }, [persist]);
 
   return [persist, setPersist];

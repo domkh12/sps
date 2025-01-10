@@ -5,11 +5,12 @@ import useTranslate from "../hook/useTranslate";
 function DataNotFound() {
   const { t } = useTranslate();
   return (
-    <div className="flex justify-center items-center w-full h-[500px] flex-col">
+    <div className="flex justify-center items-center w-full h-[260px] flex-col col-span-full">
       <img
         src="/images/ic-content.svg"
         alt="ic_content"
-        className="w-full h-fit"
+        className="w-[160px] h-fit"
+        
       />
       <Typography variant="body1" sx={{ color: "gray" }}>
         {t("noData")}

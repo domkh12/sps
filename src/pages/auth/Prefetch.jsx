@@ -1,50 +1,32 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import store from "./../../redux/app/store";
 import { userApiSlice } from "../../redux/feature/users/userApiSlice";
-import { vehicleTypeTypeApiSlice } from "../../redux/feature/vehicles/vehicleTypeApiSlice";
+import useAuth from "../../hook/useAuth";
 import { vehicleApiSlice } from "../../redux/feature/vehicles/vehicleApiSlice";
-import { parkingApiSlice } from "../../redux/feature/parking/parkingApiSlice";
-import { roleApiSlice } from "../../redux/feature/role/roleApiSlice";
-import { signUpMethodApiSlice } from "../../redux/feature/signUpMethod/signUpMethodApiSlice";
+import { companiesApiSlice } from "../../redux/feature/company/companyApiSlice";
+import { sitesApiSlice } from "../../redux/feature/site/siteApiSlice";
 
 function Prefetch() {
-  useEffect(() => {
-    // console.log("subscribing...");
-    const users = store.dispatch(userApiSlice.endpoints.getUsers.initiate());
-    const fullNameUsers = store.dispatch(
-      userApiSlice.endpoints.getFullNameUsers.initiate()
-    );
-    const vehicle = store.dispatch(
-      vehicleApiSlice.endpoints.getVehicle.initiate()
-    );
-    const vehicleTypes = store.dispatch(
-      vehicleTypeTypeApiSlice.endpoints.getVehicleType.initiate()
-    );
-    const parking = store.dispatch(
-      parkingApiSlice.endpoints.getParking.initiate()
-    );
-    const role = store.dispatch(
-      roleApiSlice.endpoints.getRole.initiate()
-    );
-    const sighUpMethod = store.dispatch(
-      signUpMethodApiSlice.endpoints.getSignUpMethod.initiate()
-    );
-    // const parkingSlots = store.dispatch(
-    //   parkingSlotsApiSlice.endpoints.getParkingSlots.initiate()
-    // );
+  const { isManager, isAdmin } = useAuth();
 
-    return () => {
-      users.unsubscribe();
-      fullNameUsers.unsubscribe();
-      vehicle.unsubscribe();
-      vehicleTypes.unsubscribe();
-      parking.unsubscribe();
-      role.unsubscribe();
-      sighUpMethod.unsubscribe();
-      // parkingSlots.unsubscribe();
-      // console.log("unsubscribing...");
-    };
+  useEffect(() => {
+    if (isManager) {
+      store.dispatch(
+        sitesApiSlice.util.prefetch("getSites", "sitesList", { force: true })
+      );
+    }
+
+    if (isManager || isAdmin) {
+      store.dispatch(
+        userApiSlice.util.prefetch("getUsers", "usersList", { force: true })
+      );
+      store.dispatch(
+        vehicleApiSlice.util.prefetch("getVehicles", "vehiclesList", {
+          force: true,
+        })
+      );
+    }
   }, []);
 
   return <Outlet />;

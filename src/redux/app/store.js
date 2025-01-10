@@ -5,10 +5,13 @@ import { apiSlice } from "./api/apiSlice.js";
 import userReducer from "../feature/users/userSlice.js";
 import vehicleReducer from "../feature/vehicles/vehicleSlice.js";
 import parkingDetailReducer from "../feature/parking/parkingDetailSlice.js";
-import roleReducer from "../feature/role/roleSlice.js";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import translationReducer from "../feature/translate/translationSlice.js";
 import parkingReducer from "../feature/parking/parkingSlice.js";
+import siteReducer from "../feature/site/siteSlice.js";
+import companiesReducer from "../feature/company/companySlice.js";
+import cityReducer from "../feature/city/citySlice.js";
+import siteTypeReducer from "../feature/siteType/siteTypeSlice.js";
 
 const store = configureStore({
   reducer: {
@@ -19,12 +22,15 @@ const store = configureStore({
     vehicles: vehicleReducer,
     parking: parkingReducer,
     parkingDetail: parkingDetailReducer,
-    role: roleReducer,
     translation: translationReducer,
+    sites: siteReducer,
+    companies: companiesReducer,
+    city: cityReducer,
+    siteType: siteTypeReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(apiSlice.middleware),
-  devTools: false,
+  devTools: true,
 });
 
 setupListeners(store.dispatch);
