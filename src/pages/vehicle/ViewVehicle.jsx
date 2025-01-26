@@ -1,16 +1,27 @@
-import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { selectVehicleById } from "../../redux/feature/vehicles/vehicleApiSlice";
 import ViewVehicleDetail from "./ViewVehicleDetail";
+import { useGetVehiclesQuery } from "../../redux/feature/vehicles/vehicleApiSlice";
+import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
+import { useGetUsersQuery } from "../../redux/feature/users/userApiSlice";
 
 function ViewVehicle() {
   const { id } = useParams();
-  const vehicle = useSelector((state) => selectVehicleById(state, id));
+
+  const { vehicle } = useGetVehiclesQuery("vehiclesList", {
+    selectFromResult: ({ data }) => ({
+      vehicle: data?.entities[id],
+    }),
+  });   
+
+  let content;
+  
   if (!vehicle) {
-    return <p>no vehicle available</p>;
-  } else {
-    return <ViewVehicleDetail vehicle={vehicle} />;
+    content = <LoadingFetchingDataComponent />;
   }
+
+  content = <ViewVehicleDetail vehicle={vehicle} />;
+
+  return content;
 }
 
 export default ViewVehicle;

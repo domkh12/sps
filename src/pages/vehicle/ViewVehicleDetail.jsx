@@ -1,301 +1,337 @@
-import { useState } from "react";
-import { FaUserAlt } from "react-icons/fa";
-import { FaXmarksLines } from "react-icons/fa6";
-import { IoMdImages } from "react-icons/io";
-import { LiaImageSolid } from "react-icons/lia";
-import {
-  PiCaretLeftThin,
-  PiCarThin,
-  PiImageThin,
-  PiPenThin,
-  PiUserThin,
-  PiXThin,
-} from "react-icons/pi";
+import { lazy, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import MainHeaderComponent from "./../../components/MainHeaderComponent";
+import useTranslate from "./../../hook/useTranslate";
+import {
+  Avatar,
+  Badge,
+  Card,
+  Chip,
+  Grid2,
+  List,
+  ListItem,
+  ListItemText,
+  styled,
+  Typography,
+} from "@mui/material";
+import { cardStyle } from "../../assets/style";
+import EditButtonComponent from "../../components/EditButtonComponent";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setIsOpenQuickEdit,
+  setUserForQuickEdit,
+} from "../../redux/feature/users/userSlice";
+import {
+  setIsOpenQuickEditVehicle,
+  setVehicleForQuickEdit,
+} from "../../redux/feature/vehicles/vehicleSlice";
+import QuickEditVehicleComponent from "../../components/QuickEditVehicleComponent";
+import QuickEditUserComponent from "./../../components/QuickEditUserComponent";
+
+function stringToColor(string) {
+  let hash = 0;
+  let i;
+
+  /* eslint-disable no-bitwise */
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  let color = "#";
+
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+  /* eslint-enable no-bitwise */
+
+  return color;
+}
+
+function stringAvatar(name) {
+  if (!name || typeof name !== "string" || name.trim() === "") {
+    return {
+      sx: {
+        bgcolor: "#9E9E9E",
+      },
+      children: "?",
+    };
+  }
+  const parts = name.trim().split(" ");
+  let initials = "";
+
+  if (parts.length >= 2) {
+    initials = `${parts[0][0]}${parts[1][0]}`;
+  } else if (parts.length === 1) {
+    initials = parts[0].slice(0, 2);
+  }
+
+  return {
+    sx: {
+      bgcolor: stringToColor(name),
+    },
+    children: initials,
+  };
+}
 
 function ViewVehicleDetail({ vehicle }) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const navigator = useNavigate();
+  const userActive = useSelector((state) => state.users.isOnlineUser);
+  const isOpenQuickEdit = useSelector(
+    (state) => state.vehicles.isOpenQuickEditVehicle
+  );
+  const isOpenQuickEditUser = useSelector(
+    (state) => state.users.isOpenQuickEdit
+  );
+  const navigate = useNavigate();
+  const { t } = useTranslate();
+  const dispatch = useDispatch();
+  const [loadedUser, setLoadedUser] = useState(vehicle.user || {});
 
-  const handleImageClick = () => {
-    setIsDialogOpen(true);
+  useEffect(() => {
+    if (userActive?.uuid === vehicle?.user?.uuid) {
+      setLoadedUser({ ...vehicle?.user, isOnline: userActive.isOnline });
+    }
+  }, [userActive]);
+
+  const StyledBadge = styled(Badge)(({ theme, isonline }) => ({
+    "& .MuiBadge-badge": {
+      backgroundColor: isonline === "true" ? "#44b700" : "#9E9E9E",
+      color: isonline === "true" ? "#44b700" : "#9E9E9E",
+      boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+      "&::after": {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        borderRadius: "50%",
+        animation:
+          isonline === "true" ? "ripple 1.2s infinite ease-in-out" : "none",
+        border: "1px solid currentColor",
+        content: '""',
+      },
+    },
+    "@keyframes ripple": {
+      "0%": {
+        transform: "scale(.8)",
+        opacity: 1,
+      },
+      "100%": {
+        transform: "scale(2.4)",
+        opacity: 0,
+      },
+    },
+  }));
+
+  const breadcrumbs = [
+    <button
+      className="text-black hover:underline"
+      onClick={() => navigate("/dash")}
+      key={1}
+    >
+      {t("dashboard")}
+    </button>,
+    <Typography color="inherit" key={2}>
+      {t("vehicle")}
+    </Typography>,
+    <Typography color="inherit" key={3}>
+      {vehicle.numberPlate}
+    </Typography>,
+  ];
+  const getChipStyles = () => {
+    let backgroundColor = "#D2E3D6";
+    let color = "#207234";
+
+    if (loadedUser.status === "Banned") {
+      backgroundColor = "#FFD6D6";
+      color = "#981212";
+    } else if (loadedUser.status === "Pending") {
+      backgroundColor = "#FFF5D6";
+      color = "#B68D0F";
+    } else if (loadedUser.status === "Active") {
+      backgroundColor = "#D2E3D6";
+      color = "#207234";
+    }
+
+    return {
+      backgroundColor,
+      color,
+      borderRadius: "6px",
+      fontWeight: "500",
+    };
   };
-
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
-  };
-
-  const handleBtnBackClicked = () => {
-    navigator("/dash/vehicles");
-  };
-
-  const handleBtnEditClicked = () => {
-    navigator(`/dash/vehicles/${vehicle.uuid}`);
-  };
-
+  console.log("vehicle", vehicle);
   return (
     <div>
-      <h1 className="text-2xl px-8 py-5 font-medium">Vehicle Detail</h1>
-      <div className="flex justify-center items-center gap-1">
-        <div className="w-8 h-[1px] bg-gray-600"></div>
-        <p className="whitespace-nowrap dark:text-gray-200">
-          Vehicle Information
-        </p>
-        <div className="w-full h-[1px] bg-gray-600"></div>
-      </div>
-
-      <div className="grid grid-cols-2">
-        <div className="flex flex-col gap-5 pl-8 pt-5">
-          <p className="flex justify-start items-center gap-3">
-            <FaXmarksLines className="font-thin h-5 w-5" />
-            <span>License Plate Number :</span>
-            <span className="text-lg text-primary">{vehicle.numberPlate}</span>
-          </p>
-
-          <p className="flex justify-start items-center gap-3">
-            <FaXmarksLines className="font-thin h-5 w-5" />
-            <span>License Plate Name Kh :</span>
-            <span className="text-lg text-primary">
-              {vehicle.licensePlateKhName}
-            </span>
-          </p>
-
-          <p className="flex justify-start items-center gap-3">
-            <FaXmarksLines className="font-thin h-5 w-5" />
-            <span>License Plate Name Eng :</span>
-            <span className="text-lg text-primary">
-              {vehicle.licensePlateEngName}
-            </span>
-          </p>
-
-          <p className="flex justify-start items-center gap-3">
-            <PiCarThin className="h-5 w-5" />
-            <span>Vehicle Type :</span>
-            <span className="text-lg text-primary">
-              {vehicle.vehicleType.name}
-            </span>
-          </p>
-
-          <p className="flex justify-start items-center gap-3">
-            <PiCarThin className="font-thin h-5 w-5" />
-            <span>Vehicle Make :</span>
-            <span className="text-lg text-primary">{vehicle.vehicleMake}</span>
-          </p>
-
-          <p className="flex justify-start items-center gap-3">
-            <PiCarThin className="font-thin h-5 w-5" />
-            <span>Vehicle Model :</span>
-            <span className="text-lg text-primary">{vehicle.vehicleModel}</span>
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-8 pt-5">
-          <div className="flex flex-col w-[325px] md:w-full h-[150px] mb-5">
-            <span className="mb-2">Preview</span>
-            <div className="p-2 h-full shrink-0 bg-gradient-to-b from-blue-700 via-blue-600 to-blue-500 rounded-lg shadow-lg ">
-              <div className="h-full grid grid-rows-12 grid-cols-1 justify-center items-center text-center py-2 rounded-md bg-gray-50 shadow-inner">
-                <p className="text-blue-600 text-lg row-span-3">
-                  {vehicle.licensePlateKhName || "xxxxx"}
-                </p>
-                <span className="text-blue-600 text-3xl row-span-6">
-                  {vehicle.numberPlate || "xx-xxxx"}
-                </span>
-                <div className="h-[2px] rounded-full bg-blue-600 row-span-1 mx-3"></div>
-                <p className="text-red-600 text-sm row-span-2">
-                  {vehicle.licensePlateEngName || "xxxxx"}
-                </p>
+      <MainHeaderComponent
+        breadcrumbs={breadcrumbs}
+        title={vehicle.numberPlate}
+        handleBackClick={() => navigate("/dash/vehicles")}
+      />
+      <Grid2 container spacing={2}>
+        <Grid2 size={{ xs: 12, md: 5 }}>
+          <Card sx={{ ...cardStyle, mb: 2 }}>
+            <div className="w-auto rounded-[12px] m-[16px] border-blue-600 border-[3px] px-[24px] py-2 flex items-center justify-between">
+              <div className="flex flex-col">
+                <Typography variant="h6" className="text-blue-600">
+                  {vehicle.licensePlateProvince.provinceNameEn}
+                </Typography>
+                <Typography variant="h6" className="text-red-600">
+                  {vehicle.licensePlateProvince.provinceNameKh}
+                </Typography>
               </div>
-            </div>
-          </div>
-
-          {vehicle.image ? (
-            <div>
-              <span className="mb-2">Image</span>
-              <div
-                className="relative flex w-[325px] h-[187px] cursor-pointer flex-col overflow-hidden rounded-lg bg-clip-border shadow-sm transition-opacity hover:opacity-90"
-                onClick={handleImageClick}
+              <Typography
+                variant="h4"
+                className="underline text-blue-600 uppercase"
               >
-                <img
-                  alt="nature"
-                  className="h-full w-full object-cover object-center"
-                  src={vehicle.image}
-                />
-              </div>
-              {isDialogOpen && (
-                <div
-                  className="fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60  backdrop-blur-sm transition-opacity duration-300"
-                  onClick={handleCloseDialog}
-                >
-                  <div
-                    className="relative m-4 w-2/4 rounded-lg bg-white shadow-sm"
-                    onClick={(event) => event.stopPropagation()}
+                {vehicle.numberPlate}
+              </Typography>
+            </div>
+          </Card>
+
+          <Card sx={{ ...cardStyle, p: "16px" }}>
+            <div className="flex justify-between items-center mb-5">
+              <Typography variant="h6">User info</Typography>
+
+              <EditButtonComponent
+                handleQuickEdit={() => {
+                  dispatch(setIsOpenQuickEdit(true));
+                  dispatch(setUserForQuickEdit(vehicle.user));
+                }}
+              />
+            </div>
+            <div className="flex justify-between">
+              <List sx={{ padding: "0" }}>
+                <ListItem sx={{ padding: "0", gap: "10px" }}>
+                  <StyledBadge
+                    overlap="circular"
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    variant="dot"
+                    isonline={String(loadedUser?.isOnline)}
                   >
-                    <div className="flex items-center justify-between p-4">
-                      <div className="flex items-center gap-3">
-                        <img
-                          alt={vehicle.user.fullName}
-                          src={vehicle.user.profileImage}
-                          className="relative inline-block h-9 w-9 rounded-full object-cover object-center"
-                        />
-                        <div className="-mt-px flex flex-col">
-                          <p className="text-sm text-slate-800 font-medium">
-                            {vehicle.user.firstName +
-                              " " +
-                              vehicle.user.lastName}
-                          </p>
-                          <p className="text-xs font-normal text-slate-500">
-                            {vehicle.user.fullName}
-                          </p>
-                        </div>
-                      </div>
-
-                      <button
-                        className="hover:bg-gray-200 rounded-full p-2"
-                        onClick={handleCloseDialog}
+                    <Avatar
+                      alt={loadedUser.fullName}
+                      src={loadedUser.profileImage}
+                      {...stringAvatar(loadedUser.fullName)}
+                    />
+                  </StyledBadge>
+                  <ListItemText
+                    primary={<>{loadedUser.fullName}</> || "N/A"}
+                    secondary={
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{ color: "gray", display: "inline" }}
                       >
-                        <PiXThin className="h-7 w-7" />
-                      </button>
-                    </div>
-                    <div className="relative border-b border-t border-b-blue-gray-100 border-t-blue-gray-100 p-0 font-sans text-base font-light leading-relaxed text-blue-gray-500 antialiased bg-black">
-                      <img
-                        alt="nature"
-                        className="h-[30rem] w-full object-contain object-center"
-                        src={vehicle.image}
-                      />
-                    </div>
-                    <div className="flex shrink-0 flex-wrap items-center justify-between p-4 text-blue-gray-500"></div>
-                  </div>
-                </div>
-              )}
+                        {loadedUser?.email || "N/A"}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              </List>
+
+              <Chip
+                sx={getChipStyles()}
+                size="small"
+                label={loadedUser.status}
+              />
             </div>
-          ) : (
-            <>
-              <div
-                className="relative flex w-[325px] h-[187px] cursor-pointer flex-col overflow-hidden rounded-lg bg-clip-border shadow-sm transition-opacity hover:opacity-90 bg-gray-200 justify-center items-center"
-                onClick={handleImageClick}
-              >
-                <IoMdImages className="h-24 w-24 text-gray-400" />
-              </div>
-            </>
-          )}
-        </div>
-      </div>
 
-      <div className="flex justify-center items-center gap-1 py-5">
-        <div className="w-8 h-[1px] bg-gray-600"></div>
-        <p className="whitespace-nowrap dark:text-gray-200">
-          Owner Information
-        </p>
-        <div className="w-full h-[1px] bg-gray-600"></div>
-      </div>
+            <div className="flex flex-col gap-3 mt-5">
+              <Typography variant="body1">
+                <span className="text-gray-cus">Gender</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle.user.gender.gender}`}
+              </Typography>
+              <Typography variant="body1">
+                <span className="text-gray-cus">{`Date${"\u00a0"}of${"\u00a0"}birth`}</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle.user.dateOfBirth}`}
+              </Typography>
+              <Typography variant="body1">
+                <span className="text-gray-cus">{`Phone`}</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle.user.phoneNumber}`}
+              </Typography>
+              <Typography variant="body1">
+                <span className="text-gray-cus">{`Role`}</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle.user.roles.map((role) => role.name)}`}
+              </Typography>
+              <Typography variant="body1">
+                <span className="text-gray-cus">{`Branch`}</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle.user.sites.map((site) => site.siteName)}`}
+              </Typography>
+            </div>
+          </Card>
+        </Grid2>
+        <Grid2 size={{ xs: 12, md: 7 }}>
+          <Card sx={{ ...cardStyle, p: "16px" }}>
+            <div className="flex justify-between items-center mb-5">
+              <Typography variant="h6">User info</Typography>
 
-      <div className="grid grid-cols-2">
-        <div className="flex flex-col gap-5 pl-8 pt-5">
-          <p className="flex justify-start items-center gap-3">
-            <PiUserThin className="font-thin h-5 w-5" />
-            <span>First Name :</span>
-            <span className="text-lg text-primary">
-              {vehicle.user.firstName}
-            </span>
-          </p>
-
-          <p className="flex justify-start items-center gap-3">
-            <PiUserThin className="font-thin h-5 w-5" />
-            <span>Last Name :</span>
-            <span className="text-lg text-primary">
-              {vehicle.user.lastName}
-            </span>
-          </p>
-
-          <p className="flex justify-start items-center gap-3">
-            <PiUserThin className="font-thin h-5 w-5" />
-            <span>Full name :</span>
-            <span className="text-lg text-primary">
-              {vehicle.user.fullName}
-            </span>
-          </p>
-
-          <p className="flex justify-start items-center gap-3">
-            <PiCarThin className="font-thin h-5 w-5" />
-            <span>Gender :</span>
-            <span className="text-lg text-primary">
-              {vehicle.user.gender.fullNameEnglish}
-            </span>
-          </p>
-
-          <p className="flex justify-start items-center gap-3">
-            <PiCarThin className="h-5 w-5" />
-            <span>Date of Birth :</span>
-            <span className="text-lg text-primary">
-              {vehicle.user.dateOfBirth}
-            </span>
-          </p>
-
-          <p className="flex justify-start items-center gap-3">
-            <PiCarThin className="font-thin h-5 w-5" />
-            <span>Email :</span>
-            <span className="text-lg text-primary">{vehicle.user.email}</span>
-          </p>
-
-          <p className="flex justify-start items-center gap-3">
-            <PiCarThin className="font-thin h-5 w-5" />
-            <span>Role :</span>
-            <span className="text-lg text-primary">
-              {vehicle.user.roleNames.join(", ")}
-            </span>
-          </p>
-
-          <p className="flex justify-start items-center gap-3">
-            <PiCarThin className="font-thin h-5 w-5" />
-            <span>Phone Number :</span>
-            <span className="text-lg text-primary">
-              {vehicle.user.phoneNumber}
-            </span>
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-8">
-          {vehicle.user.profileImage ? (
-            <>
-              <div className="flex flex-col w-[325px] md:w-full h-auto mb-5">
-                <span className="mb-2">Profile Image</span>
-                <div className="bg-black h-[25rem]">
+              <EditButtonComponent
+                handleQuickEdit={() => {
+                  dispatch(setIsOpenQuickEditVehicle(true));
+                  dispatch(setVehicleForQuickEdit(vehicle));
+                }}
+              />
+            </div>
+            <div className="flex items-center gap-5">
+              <div className="p-1 border-dashed border rounded-[12px]">
+                <div className="w-48 h-28 rounded-[12px] overflow-hidden">
                   <img
-                    src={vehicle.user.profileImage}
-                    alt=""
-                    className="object-cover object-center h-[25rem]"
+                    src={vehicle.image || "/images/car-img-placeholder.jpg"}
+                    alt="vehicleImage"
+                    className="w-full h-full object-cover"
                   />
                 </div>
               </div>
-            </>
-          ) : (
-            <>
-              <div className="w-[325px] h-[25rem] mb-5">
-                <span className="mb-2">Profile Image</span>
-                <div className=" bg-gray-200 rounded-lg h-full w-full mx-auto grid justify-center items-center">
-                  <FaUserAlt className="h-24 w-24 text-gray-400" />
-                </div>
+              <div className="flex flex-col gap-2">
+                <Typography variant="body1">{vehicle?.vehicleMake}</Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "gray", display: "inline" }}
+                >
+                  {vehicle?.vehicleModel}
+                </Typography>
               </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className="flex justify-start items-center gap-5 p-8">
-        <button className="px-4 py-2  border border-primary rounded-lg text-primary hover:bg-gray-200 flex justify-center items-center gap-2"
-        onClick={handleBtnBackClicked}
-        >
-          <PiCaretLeftThin className="h-5 w-5" />
-          Back
-        </button>
-
-        <button className="px-4 py-2 border border-primary rounded-lg text-gray-50  hover:bg-primary-hover bg-primary flex justify-center items-center gap-2"
-        onClick={handleBtnEditClicked}
-        >
-          <PiPenThin className="h-5 w-5" />
-          Edit
-        </button>
-      </div>
+            </div>
+            <div className="flex flex-col gap-3 mt-5">
+              <Typography variant="body1">
+                <span className="text-gray-cus">{t("vehicleType")}</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle.vehicleType.name}`}
+              </Typography>
+              <div className="flex gap-2">
+                <Typography variant="body1">{`${t("color")}${"\u00a0"}:`}</Typography>
+                <div
+                  className="w-5 h-5 rounded-full border-[2px]"
+                  style={{ backgroundColor: vehicle.color }}
+                ></div>
+                <Typography variant="body1">{vehicle.color}</Typography>
+              </div>
+              <Typography variant="body1">
+                <span className="text-gray-cus">{t("licensePlateType")}</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle.licensePlateType.name}`}
+              </Typography>
+              <Typography variant="body1">
+                <span className="text-gray-cus">Total parking hours</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.totalParkingHours || "N/A"}`}
+              </Typography>
+              <Typography variant="body1">
+                <span className="text-gray-cus">Total parking fee</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.totalParkingFees || "N/A"}`}
+              </Typography>
+              <Typography variant="body1">
+                <span className="text-gray-cus">Last parking lot</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle.lastParkingLot || "N/A"}`}
+              </Typography>
+              <Typography variant="body1">
+                <span className="text-gray-cus">Last parking-time</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle.lastParkingTime || "N/A"}`}
+              </Typography>
+            </div>
+          </Card>
+        </Grid2>
+      </Grid2>
+      {isOpenQuickEditUser && <QuickEditUserComponent />}
+      {isOpenQuickEdit && <QuickEditVehicleComponent />}
     </div>
   );
 }

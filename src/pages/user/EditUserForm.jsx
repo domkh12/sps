@@ -1,25 +1,28 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useFindAllGenderMutation,
   useGetAllRolesMutation,
   useUpdateUserMutation,
 } from "../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
-import {
-  useThemeMode,
-} from "flowbite-react";
-import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
-import {
-  IoEye,
-  IoEyeOff,
-} from "react-icons/io5";
 import * as Yup from "yup";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice";
 import useAuth from "../../hook/useAuth";
 import useTranslate from "../../hook/useTranslate";
-import { Card, FormControl, FormHelperText, Grid2, IconButton, InputAdornment, InputLabel, OutlinedInput, styled, Switch, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  Chip,
+  FormControl,
+  FormHelperText,
+  Grid2,
+  styled,
+  Switch,
+  TextField,
+  Typography,
+} from "@mui/material";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import SeoComponent from "../../components/SeoComponent";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
@@ -27,19 +30,21 @@ import { cardStyle } from "../../assets/style";
 import ProfileUploadComponent from "../../components/ProfileUploadComponent";
 import SelectSingleComponent from "../../components/SelectSingleComponent";
 import { DatePicker } from "@mui/x-date-pickers";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import SelectComponent from "../../components/SelectComponent";
 import ButtonComponent from "../../components/ButtonComponent";
+import dayjs from "dayjs";
+import {
+  setCaptionSnackBar,
+  setErrorSnackbar,
+  setIsOpenConfirmDelete,
+  setIsOpenSnackBar,
+} from "../../redux/feature/actions/actionSlice";
+import { setIdUserToDelete } from "../../redux/feature/users/userSlice";
 
 function EditUserForm({ user }) {
   const navigate = useNavigate();
   const [profileImageFile, setProfileImageFile] = useState(null);
-  const [cboRolesToggle, setCboRolesToggle] = useState(false);
-  const { mode } = useThemeMode();
-  const dropdownRef = useRef(null);
-  const [rolesPlaceHolder, setRolesPlaceHolder] =
-    useState("Admin,User,Manager");
-  const [isDataChanged, setIsDataChanged] = useState(false);
   const { t } = useTranslate();
   const { isManager, isAdmin } = useAuth();
   const [error, setError] = useState(null);
@@ -47,15 +52,13 @@ function EditUserForm({ user }) {
   const genderFetched = useSelector((state) => state.users.genders);
   const rolesFetched = useSelector((state) => state.users.roles);
   const companyData = useSelector((state) => state.companies.companiesData);
-  const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const dispatch = useDispatch();
   const [
     updateUser,
     {
-      isSuccess,
+      isSuccess: isSuccessUpdateUser,
       isLoading: isLoadingUpdateUser,
-      isError,
+      isError: isErrorUpdateUser,
       error: errorUpdateUser,
     },
   ] = useUpdateUserMutation();
@@ -113,65 +116,57 @@ function EditUserForm({ user }) {
   }, [isManager, getAllRoles, getAllCompanies, findAllGender]);
 
   const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required("First name is required"),
-    lastName: Yup.string().required("Last name is required"),
-    fullName: Yup.string().required("Full name is required"),
-    dateOfBirth: Yup.date().required("Date of birth is required"),
+    fullName: Yup.string()
+      .matches(
+        /^[\u1780-\u17FF\sA-Za-z]+$/,
+        "Full name must contain only Khmer and English letters and spaces"
+      )
+      .required("Full name is required"),
+    dateOfBirth: Yup.date()
+      .required("Date of birth is required")
+      .test(
+        "is-valid-age",
+        "Must be between 10 and 120 years old",
+        function (value) {
+          if (!value) {
+            return false;
+          }
+          const today = dayjs();
+          const birthDate = dayjs(value);
+          const age = today.diff(birthDate, "year");
+          return age >= 10 && age <= 120;
+        }
+      ),
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),
     phoneNumber: Yup.string()
-      .matches(/^\d+$/, "Phone number must numbers")
+      .matches(/^\+?\d+$/, "Phone number must be numbers with an optional '+'")
+      .test("len", "Must be between 7 and 15 digits", (val) => {
+        if (val) {
+          const digitsOnly = val.replace(/\D/g, "");
+          return digitsOnly.length >= 7 && digitsOnly.length <= 15;
+        }
+        return true;
+      })
       .required("Phone number is required"),
-    roleName: Yup.array()
-      .min(1, "At least one role must be selected")
-      .required("Role is required"),
+    genderId: Yup.string().required("Gender is required"),
+
+    ...(isManager
+      ? {
+          roleId: Yup.array()
+            .test("len", "Role must not be empty", (val) => {
+              return val ? val.length !== 0 : false;
+            })
+            .required("Role is required"),
+          branchId: Yup.array()
+            .test("len", "Branch must not be empty", (val) => {
+              return val ? val.length !== 0 : false;
+            })
+            .required("Branch is required"),
+        }
+      : {}),
   });
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setCboRolesToggle(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isSuccess) {
-      navigate("/dash/users/custom");
-
-      toast.success("Update Successful", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
-    }
-  }, [isSuccess, navigate]);
-
-  useEffect(() => {
-    if (isError) {
-      toast.error(`${error?.data?.error?.description}`, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
-    }
-  }, [isError]);
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -185,16 +180,17 @@ function EditUserForm({ user }) {
 
       await updateUser({
         id: user.uuid,
-        firstName: values.firstName,
-        lastName: values.lastName,
         dateOfBirth: values.dateOfBirth,
         fullName: values.fullName,
-        genderName: values.genderName,
+        genderId: values.genderId,
+        address: values.address,
+        branchId: values.branchId,
         email: values.email,
         phoneNumber: values.phoneNumber,
-        roleName: values.roleName,
+        roleId: values.roleId,
         profileImage: profileImageUri,
-        isDeleted: values.isDisabled,
+        isVerified: values.isVerified,
+        isDeleted: values.isDeleted,
       });
     } catch (error) {
       console.error(error);
@@ -203,43 +199,38 @@ function EditUserForm({ user }) {
     }
   };
 
-  const handleBtnBackClicked = () => {
-    navigate("/dash/users/custom");
-  };
+  useEffect(() => {
+    if (isSuccessUpdateUser) {
+      navigate("/dash/users");
+      dispatch(setIsOpenSnackBar(true));
+      dispatch(setCaptionSnackBar(t("createSuccess")));
+      setTimeout(() => {
+        dispatch(setIsOpenSnackBar(false));
+      }, 3000);
+    }
+  }, [isSuccessUpdateUser]);
 
-  const customTheme = {
-    views: {
-      days: {
-        items: {
-          item: {
-            selected: "bg-primary text-white hover:bg-cyan-600",
-          },
-        },
-      },
-    },
-  };
+  useEffect(() => {
+    console.log("error", errorUpdateUser);
+    if (isErrorUpdateUser) {
+      dispatch(setIsOpenSnackBar(true));
+      dispatch(setErrorSnackbar(true));
+      dispatch(
+        setCaptionSnackBar(`${errorUpdateUser?.data?.error?.description}`)
+      );
+      setTimeout(() => {
+        dispatch(setIsOpenSnackBar(false));
+      }, 3000);
 
-  const handleToggleRoleCbo = () => {
-    setCboRolesToggle(!cboRolesToggle);
-  };
+      setTimeout(() => {
+        dispatch(setErrorSnackbar(false));
+      }, 3500);
+    }
+  }, [isErrorUpdateUser, dispatch]);
 
-  // const initialValues = {
-  //   fullName: user.fullName,
-  //   genderName: user.gender.fullNameEnglish,
-  //   email: user.email,
-  //   phoneNumber: user.phoneNumber,
-  //   profileImage: user.profileImage,
-  //   dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : new Date(),
-  //   roleName: user.roleNames,
-  //   isDisabled: user.isDeleted,
-  // };
-
-  const checkDataChanged = (values) => {
-    return JSON.stringify(values) !== JSON.stringify(initialValues);
-  };
-
-  const handleDoneButtonClick = () => {
-    setCboRolesToggle(false);
+  const handleDelete = () => {
+    dispatch(setIsOpenConfirmDelete(true));
+    dispatch(setIdUserToDelete(user.uuid));
   };
 
   const AntSwitch = styled(Switch)(({ theme }) => ({
@@ -262,7 +253,7 @@ function EditUserForm({ user }) {
         color: "#fff",
         "& + .MuiSwitch-track": {
           opacity: 1,
-          backgroundColor: "#1890ff",
+          backgroundColor: "#2C3092",
           ...theme.applyStyles("dark", {
             backgroundColor: "#177ddc",
           }),
@@ -289,39 +280,6 @@ function EditUserForm({ user }) {
     },
   }));
 
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-  const handleMouseUpPassword = (event) => {
-    event.preventDefault();
-  };
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleMouseDownConfirmPassword = (event) => {
-    event.preventDefault();
-  };
-  const handleMouseUpConfirmPassword = (event) => {
-    event.preventDefault();
-  };
-  const handleClickShowConfirmPassword = () =>
-    setShowConfirmPassword((show) => !show);
-  
-
-  const breadcrumbs = [
-    <button
-      className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
-      key={1}
-    >
-      {t("dashboard")}
-    </button>,
-    <Typography color="inherit" key={2}>
-      {t("user")}
-    </Typography>,
-    <Typography color="inherit" key={3}>
-      {t("newUser")}
-    </Typography>,
-  ];
-
   let content;
 
   if (isLoading) content = <LoadingFetchingDataComponent />;
@@ -329,7 +287,7 @@ function EditUserForm({ user }) {
   if (error) {
     content = "Error";
   }
-  console.log("user", user)
+
   if (
     !isLoading &&
     !error &&
@@ -339,27 +297,42 @@ function EditUserForm({ user }) {
         isGetAllCompaniesSuccess
       : isFindAllGenderSuccess)
   ) {
+    const breadcrumbs = [
+      <button
+        className="text-black hover:underline"
+        onClick={() => navigate("/dash")}
+        key={1}
+      >
+        {t("dashboard")}
+      </button>,
+      <Typography color="inherit" key={2}>
+        {t("user")}
+      </Typography>,
+      <Typography color="inherit" key={3}>
+        {user?.fullName}
+      </Typography>,
+    ];
     content = (
       <div data-aos="fade-left">
         <SeoComponent title={"Create a new user"} />
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
-          title={t("createANewUser")}
+          title={t("edit")}
+          handleBackClick={() => navigate("/dash/users")}
         />
         <Formik
           initialValues={{
-            fullName: user.fullName,
-            genderId: user.gender.uuid,
-            email: "",
-            password: "",
-            confirmPassword: "",
-            address: "",
-            phoneNumber: "",
-            profileImage: "",
-            dateOfBirth: null,
-            roleId: [],
-            branchId: [],
-            isVerified: true,
+            fullName: user?.fullName,
+            genderId: user?.gender?.uuid,
+            email: user?.email,
+            address: user?.address || "",
+            phoneNumber: user?.phoneNumber,
+            profileImage: user?.profileImage,
+            dateOfBirth: dayjs(user?.dateOfBirth),
+            roleId: user?.roles.map((role) => role.uuid),
+            branchId: user?.sites.map((site) => site.uuid),
+            isVerified: user?.isVerified,
+            isDeleted: user?.isDeleted,
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -391,6 +364,10 @@ function EditUserForm({ user }) {
               setFieldValue("isVerified", event.target.checked);
             };
 
+            const handleisDeletedChange = (event) => {
+              setFieldValue("isDeleted", event.target.checked);
+            };
+
             return (
               <Form className="pb-8">
                 <Grid2 container spacing={3}>
@@ -399,14 +376,61 @@ function EditUserForm({ user }) {
                       sx={{
                         ...cardStyle,
                       }}
-                      className=" gap-5 pt-[80px] px-[24px] pb-[40px] "
+                      className=" gap-5 pt-[24px] px-[24px] pb-[40px] "
                     >
+                      <div className="flex justify-end items-center mb-3">
+                        {values.isDeleted ? (
+                          <Chip
+                            sx={{
+                              backgroundColor: "#FFD6D6",
+                              color: "#981212",
+                              borderRadius: "6px",
+                              fontWeight: "500",
+                            }}
+                            size="small"
+                            label="Banned"
+                          />
+                        ) : (
+                          <Chip
+                            sx={{
+                              backgroundColor: "#D2E3D6",
+                              color: "#207234",
+                              borderRadius: "6px",
+                              fontWeight: "500",
+                            }}
+                            size="small"
+                            label="Active"
+                          />
+                        )}
+                      </div>
+
                       <div className="flex justify-center items-center flex-col gap-5">
                         <ProfileUploadComponent
                           setProfileImageFile={setProfileImageFile}
-                          profileImageFile={profileImageFile}
+                          profileImageFile={profileImageFile || ""}
+                          profileUrl={values?.profileImage || ""}
                         />
                       </div>
+
+                      <div className="flex items-center justify-between gap-7 mt-5">
+                        <div className="flex flex-col gap-2">
+                          <Typography
+                            variant="body1"
+                            sx={{ fontWeight: "500" }}
+                          >
+                            {t("banned")}
+                          </Typography>
+                          <Typography variant="body2">
+                            {t("descriptionBanned")}
+                          </Typography>
+                        </div>
+                        <AntSwitch
+                          checked={values.isDeleted}
+                          onChange={handleisDeletedChange}
+                          inputProps={{ "aria-label": values.isDeleted }}
+                        />
+                      </div>
+
                       <div className="flex items-center justify-between gap-7 mt-5">
                         <div className="flex flex-col gap-2">
                           <Typography
@@ -424,8 +448,28 @@ function EditUserForm({ user }) {
                         <AntSwitch
                           checked={values.isVerified}
                           onChange={handleIsVerifiedChange}
-                          inputProps={{ "aria-label": "ant design" }}
+                          inputProps={{ "aria-label": values.isVerified }}
                         />
+                      </div>
+                      <div className="flex justify-center items-center">
+                        <Button
+                          variant="contained"
+                          sx={{
+                            backgroundColor: "#FFD6D6",
+                            color: "#981212",
+                            borderRadius: "8px",
+                            fontWeight: "500",
+                            boxShadow: "none",
+                            ":hover": {
+                              boxShadow: "none",
+                            },
+                            textTransform: "none",
+                            mt: 3,
+                          }}
+                          onClick={handleDelete}
+                        >
+                          Delete user
+                        </Button>
                       </div>
                     </Card>
                   </Grid2>
@@ -589,110 +633,6 @@ function EditUserForm({ user }) {
                           </FormHelperText>
                         </FormControl>
 
-                        <FormControl
-                          sx={{ width: "100%" }}
-                          variant="outlined"
-                          size="medium"
-                          error={errors.password && touched.password}
-                        >
-                          <InputLabel htmlFor="password">
-                            {t("password")}
-                          </InputLabel>
-                          <OutlinedInput
-                            sx={{
-                              "& .MuiInputBase-input": {
-                                boxShadow: "none",
-                              },
-                              borderRadius: "6px",
-                            }}
-                            id="password"
-                            name="password"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            autoComplete="off"
-                            value={values.password}
-                            type={showPassword ? "text" : "password"}
-                            endAdornment={
-                              <InputAdornment position="end">
-                                <IconButton
-                                  aria-label={
-                                    showPassword
-                                      ? "hide the password"
-                                      : "display the password"
-                                  }
-                                  onClick={handleClickShowPassword}
-                                  onMouseDown={handleMouseDownPassword}
-                                  onMouseUp={handleMouseUpPassword}
-                                  edge="end"
-                                >
-                                  {showPassword ? <IoEye /> : <IoEyeOff />}
-                                </IconButton>
-                              </InputAdornment>
-                            }
-                            label="Password"
-                          />
-                          <FormHelperText>
-                            {errors.password && touched.password
-                              ? errors.password
-                              : null}
-                          </FormHelperText>
-                        </FormControl>
-
-                        <FormControl
-                          sx={{ width: "100%" }}
-                          variant="outlined"
-                          size="medium"
-                          error={
-                            errors.confirmPassword && touched.confirmPassword
-                          }
-                        >
-                          <InputLabel htmlFor="confirmPassword">
-                            {t("confirmPassword")}
-                          </InputLabel>
-                          <OutlinedInput
-                            sx={{
-                              "& .MuiInputBase-input": {
-                                boxShadow: "none",
-                              },
-                              borderRadius: "6px",
-                            }}
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            autoComplete="off"
-                            value={values.confirmPassword}
-                            type={showConfirmPassword ? "text" : "password"}
-                            endAdornment={
-                              <InputAdornment position="end">
-                                <IconButton
-                                  aria-label={
-                                    showConfirmPassword
-                                      ? "hide the confirmPassword"
-                                      : "display the confirmPassword"
-                                  }
-                                  onClick={handleClickShowConfirmPassword}
-                                  onMouseDown={handleMouseDownConfirmPassword}
-                                  onMouseUp={handleMouseUpConfirmPassword}
-                                  edge="end"
-                                >
-                                  {showConfirmPassword ? (
-                                    <IoEye />
-                                  ) : (
-                                    <IoEyeOff />
-                                  )}
-                                </IconButton>
-                              </InputAdornment>
-                            }
-                            label="Confirm Password"
-                          />
-                          <FormHelperText>
-                            {errors.confirmPassword && touched.confirmPassword
-                              ? errors.confirmPassword
-                              : null}
-                          </FormHelperText>
-                        </FormControl>
-
                         {isManager && (
                           <SelectComponent
                             label={t("role")}
@@ -702,6 +642,7 @@ function EditUserForm({ user }) {
                             error={errors.roleId}
                             touched={touched.roleId}
                             optionLabelKey="name"
+                            selectFistValue={values.roleId}
                           />
                         )}
 
@@ -711,11 +652,12 @@ function EditUserForm({ user }) {
                             options={companyData.data}
                             onChange={handleBranchChange}
                             fullWidth={true}
-                            error={errors.roleId}
-                            touched={touched.roleId}
+                            error={errors.branchId}
+                            touched={touched.branchId}
                             itemsLabelKey="sites"
                             optionLabelKey="siteName"
                             groupLabelKey="companyName"
+                            selectFistValue={values.branchId}
                           />
                         )}
                       </div>
@@ -723,8 +665,7 @@ function EditUserForm({ user }) {
                       <div className="col-span-2 flex justify-end mt-[20px]">
                         <ButtonComponent
                           btnTitle={t("saveChanges")}
-                          type={"submit"}
-                          loadingCaption={t("pleaseWait")}
+                          type="submit"
                           isLoading={isLoadingUpdateUser}
                         />
                       </div>

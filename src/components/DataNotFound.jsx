@@ -5,7 +5,7 @@ import useTranslate from "../hook/useTranslate";
 function DataNotFound() {
   const { t } = useTranslate();
   return (
-    <div className="flex justify-center items-center w-full h-[260px] flex-col col-span-full">
+    <div className="flex justify-center items-center w-full h-auto flex-col col-span-full">
       <img
         src="/images/ic-content.svg"
         alt="ic_content"

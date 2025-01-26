@@ -4,8 +4,8 @@ import store from "./../../redux/app/store";
 import { userApiSlice } from "../../redux/feature/users/userApiSlice";
 import useAuth from "../../hook/useAuth";
 import { vehicleApiSlice } from "../../redux/feature/vehicles/vehicleApiSlice";
-import { companiesApiSlice } from "../../redux/feature/company/companyApiSlice";
 import { sitesApiSlice } from "../../redux/feature/site/siteApiSlice";
+import { parkingApiSlice } from "../../redux/feature/parking/parkingApiSlice";
 
 function Prefetch() {
   const { isManager, isAdmin } = useAuth();
@@ -18,6 +18,11 @@ function Prefetch() {
     }
 
     if (isManager || isAdmin) {
+      store.dispatch(
+        parkingApiSlice.util.prefetch("getParkingSpaces", "parkingSpacesList", {
+          force: true,
+        })
+      );
       store.dispatch(
         userApiSlice.util.prefetch("getUsers", "usersList", { force: true })
       );

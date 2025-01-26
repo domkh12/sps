@@ -1,14 +1,35 @@
-import { Breadcrumbs, Button, Typography } from "@mui/material";
+import { Breadcrumbs, Button, IconButton, Typography } from "@mui/material";
 import React from "react";
 import { FiPlus } from "react-icons/fi";
+import { IoIosArrowBack } from "react-icons/io";
 
-function MainHeaderComponent({ breadcrumbs, title, btnTitle, onClick }) {
+function MainHeaderComponent({
+  breadcrumbs,
+  title,
+  btnTitle,
+  onClick,
+  handleBackClick,
+}) {
   return (
     <div className="pb-10 pt-1 flex flex-wrap justify-between items-center gap-5">
       <div className="flex flex-col gap-5">
-        <Typography variant="h5" sx={{ fontSize: "24px", fontWeight: "500" }}>
-          {title}
-        </Typography>
+        <div className="relative">
+          {handleBackClick && (
+            <IconButton
+              aria-label="back"
+              onClick={handleBackClick}
+              size="small"
+              disableRipple
+              sx={{ position: "absolute", top: "2px", left: "-20px" }}
+            >
+              <IoIosArrowBack className="text-gray-700"/>
+            </IconButton>
+          )}
+
+          <Typography variant="h5" sx={{ fontSize: "24px", fontWeight: "500" }}>
+            {title}
+          </Typography>
+        </div>
         <Breadcrumbs
           separator={
             <div className="w-[5px] h-[5px] mx-2 rounded-full bg-light-gray"></div>

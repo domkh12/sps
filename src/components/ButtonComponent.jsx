@@ -1,7 +1,14 @@
 import { LoadingButton } from "@mui/lab";
 import React from "react";
 
-function ButtonComponent({ onClick, btnTitle, icon, type, isLoading, loadingCaption }) {
+function ButtonComponent({
+  onClick,
+  btnTitle,
+  icon,
+  type,
+  isLoading,
+  loadingCaption,
+}) {
   return (
     <LoadingButton
       variant="contained"
@@ -15,7 +22,7 @@ function ButtonComponent({ onClick, btnTitle, icon, type, isLoading, loadingCapt
       onClick={onClick}
       type={type}
       loading={isLoading}
-      loadingIndicator={loadingCaption}
+      {...(loadingCaption && {loadingIndicator:  loadingCaption })}
     >
       {btnTitle}
     </LoadingButton>

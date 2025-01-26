@@ -23,17 +23,21 @@ import { FaUserCircle, FaUserTie } from "react-icons/fa";
 import { listItemButtonStyle } from "../assets/style";
 import { useConnectedUserMutation } from "../redux/feature/users/userApiSlice";
 import PortraitTwoToneIcon from "@mui/icons-material/PortraitTwoTone";
+import useTranslate from "../hook/useTranslate";
 
 function ProfileDrawerComponent({ open: initialOpen, onClose }) {
   const { username, status } = useAuth();
   const user = useSelector((state) => state.users.user);
   const [open, setOpen] = useState(initialOpen);
+  const { t } = useTranslate();
   const navigate = useNavigate();
   const [sendLogout, { isLoading, isSucess, isError, error }] =
     useSendLogoutMutation();
+
   const handleDrawerClose = () => {
     onClose();
   };
+
   const [
     connectedUser,
     { isSuccess: isSuccessConnectUser, isLoading: isLoadingConnectUser },
@@ -131,12 +135,16 @@ function ProfileDrawerComponent({ open: initialOpen, onClose }) {
             >
               <ListItem disablePadding>
                 <ListItemButton
+                  onClick={() => {
+                    navigate("accounts");
+                    handleDrawerClose();
+                  }}
                   sx={{ borderRadius: "6px", ...listItemButtonStyle }}
                 >
                   <ListItemIcon sx={{ mr: "10px", minWidth: 0 }}>
                     <PortraitTwoToneIcon />
                   </ListItemIcon>
-                  <ListItemText primary="Account" />
+                  <ListItemText primary={t("account")} />
                 </ListItemButton>
               </ListItem>
             </List>

@@ -11,6 +11,8 @@ const actionSlice = createSlice({
     captionSnackBar: "",
     isOpenSnackBar: false,
     isErrorSnackbar: false,
+    isOpenConfirmDelete: false,
+    isFiltered: false,
   },
   reducers: {
     toggleCollapsed(state, action) {
@@ -37,6 +39,12 @@ const actionSlice = createSlice({
     setErrorSnackbar(state, action) {
       state.isErrorSnackbar = action.payload;
     },
+    setIsOpenConfirmDelete(state, action) {
+      state.isOpenConfirmDelete = action.payload;
+    },
+    setIsFiltered(state, action) {
+      state.isFiltered = action.payload;
+    },
   },
 });
 
@@ -49,6 +57,8 @@ export const {
   setCaptionSnackBar,
   setIsOpenSnackBar,
   setErrorSnackbar,
+  setIsOpenConfirmDelete,
+  setIsFiltered,
 } = actionSlice.actions;
 
 export default actionSlice.reducer;

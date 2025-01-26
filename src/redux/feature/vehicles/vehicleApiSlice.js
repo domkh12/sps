@@ -1,5 +1,10 @@
 import { createEntityAdapter, createSelector } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
+import {
+  setLicensePlateProvincesFetched,
+  setLicensePlateTypesFetched,
+  setVehicleTypeFetched,
+} from "./vehicleSlice";
 
 const vehicleAdapter = createEntityAdapter({});
 
@@ -8,19 +13,14 @@ const initialState = vehicleAdapter.getInitialState();
 export const vehicleApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getVehicles: builder.query({
-      query: ({ pageNo = 1, pageSize = 30 } = {}) =>
-        `/vehicles?pageNo=${pageNo}&pageSize=${pageSize}`,
-      validateStatus: (response, result) => {
-        return response.result === 200 && !result.isError;
-      },
-      serializeQueryArgs: ({ pageNo }) => {
-        const newQueryArgs = { ...pageNo };
-        if (newQueryArgs.page) {
-          delete newQueryArgs.page;
-        }
-        return newQueryArgs;
-      },
+      query: ({ pageNo = 1, pageSize = 20 }) => ({
+        url: `/vehicles?pageNo=${pageNo}&pageSize=${pageSize}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError;
+        },
+      }),
       transformResponse: (responseData) => {
+        console.log("responseData: ", responseData);
         const loadVehicles = responseData.content.map((vehicle) => {
           vehicle.id = vehicle.uuid;
           return vehicle;
@@ -39,11 +39,47 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
             { type: "Vehicle", id: "LIST" },
             ...result.ids.map((id) => ({ type: "Vehicle", id })),
           ];
-        } else {
-          return [{ type: "Vehicle", id: "LIST" }];
-        }
+        } else return [{ type: "Vehicle", id: "LIST" }];
       },
     }),
+
+    filterVehicles: builder.query({
+      query: ({
+        pageNo = 1,
+        pageSize = 20,
+        keywords = "",
+        branchId = "",
+        vehiceTypeId = "",
+      }) => ({
+        url: `/vehicles/filters?pageNo=${pageNo}&pageSize=${pageSize}&keywords=${keywords}&branchId=${branchId}&vehicleTypeId=${vehiceTypeId}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError;
+        },
+      }),
+      transformResponse: (responseData) => {
+        console.log("responseData: ", responseData);
+        const loadVehicles = responseData.content.map((vehicle) => {
+          vehicle.id = vehicle.uuid;
+          return vehicle;
+        });
+        return {
+          ...vehicleAdapter.setAll(initialState, loadVehicles),
+          totalPages: responseData.page.totalPages,
+          totalElements: responseData.page.totalElements,
+          pageNo: responseData.page.number,
+          pageSize: responseData.page.size,
+        };
+      },
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [
+            { type: "Vehicle", id: "LIST" },
+            ...result.ids.map((id) => ({ type: "Vehicle", id })),
+          ];
+        } else return [{ type: "Vehicle", id: "LIST" }];
+      },
+    }),
+
     addNewVehicle: builder.mutation({
       query: (initialState) => ({
         url: "/vehicles",
@@ -54,6 +90,7 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Vehicle", id: "LIST" }],
     }),
+
     updateVehicle: builder.mutation({
       query: ({ uuid, ...initialState }) => ({
         url: `/vehicles/${uuid}`,
@@ -66,6 +103,59 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
         { type: "Vehicle", id: arg.uuid },
       ],
     }),
+
+    deleteVehicle: builder.mutation({
+      query: ({ id }) => ({
+        url: `/vehicles/${id}`,
+        method: "DELETE",
+        body: {
+          id,
+        },
+      }),
+      invalidatesTags: [{ type: "Vehicle", id: "LIST" }],
+    }),
+
+    getAllLicensePlateProvinces: builder.mutation({
+      query: () => ({
+        url: "/license-plate-provinces",
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setLicensePlateProvincesFetched({ data }));
+        } catch (error) {
+          console.error("Failed to fetch:", error);
+        }
+      },
+    }),
+
+    getAllVehicleTypes: builder.mutation({
+      query: () => ({
+        url: "/vehicle-types",
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setVehicleTypeFetched({ data }));
+        } catch (error) {
+          console.error("Failed to fetch:", error);
+        }
+      },
+    }),
+
+    getAllLicensePlateTypes: builder.mutation({
+      query: () => ({
+        url: "/license-plate-types",
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setLicensePlateTypesFetched({ data }));
+        } catch (error) {
+          console.error("Failed to fetch:", error);
+        }
+      },
+    }),
   }),
 });
 
@@ -73,6 +163,11 @@ export const {
   useGetVehiclesQuery,
   useAddNewVehicleMutation,
   useUpdateVehicleMutation,
+  useGetAllLicensePlateProvincesMutation,
+  useGetAllVehicleTypesMutation,
+  useGetAllLicensePlateTypesMutation,
+  useDeleteVehicleMutation,
+  useFilterVehiclesQuery,
 } = vehicleApiSlice;
 
 // return query result object

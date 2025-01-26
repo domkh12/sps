@@ -12,10 +12,12 @@ function EditUser() {
     }),
   });
 
-  if (!user) return <LoadingFetchingDataComponent />;
+  let content;
 
-  const content = <EditUserForm user={user} />;
-  
+  if (!user) content = <LoadingFetchingDataComponent />;
+
+  content = <EditUserForm user={user} />;
+
   return content;
 }
 

@@ -117,7 +117,7 @@ function AddNewBranch() {
 
   useEffect(() => {
     if (isSuccessGetAllCompanies) {
-      navigate("/dash/branch");
+      navigate("/dash/branches");
       dispatch(setIsOpenSnackBar(true));
       dispatch(setCaptionSnackBar(t("createSuccess")));
       setTimeout(() => {

@@ -20,10 +20,11 @@ const userSlice = createSlice({
     statusFilter: "",
     branchFilter: [],
     resultFound: "",
-    isFiltered: false,
     isOpenQuickEdit: false,
     userForQuickEdit: {},
     quickEditUserReponse: {},
+    idUserToDelete: "",
+    allFullNameUsersFetched: [],
   },
   reducers: {
     setIsLoadingUser(state, action) {
@@ -103,9 +104,6 @@ const userSlice = createSlice({
     setResultFound(state, action) {
       state.resultFound = action.payload;
     },
-    setIsFiltered(state, action) {
-      state.isFiltered = action.payload;
-    },
     setIsOpenQuickEdit(state, action) {
       state.isOpenQuickEdit = action.payload;
     },
@@ -114,6 +112,12 @@ const userSlice = createSlice({
     },
     setQuickEditUserReponse(state, action) {
       state.quickEditUserReponse = action.payload;
+    },
+    setAllFullNameUsersFetched(state, action) {
+      state.allFullNameUsersFetched = action.payload;
+    },
+    setIdUserToDelete(state, action) {
+      state.idUserToDelete = action.payload;
     }
   },
 });
@@ -143,10 +147,11 @@ export const {
   setPageNo,
   setBranchFilter,
   setResultFound,
-  setIsFiltered,
   setIsOpenQuickEdit,
   setUserForQuickEdit,
   setQuickEditUserReponse,
+  setAllFullNameUsersFetched,
+  setIdUserToDelete,
 } = userSlice.actions;
 
 export default userSlice.reducer;

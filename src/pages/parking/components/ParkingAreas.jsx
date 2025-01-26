@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import {
   selectAllParking,
-  useGetParkingQuery,
+  useGetParkingSpacesQuery,
 } from "../../../redux/feature/parking/parkingApiSlice";
 import { Box, Grid2, Tab, Tabs } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
@@ -62,7 +62,7 @@ function ParkingAreas() {
     isSuccess,
     isError,
     error,
-  } = useGetParkingQuery();
+  } = useGetParkingSpacesQuery();
 
   let content;
 

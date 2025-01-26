@@ -122,7 +122,7 @@ const SelectComponent = ({
     },
   };
 
-  const hasError = error && touched;
+  const hasError = Boolean(error && touched);
 
   const renderMenuItems = () => {
     if (!options || options.length === 0) return null;

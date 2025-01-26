@@ -6,10 +6,12 @@ import Aos from "aos";
 import "aos/dist/aos.css";
 import RequireAuth from "./pages/auth/RequireAuth.jsx";
 import { ROLES } from "./config/roles.js";
-import AddNewCompany from "./pages/branch/AddNewBranch.jsx";
-import BranchList from "./pages/branch/BranchList.jsx";
-import AddNewBranch from "./pages/branch/AddNewBranch.jsx";
-const CompanyList = lazy(() => import("./pages/branch/BranchList.jsx"));
+const BranchList = lazy(() => import("./pages/branch/BranchList.jsx"));
+const AddNewBranch = lazy(() => import("./pages/branch/AddNewBranch.jsx"));
+const Error403Component = lazy(
+  () => import("./components/Error403Component.jsx")
+);
+const EditBranch = lazy(() => import("./pages/branch/EditBranch.jsx"));
 const AdminLayout = lazy(() => import("./pages/layout/AdminLayout.jsx"));
 const Dashboard = lazy(() => import("./pages/dashboard/Dashboard.jsx"));
 const Prefetch = lazy(() => import("./pages/auth/Prefetch.jsx"));
@@ -34,14 +36,11 @@ const OAuth2RedirectHandler = lazy(
 const UserList = lazy(() => import("./pages/user/UserList.jsx"));
 const AddNewParking = lazy(() => import("./pages/parking/AddNewParking.jsx"));
 const Profile = lazy(() => import("./pages/profile/Profile.jsx"));
-const ProfileDetails = lazy(
-  () => import("./pages/profile/components/ProfileDetails.jsx")
-);
 const ParkingAreas = lazy(
   () => import("./pages/parking/components/ParkingAreas.jsx")
 );
 const MapViews = lazy(() => import("./pages/map_view/MapViews.jsx"));
-const Parking = lazy(() => import("./pages/parking/Parking.jsx"));
+const ParkingList = lazy(() => import("./pages/parking/ParkingList.jsx"));
 const TestComponent = lazy(() => import("./components/TestComponent.jsx"));
 const ReportList = lazy(() => import("./pages/report/ReportList.jsx"));
 const CreateReport = lazy(() => import("./pages/report/CreateReport.jsx"));
@@ -84,6 +83,7 @@ function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/test" element={<TestComponent />} />
           <Route path="/login" element={<Login />} />
+          <Route path="unauthorize" element={<Error403Component />} />
 
           {/* Protected routes */}
           <Route element={<PersistLogin />}>
@@ -95,10 +95,7 @@ function App() {
 
                 <Route path="/dash" element={<AdminLayout />}>
                   <Route index element={<Dashboard />} />
-
-                  <Route path="profiles" element={<Profile />}>
-                    <Route path="details" element={<ProfileDetails />} />
-                  </Route>
+                  <Route path="accounts" element={<Profile />} />
 
                   <Route
                     element={
@@ -131,10 +128,18 @@ function App() {
                   </Route>
 
                   <Route path="parkings">
-                    <Route index element={<Parking />} />
-                    <Route path="new" element={<AddNewParking />} />
-                    <Route index path=":id" element={<ParkingAreas />} />
-                    <Route path=":id" element={<ParkingAreasList />} />
+                    <Route index element={<ParkingList />} />
+
+                    <Route
+                      element={
+                        <RequireAuth allowedRoles={[ROLES.ROLE_ADMIN]} />
+                      }
+                    >
+                      <Route path="new" element={<AddNewParking />} />
+                      <Route index path=":id" element={<ParkingAreas />} />
+                      <Route path=":id" element={<ParkingAreasList />} />
+                    </Route>
+
                     <Route path="history" element={<HistoryParking />} />
                   </Route>
 
@@ -152,9 +157,10 @@ function App() {
                       <RequireAuth allowedRoles={[ROLES.ROLE_MANAGER]} />
                     }
                   >
-                    <Route path="branch">
+                    <Route path="branches">
                       <Route index element={<BranchList />} />
                       <Route path="new" element={<AddNewBranch />} />
+                      <Route path=":id" element={<EditBranch />} />
                     </Route>
                   </Route>
                 </Route>

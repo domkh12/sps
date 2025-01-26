@@ -1,11 +1,12 @@
 import { Typography } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { BsCameraFill } from "react-icons/bs";
 import useTranslate from "../hook/useTranslate";
 
-function ProfileUploadComponent({ profileImageFile, setProfileImageFile }) {
+function ProfileUploadComponent({ profileImageFile, setProfileImageFile, profileUrl }) {
+  
   const profileRef = useRef(null);
-  const [profileImageURL, setProfileImageURL] = useState(null);
+  const [profileImageURL, setProfileImageURL] = useState(profileUrl || "");
   const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState(null);
   const { t } = useTranslate();
@@ -62,17 +63,13 @@ function ProfileUploadComponent({ profileImageFile, setProfileImageFile }) {
               >
                 <div className="flex justify-center items-center flex-col gap-2">
                   <BsCameraFill className=" text-white w-7 h-7 " />
-                  <span
-                    className="text-white text-sm"
-                  >
-                    Upload photo
-                  </span>
+                  <span className="text-white text-sm">Upload photo</span>
                 </div>
               </button>
             </>
           )}
         </div>
-        {!profileImageFile && (
+        {!profileImageFile && profileImageURL === "" && (
           <button
             onClick={handleClick}
             className={`absolute group-hover:block top-[6px] w-[160px] h-[160px]  rounded-full ${isError ? "bg-[#F8DDDD] bg-opacity-100 hover:bg-opacity-80 " : "bg-black bg-opacity-10 hover:bg-opacity-5 "}`}

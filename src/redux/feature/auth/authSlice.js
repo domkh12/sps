@@ -9,6 +9,7 @@ const authSlice = createSlice({
     qrCodeUrl: null,
     twoFASecretCode: null,
     isTwoFAEnabled: false,
+    userProfile: {}
   },
 
   // function
@@ -35,6 +36,9 @@ const authSlice = createSlice({
     logOut: (state, action) => {
       state.token = null;
     },
+    setUserProfile: (state, action) => {
+      state.userProfile = action.payload;
+    }
   },
 });
 
@@ -44,6 +48,7 @@ export const {
   setQrCodeUrl,
   setTwoFASecretCode,
   setIsTwoFAEnabled,
+  setUserProfile,
 } = authSlice.actions;
 
 export default authSlice.reducer;

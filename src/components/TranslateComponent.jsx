@@ -45,10 +45,7 @@ function TranslateComponent() {
       }, 3000);
     }
   }, [isSuccess, dispatch]);
-
-  useEffect(() => {
-    console.log("TranslateComponent use effect");
-  }, []);
+  
   const handleLanguageChange = (lang) => {
     dispatch(setLanguage(lang));
     dispatch(fetchTranslations(lang));

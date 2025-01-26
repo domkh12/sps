@@ -19,10 +19,13 @@ import EditButtonComponent from "./EditButtonComponent";
 import MoreActionComponent from "./MoreActionComponent";
 import { FaPen, FaTrashCan } from "react-icons/fa6";
 import {
+  setIdUserToDelete,
   setIsOpenQuickEdit,
   setUserForQuickEdit,
 } from "../redux/feature/users/userSlice";
 import { useGetUsersQuery } from "../redux/feature/users/userApiSlice";
+import { setIsOpenConfirmDelete } from "../redux/feature/actions/actionSlice";
+import useAuth from "../hook/useAuth";
 
 function stringToColor(string) {
   let hash = 0;
@@ -73,6 +76,7 @@ function stringAvatar(name) {
 function UserRowComponent({ userId }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { isManager } = useAuth();
 
   const { user } = useGetUsersQuery("usersList", {
     selectFromResult: ({ data }) => ({
@@ -89,7 +93,7 @@ function UserRowComponent({ userId }) {
   const [loadedUser, setLoadedUser] = useState(user || {});
 
   useEffect(() => {
-    if(quickEditUserResponse.data?.uuid === loadedUser.uuid) {
+    if (quickEditUserResponse.data?.uuid === loadedUser.uuid) {
       setLoadedUser(quickEditUserResponse.data);
     }
   }, [quickEditUserResponse]);
@@ -101,7 +105,8 @@ function UserRowComponent({ userId }) {
   }, [userActive]);
 
   const handleDelete = () => {
-    console.log("Download action triggered");
+    dispatch(setIsOpenConfirmDelete(true));
+    dispatch(setIdUserToDelete(user.uuid));
   };
 
   const handleQuickEdit = () => {
@@ -241,26 +246,29 @@ function UserRowComponent({ userId }) {
           <TableCell sx={{ borderBottomStyle: "dashed" }}>
             <div className="flex gap-5 items-center">{roles}</div>
           </TableCell>
-          <TableCell sx={{ borderBottomStyle: "dashed" }}>
-            <Stack direction="column" spacing={1}>
-              {loadedUser.sites.map((site) => (
-                <div key={site.uuid}>
-                  <Chip
-                    avatar={
-                      <Avatar
-                        alt="Branch_Img"
-                        src={site.image}
-                        {...stringAvatar(site.siteName)}
-                      />
-                    }
-                    className="w-fit"
-                    label={site.siteName}
-                    variant="outlined"
-                  />
-                </div>
-              ))}
-            </Stack>
-          </TableCell>
+          {isManager && (
+            <TableCell sx={{ borderBottomStyle: "dashed" }}>
+              <Stack direction="column" spacing={1}>
+                {loadedUser.sites.map((site) => (
+                  <div key={site.uuid}>
+                    <Chip
+                      avatar={
+                        <Avatar
+                          alt="Branch_Img"
+                          src={site.image}
+                          {...stringAvatar(site.siteName)}
+                        />
+                      }
+                      className="w-fit"
+                      label={site.siteName}
+                      variant="outlined"
+                    />
+                  </div>
+                ))}
+              </Stack>
+            </TableCell>
+          )}
+
           <TableCell sx={{ borderBottomStyle: "dashed" }}>
             <Chip sx={getChipStyles()} size="small" label={loadedUser.status} />
           </TableCell>

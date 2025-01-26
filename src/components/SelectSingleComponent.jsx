@@ -7,6 +7,7 @@ import {
   Select,
   FormHelperText,
 } from "@mui/material";
+import DataNotFound from "./DataNotFound";
 
 function SelectSingleComponent({
   label,
@@ -62,19 +63,23 @@ function SelectSingleComponent({
           }),
         }}
       >
-        {options?.length
-          ? options.map((option) => (
-              <MenuItem
-                key={option.uuid}
-                sx={{
-                  borderRadius: "5px",
-                }}
-                value={option.uuid}
-              >
-                {option[optionLabelKey]}
-              </MenuItem>
-            ))
-          : null}
+        {options?.length ? (
+          options.map((option) => (
+            <MenuItem
+              key={option?.uuid}
+              sx={{
+                borderRadius: "5px",
+              }}
+              value={option?.uuid}
+            >
+              {option[optionLabelKey]}
+            </MenuItem>
+          ))
+        ) : (
+          <div className="py-3">
+            <DataNotFound />
+          </div>
+        )}
       </Select>
       <FormHelperText error={hasError}>
         {hasError ? error : null}

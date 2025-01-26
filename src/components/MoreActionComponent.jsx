@@ -17,6 +17,7 @@ function MoreActionComponent({
   // textColor = "#424242",
   // buttonColor = "#424242",
 }) {
+  console.log("menuItems", menuItems)
   return (
     <div>
       <PopupState variant="popover" popupId="more-action-popover">
@@ -69,22 +70,22 @@ function MoreActionComponent({
                     }}
                     sx={{
                       borderRadius: "6px",
-                      color: item.buttonColor,
+                      color: item?.buttonColor,
                     }}
                   >
                     <ListItemText
                       primary={
                         <div className="flex items-center gap-3">
-                          {item.icon}
+                          {item?.icon}
                           <Typography
                             component="span"
                             variant="body2"
                             sx={{
-                              color: item.textColor,
+                              color: item?.textColor,
                               display: "inline",
                             }}
                           >
-                            {item.label}
+                            {item?.label}
                           </Typography>
                         </div>
                       }

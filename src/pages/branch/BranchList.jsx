@@ -1,11 +1,6 @@
 import {
   Card,
   Checkbox,
-  IconButton,
-  List,
-  ListItemButton,
-  ListItemText,
-  Popover,
   Table,
   TableBody,
   TableCell,
@@ -17,40 +12,133 @@ import {
 import SeoComponent from "../../components/SeoComponent";
 import { useNavigate } from "react-router-dom";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
-import SelectComponent from "../../components/SelectComponent";
-import SearchComponent from "../../components/SearchComponent";
-import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
-import { BsFillPrinterFill, BsThreeDotsVertical } from "react-icons/bs";
 import { cardStyle, listStyle } from "../../assets/style";
 import useAuth from "../../hook/useAuth";
 import useTranslate from "../../hook/useTranslate";
-import { useSelector } from "react-redux";
-import { useGetSitesQuery } from "../../redux/feature/site/siteApiSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  useFilterSitesQuery,
+  useGetSitesQuery,
+} from "../../redux/feature/site/siteApiSlice";
 import BranchRowComponent from "../../components/BranchRowComponent";
-import { useCallback, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import QuickEditBranchComponent from "../../components/QuickEditBranchComponent";
+import FilterBarComponent from "../../components/FilterBarComponent";
+import { useGetAllCitiesMutation } from "../../redux/feature/city/cityApiSlice";
+import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
+import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice";
+import { setCityFilter } from "../../redux/feature/city/citySlice";
+import {
+  setBranchTypeFilter,
+  setSearchKeywords,
+} from "../../redux/feature/site/siteSlice";
+import { setCompanyFilter } from "../../redux/feature/company/companySlice";
+import { useGetAllSiteTypesMutation } from "../../redux/feature/siteType/siteTypeApiSlice";
+import DataNotFound from "../../components/DataNotFound";
 
 function BranchList() {
   const navigate = useNavigate();
   const { isManager } = useAuth();
+  const openQuickEdit = useSelector(
+    (state) => state.sites.isQuickEditBranchOpen
+  );
   const { t } = useTranslate();
   const pageNo = useSelector((state) => state.companies.pageNo);
   const pageSize = useSelector((state) => state.companies.pageSize);
   const [searchTerm, setSearchTerm] = useState("");
-  const searchTimeout = useRef(null);
-  console.log("searchTerm", searchTerm);
+  const [isLoading, setIsLoading] = useState(true);
+  const cityFilter = useSelector((state) => state.city.cityFilter);
+  const citiesFetchedData = useSelector((state) => state.city.cityData);
+  const siteTypesFetchedData = useSelector(
+    (state) => state.siteType.siteTypeData
+  );
+  const companiesFetchedData = useSelector(
+    (state) => state.companies.companiesData
+  );
+  const companyFilter = useSelector((state) => state.companies.companyFilter);
+  const branchTypeFilter = useSelector((state) => state.sites.branchTypeFilter);
+  const searchKeywords = useSelector((state) => state.sites.searchKeywords);
+  const dispatch = useDispatch();
 
   const {
     data: sites,
     isSuccess,
-    isLoading,
+    isLoading: isLoadingGetAllSite,
     isError,
     error,
-    refetch,
-  } = useGetSitesQuery("sitesList", {
-    pageNo,
-    pageSize,
-    searchTerm,
-  });
+  } = useGetSitesQuery({ query: "usersList", pageNo, pageSize });
+
+  const {
+    data: filterData,
+    isSuccess: isSuccessFilter,
+    isLoading: isLoadingFilter,
+    isError: isErrorFilter,
+    error: errorFilter,
+  } = useFilterSitesQuery(
+    {
+      pageNo,
+      pageSize,
+      keywords: searchKeywords,
+      cityId: cityFilter,
+      siteTypeId: branchTypeFilter,
+      companyId: companyFilter,
+    },
+    {
+      skip:
+        searchKeywords === "" &&
+        cityFilter === "" &&
+        branchTypeFilter.length === 0 &&
+        companyFilter.length === 0,
+    }
+  );
+
+  const [
+    getAllCities,
+    {
+      isSuccess: isSuccessGetAllCities,
+      isLoading: isLoadingGetAllCities,
+      isError: isErrorGetAllCities,
+      error: errorGetAllCities,
+    },
+  ] = useGetAllCitiesMutation();
+
+  const [
+    getAllSiteTypes,
+    {
+      isSuccess: isSuccessGetAllSiteTypes,
+      isLoading: isLoadingGetAllSiteTypes,
+      isError: isErrorGetAllSiteTypes,
+      error: errorGetAllSiteType,
+    },
+  ] = useGetAllSiteTypesMutation();
+
+  const [
+    getAllCompanies,
+    {
+      isSuccess: isSuccessGetAllCompanies,
+      isLoading: isLoadingGetAllCompanies,
+      isError: isErrorGetAllCompanies,
+      error: errorGetAllCompanies,
+    },
+  ] = useGetAllCompaniesMutation();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([
+          getAllCompanies(),
+          getAllCities(),
+          getAllSiteTypes(),
+        ]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const breadcrumbs = [
     <button
@@ -111,20 +199,21 @@ function BranchList() {
     },
   ];
 
-  const handleAddNewClick = () => {
-    navigate("/dash/branch/new");
+  const handleCityChange = (value) => {
+    dispatch(setCityFilter(value));
   };
 
-  const handleSearchChange = useCallback((value) => {
-    if (searchTimeout.current) {
-      clearTimeout(searchTimeout.current);
-    }
+  const handleBranchTypeChange = (value) => {
+    dispatch(setBranchTypeFilter(value));
+  };
 
-    searchTimeout.current = setTimeout(() => {
-      setSearchTerm(value);
-      // refetch();
-    }, 500);
-  }, []);
+  const handleSearchChange = (keyword) => {
+    dispatch(setSearchKeywords(keyword));
+  };
+
+  const handleCompanyFilter = (value) => {
+    dispatch(setCompanyFilter(value));
+  };
 
   let content;
 
@@ -134,12 +223,45 @@ function BranchList() {
     content = <p>Error: {error?.message}</p>;
   }
 
-  if (isSuccess) {
+  if (isSuccess && !isLoading) {
     const { ids, totalElements, pageSize, pageNo } = sites;
-    cardStyle;
-    const tableContent = ids?.length
-      ? ids.map((siteId) => <BranchRowComponent key={siteId} siteId={siteId} />)
-      : null;
+
+    const { ids: idsFilterData } = filterData || {};
+    
+    const tableContent =
+      searchKeywords !== "" ||
+      cityFilter.length > 0 ||
+      branchTypeFilter.length > 0 ||
+      companyFilter.length > 0 ? (
+        <>
+          {idsFilterData?.length ? (
+            idsFilterData?.map((siteId) => (
+              <BranchRowComponent key={siteId} siteId={siteId} />
+            ))
+          ) : (
+            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+              <TableCell align="center" colSpan={8}>
+                <DataNotFound />
+              </TableCell>
+            </TableRow>
+          )}
+        </>
+      ) : (
+        <>
+          {ids?.length ? (
+            ids.map((siteId) => (
+              <BranchRowComponent key={siteId} siteId={siteId} />
+            ))
+          ) : (
+            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+              <TableCell align="center" colSpan={6}>
+                <DataNotFound />
+              </TableCell>
+            </TableRow>
+          )}
+        </>
+      );
+
     content = (
       <div data-aos="fade-left">
         <SeoComponent title="Company List" />
@@ -147,102 +269,25 @@ function BranchList() {
           breadcrumbs={breadcrumbs}
           title={t("list")}
           btnTitle={t("newBranch")}
-          onClick={handleAddNewClick}
+          onClick={() => navigate("/dash/branches/new")}
         />
 
         <div>
           <Card sx={{ ...cardStyle }}>
-            <div className="p-[20px] flex gap-[16px] flex-col xl:flex-row">
-              <SelectComponent
-                label={t("company")}
-                labelId="company_label"
-                id="company"
-                // options={companyNames.data}
-                // onChange={handleRoleChange}
-                optionLabelKey="companyName"
-              />
-
-              <SelectComponent
-                label={t("city")}
-                labelId="city_label"
-                id="city"
-                // options={companyNames.data}
-                // onChange={handleRoleChange}
-                optionLabelKey="companyName"
-              />
-
-              <div className="flex items-center gap-3 w-full">
-                <SearchComponent onSearchChange={handleSearchChange} />
-                <PopupState variant="popover" popupId="demo-popup-popover">
-                  {(popupState) => (
-                    <div>
-                      <IconButton
-                        aria-label="more_menu"
-                        {...bindTrigger(popupState)}
-                        size="small"
-                        sx={{ width: "36px", height: "36px" }}
-                      >
-                        <BsThreeDotsVertical className="w-5 h-5" />
-                      </IconButton>
-                      <Popover
-                        {...bindPopover(popupState)}
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "center",
-                        }}
-                        slotProps={{
-                          paper: {
-                            style: {
-                              padding: 10,
-                              backgroundColor: "transparent",
-                              boxShadow: "none",
-                            },
-                          },
-                        }}
-                        transformOrigin={{
-                          vertical: "top",
-                          horizontal: "center",
-                        }}
-                      >
-                        <List
-                          component="div"
-                          disablePadding
-                          dense={true}
-                          sx={{
-                            ...listStyle,
-                          }}
-                        >
-                          <ListItemButton
-                            sx={{
-                              borderRadius: "6px",
-                              color: "#424242",
-                            }}
-                          >
-                            <ListItemText
-                              primary={
-                                <div className="flex items-center gap-3">
-                                  <BsFillPrinterFill className="w-5 h-5" />
-                                  <Typography
-                                    component="span"
-                                    variant="body1"
-                                    sx={{
-                                      color: "#424242",
-                                      display: "inline",
-                                    }}
-                                  >
-                                    Print
-                                  </Typography>
-                                </div>
-                              }
-                            />
-                          </ListItemButton>
-                        </List>
-                      </Popover>
-                    </div>
-                  )}
-                </PopupState>
-              </div>
-            </div>
+            <FilterBarComponent
+              showTabs={false}
+              searchQuery={searchKeywords}
+              cityFetched={citiesFetchedData}
+              branchTypeFetched={siteTypesFetchedData}
+              companyFetched={companiesFetchedData}
+              cityFilter={cityFilter}
+              branchTypeFilter={branchTypeFilter}
+              companyFilter={companyFilter}
+              handleCityChange={handleCityChange}
+              handleBranchTypeChange={handleBranchTypeChange}
+              handleSearchChange={handleSearchChange}
+              handleCompanyChange={handleCompanyFilter}
+            />
 
             <TableContainer>
               <Table>
@@ -286,6 +331,7 @@ function BranchList() {
             /> */}
           </Card>
         </div>
+        {openQuickEdit && <QuickEditBranchComponent />}
       </div>
     );
   }

@@ -58,8 +58,8 @@ function SideBar() {
   const isReportListPage = location.pathname === "/dash/reports";
   const isReportCreatePage = location.pathname === "/dash/reports/new";
   const isHistoryPage = location.pathname === "/dash/history";
-  const isBranchListPage = location.pathname === "/dash/branch";
-  const isBranchCreatePage = location.pathname === "/dash/branch/new";
+  const isBranchListPage = location.pathname === "/dash/branches";
+  const isBranchCreatePage = location.pathname === "/dash/branches/new";
   const { t } = useTranslate();
 
   const handleManagementClick = () => {
@@ -262,7 +262,7 @@ function SideBar() {
                               textWrap: "nowrap",
                             }}
                           >
-                            Map View
+                            {t("mapView")}
                           </Typography>
                         }
                       />
@@ -280,7 +280,7 @@ function SideBar() {
                             textWrap: "nowrap",
                           }}
                         >
-                          Map View
+                          {t("mapView")}
                         </Typography>
                       }
                     />
@@ -320,7 +320,7 @@ function SideBar() {
                               textWrap: "nowrap",
                             }}
                           >
-                            History
+                            {t("history")}
                           </Typography>
                         }
                       />
@@ -334,7 +334,7 @@ function SideBar() {
                           variant="body1"
                           sx={{ color: "#424242", display: "inline" }}
                         >
-                          History
+                          {t("history")}
                         </Typography>
                       }
                     />
@@ -481,14 +481,15 @@ function SideBar() {
                                         }}
                                         onClick={() => {
                                           if (
-                                            location.pathname !== "/dash/branch"
+                                            location.pathname !==
+                                            "/dash/branches"
                                           ) {
                                             popupState.close();
                                           }
-                                          navigate("/dash/branch");
+                                          navigate("/dash/branches");
                                         }}
                                         selected={
-                                          location.pathname === "/dash/branch"
+                                          location.pathname === "/dash/branches"
                                         }
                                       >
                                         <ListItemText
@@ -519,11 +520,11 @@ function SideBar() {
                                           ) {
                                             popupState.close();
                                           }
-                                          navigate("/dash/branch/new");
+                                          navigate("/dash/branches/new");
                                         }}
                                         selected={
                                           location.pathname ===
-                                          "/dash/branch/new"
+                                          "/dash/branches/new"
                                         }
                                       >
                                         <ListItemText
@@ -625,9 +626,9 @@ function SideBar() {
                                     color: "#424242",
                                     mb: "5px",
                                   }}
-                                  onClick={() => navigate("/dash/branch")}
+                                  onClick={() => navigate("/dash/branches")}
                                   selected={
-                                    location.pathname === "/dash/branch"
+                                    location.pathname === "/dash/branches"
                                   }
                                 >
                                   <ListItemText
@@ -658,9 +659,9 @@ function SideBar() {
                                     color: "#424242",
                                     mb: "5px",
                                   }}
-                                  onClick={() => navigate("/dash/branch/new")}
+                                  onClick={() => navigate("/dash/branches/new")}
                                   selected={
-                                    location.pathname === "/dash/branch/new"
+                                    location.pathname === "/dash/branches/new"
                                   }
                                 >
                                   <ListItemText
@@ -686,7 +687,7 @@ function SideBar() {
                     )}
 
                     {/* Parking Menu */}
-                    {isAdmin && (
+                    {(isManager || isAdmin) && (
                       <>
                         {isCollapsed ? (
                           <>
@@ -732,7 +733,7 @@ function SideBar() {
                                               textWrap: "nowrap",
                                             }}
                                           >
-                                            Parking
+                                            {t("parkingSpace")}
                                           </Typography>
                                         }
                                       />
@@ -802,46 +803,47 @@ function SideBar() {
                                                 display: "inline",
                                               }}
                                             >
-                                              List
+                                              {t("list")}
                                             </Typography>
                                           }
                                         />
                                       </ListItemButton>
-
-                                      <ListItemButton
-                                        sx={{
-                                          borderRadius: "6px",
-                                          color: "#424242",
-                                        }}
-                                        onClick={() => {
-                                          if (
-                                            location.pathname !==
+                                      {isAdmin && (
+                                        <ListItemButton
+                                          sx={{
+                                            borderRadius: "6px",
+                                            color: "#424242",
+                                          }}
+                                          onClick={() => {
+                                            if (
+                                              location.pathname !==
+                                              "/dash/parkings/new"
+                                            ) {
+                                              popupState.close();
+                                            }
+                                            navigate("/dash/parkings/new");
+                                          }}
+                                          selected={
+                                            location.pathname ===
                                             "/dash/parkings/new"
-                                          ) {
-                                            popupState.close();
                                           }
-                                          navigate("/dash/parkings/new");
-                                        }}
-                                        selected={
-                                          location.pathname ===
-                                          "/dash/parkings/new"
-                                        }
-                                      >
-                                        <ListItemText
-                                          primary={
-                                            <Typography
-                                              component="span"
-                                              variant="body1"
-                                              sx={{
-                                                color: "#424242",
-                                                display: "inline",
-                                              }}
-                                            >
-                                              Create
-                                            </Typography>
-                                          }
-                                        />
-                                      </ListItemButton>
+                                        >
+                                          <ListItemText
+                                            primary={
+                                              <Typography
+                                                component="span"
+                                                variant="body1"
+                                                sx={{
+                                                  color: "#424242",
+                                                  display: "inline",
+                                                }}
+                                              >
+                                                {t("create")}
+                                              </Typography>
+                                            }
+                                          />
+                                        </ListItemButton>
+                                      )}
                                     </List>
                                   </HoverPopover>
                                 </div>
@@ -890,7 +892,7 @@ function SideBar() {
                                         display: "inline",
                                       }}
                                     >
-                                      Parking
+                                      {t("parkingSpace")}
                                     </Typography>
                                   }
                                 />
@@ -938,42 +940,48 @@ function SideBar() {
                                     variant="body1"
                                     sx={{ color: "#424242", display: "inline" }}
                                   >
-                                    List
+                                    {t("list")}
                                   </Typography>
                                 }
                               />
                             </ListItemButton>
                           </li>
-                          <li>
-                            <img
-                              src="/images/nav_sublist.svg"
-                              alt="sub_list_img"
-                              className="absolute top-[55px] left-6 h-[14px] w-[14px]"
-                            />
-                            <ListItemButton
-                              sx={{
-                                borderRadius: "10px",
-                                color: "#424242",
-                                mb: "5px",
-                              }}
-                              onClick={() => navigate("/dash/parkings/new")}
-                              selected={
-                                location.pathname === "/dash/parkings/new"
-                              }
-                            >
-                              <ListItemText
-                                primary={
-                                  <Typography
-                                    component="span"
-                                    variant="body1"
-                                    sx={{ color: "#424242", display: "inline" }}
-                                  >
-                                    Create
-                                  </Typography>
-                                }
+
+                          {isAdmin && (
+                            <li>
+                              <img
+                                src="/images/nav_sublist.svg"
+                                alt="sub_list_img"
+                                className="absolute top-[55px] left-6 h-[14px] w-[14px]"
                               />
-                            </ListItemButton>
-                          </li>
+                              <ListItemButton
+                                sx={{
+                                  borderRadius: "10px",
+                                  color: "#424242",
+                                  mb: "5px",
+                                }}
+                                onClick={() => navigate("/dash/parkings/new")}
+                                selected={
+                                  location.pathname === "/dash/parkings/new"
+                                }
+                              >
+                                <ListItemText
+                                  primary={
+                                    <Typography
+                                      component="span"
+                                      variant="body1"
+                                      sx={{
+                                        color: "#424242",
+                                        display: "inline",
+                                      }}
+                                    >
+                                      {t("create")}
+                                    </Typography>
+                                  }
+                                />
+                              </ListItemButton>
+                            </li>
+                          )}
                         </ul>
                       </List>
                     </Collapse>

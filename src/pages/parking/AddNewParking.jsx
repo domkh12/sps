@@ -1,229 +1,246 @@
 import {
-  Box,
-  Button,
+  Autocomplete,
   Card,
   Chip,
-  IconButton,
-  InputBase,
-  Snackbar,
+  Grid2,
   styled,
   TextField,
-  useTheme,
+  Typography,
 } from "@mui/material";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
-import { PiXThin } from "react-icons/pi";
 import { useAddNewParkingMutation } from "../../redux/feature/parking/parkingApiSlice";
-import { toast } from "react-toastify";
+import SeoComponent from "./../../components/SeoComponent";
+import MainHeaderComponent from "../../components/MainHeaderComponent";
+import useTranslate from "../../hook/useTranslate";
+import { useNavigate } from "react-router-dom";
+import { cardStyle } from "../../assets/style";
+import ImageUploadComponent from "../../components/ImageUploadComponent";
+import ButtonComponent from "../../components/ButtonComponent";
+import {
+  setCaptionSnackBar,
+  setErrorSnackbar,
+  setIsOpenSnackBar,
+} from "../../redux/feature/actions/actionSlice";
+import { useDispatch } from "react-redux";
+import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
+import { useAddNewParkingLotsMutation } from "../../redux/feature/parking/parkingLotApiSlice";
 
 export default function AddNewParking() {
-  const [inputValue, setInputValue] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const { t } = useTranslate();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const theme = useTheme();
+  const [
+    addNewParking,
+    {
+      isSuccess: isAddNewParkingSuccess,
+      isError: isErrorAddNewParking,
+      error: errorAddNewParking,
+    },
+  ] = useAddNewParkingMutation();
 
-  const ListItem = styled("li")(({ theme }) => ({
-    margin: theme.spacing(0.5),
-  }));
+  const [
+    addNewParkingLots,
+    {
+      isSuccess: isAddNewParkingLotsSuccess,
+      isLoading: isLoadingAddNewParkingLots,
+      isError: isErrorAddNewParkingLots,
+      error: errorAddNewParkingLots,
+    },
+  ] = useAddNewParkingLotsMutation();
 
-  const [addNewParking, { isSuccess: isAddNewParkingSuccess }] =
-    useAddNewParkingMutation();
+  const [uploadImage] = useUploadImageMutation();
 
   const validationSchema = Yup.object().shape({
-    parkingName: Yup.string()
-      .required("Parking name is required") // Required field
-      .min(3, "Parking name must be at least 3 characters long"), // Minimum length
-    parkingSlotsName: Yup.array().of(
-      Yup.object().shape({
-        label: Yup.string().required("Slot label is required"), // Required label for each slot
-      })
-    ),
+    // parkingName: Yup.string()
+    //   .required("Parking name is required")
+    //   .min(3, "Parking name must be at least 3 characters long"),
+    // parkingSlotsName: Yup.array().of(
+    //   Yup.object().shape({
+    //     label: Yup.string().required("Slot label is required"),
+    //   })
+    // ),
   });
-
-  const handleSubmit = async (values,{ resetForm }) => {
-    const updatedValues = {
-      ...values,
-      parkingSlotsName: values.parkingSlotsName.map((slot) => slot.label),
-    };
-    console.log(updatedValues);
-    await addNewParking(updatedValues);
-    resetForm();
-  };
 
   useEffect(() => {
     if (isAddNewParkingSuccess) {
-      toast.success("Create Parking Successfully", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      navigate("/dash/parkings");
+      dispatch(setIsOpenSnackBar(true));
+      dispatch(setCaptionSnackBar(t("createSuccess")));
+      setTimeout(() => {
+        dispatch(setIsOpenSnackBar(false));
+      }, 3000);
     }
   }, [isAddNewParkingSuccess]);
 
+  useEffect(() => {
+    if (isErrorAddNewParking) {
+      dispatch(setIsOpenSnackBar(true));
+      dispatch(setErrorSnackbar(true));
+      dispatch(
+        setCaptionSnackBar(`${errorAddNewParking?.data?.error?.description}`)
+      );
+      setTimeout(() => {
+        dispatch(setIsOpenSnackBar(false));
+      }, 3000);
+
+      setTimeout(() => {
+        dispatch(setErrorSnackbar(false));
+      }, 3500);
+    }
+  }, [isErrorAddNewParking]);
+
+  const handleSubmit = async (values) => {
+    try {
+      const formData = new FormData();
+      let profileImageUri = null;
+      let parkingSpaceUuid = "";
+      if (profileImageFile) {
+        formData.append("file", profileImageFile);
+        const uploadResponse = await uploadImage(formData).unwrap();
+        profileImageUri = uploadResponse.uri;
+      }
+      const addNewParkingSpaceResponse = await addNewParking({
+        label: values.location,
+        image: profileImageUri,
+      }).unwrap();
+
+      parkingSpaceUuid = addNewParkingSpaceResponse.uuid;
+      console.log("values lotname", values.lotName)
+      await addNewParkingLots({
+        parkingSpaceUuid: parkingSpaceUuid,
+        lotName: values.lotName,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const breadcrumbs = [
+    <button
+      className="text-black hover:underline"
+      onClick={() => navigate("/dash")}
+      key={1}
+    >
+      {t("dashboard")}
+    </button>,
+    <Typography color="inherit" key={2}>
+      {t("parkingSpace")}
+    </Typography>,
+    <Typography color="inherit" key={3}>
+      {t("newParkingSpace")}
+    </Typography>,
+  ];
+
   let content;
+
   content = (
     <>
-      <Box
-        component="div"
-        sx={{
-          paddingX: "2rem",
-          bgcolor: "background.default",
-          color: "text.primary",
-          height: "100%",
-        }}
-      >
+      <SeoComponent title={"Create a new parking space"} />
+      <MainHeaderComponent
+        breadcrumbs={breadcrumbs}
+        title={t("createAParkingSpace")}
+      />
+      <div>
         <Formik
-          initialValues={{ parkingName: "", parkingSlotsName: [] }}
+          initialValues={{ location: "", lotName: [] }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
           {({
             values,
-            errors,
             touched,
+            errors,
             handleChange,
             handleBlur,
             setFieldValue,
-          }) => {          
-
-            const handleDelete = (slotToDelete) => () => {
-              setFieldValue(
-                "parkingSlotsName",
-                values.parkingSlotsName.filter(
-                  (slot) => slot.label !== slotToDelete.label
-                )
-              );
-            };
-
-            const handleKeyDown = (event) => {
-              // New function to handle key down events
-              if (event.key === "Enter" && inputValue.trim()) {
-                // Update to use setFieldValue for parkingSlotsName
-                setFieldValue("parkingSlotsName", [
-                  ...values.parkingSlotsName,
-                  { label: inputValue },
-                ]);
-
-                setInputValue(""); // Clear input after adding slot
-                event.preventDefault(); // Prevent form submission
-              }
-            };
+          }) => {
             return (
               <Form>
-                <h1 className="text-2xl font-medium dark:text-gray-100 py-4 ">
-                  Create Parking
-                </h1>
-
-                <TextField
-                  id="outlined-basic"
-                  sx={{
-                    "& .MuiInputBase-input": {
-                      boxShadow: "none",
-                    },
-                  }}
-                  autoComplete="off"
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Enter Parking Name"
-                  name="parkingName"
-                  value={values.parkingName}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                />
-                {errors.parkingName && touched.parkingName && (
-                  <div style={{ color: "red", marginBottom: "8px" }}>
-                    {errors.parkingName}
-                  </div>
-                )}
-
-                <Card
-                  variant="outlined"
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    flexWrap: "wrap",
-                    listStyle: "none",
-                    px: 0.5,
-                    py: 1.5,
-                    m: 0,
-                    mt: 2,
-                    outline: isFocused
-                      ? theme.palette.mode === "dark"
-                        ? "2px solid white"
-                        : "2px solid black"
-                      : "none",
-                    position: "relative",
-                  }}
-                  component="ul"
-                >
-                  {values.parkingSlotsName.length > 0 && (
-                    <IconButton
-                      variant="outlined"
-                      onClick={() => setFieldValue("parkingSlotsName", [])} // Clear the chip data
-                      sx={{
-                        position: "absolute", // Position the button absolutely
-                        top: 8, // Adjust top position
-                        right: 8,
-                        zIndex: 1,
-                      }}
+                <Grid2 container spacing={3}>
+                  <Grid2 size={{ xs: 12, md: 4 }}>
+                    <Card
+                      sx={{ ...cardStyle }}
+                      className=" gap-5 pt-[40px] px-[24px] pb-[40px]"
                     >
-                      <PiXThin />
-                    </IconButton>
-                  )}
+                      <ImageUploadComponent
+                        setProfileImageFile={setProfileImageFile}
+                        profileImageFile={profileImageFile}
+                      />
+                    </Card>
+                  </Grid2>
+                  <Grid2 size={{ xs: 12, md: 8 }}>
+                    <Card sx={{ ...cardStyle, padding: "24px" }}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <TextField
+                          label={t("location")}
+                          variant="outlined"
+                          sx={{
+                            "& .MuiInputBase-input": {
+                              boxShadow: "none",
+                            },
+                            borderRadius: "6px",
+                          }}
+                          type="text"
+                          id="location"
+                          name="location"
+                          fullWidth
+                          value={values.location}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          autoComplete="off"
+                          error={errors.location && touched.location}
+                          helperText={
+                            errors.location && touched.location
+                              ? errors.location
+                              : null
+                          }
+                          size="medium"
+                        />
 
-                  {values.parkingSlotsName.map((data, index) => (
-                    <ListItem key={index}>
-                      <Chip label={data.label} onDelete={handleDelete(data)} />
-                    </ListItem>
-                  ))}
-
-                  <InputBase
-                    sx={{
-                      ml: 1,
-                      flex: 1,
-                      "& .MuiInputBase-input": {
-                        boxShadow: "none",
-                      },
-                    }}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    placeholder={
-                      values.parkingSlotsName.length === 0
-                        ? "Add Parking Slot"
-                        : ""
-                    }
-                    inputProps={{ "aria-label": "search google maps" }}
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                  />
-                </Card>
-                {errors.parkingSlotsName && touched.parkingSlotsName && (
-                  <div style={{ color: "red", marginBottom: "8px" }}>
-                    {errors.parkingSlotsName}
-                  </div>
-                )}
-
-                <Button
-                  variant="contained"
-                  sx={{
-                    mt: 2,
-                  }}
-                  type="submit"
-                >
-                  Create
-                </Button>
+                        <Autocomplete
+                          sx={{
+                            "& .MuiInputBase-input": {
+                              boxShadow: "none",
+                            },
+                          }}
+                          clearIcon={false}
+                          options={values.lotName}
+                          freeSolo
+                          multiple
+                          getOptionLabel={(option) => option}
+                          onChange={(event, newValue) => {
+                            setFieldValue("lotName", newValue);
+                          }}
+                          renderTags={(value, props) =>
+                            value.map((option, index) => (
+                              <Chip label={option} {...props({ index })} />
+                            ))
+                          }
+                          renderInput={(params) => (
+                            <TextField label={t("addLots")} {...params} />
+                          )}
+                        />
+                      </div>
+                      <div className="col-span-2 flex justify-end mt-[20px]">
+                        <ButtonComponent
+                          btnTitle={t("createParkingSpace")}
+                          type={"submit"}
+                          loadingCaption={t("creating")}
+                          // isLoading={isLoading}
+                        />
+                      </div>
+                    </Card>
+                  </Grid2>
+                </Grid2>
               </Form>
             );
           }}
         </Formik>
-      </Box>
+      </div>
     </>
   );
 

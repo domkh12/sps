@@ -7,8 +7,15 @@ function SearchComponent({ onSearchChange, value }) {
   const { t } = useTranslate();
 
   const handleInputChange = (event) => {
-    const value = event.target.value;
-    onSearchChange(value);
+    let inputValue = event.target.value;
+
+    const regex = /^[a-zA-Z0-9\s]*$/;
+
+    if (regex.test(inputValue)) {
+      onSearchChange(inputValue);
+    } else {
+      event.target.value = value;
+    }
   };
 
   return (

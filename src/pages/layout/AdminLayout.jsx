@@ -16,6 +16,8 @@ import { useGetUserProfileMutation } from "../../redux/feature/auth/authApiSlice
 import LoadingFetchingDataComponent from "./../../components/LoadingFetchingDataComponent";
 import { setSites, setSitesForChange } from "../../redux/feature/site/siteSlice";
 import { useGetSitesListMutation } from "../../redux/feature/site/siteApiSlice";
+import DeleteConfirmComponent from "../../components/DeleteConfirmComponent";
+import { setUserProfile } from "../../redux/feature/auth/authSlice";
 
 function AdminLayout() {
   const isPaginationSuccess = useSelector(
@@ -71,7 +73,7 @@ function AdminLayout() {
   }, [isPaginationSuccess]);
 
   useEffect(() => {
-    if (isSuccessGetUserProfile) {
+    if (isSuccessGetUserProfile) {      
       const connectUser = async () => {
         await connectedUser({ uuid: user?.uuid, isOnline: true });
       };
@@ -81,11 +83,11 @@ function AdminLayout() {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      await getUserProfile();
+      const res = await getUserProfile().unwrap();
+      dispatch(setUserProfile(res));
     };
     const fetchSite = async () => {
       const response = await getSitesList().unwrap();
-      console.log("response: ", response)
       dispatch(setSitesForChange({ response }));
     };
     fetchSite();
@@ -158,6 +160,7 @@ function AdminLayout() {
           caption={captionSnackBar}
           isOpen={isOpenSnackBar}
         />
+        <DeleteConfirmComponent />
       </div>
     );
   }

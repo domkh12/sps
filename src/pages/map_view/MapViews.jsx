@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Typography,
-} from "@mui/material";
+import { Card, Typography } from "@mui/material";
 import { Gauge } from "@mui/x-charts/Gauge";
 import { cardStyle } from "../../assets/style";
 import { BarChart } from "@mui/x-charts";
 import { useNavigate } from "react-router-dom";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
 import SearchComponent from "../../components/SearchComponent";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   useFindAllLabelsMutation,
   useFindParkingByUuidMutation,
-  useGetParkingQuery,
+  useGetParkingSpacesQuery,
 } from "../../redux/feature/parking/parkingApiSlice";
 import ParkingSlotComponent from "../../components/ParkingSlotComponent";
 import useTranslate from "./../../hook/useTranslate";
@@ -22,17 +19,19 @@ import SeoComponent from "../../components/SeoComponent";
 import useWebSocket from "../../hook/useWebSocket";
 import DataNotFound from "../../components/DataNotFound";
 import SelectSingleComponent from "../../components/SelectSingleComponent";
+import { clearParking } from "../../redux/feature/parking/parkingSlice";
 
 function MapViews() {
   const [valueGauge, setValueGauge] = useState(0);
   const [label, setLabel] = useState("");
+  const dispatch = useDispatch();
   const navitage = useNavigate();
   const { t } = useTranslate();
   const parkingLabels = useSelector((state) => state.parking.labels);
   const parkingData = useSelector((state) => state.parking.parking);
-  const [selectFirstLabel, setSelectedLabel] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [selectFirstLabel, setSelectedLabel] = useState(1);
 
+  const [searchTerm, setSearchTerm] = useState("");
   const {
     loading,
     error: websocketError,
@@ -46,7 +45,7 @@ function MapViews() {
     isFetching,
     isError,
     error,
-  } = useGetParkingQuery({ pageNo: 1, pageSize: 1 });
+  } = useGetParkingSpacesQuery("parkingSpacesList");
 
   const [
     findParkingByUuid,
@@ -70,16 +69,18 @@ function MapViews() {
 
   useEffect(() => {
     if (isSuccessLabel) {
-      setSelectedLabel(parkingLabels.data[0].uuid);
+      setSelectedLabel(parkingLabels?.data[0]?.uuid);
     }
   }, [isSuccessLabel]);
 
   useEffect(() => {
-    if (selectFirstLabel != null) {
+    if (selectFirstLabel !== 1) {
       const fetchFistParking = async () => {
         await findParkingByUuid(selectFirstLabel);
       };
       fetchFistParking();
+    } else {
+      dispatch(clearParking());
     }
   }, [selectFirstLabel]);
 
@@ -105,11 +106,11 @@ function MapViews() {
 
   const calculateColor = () => {
     if (valueGauge >= 90) {
-      return "#FF0000"; // Red
+      return "#FF0000";
     } else if (valueGauge >= 70) {
-      return "#FFC107"; // Yellow
+      return "#FFC107";
     } else {
-      return "#2C3092"; // Default blue color
+      return "#2C3092";
     }
   };
 
@@ -119,10 +120,10 @@ function MapViews() {
 
   const handleChange = async (value) => {
     await findParkingByUuid(value);
-    setSelectedLabel(null);
+    setSelectedLabel(0);
     setLabel(value);
   };
-  
+
   const valueColor = calculateColor();
 
   const breadcrumbs = [
@@ -156,7 +157,7 @@ function MapViews() {
         if (!searchTerm) return true; // If no search term, show all slots
         return slot.lotName.toLowerCase().includes(searchTerm.toLowerCase());
       })
-      ?.map((slot) => <ParkingSlotComponent key={slot.uuid} slot={slot}/>);
+      ?.map((slot) => <ParkingSlotComponent key={slot.uuid} slot={slot} />);
 
     const slotContent =
       filteredSlots && filteredSlots.length > 0 ? (
@@ -164,7 +165,7 @@ function MapViews() {
       ) : (
         <DataNotFound />
       );
-      
+
     content = (
       <>
         <SeoComponent title={"Map Views"} />
@@ -175,7 +176,7 @@ function MapViews() {
             <Card
               sx={{
                 ...cardStyle,
-                overflow:"auto"
+                overflow: "auto",
               }}
               className=" max-h-[700px]"
             >
@@ -265,11 +266,11 @@ function MapViews() {
               </Typography>
               <div className="flex items-center gap-5 my-4 px-[20px]">
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-primary"></div>
+                  <div className="w-3 h-3 rounded-full bg-primary"></div>
                   <Typography variant="body1">IN</Typography>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-secondary"></div>
+                  <div className="w-3 h-3 rounded-full bg-secondary"></div>
                   <Typography variant="body1">OUT</Typography>
                 </div>
               </div>

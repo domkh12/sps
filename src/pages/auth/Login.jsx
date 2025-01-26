@@ -209,7 +209,7 @@ export default function Login() {
             console.log(err);
           }
         }
-      } else if (sites && sites?.length === 1) {
+      } else {
         if (roles.includes(ROLES.ROLE_ADMIN)) {
           try {
             await verifySites({ uuid: sites });
@@ -219,9 +219,7 @@ export default function Login() {
           } catch (err) {
             console.log(err);
           }
-        }
-      } else if (sites) {
-        if (roles.includes(ROLES.ROLE_MANAGER)) {
+        } else if (roles.includes(ROLES.ROLE_MANAGER)) {
           try {
             await verifySites({ uuid: sites });
             dispatch(setUuid(uuid));

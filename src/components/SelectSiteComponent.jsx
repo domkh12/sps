@@ -32,7 +32,7 @@ function SelectSiteComponent({
       },
     },
   };
-
+  console.log("options", options);
   const hasError = error && touched;
 
   const handleChange = (event) => {
@@ -57,7 +57,25 @@ function SelectSiteComponent({
         sx={{
           "& .MuiOutlinedInput-notchedOutline": {
             borderColor: "transparent",
+          },
+          "&.MuiOutlinedInput-root": {
+            borderColor: "transparent",
             bgcolor: "transparent",
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "transparent",
+            },
+            "&:hover": {
+              borderColor: "transparent",
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "transparent",
+            },
+            "&.Mui-focused": {
+              borderColor: "transparent",
+            },
+          },
+          "& .MuiSelect-select": {
+            padding: "0",
           },
         }}
       >
@@ -70,7 +88,17 @@ function SelectSiteComponent({
                 }}
                 value={option.uuid}
               >
-                {option[optionLabelKey]}
+                <div className="flex items-center gap-3">
+                  <div className="w-[30px] h-[30px] overflow-hidden rounded-full">
+                    <img
+                      src={option?.image || "/images/logoPlaceholder.jpg"}
+                      alt={option?.uuid}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+
+                  {option[optionLabelKey]}
+                </div>
               </MenuItem>
             ))
           : null}

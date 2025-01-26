@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 function LogoComponent() {
   const isCollapsed = useSelector((state) => state.action.isCollapsed);
   return (
-    <div className="flex items-center gap-2 mb-5 pl-[28px] pt-[20px]">
+    <div className="flex items-center gap-2 mb-5 pl-[24px] pt-[20px]">
       <div className="overflow-hidden w-10 h-10">
         <img src="/images/logo.png" alt="logo_sps" className="object-cover" />
       </div>

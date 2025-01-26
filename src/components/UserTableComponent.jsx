@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import DataNotFound from "./DataNotFound";
 import UserRowComponent from "./UserRowComponent";
+import useTranslate from "../hook/useTranslate";
 
 function UserTableComponent({
   columns,
@@ -31,8 +32,9 @@ function UserTableComponent({
   handleChangeRowsPerPage,
   entities,
   searchEntities,
-  t,
 }) {
+  const { t } = useTranslate();
+  
   const tableContent =
     searchQuery !== "" ||
     roleFilter.length > 0 ||
@@ -50,7 +52,7 @@ function UserTableComponent({
           ))
         ) : (
           <TableRow sx={{ bgcolor: "#f9fafb" }}>
-            <TableCell align="center" colSpan={7}>
+            <TableCell align="center" colSpan={8}>
               <DataNotFound />
             </TableCell>
           </TableRow>
@@ -68,7 +70,7 @@ function UserTableComponent({
           ))
         ) : (
           <TableRow sx={{ bgcolor: "#f9fafb" }}>
-            <TableCell align="center" colSpan={7}>
+            <TableCell align="center" colSpan={8}>
               <DataNotFound />
             </TableCell>
           </TableRow>
@@ -102,13 +104,13 @@ function UserTableComponent({
                   color="primary"
                 />
               </TableCell>
-              {columns.map((column) => (
+              {columns?.map((column) => (
                 <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth, color: "gray" }}
+                  key={column?.id}
+                  align={column?.align}
+                  style={{ minWidth: column?.minWidth, color: "gray" }}
                 >
-                  {column.label}
+                  {column?.label}
                 </TableCell>
               ))}
             </TableRow>

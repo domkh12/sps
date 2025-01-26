@@ -16,11 +16,11 @@ import { useEffect, useState } from "react";
 import useTranslate from "../../hook/useTranslate";
 import useAuth from "../../hook/useAuth";
 import {
+  clearFilter,
   setBranchFilter,
-  setIsFiltered,
+  setClearSearchQuery,
   setPageNo,
   setPageSize,
-  setResultFound,
   setRoleFilter,
   setSearchQuery,
   setSignUpMethodFilter,
@@ -31,6 +31,7 @@ import FilterBarComponent from "../../components/FilterBarComponent";
 import FilterChipsComponent from "../../components/FilterChipsComponent";
 import UserTableComponent from "../../components/UserTableComponent";
 import QuickEditUserComponent from "../../components/QuickEditUserComponent";
+import { setIsFiltered } from "../../redux/feature/actions/actionSlice";
 
 function UserList() {
   const statusFilter = useSelector((state) => state.users.statusFilter);
@@ -169,12 +170,13 @@ function UserList() {
       minWidth: 120,
       align: "left",
     },
+    isManager ? 
     {
       id: "branch",
       label: "Branch",
       minWidth: 120,
       align: "left",
-    },
+    }: null,
     {
       id: "status",
       label: "Status",
@@ -193,7 +195,7 @@ function UserList() {
       minWidth: 30,
       align: "left",
     },
-  ];
+  ].filter(Boolean);
 
   const handleChange = (event, newValue) => {
     dispatch(setStatusFilter(newValue));
@@ -222,7 +224,7 @@ function UserList() {
     dispatch(setPageNo(newPage + 1));
   };
 
-  const handleChangeRowsPerPage = (event) => {    
+  const handleChangeRowsPerPage = (event) => {
     dispatch(setPageSize(event.target.value));
     dispatch(setPageNo(1));
   };
@@ -295,8 +297,7 @@ function UserList() {
             roleFetched={roleFetched}
             signUpMethodsFetched={signUpMethodsFetched}
             branchFetched={branchFetched}
-            isAdmin={isAdmin}
-            isManager={isManager}
+            branchFilter={branchFilter}
             handleRoleChange={handleRoleChange}
             handleMethodChange={handleMethodChange}
             handleBranchChange={handleBranchChange}
@@ -308,7 +309,6 @@ function UserList() {
             bannedCount={bannedCount}
             totalElements={totalElements}
             handleChange={handleChange}
-            t={t}
           />
           <FilterChipsComponent
             statusFilter={statusFilter}
@@ -323,6 +323,8 @@ function UserList() {
             handleRoleChange={handleRoleChange}
             handleBranchChange={handleBranchChange}
             handleMethodChange={handleMethodChange}
+            clearFilter={() => dispatch(clearFilter())}
+            clearSearch={() => dispatch(setClearSearchQuery())}
             t={t}
           />
           <UserTableComponent
@@ -345,7 +347,7 @@ function UserList() {
             handleChangeRowsPerPage={handleChangeRowsPerPage}
             entities={entities}
             searchEntities={searchEntities}
-            t={t}
+            
           />
         </Card>
         <QuickEditUserComponent />

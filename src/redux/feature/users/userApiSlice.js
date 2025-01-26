@@ -2,6 +2,7 @@ import { createEntityAdapter, createSelector } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
 import { setIsTwoFAEnabled, setTwoFASecretCode } from "../auth/authSlice";
 import {
+  setAllFullNameUsersFetched,
   setGender,
   setRoles,
   setSignUpMethods,
@@ -162,28 +163,18 @@ export const userApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.uuid }],
     }),
 
-    getFullNameUsers: builder.query({
+    getAllFullNameUsers: builder.mutation({
       query: () => ({
         url: `/users/full-names`,
-        validateStatus: (response, result) => {
-          return response.status === 200 && !result.isError;
-        },
       }),
-      transformResponse: (responseData) => {
-        const loadedUsers = responseData.map((user) => {
-          user.id = user.uuid;
-          return user;
-        });
-        return usersAdapter.setAll(initialState, loadedUsers);
-      },
-      providesTags: (result, error, arg) => {
-        if (result?.ids) {
-          return [
-            { type: "User", id: "LIST" },
-            ...result.ids.map((id) => ({ type: "User", id })),
-          ];
-        } else return [{ type: "User", id: "LIST" }];
-      },
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+         try {
+           const { data } = await queryFulfilled;
+           dispatch(setAllFullNameUsersFetched({ data }));
+         } catch (error) {
+           console.log(error);
+         }
+      }
     }),
 
     get2faSecretCode: builder.mutation({
@@ -270,7 +261,7 @@ export const {
   useGetUsersQuery,
   useFindUserByUuidQuery,
   useAddNewUserMutation,
-  useGetFullNameUsersQuery,
+  useGetAllFullNameUsersMutation,
   useUpdateUserMutation,
   useConnectedUserMutation,
   useGet2faSecretCodeMutation,

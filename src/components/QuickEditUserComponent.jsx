@@ -8,7 +8,10 @@ import {
   Typography,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsOpenQuickEdit, setQuickEditUserReponse } from "../redux/feature/users/userSlice";
+import {
+  setIsOpenQuickEdit,
+  setQuickEditUserReponse,
+} from "../redux/feature/users/userSlice";
 import { buttonStyleContained, buttonStyleOutlined } from "../assets/style";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
@@ -28,8 +31,10 @@ import { useEffect, useState } from "react";
 import LoadingFetchingDataComponent from "./LoadingFetchingDataComponent";
 import {
   setCaptionSnackBar,
+  setErrorSnackbar,
   setIsOpenSnackBar,
 } from "../redux/feature/actions/actionSlice";
+import AlertMessageComponent from "./AlertMessageComponent";
 
 function QuickEditUserComponent() {
   const open = useSelector((state) => state.users.isOpenQuickEdit);
@@ -197,6 +202,14 @@ function QuickEditUserComponent() {
       }, 3000);
     }
   }, [isSuccessUpdateUser]);
+
+  useEffect(() => {
+    if (isErrorUpdateUser) {
+      dispatch(
+        setCaptionSnackBar(`${errorUpdateUser?.data?.error?.description}`)
+      );
+    }
+  }, [isErrorUpdateUser]);
 
   const initialDateOfBirth = user.dateOfBirth ? dayjs(user.dateOfBirth) : null;
 
@@ -487,7 +500,14 @@ function QuickEditUserComponent() {
           >
             Quick update
           </Typography>
+          {isErrorUpdateUser && (
+            <Box sx={{ px: "24px" }}>
+              <AlertMessageComponent />
+            </Box>
+          )}
+
           {content}
+          
         </Box>
       </Box>
     </Modal>

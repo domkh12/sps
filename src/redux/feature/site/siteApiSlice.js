@@ -9,8 +9,45 @@ const initialState = sitesAdapter.getInitialState();
 export const sitesApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getSites: builder.query({
-      query: ({ pageNo = 1, pageSize = 20, searchTerm = "" }) => ({
-        url: `/sites?pageNo=${pageNo}&pageSize=${pageSize}&searchTerm=${searchTerm}`,
+      query: ({ pageNo = 1, pageSize = 20 }) => ({
+        url: `/sites?pageNo=${pageNo}&pageSize=${pageSize}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError;
+        },
+      }),
+      transformResponse: (responseData) => {
+        const loadedSites = responseData.content.map((site) => {
+          site.id = site.uuid;
+          return site;
+        });
+        return {
+          ...sitesAdapter.setAll(initialState, loadedSites),
+          totalPages: responseData.page.totalPages,
+          totalElements: responseData.page.totalElements,
+          pageNo: responseData.page.number,
+          pageSize: responseData.page.size,
+        };
+      },
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [
+            { type: "Site", id: "LIST" },
+            ...result.ids.map((id) => ({ type: "Site", id })),
+          ];
+        } else return [{ type: "Site", id: "LIST" }];
+      },
+    }),
+
+    filterSites: builder.query({
+      query: ({
+        pageNo = 1,
+        pageSize = 20,
+        keywords = "",
+        cityId = "",
+        siteTypeId = "",
+        companyId = "",
+      }) => ({
+        url: `/sites/filter?pageNo=${pageNo}&pageSize=${pageSize}&keywords=${keywords}&cityId=${cityId}&siteTypeId=${siteTypeId}&companyId=${companyId}`,
         validateStatus: (response, result) => {
           return response.status === 200 && !result.isError;
         },
@@ -63,6 +100,17 @@ export const sitesApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Site", id: "LIST" }],
     }),
+
+    updateSite: builder.mutation({
+      query: ({ uuid, ...initialState }) => ({
+        url: `/sites/${uuid}`,
+        method: "PATCH",
+        body: {
+          ...initialState,
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: "Site", id: arg.uuid }],
+    }),
   }),
 });
 
@@ -70,6 +118,8 @@ export const {
   useGetSitesQuery,
   useGetSitesListMutation,
   useCreateNewSiteMutation,
+  useUpdateSiteMutation,
+  useFilterSitesQuery
 } = sitesApiSlice;
 
 // return the query result object

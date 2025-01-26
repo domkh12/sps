@@ -10,10 +10,15 @@ import {
 } from "@mui/material";
 import EditButtonComponent from "./EditButtonComponent";
 import MoreActionComponent from "./MoreActionComponent";
-import { FaPen, FaTrashCan } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+import { FaEye, FaPen, FaTrashCan } from "react-icons/fa6";
+import { Link, useNavigate } from "react-router-dom";
 import { memo } from "react";
 import { useGetSitesQuery } from "../redux/feature/site/siteApiSlice";
+import { useDispatch } from "react-redux";
+import {
+  setBranchForQuickEdit,
+  setIsQuickEditBranchOpen,
+} from "../redux/feature/site/siteSlice";
 
 function stringToColor(string) {
   let hash = 0;
@@ -62,12 +67,14 @@ function stringAvatar(name) {
 }
 
 function BranchRowComponent({ siteId }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { site } = useGetSitesQuery("sitesList", {
     selectFromResult: ({ data }) => ({
       site: data?.entities[siteId],
     }),
   });
-  console.log("site", site);
 
   if (site) {
     const dateObj = new Date(site.createdAt);
@@ -81,13 +88,19 @@ function BranchRowComponent({ siteId }) {
     const handleDelete = () => {
       console.log("Download action triggered");
     };
-    var handleEdit = () => navigate(`/dash/users/${userId}`);
+    var handleEdit = () => navigate(`/dash/branches/${siteId}`);
+    var handleView = () => navigate(`/dash/branches/${siteId}/view`);
 
     var menuActions = [
       {
         label: "Edit",
         icon: <FaPen className="w-5 h-5" />,
         onClick: handleEdit,
+      },
+      {
+        label: "View",
+        icon: <FaEye className="w-5 h-5" />,
+        onClick: handleView,
       },
       {
         label: "Delete",
@@ -160,7 +173,12 @@ function BranchRowComponent({ siteId }) {
           }}
         >
           <div className="flex justify-center items-center">
-            <EditButtonComponent />
+            <EditButtonComponent
+              handleQuickEdit={() => {
+                dispatch(setIsQuickEditBranchOpen(true));
+                dispatch(setBranchForQuickEdit(site));
+              }}
+            />
             <MoreActionComponent menuItems={menuActions} />
           </div>
         </TableCell>
@@ -172,4 +190,5 @@ function BranchRowComponent({ siteId }) {
 }
 
 const memoizedBranchRow = memo(BranchRowComponent);
+
 export default memoizedBranchRow;

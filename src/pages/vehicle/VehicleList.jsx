@@ -1,29 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useGetVehiclesQuery } from "../../redux/feature/vehicles/vehicleApiSlice";
+import {
+  useFilterVehiclesQuery,
+  useGetAllVehicleTypesMutation,
+  useGetVehiclesQuery,
+} from "../../redux/feature/vehicles/vehicleApiSlice";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  setIsFiltered,
   setIsLoadingBar,
   setIsPaginationSuccess,
 } from "../../redux/feature/actions/actionSlice";
 import {
-  increasePageNo,
-  decreasePageNo,
-  resetPageNo,
-  setPageSize,
   setTotalPages,
-  lastPageNo,
+  setBranchFilter,
+  setVehicleTypeFilter,
+  setSearchKeywords,
+  setClearVehicleFilter,
 } from "../../redux/feature/vehicles/vehicleSlice";
 import SeoComponent from "../../components/SeoComponent";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
 import {
   Card,
   Checkbox,
-  IconButton,
-  List,
-  ListItemButton,
-  ListItemText,
-  Popover,
   Table,
   TableBody,
   TableCell,
@@ -32,36 +31,103 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import SelectComponent from "../../components/SelectComponent";
-import SearchComponent from "../../components/SearchComponent";
 import { cardStyle, listStyle } from "../../assets/style";
 import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import { BsFillPrinterFill, BsThreeDotsVertical } from "react-icons/bs";
 import useTranslate from "../../hook/useTranslate";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import VehicleRowComponent from "../../components/VehicleRowComponent";
+import useAuth from "../../hook/useAuth";
+import QuickEditVehicleComponent from "../../components/QuickEditVehicleComponent";
+import { useGetSitesListMutation } from "../../redux/feature/site/siteApiSlice";
+import DataNotFound from "../../components/DataNotFound";
+import FilterChipsComponent from "../../components/FilterChipsComponent";
+import FilterBarComponent from "../../components/FilterBarComponent";
 
 function VehicleList() {
-  const [search, setSearch] = useState("");
   const dispatch = useDispatch();
   const navigator = useNavigate();
-  const isScrolling = useSelector((state) => state.action.isScrolling);
   const pageNo = useSelector((state) => state.vehicles.pageNo);
   const pageSize = useSelector((state) => state.vehicles.pageSize);
   const totalPages = useSelector((state) => state.vehicles.totalPages);
   const [isPageSizeOpen, setIsPageSizeOpen] = useState(false);
   const pageSizeRef = useRef(null);
   const { t } = useTranslate();
+  const [isLoading, setIsLoading] = useState(true);
+  const branchFetched = useSelector((state) => state.sites.sites);
+  const branchFilter = useSelector((state) => state.vehicles.branchFilter);
+  const vehicleTypeFetched = useSelector(
+    (state) => state.vehicles.vehicleTypeFetched
+  );
+  const vehicleTypeFilter = useSelector(
+    (state) => state.vehicles.vehicleTypeFilter
+  );
+  const searchKeywords = useSelector((state) => state.vehicles.searchKeywords);
 
   const {
     data: vehicles,
-    isLoading,
+    isLoading: isLoadingGetVehicles,
     isSuccess,
     isError,
     refetch,
     isFetching,
     error,
-  } = useGetVehiclesQuery("vehiclesList", { pageNo, pageSize });
+  } = useGetVehiclesQuery("vehiclesList");
+
+  const {
+    data: vehicleFilterData,
+    isLoading: isLoadingGetVehicleFilter,
+    isSuccess: isSuccessGetVehicleFilter,
+    isError: isErrorGetVehicleFilter,
+    error: errorGetVehicleFilter,
+  } = useFilterVehiclesQuery(
+    {
+      query: "vehicleList",
+      keywords: searchKeywords,
+      vehiceTypeId: vehicleTypeFilter,
+      branchId: branchFilter,
+    },
+    {
+      skip:
+        searchKeywords === "" &&
+        vehicleTypeFilter.length === 0 &&
+        branchFilter.length === 0,
+    }
+  );
+
+  const [
+    getSitesList,
+    {
+      isSuccess: isGetSitesListSuccess,
+      isLoading: isGetSitesListLoading,
+      isError: isGetSitesListError,
+      error: errorGetSitesList,
+    },
+  ] = useGetSitesListMutation();
+
+  const [
+    getAllVehicleTypes,
+    {
+      isSuccess: isGetAllVehicleTypesSuccess,
+      isLoading: isGetAllVehicleTypesLoading,
+      isError: isGetAllVehicleTypesError,
+      error: errorGetAllVehicleTypes,
+    },
+  ] = useGetAllVehicleTypesMutation();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([getSitesList(), getAllVehicleTypes()]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (isFetching) {
@@ -95,54 +161,6 @@ function VehicleList() {
       dispatch(setTotalPages(vehicles.totalPages));
     }
   }, [vehicles, totalPages, pageNo]);
-
-  const toggleDropdown = () => {
-    setIsPageSizeOpen((prev) => !prev);
-  };
-
-  const handleClearSearch = async () => {
-    setSearch("");
-  };
-
-  const handleBtnSearch = async () => {};
-
-  const handleBtnAddNewClicked = () => {
-    navigator("/dash/vehicles/new");
-  };
-
-  const handleNextPagination = async () => {
-    dispatch(increasePageNo());
-    dispatch(setIsPaginationSuccess(true));
-  };
-
-  const handleBackPagination = async () => {
-    dispatch(decreasePageNo());
-    dispatch(setIsPaginationSuccess(true));
-  };
-
-  const handleResetPagination = async () => {
-    dispatch(resetPageNo());
-    dispatch(setIsPaginationSuccess(true));
-  };
-
-  const handleLastPagination = async () => {
-    dispatch(lastPageNo());
-    dispatch(setIsPaginationSuccess(true));
-  };
-
-  const handleSetPageSize = (size) => {
-    if ([10, 30, 50].includes(size)) {
-      dispatch(setPageSize(size));
-    } else {
-      console.error("Invalid page size:", size);
-    }
-  };
-
-  const calculateItemRange = () => {
-    const startItem = (pageNo - 1) * pageSize + 1;
-    const endItem = Math.min(pageNo * pageSize, vehicles.totalElements);
-    return `${startItem}-${endItem}`;
-  };
 
   const breadcrumbs = [
     <button
@@ -198,6 +216,27 @@ function VehicleList() {
     },
   ];
 
+  const handleBranchChange = (branch) => {
+    dispatch(setBranchFilter(branch));
+  };
+
+  const handleVehicleTypeChange = (vehicleType) => {
+    dispatch(setVehicleTypeFilter(vehicleType));
+  };
+
+  const handleSearchChange = (keyword) => {
+    dispatch(setSearchKeywords(keyword));
+  };
+
+  const isFiltered =
+    searchKeywords !== "" ||
+    branchFilter?.length > 0 ||
+    vehicleTypeFilter?.length > 0;
+
+  useEffect(() => {
+    dispatch(setIsFiltered(isFiltered));
+  }, [isFiltered, dispatch]);
+
   let content;
 
   if (isLoading) content = <LoadingFetchingDataComponent />;
@@ -206,14 +245,47 @@ function VehicleList() {
     content = <p>Error: {error?.message}</p>;
   }
 
-  if (isSuccess) {
+  if (!isLoading && isSuccess) {
     const { ids, totalPages, totalElements } = vehicles;
 
-    const tableContent = ids?.length
-      ? ids.map((vehicleId) => (
-          <VehicleRowComponent key={vehicleId} vehicleId={vehicleId} />
-        ))
-      : null;
+    const {
+      ids: idsFilteredVehicles,
+      totalPages: totalFilteredVehicles,
+      totalElements: totalElementsFilteredVehicles,
+    } = vehicleFilterData || {};
+
+    const tableContent =
+      searchKeywords !== "" ||
+      vehicleTypeFilter.length > 0 ||
+      branchFilter.length > 0 ? (
+        <>
+          {idsFilteredVehicles?.length ? (
+            idsFilteredVehicles.map((vehicleId) => (
+              <VehicleRowComponent key={vehicleId} vehicleId={vehicleId} />
+            ))
+          ) : (
+            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+              <TableCell align="center" colSpan={8}>
+                <DataNotFound />
+              </TableCell>
+            </TableRow>
+          )}
+        </>
+      ) : (
+        <>
+          {ids.length ? (
+            ids.map((vehicleId) => (
+              <VehicleRowComponent key={vehicleId} vehicleId={vehicleId} />
+            ))
+          ) : (
+            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+              <TableCell align="center" colSpan={8}>
+                <DataNotFound />
+              </TableCell>
+            </TableRow>
+          )}
+        </>
+      );
 
     content = (
       <div data-aos="fade-left">
@@ -222,101 +294,36 @@ function VehicleList() {
           breadcrumbs={breadcrumbs}
           title={"List"}
           btnTitle={t("newVehicle")}
-          // onClick={handleAddNewClick}
+          onClick={() => navigator("/dash/vehicles/new")}
         />
         <div>
           <Card sx={{ ...cardStyle }}>
-            <div className="p-[20px] flex gap-[16px] flex-col xl:flex-row">
-              <SelectComponent
-                label="Vehicle types"
-                labelId="role_label"
-                id="role"
-                // options={roleFetched.data}
-                // onChange={handleRoleChange}
-                optionLabelKey="name"
-              />
+            <FilterBarComponent
+              showTabs={false}
+              searchQuery={searchKeywords}
+              branchFilter={branchFilter}
+              vehicleTypeFilter={vehicleTypeFilter}
+              branchFetched={branchFetched}
+              vehicleTypeFetched={vehicleTypeFetched}
+              handleVehicleTypeChange={handleVehicleTypeChange}
+              handleBranchChange={handleBranchChange}
+              handleSearchChange={handleSearchChange}
+            />
 
-              <SelectComponent
-                label="Vehicle models"
-                labelId="signUpMehod_label"
-                id="sighUpMethod"
-                // options={signUpMethodsFetched.data}
-                // onChange={handleMethodChange}
-                optionLabelKey="name"
-              />
-              <div className="flex items-center gap-3 w-full">
-                <SearchComponent />
-                <PopupState variant="popover" popupId="demo-popup-popover">
-                  {(popupState) => (
-                    <div>
-                      <IconButton
-                        aria-label="more_menu"
-                        {...bindTrigger(popupState)}
-                        size="small"
-                        sx={{ width: "36px", height: "36px" }}
-                      >
-                        <BsThreeDotsVertical className="w-5 h-5" />
-                      </IconButton>
-                      <Popover
-                        {...bindPopover(popupState)}
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "center",
-                        }}
-                        slotProps={{
-                          paper: {
-                            style: {
-                              padding: 10,
-                              backgroundColor: "transparent",
-                              boxShadow: "none",
-                            },
-                          },
-                        }}
-                        transformOrigin={{
-                          vertical: "top",
-                          horizontal: "center",
-                        }}
-                      >
-                        <List
-                          component="div"
-                          disablePadding
-                          dense={true}
-                          sx={{
-                            ...listStyle,
-                          }}
-                        >
-                          <ListItemButton
-                            sx={{
-                              borderRadius: "6px",
-                              color: "#424242",
-                            }}
-                          >
-                            <ListItemText
-                              primary={
-                                <div className="flex items-center gap-3">
-                                  <BsFillPrinterFill className="w-5 h-5" />
-                                  <Typography
-                                    component="span"
-                                    variant="body1"
-                                    sx={{
-                                      color: "#424242",
-                                      display: "inline",
-                                    }}
-                                  >
-                                    Print
-                                  </Typography>
-                                </div>
-                              }
-                            />
-                          </ListItemButton>
-                        </List>
-                      </Popover>
-                    </div>
-                  )}
-                </PopupState>
-              </div>
-            </div>
-
+            <FilterChipsComponent
+              searchQuery={searchKeywords}
+              branchFilter={branchFilter}
+              branchFetched={branchFetched}
+              vehicleTypeFilter={vehicleTypeFilter}
+              vehicleTypeFetched={vehicleTypeFetched.data}
+              handleVehicleTypeChange={handleVehicleTypeChange}
+              handleSearchChange={handleSearchChange}
+              handleBranchChange={handleBranchChange}
+              dispatch={dispatch}
+              clearFilter={() => dispatch(setClearVehicleFilter())}
+              clearSearch={() => dispatch(setSearchKeywords(""))}
+              t={t}
+            />
             <TableContainer>
               <Table>
                 <TableHead>
@@ -517,6 +524,7 @@ function VehicleList() {
             </tfoot>
           </table>
         </div> */}
+        <QuickEditVehicleComponent />
       </div>
     );
   }

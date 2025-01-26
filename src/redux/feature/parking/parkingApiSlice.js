@@ -8,12 +8,13 @@ const initialState = parkingAdapter.getInitialState();
 
 export const parkingApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getParking: builder.query({
-      query: ({ pageNo = 1, pageSize = 10 } = {}) =>
-        `/parking-spaces?pageNo=${pageNo}&pageSize=${pageSize}`,
-      validateStatus: (response, result) => {
-        return response.status === 200 && !result.isError;
-      },
+    getParkingSpaces: builder.query({
+      query: ({ pageNo = 1, pageSize = 10 }) => ({
+        url: `/parking-spaces?pageNo=${pageNo}&pageSize=${pageSize}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError;
+        },
+      }),
       transformResponse: (responseData) => {
         const loadedParking = responseData.content.map((parking) => {
           parking.id = parking.uuid;
@@ -32,7 +33,7 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
     }),
     addNewParking: builder.mutation({
       query: (initialState) => ({
-        url: "/parking",
+        url: "/parking-spaces",
         method: "POST",
         body: {
           ...initialState,
@@ -53,15 +54,15 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
       ],
     }),
     deleteParking: builder.mutation({
-      query: ({ id }) => ({
-        url: `/parking/${id}`,
+      query: ({ uuid }) => ({
+        url: `/parking-spaces/${uuid}`,
         method: "DELETE",
         body: {
-          id,
+          uuid,
         },
       }),
       invalidatesTags: (result, error, arg) => [
-        { type: "Parking", id: arg.id },
+        { type: "Parking", id: arg.uuid },
       ],
     }),
     searchParking: builder.mutation({
@@ -112,9 +113,6 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
           console.error("Failed to fetch parking label:", error);
         }
       },
-      invalidatesTags: (result, error, arg) => [
-        { type: "Parking", id: "LIST" },
-      ],
     }),
 
     findParkingByUuid: builder.mutation({
@@ -123,18 +121,21 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
-          const { data } = await queryFulfilled;          
+          const { data } = await queryFulfilled;
           dispatch(setParking(data));
         } catch (error) {
           console.error("Failed to fetch user:", error);
         }
       },
+      invalidatesTags: (result, error, arg) => [
+        { type: "Parking", id: "LIST" },
+      ],
     }),
   }),
 });
 
 export const {
-  useGetParkingQuery,
+  useGetParkingSpacesQuery,
   useAddNewParkingMutation,
   useUpdateParkingMutation,
   useDeleteParkingMutation,
@@ -144,8 +145,7 @@ export const {
 } = parkingApiSlice;
 
 // return the query result object
-export const selectParkingResult =
-  parkingApiSlice.endpoints.getParking.select();
+export const selectParkingResult = parkingApiSlice.endpoints.getParkingSpaces.select();
 // create momorized selector
 const selectParkingData = createSelector(
   selectParkingResult,

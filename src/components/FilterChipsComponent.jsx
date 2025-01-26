@@ -1,26 +1,35 @@
 import { Button, Chip } from "@mui/material";
 import { FaTrashCan } from "react-icons/fa6";
-import { clearFilter, setClearSearchQuery, setClearStatusFilter } from "../redux/feature/users/userSlice";
+import {
+  clearFilter,
+  setClearSearchQuery,
+  setClearStatusFilter,
+} from "../redux/feature/users/userSlice";
 import { useSelector } from "react-redux";
 
 function FilterChipsComponent({
-  statusFilter,
+  statusFilter = "",
   searchQuery,
   roleFilter,
   branchFilter,
   signUpMethodFilter,
+  vehicleTypeFilter,
   roleFetched,
   branchFetched,
   signUpMethodsFetched,
+  vehicleTypeFetched,
   dispatch,
   handleRoleChange,
   handleBranchChange,
   handleMethodChange,
+  handleVehicleTypeChange,
+  clearFilter,
+  clearSearch,
   t,
 }) {
   const resultFound = useSelector((state) => state.users.resultFound);
-  const isFiltered = useSelector((state) => state.users.isFiltered);
- 
+  const isFiltered = useSelector((state) => state.action.isFiltered);
+
   return (
     <>
       {isFiltered && (
@@ -53,13 +62,13 @@ function FilterChipsComponent({
                     size="small"
                     sx={{ borderRadius: "8px" }}
                     label={searchQuery}
-                    onDelete={() => dispatch(setClearSearchQuery())}
+                    onDelete={clearSearch}
                   />
                 </div>
               </div>
             ) : null}
 
-            {roleFilter.length > 0 ? (
+            {roleFilter?.length > 0 ? (
               <div className="p-2 rounded-[7px] border-dashed border w-fit flex items-center">
                 <span className="font-medium mr-2">Role:</span>
                 <div className="flex gap-3">
@@ -84,7 +93,39 @@ function FilterChipsComponent({
               </div>
             ) : null}
 
-            {branchFilter.length > 0 ? (
+            {vehicleTypeFilter?.length > 0 ? (
+              <div className="p-2 rounded-[7px] border-dashed border w-fit flex items-center">
+                <span className="font-medium mr-2">
+                  {`Vehicle${"\u00a0"}Type:${"\u00a0"}`}
+                </span>
+                <div className="flex gap-3">
+                  {vehicleTypeFilter.map((vehicleType) => {
+                    const matchedVehicleType = vehicleTypeFetched?.find(
+                      (fetchedVehicleType) =>
+                        fetchedVehicleType.uuid === vehicleType
+                    );
+                    const vehicleTypeName = matchedVehicleType
+                      ? matchedVehicleType.name
+                      : vehicleType;
+                    return (
+                      <Chip
+                        key={vehicleType}
+                        size="small"
+                        sx={{ borderRadius: "8px" }}
+                        label={vehicleTypeName}
+                        onDelete={() =>
+                          handleVehicleTypeChange(
+                            vehicleTypeFilter.filter((b) => b !== vehicleType)
+                          )
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+
+            {branchFilter?.length > 0 ? (
               <div className="p-2 rounded-[7px] border-dashed border w-fit flex items-center">
                 <span className="font-medium mr-2">Branch:</span>
                 <div className="flex gap-3">
@@ -94,7 +135,7 @@ function FilterChipsComponent({
                     );
                     const branchName = matchedBranch
                       ? matchedBranch.siteName
-                      : branch; // Use fetched name if match found
+                      : branch;
                     return (
                       <Chip
                         key={branch}
@@ -113,7 +154,7 @@ function FilterChipsComponent({
               </div>
             ) : null}
 
-            {signUpMethodFilter.length > 0 ? (
+            {signUpMethodFilter?.length > 0 ? (
               <div className="p-2 rounded-[7px] border-dashed border w-fit flex items-center">
                 <span className="font-medium mr-2">{`Sign\u00a0up\u00a0method:`}</span>
                 <div className="flex gap-3">
@@ -144,7 +185,7 @@ function FilterChipsComponent({
             ) : null}
 
             <Button
-              onClick={() => dispatch(clearFilter())}
+              onClick={clearFilter}
               sx={{ borderRadius: "8px" }}
               color="error"
               startIcon={<FaTrashCan />}
