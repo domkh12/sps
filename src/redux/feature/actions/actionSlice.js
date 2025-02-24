@@ -13,6 +13,7 @@ const actionSlice = createSlice({
     isErrorSnackbar: false,
     isOpenConfirmDelete: false,
     isFiltered: false,
+    isOpenDrawerProfiles: false,
   },
   reducers: {
     toggleCollapsed(state, action) {
@@ -45,6 +46,9 @@ const actionSlice = createSlice({
     setIsFiltered(state, action) {
       state.isFiltered = action.payload;
     },
+    setIsOpenDrawerProfiles(state, action) {
+      state.isOpenDrawerProfiles = action.payload;
+    }
   },
 });
 
@@ -59,6 +63,7 @@ export const {
   setErrorSnackbar,
   setIsOpenConfirmDelete,
   setIsFiltered,
+  setIsOpenDrawerProfiles,
 } = actionSlice.actions;
 
 export default actionSlice.reducer;

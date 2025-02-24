@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { setClearBranchFilter } from "../site/siteSlice";
 
 const companySlice = createSlice({
   name: "companies",
@@ -17,10 +18,22 @@ const companySlice = createSlice({
     setCompanyFilter(state, action) {
       state.companyFilter = action.payload;
     },
+    setClearCompanyFilter(state, action) {
+      state.companyFilter = [];
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(setClearBranchFilter, (state) => {
+      state.companyFilter = [];
+    });
   },
 });
 
-export const { setCompanyNames, setCompaniesData, setCompanyFilter } =
-  companySlice.actions;
+export const {
+  setCompanyNames,
+  setCompaniesData,
+  setCompanyFilter,
+  setClearCompanyFilter,
+} = companySlice.actions;
 
 export default companySlice.reducer;

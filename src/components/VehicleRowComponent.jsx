@@ -20,16 +20,11 @@ import {
   setIsOpenQuickEditVehicle,
   setVehicleForQuickEdit,
 } from "../redux/feature/vehicles/vehicleSlice";
+import useDateFormatter from "../hook/useDateFormatter";
 
-function VehicleRowComponent({ vehicleId }) {
+function VehicleRowComponent({ vehicleId, vehicle }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const { vehicle } = useGetVehiclesQuery("vehiclesList", {
-    selectFromResult: ({ data }) => ({
-      vehicle: data?.entities[vehicleId],
-    }),
-  });
 
   const handleDelete = () => {
     dispatch(setIsOpenConfirmDelete(true));
@@ -66,7 +61,9 @@ function VehicleRowComponent({ vehicleId }) {
     ];
 
     const dateObj = new Date(vehicle.createdAt);
-    var formattedDate = dateObj.toLocaleDateString("en-GB");
+    var { formattedDateDDMMYYYYNoZeros } = useDateFormatter(
+      new Date(vehicle.createdAt)
+    );
     var formattedTime = dateObj.toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
@@ -95,7 +92,7 @@ function VehicleRowComponent({ vehicleId }) {
                       className="hover:underline"
                       to={`/dash/vehicles/${vehicleId}/view`}
                     >
-                      {vehicle.vehicleMake}
+                      {vehicle?.vehicleMake || "N/A"}
                     </Link>
                   ) || "N/A"
                 }
@@ -105,7 +102,7 @@ function VehicleRowComponent({ vehicleId }) {
                     variant="body2"
                     sx={{ color: "gray", display: "inline" }}
                   >
-                    {vehicle.vehicleModel || "N/A"}
+                    {vehicle?.vehicleModel || "N/A"}
                   </Typography>
                 }
               />
@@ -117,34 +114,38 @@ function VehicleRowComponent({ vehicleId }) {
           <div className="w-[250px]  rounded-[12px] border-blue-600 border-[3px] px-3 py-2 flex items-center justify-between">
             <div className="flex flex-col">
               <Typography variant="body1" className="text-blue-600">
-                {vehicle.licensePlateProvince.provinceNameKh}
+                {vehicle?.licensePlateProvince?.provinceNameKh}
               </Typography>
               <Typography variant="body1" className="text-red-600">
-                {vehicle.licensePlateProvince.provinceNameEn}
+                {vehicle?.licensePlateProvince?.provinceNameEn}
               </Typography>
             </div>
             <Typography variant="h5" className="underline text-blue-600">
-              {vehicle.numberPlate}
+              {vehicle?.numberPlate}
             </Typography>
           </div>
         </TableCell>
 
         <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          <Typography variant="body1">{vehicle.vehicleType.name}</Typography>
+          <Typography variant="body1">
+            {vehicle?.vehicleType?.name || "N/A"}
+          </Typography>
         </TableCell>
 
         <TableCell sx={{ borderBottomStyle: "dashed" }}>
           <div className="flex gap-2">
             <div
               className="w-5 h-5 rounded-full border-[2px]"
-              style={{ backgroundColor: vehicle.color }}
+              style={{ backgroundColor: vehicle?.color || "transparent" }}
             ></div>
-            <Typography variant="body1">{vehicle.color}</Typography>
+            <Typography variant="body1">{vehicle?.color || "N/A"}</Typography>
           </div>
         </TableCell>
 
         <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          <Typography variant="body1">{formattedDate}</Typography>
+          <Typography variant="body1">
+            {formattedDateDDMMYYYYNoZeros}
+          </Typography>
           <Typography variant="body2" color="gray">
             {formattedTime}
           </Typography>

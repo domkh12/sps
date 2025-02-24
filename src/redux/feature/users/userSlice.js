@@ -118,7 +118,7 @@ const userSlice = createSlice({
     },
     setIdUserToDelete(state, action) {
       state.idUserToDelete = action.payload;
-    }
+    },
   },
 });
 

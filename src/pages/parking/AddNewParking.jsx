@@ -23,15 +23,21 @@ import {
   setErrorSnackbar,
   setIsOpenSnackBar,
 } from "../../redux/feature/actions/actionSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
-import { useAddNewParkingLotsMutation } from "../../redux/feature/parking/parkingLotApiSlice";
+import SelectSingleComponent from "./../../components/SelectSingleComponent";
+import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice";
+import useAuth from "../../hook/useAuth";
+import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 
 export default function AddNewParking() {
   const [profileImageFile, setProfileImageFile] = useState(null);
   const { t } = useTranslate();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
+  const { isManager } = useAuth();
+  const companyFetched = useSelector((state) => state.companies.companiesData);
 
   const [
     addNewParking,
@@ -43,27 +49,41 @@ export default function AddNewParking() {
   ] = useAddNewParkingMutation();
 
   const [
-    addNewParkingLots,
+    getAllCompanies,
     {
-      isSuccess: isAddNewParkingLotsSuccess,
-      isLoading: isLoadingAddNewParkingLots,
-      isError: isErrorAddNewParkingLots,
-      error: errorAddNewParkingLots,
+      isSuccess: isGetAllCompaniesSuccess,
+      isLoading: isLoadingGetAllCompanies,
+      isError: isErrorGetAllCompanies,
+      error: errorGetAllCompanies,
     },
-  ] = useAddNewParkingLotsMutation();
+  ] = useGetAllCompaniesMutation();
 
   const [uploadImage] = useUploadImageMutation();
 
   const validationSchema = Yup.object().shape({
-    // parkingName: Yup.string()
-    //   .required("Parking name is required")
-    //   .min(3, "Parking name must be at least 3 characters long"),
-    // parkingSlotsName: Yup.array().of(
-    //   Yup.object().shape({
-    //     label: Yup.string().required("Slot label is required"),
-    //   })
-    // ),
+    location: Yup.string().required(t("locationIsRequired")),
+    lotName: Yup.array().min(1, t("lotNameValidate")),
+    siteUuid: Yup.string().required("Branch is required!"),
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const promises = [];
+        if (isManager) {
+          promises.push(getAllCompanies());
+        }
+
+        await Promise.all(promises);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (isAddNewParkingSuccess) {
@@ -97,23 +117,20 @@ export default function AddNewParking() {
     try {
       const formData = new FormData();
       let profileImageUri = null;
-      let parkingSpaceUuid = "";
+     
       if (profileImageFile) {
         formData.append("file", profileImageFile);
         const uploadResponse = await uploadImage(formData).unwrap();
         profileImageUri = uploadResponse.uri;
       }
-      const addNewParkingSpaceResponse = await addNewParking({
+
+       await addNewParking({
         label: values.location,
         image: profileImageUri,
-      }).unwrap();
-
-      parkingSpaceUuid = addNewParkingSpaceResponse.uuid;
-      console.log("values lotname", values.lotName)
-      await addNewParkingLots({
-        parkingSpaceUuid: parkingSpaceUuid,
+        siteUuid: values.siteUuid,
         lotName: values.lotName,
       });
+
     } catch (err) {
       console.log(err);
     }
@@ -137,112 +154,141 @@ export default function AddNewParking() {
 
   let content;
 
-  content = (
-    <>
-      <SeoComponent title={"Create a new parking space"} />
-      <MainHeaderComponent
-        breadcrumbs={breadcrumbs}
-        title={t("createAParkingSpace")}
-      />
-      <div>
-        <Formik
-          initialValues={{ location: "", lotName: [] }}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({
-            values,
-            touched,
-            errors,
-            handleChange,
-            handleBlur,
-            setFieldValue,
-          }) => {
-            return (
-              <Form>
-                <Grid2 container spacing={3}>
-                  <Grid2 size={{ xs: 12, md: 4 }}>
-                    <Card
-                      sx={{ ...cardStyle }}
-                      className=" gap-5 pt-[40px] px-[24px] pb-[40px]"
-                    >
-                      <ImageUploadComponent
-                        setProfileImageFile={setProfileImageFile}
-                        profileImageFile={profileImageFile}
-                      />
-                    </Card>
-                  </Grid2>
-                  <Grid2 size={{ xs: 12, md: 8 }}>
-                    <Card sx={{ ...cardStyle, padding: "24px" }}>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <TextField
-                          label={t("location")}
-                          variant="outlined"
-                          sx={{
-                            "& .MuiInputBase-input": {
-                              boxShadow: "none",
-                            },
-                            borderRadius: "6px",
-                          }}
-                          type="text"
-                          id="location"
-                          name="location"
-                          fullWidth
-                          value={values.location}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          autoComplete="off"
-                          error={errors.location && touched.location}
-                          helperText={
-                            errors.location && touched.location
-                              ? errors.location
-                              : null
-                          }
-                          size="medium"
-                        />
+  if (isLoading) content = <LoadingFetchingDataComponent />;
 
-                        <Autocomplete
-                          sx={{
-                            "& .MuiInputBase-input": {
-                              boxShadow: "none",
-                            },
-                          }}
-                          clearIcon={false}
-                          options={values.lotName}
-                          freeSolo
-                          multiple
-                          getOptionLabel={(option) => option}
-                          onChange={(event, newValue) => {
-                            setFieldValue("lotName", newValue);
-                          }}
-                          renderTags={(value, props) =>
-                            value.map((option, index) => (
-                              <Chip label={option} {...props({ index })} />
-                            ))
-                          }
-                          renderInput={(params) => (
-                            <TextField label={t("addLots")} {...params} />
-                          )}
+  if (!isLoading) {
+    content = (
+      <>
+        <SeoComponent title={"Create a new parking space"} />
+        <MainHeaderComponent
+          breadcrumbs={breadcrumbs}
+          title={t("createAParkingSpace")}
+        />
+        <div>
+          <Formik
+            initialValues={{ location: "", lotName: [], siteUuid: "" }}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({
+              values,
+              touched,
+              errors,
+              handleChange,
+              handleBlur,
+              setFieldValue,
+            }) => {
+              const handleBranchChange = (value) => {
+                setFieldValue("siteUuid", value);
+              };
+
+              return (
+                <Form>
+                  <Grid2 container spacing={3}>
+                    <Grid2 size={{ xs: 12, md: 4 }}>
+                      <Card
+                        sx={{ ...cardStyle }}
+                        className=" gap-5 pt-[40px] px-[24px] pb-[40px]"
+                      >
+                        <ImageUploadComponent
+                          setProfileImageFile={setProfileImageFile}
+                          profileImageFile={profileImageFile}
                         />
-                      </div>
-                      <div className="col-span-2 flex justify-end mt-[20px]">
-                        <ButtonComponent
-                          btnTitle={t("createParkingSpace")}
-                          type={"submit"}
-                          loadingCaption={t("creating")}
-                          // isLoading={isLoading}
-                        />
-                      </div>
-                    </Card>
+                      </Card>
+                    </Grid2>
+                    <Grid2 size={{ xs: 12, md: 8 }}>
+                      <Card sx={{ ...cardStyle, padding: "24px" }}>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                          <TextField
+                            label={t("location")}
+                            variant="outlined"
+                            sx={{
+                              "& .MuiInputBase-input": {
+                                boxShadow: "none",
+                              },
+                              borderRadius: "6px",
+                            }}
+                            type="text"
+                            id="location"
+                            name="location"
+                            fullWidth
+                            value={values.location}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            autoComplete="off"
+                            error={errors.location && touched.location}
+                            helperText={
+                              errors.location && touched.location
+                                ? errors.location
+                                : null
+                            }
+                            size="medium"
+                          />
+
+                          <SelectSingleComponent
+                            label={t("branch")}
+                            options={companyFetched.data}
+                            onChange={handleBranchChange}
+                            fullWidth={true}
+                            error={errors.siteUuid}
+                            touched={touched.siteUuid}
+                            itemsLabelKey="sites"
+                            optionLabelKey="siteName"
+                            groupLabelKey="companyName"
+                          />
+
+                          <Autocomplete
+                            sx={{
+                              "& .MuiInputBase-input": {
+                                boxShadow: "none",
+                              },
+                            }}
+                            clearIcon={false}
+                            options={values.lotName}
+                            freeSolo
+                            multiple
+                            getOptionLabel={(option) => option}
+                            onChange={(event, newValue) => {
+                              setFieldValue("lotName", newValue);
+                            }}
+                            renderTags={(value, props) =>
+                              value.map((option, index) => (
+                                <Chip label={option} {...props({ index })} />
+                              ))
+                            }
+                            renderInput={(params) => (
+                              <TextField
+                                label={t("addLots")}
+                                {...params}
+                                error={errors.lotName && touched.lotName}
+                                helperText={
+                                  errors.lotName && touched.lotName
+                                    ? errors.lotName
+                                    : null
+                                }
+                              />
+                            )}
+                          />
+                        </div>
+                        <div className="col-span-2 flex justify-end mt-[20px]">
+                          <ButtonComponent
+                            btnTitle={t("createParkingSpace")}
+                            type={"submit"}
+                            loadingCaption={t("creating")}
+                            // isLoading={isLoading}
+                          />
+                        </div>
+                      </Card>
+                    </Grid2>
                   </Grid2>
-                </Grid2>
-              </Form>
-            );
-          }}
-        </Formik>
-      </div>
-    </>
-  );
+                </Form>
+              );
+            }}
+          </Formik>
+        </div>
+      </>
+    );
+  }
 
   return content;
 }

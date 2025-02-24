@@ -14,17 +14,16 @@ import useAuth from "../../hook/useAuth";
 import { selectCurrentToken } from "../../redux/feature/auth/authSlice";
 import { useVerifySitesMutation } from "../../redux/feature/auth/authApiSlice";
 import { setChangedSite } from "../../redux/feature/site/siteSlice";
+import { setIsOpenDrawerProfiles } from "../../redux/feature/actions/actionSlice";
 
 function NavBarDashboard() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const user = useSelector((state) => state.users.user);
+  const drawerOpen = useSelector((state) => state.action.isOpenDrawerProfiles);
+  const user = useSelector((state) => state.auth.userProfile);
   const sites = useSelector((state) => state.sites.sitesForChange);
   const { isAdmin, isManager, sites: currentSite } = useAuth();
   const dispatch = useDispatch();
   const token = useSelector(selectCurrentToken);
-  const handleDrawerOpen = () => {
-    setDrawerOpen(true);
-  };
+
   const [
     verifySites,
     {
@@ -34,16 +33,6 @@ function NavBarDashboard() {
       error: errorVerifySite,
     },
   ] = useVerifySitesMutation();
-
-  const handleDrawerClose = () => {
-    setDrawerOpen(false);
-  };
-
-  const handleSendLogout = async () => {
-    // await sendLogout();
-    console.log("click");
-    onClose();
-  };
 
   const listGroup1 = [
     { text: "Inbox" },
@@ -118,7 +107,7 @@ function NavBarDashboard() {
             <IconButton
               sx={{ p: 0 }}
               className="w-auto h-auto  flex justify-center items-center"
-              onClick={handleDrawerOpen}
+              onClick={() => dispatch(setIsOpenDrawerProfiles(!drawerOpen))}
             >
               <Avatar alt="Profile" src={user.profileImage} />
             </IconButton>
@@ -128,8 +117,7 @@ function NavBarDashboard() {
 
       <ProfileDrawerComponent
         open={drawerOpen}
-        onClose={handleDrawerClose}
-        handleSendLogout={handleSendLogout}
+        onClose={() => dispatch(setIsOpenDrawerProfiles(false))}
       />
     </>
   );

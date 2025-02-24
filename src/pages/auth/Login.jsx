@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
   useLoginMutation,
-  useSendLogoutMutation,
   useVerify2FALoginMutation,
   useVerifySitesMutation,
 } from "../../redux/feature/auth/authApiSlice";
-import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import { jwtDecode } from "jwt-decode";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { MdKeyboardArrowLeft } from "react-icons/md";
 
 import {
   Alert,
@@ -19,6 +18,7 @@ import {
   Button,
   Card,
   CardContent,
+  Divider,
   FormControl,
   FormHelperText,
   Grid2,
@@ -40,12 +40,16 @@ import SelectSingleComponent from "../../components/SelectSingleComponent";
 import { ROLES } from "../../config/roles";
 import SeoComponent from "../../components/SeoComponent";
 import { useGetSitesListMutation } from "../../redux/feature/site/siteApiSlice";
+import { setCredentials } from "../../redux/feature/auth/authSlice";
+import OTPInput from "../../components/OTPInput";
 
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [verifyCodeErrorMessage, setVerifyCodeErrorMessage] = useState(null);
+  const [openErrorVerifyCode, setOpenErrorVerifyCode] = useState(false);
   const [open, setOpen] = useState(false);
   const [token, setToken] = useState("");
   const [step, setStep] = useState(1);
@@ -55,9 +59,11 @@ export default function Login() {
   );
   const [sitesUuid, setSitesUuid] = useState([]);
   const { t } = useTranslate();
+  const [email, setEmail] = useState("");
   const [login, { isSuccess, isLoading }] = useLoginMutation();
   const [brachCount, setBranchCount] = useState(0);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+
   const [
     getSitesList,
     {
@@ -87,13 +93,6 @@ export default function Login() {
     },
   ] = useVerifySitesMutation();
 
-  const [
-    sendLogout,
-    { isSuccess: isLogoutSuccess, isLoading: isLoadingLogout, isError, error },
-  ] = useSendLogoutMutation();
-
-  const handleLogout = () => sendLogout();
-
   useEffect(() => {
     if (rememberMe) {
       navigate("/dash");
@@ -104,9 +103,13 @@ export default function Login() {
     if (open) {
       setTimeout(() => {
         setOpen(false);
-      }, 3000);
+      }, 5000);
+    } else if (openErrorVerifyCode) {
+      setTimeout(() => {
+        setOpenErrorVerifyCode(false);
+      }, 5000);
     }
-  }, [open]);
+  }, [open, openErrorVerifyCode]);
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -134,31 +137,40 @@ export default function Login() {
   }, [isVerifySiteSuccess]);
 
   useEffect(() => {
-    if (isVerify2FASuccess) {
-      setStep(3);
-    }
-  }, [isVerify2FASuccess]);
-
-  useEffect(() => {
     if (isVerify2FaError) {
-      toast.error("Verification failed", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      setVerifyCodeErrorMessage("Verify code incorrect!");
+      setOpenErrorVerifyCode(true);
     }
   }, [isVerify2FaError]);
 
   const handleSubmiteVerifyCode = async (values) => {
     try {
-      console.log(values);
-      const { code } = values;
-      await verify2FALogin({ uuid });
+      const { accessToken } = await verify2FALogin({
+        code: values,
+        email,
+      }).unwrap();
+      dispatch(setCredentials({ accessToken }));
+
+      const decoded = jwtDecode(accessToken);
+      const { scope, sites } = decoded;
+
+      const roles = scope ? scope.split(" ") : [];
+      if (roles.includes(ROLES.ROLE_MANAGER)) {
+        navigate("/dash");
+        localStorage.setItem("isRemember", "true");
+      }
+      if (sites && sites?.length > 1) {
+        try {
+          const response = await getSitesList().unwrap();
+          setBranchCount(response.length);
+          setSitesUuid(response);
+          setStep(3);
+          setToken(accessToken);
+          resetForm({ values: { uuid: "" } });
+        } catch (err) {
+          console.log(err);
+        }
+      }
     } catch (err) {
       console.log(err);
     }
@@ -166,10 +178,10 @@ export default function Login() {
 
   const handleSubmitSite = async (values) => {
     try {
-      await verifySites({
+      const response = await verifySites({
         uuid: values.siteUuid,
-        token: token,
       });
+      dispatch(setCredentials({ accessToken: response.accessToken }));
       localStorage.setItem("isRemember", "true");
     } catch (err) {
       console.log(err);
@@ -178,24 +190,25 @@ export default function Login() {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
+      setEmail(values.email);
       setPersist(true);
-      const { accessToken } = await login({
+      const { accessToken, required2FA } = await login({
         email: values.email,
         password: values.password,
       }).unwrap();
 
+      if (!accessToken && required2FA) {
+        setStep(2);
+        resetForm({ values: { code: "" } });
+        return;
+      }
+
       const decoded = jwtDecode(accessToken);
-      const { jti: email, scope, uuid, isEnabledTwoFA, sites } = decoded;
+      const { jti: email, scope, uuid, sites } = decoded;
 
       const roles = scope ? scope.split(" ") : [];
 
-      if (isEnabledTwoFA) {
-        setStep(2);
-        setToken(accessToken);
-        handleLogout();
-        resetForm({ values: { code: "" } });
-        localStorage.setItem("isRemember", "true");
-      } else if (sites && sites?.length > 1) {
+      if (sites && sites?.length > 1) {
         if (roles.includes(ROLES.ROLE_ADMIN)) {
           try {
             const response = await getSitesList().unwrap();
@@ -203,14 +216,13 @@ export default function Login() {
             setSitesUuid(response);
             setStep(3);
             setToken(accessToken);
-            handleLogout();
             resetForm({ values: { uuid: "" } });
           } catch (err) {
             console.log(err);
           }
         }
       } else {
-        if (roles.includes(ROLES.ROLE_ADMIN)) {
+        if (!roles.includes(ROLES.ROLE_MANAGER)) {
           try {
             await verifySites({ uuid: sites });
             dispatch(setUuid(uuid));
@@ -219,15 +231,10 @@ export default function Login() {
           } catch (err) {
             console.log(err);
           }
-        } else if (roles.includes(ROLES.ROLE_MANAGER)) {
-          try {
-            await verifySites({ uuid: sites });
-            dispatch(setUuid(uuid));
-            localStorage.setItem("isRemember", "true");
-            navigate("/dash");
-          } catch (err) {
-            console.log(err);
-          }
+        } else {
+          dispatch(setUuid(uuid));
+          localStorage.setItem("isRemember", "true");
+          navigate("/dash");
         }
       }
     } catch (error) {
@@ -296,16 +303,15 @@ export default function Login() {
                   <Box
                     sx={{
                       width: "100%",
-                      px: "20px",
+                      px: "24px",
                       py: 15,
                     }}
-                    className="flex flex-col justify-start items-center lg:justify-center"
+                    className="flex flex-col justify-center items-center lg:justify-center"
                   >
-                    <Box className="max-w-[500px]">
+                    <div className="xs:min-w-[500px] max-w-[450px]">
                       <Typography variant="h6" sx={{ mb: "40px" }}>
                         {t("login-to-your-account")}
                       </Typography>
-
                       {open && (
                         <Alert
                           sx={{ mb: 2, borderRadius: "6px" }}
@@ -314,7 +320,6 @@ export default function Login() {
                           {errorMessage}
                         </Alert>
                       )}
-
                       <TextField
                         label={t("email")}
                         variant="outlined"
@@ -340,9 +345,16 @@ export default function Login() {
                         }
                         size="medium"
                       />
-
+                      <div className="flex justify-end">
+                        <Link
+                          to={"/forgot-password"}
+                          className="text-sm hover:underline text-right"
+                        >
+                          Forgot password?
+                        </Link>
+                      </div>
                       <FormControl
-                        sx={{ width: "100%", mb: 2 }}
+                        sx={{ width: "100%", mb: 2, mt: 1 }}
                         variant="outlined"
                         size="medium"
                         error={errors.password && touched.password}
@@ -389,7 +401,6 @@ export default function Login() {
                             : null}
                         </FormHelperText>
                       </FormControl>
-
                       <LoadingButton
                         variant="contained"
                         size="large"
@@ -404,36 +415,33 @@ export default function Login() {
                         className="w-full "
                       >
                         {t("login")}
-                      </LoadingButton>
-                      <Button
-                        variant="outlined"
-                        sx={{ textTransform: "none", borderRadius: "6px" }}
-                        fullWidth
-                        onClick={() =>
-                          (window.location.href = `${
-                            import.meta.env.VITE_API_BACKEND_URL
-                          }/import SeoComponent from './../../components/SeoComponent';
-oauth2/authorization/azure`)
-                        }
-                      >
-                        <svg
-                          width="30px"
-                          height="30px"
-                          viewBox="0 0 16 16"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="mr-5"
-                          fill="none"
+                      </LoadingButton>{" "}
+                      <Divider>OR</Divider>
+                      <div className="flex justify-center">
+                        <IconButton
+                          size="small"
+                          onClick={() =>
+                            (window.location.href = `${
+                              import.meta.env.VITE_API_BACKEND_URL
+                            }/oauth2/authorization/azure`)
+                          }
                         >
-                          <path fill="#F35325" d="M1 1h6.5v6.5H1V1z" />
-                          <path fill="#81BC06" d="M8.5 1H15v6.5H8.5V1z" />
-                          <path fill="#05A6F0" d="M1 8.5h6.5V15H1V8.5z" />
-                          <path fill="#FFBA08" d="M8.5 8.5H15V15H8.5V8.5z" />
-                        </svg>
-                        <span className="text-gray-800 dark:text-gray-50">
-                          {t("loginWithMicrosoft")}
-                        </span>
-                      </Button>
-                    </Box>
+                          <svg
+                            width="30px"
+                            height="30px"
+                            viewBox="0 0 16 16"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            className="m-1"
+                          >
+                            <path fill="#F35325" d="M1 1h6.5v6.5H1V1z" />
+                            <path fill="#81BC06" d="M8.5 1H15v6.5H8.5V1z" />
+                            <path fill="#05A6F0" d="M1 8.5h6.5V15H1V8.5z" />
+                            <path fill="#FFBA08" d="M8.5 8.5H15V15H8.5V8.5z" />
+                          </svg>
+                        </IconButton>
+                      </div>
+                    </div>
                   </Box>
                 </section>
               </Form>
@@ -444,92 +452,118 @@ oauth2/authorization/azure`)
     );
   } else if (step === 2) {
     content = (
-      <Formik
-        initialValues={{ code: "" }}
-        validationSchema={validationSchemaForVerifyForm}
-        onSubmit={handleSubmiteVerifyCode}
-      >
-        {({ values, touched, errors, handleChange, handleBlur }) => (
-          <Form className="grid grid-cols-12 md:grid-cols-1 grid-flow-row justify-center items-center min-h-screen gap-10">
-            <section className="md:hidden col-start-2 col-end-6">
-              <img src="/images/login.svg" alt="login_image" />
-            </section>
-            <hr className="w-1 h-[30rem] bg-primary col-span-1 mx-auto md:hidden" />
-            <Card
-              sx={{ maxWidth: "100%" }}
-              className="col-start-7 col-end-12 md:col-span-12"
-            >
-              <CardContent>
-                <div className="flex gap-5 items-center justify-start mb-3">
-                  <div className="col-span-2 row-span-2">
-                    <img
-                      src="/images/logo.png"
-                      alt="logo"
-                      width={50}
-                      height={50}
-                    />
+      <>
+        <SeoComponent title="Login" />
+        <nav className="fixed top-0 left-0 w-full bg-white bg-opacity-5 lg:bg-opacity-0 z-20 backdrop-blur-3xl lg:backdrop-blur-0">
+          <div className="flex justify-between items-center xxs:flex-nowrap flex-wrap">
+            <LogoComponent />
+            <div className="pr-[20px] flex gap-[16px]  items-center">
+              <TranslateComponent />
+              <SettingComponent />
+            </div>
+          </div>
+        </nav>
+
+        <Box
+          component="div"
+          sx={{
+            bgcolor: "background.default",
+            color: "text.primary",
+            height: "100%",
+          }}
+        >
+          <Formik
+            initialValues={{ email: "", password: "" }}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ values, touched, errors, handleChange, handleBlur }) => (
+              <Form>
+                <section className="flex h-screen">
+                  <div className="h-screen shrink-0 w-[480px] hidden lg:block bg-[#f5f5f5]">
+                    <div className="px-[20px] h-full text-center flex justify-center items-center flex-col">
+                      <img
+                        src="/images/login_image.png"
+                        alt="login_image"
+                        className="w-full h-auto"
+                      />
+                    </div>
                   </div>
-                  <Grid2 container>
-                    <Grid2
-                      size={12}
-                      className="font-semibold subpixel-antialiased tracking-wide text-nowrap text-clamp truncate col-span-10"
-                    >
-                      ប្រព័ន្ធចតរថយន្តឆ្លាតវៃ
-                    </Grid2>
-                    <Grid2
-                      size={12}
-                      className="subpixel-antialiased text-nowrap text-clampSmall col-start-3 col-end-13 row-start-2 truncate"
-                    >
-                      Smart Parking System
-                    </Grid2>
-                  </Grid2>
-                </div>
-
-                <div className="flex flex-col gap-5">
-                  <TextField
-                    label="Verificaiton Code"
-                    variant="outlined"
+                  <Box
                     sx={{
-                      "& .MuiInputBase-input": {
-                        boxShadow: "none",
-                      },
+                      width: "100%",
+                      px: "20px",
+                      py: 15,
                     }}
-                    type="text"
-                    id="code"
-                    name="code"
-                    // autoFocus
-                    fullWidth
-                    value={values.code}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    autoComplete="off"
-                    error={errors.code && touched.code}
-                    helperText={
-                      errors.code && touched.code ? errors.code : null
-                    }
-                    size="medium"
-                  />
-
-                  <LoadingButton
-                    variant="contained"
-                    size="large"
-                    sx={{
-                      textTransform: "none",
-                    }}
-                    loading={isVerify2FALoading}
-                    type="submit"
-                    className="bg-primary w-full hover:bg-primary-hover"
+                    className="flex flex-col justify-start items-center lg:justify-center"
                   >
-                    Verify
-                  </LoadingButton>
-                </div>
-              </CardContent>
-            </Card>
-          </Form>
-        )}
-      </Formik>
+                    <div className="xs:min-w-[500px] max-w-[450px] flex flex-col items-center gap-7">
+                      <img
+                        src="/images/email.svg"
+                        alt="branch_image"
+                        className="w-20 h-auto"
+                      />
+
+                      <Typography variant="h6" className="text-center">
+                        Please check your email!
+                      </Typography>
+
+                      <Typography variant="body1" className="text-center">
+                        We've emailed a 6-digit confirmation code. Please enter
+                        the code in the box below to verify your email.
+                      </Typography>
+                      <div>
+                        {openErrorVerifyCode && (
+                          <Alert
+                            sx={{ mb: 2, borderRadius: "6px" }}
+                            severity="error"
+                          >
+                            {verifyCodeErrorMessage}
+                          </Alert>
+                        )}
+
+                        <div className="flex justify-center items-center">
+                          <OTPInput
+                            length={6}
+                            onComplete={handleSubmiteVerifyCode}
+                          />
+                        </div>
+                      </div>
+
+                      <LoadingButton
+                        variant="contained"
+                        size="large"
+                        sx={{
+                          textTransform: "none",
+                          borderRadius: "6px",
+                          mb: 2,
+                        }}
+                        loading={isLoading}
+                        type="submit"
+                        loadingIndicator="Logging..."
+                        className="w-full "
+                      >
+                        Verify
+                      </LoadingButton>
+                      <div className="flex justify-center items-center hover:underline cursor-pointer">
+                        <a
+                          onClick={() => setStep(1)}
+                          className="flex justify-center items-center gap-2"
+                        >
+                          <MdKeyboardArrowLeft className="w-5 h-5" />
+                          {t("returnToLogin")}
+                        </a>
+                      </div>
+                    </div>
+                  </Box>
+                </section>
+              </Form>
+            )}
+          </Formik>
+        </Box>
+      </>
     );
-  } else if (step === 3) {
+  } else if (step === 3 && !isGetSitesLoading) {
     content = (
       <>
         <SeoComponent title="Select a branch" />
@@ -588,9 +622,8 @@ oauth2/authorization/azure`)
                       }}
                       className="flex flex-col justify-start items-center lg:justify-center"
                     >
-                      <Box
-                        sx={{ maxWidth: "500px" }}
-                        className="w-full flex flex-col justify-center items-center"
+                      <div
+                        className="xs:min-w-[500px] max-w-[450px] flex flex-col justify-center items-center"
                       >
                         <img
                           src="/images/building.png"
@@ -633,7 +666,7 @@ oauth2/authorization/azure`)
                         >
                           {t("select")}
                         </LoadingButton>
-                      </Box>
+                      </div>
                     </Box>
                   </section>
                 </Form>

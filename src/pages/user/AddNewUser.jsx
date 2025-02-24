@@ -182,7 +182,7 @@ function AddNewUser() {
   };
   const handleClickShowConfirmPassword = () =>
     setShowConfirmPassword((show) => !show);
-  
+
   const AntSwitch = styled(Switch)(({ theme }) => ({
     width: 36,
     height: 20,
@@ -263,7 +263,6 @@ function AddNewUser() {
   }, [isSuccessAddNewUser, navigate, dispatch]);
 
   useEffect(() => {
-    console.log("error", errorAddNewUser);
     if (isErrorAddNewUser) {
       dispatch(setIsOpenSnackBar(true));
       dispatch(setErrorSnackbar(true));
@@ -289,8 +288,11 @@ function AddNewUser() {
         const uploadResponse = await uploadImage(formData).unwrap();
         profileImageUri = uploadResponse.uri;
       }
-      const dateOfBirth = new Date(values.dateOfBirth);
-      const formattedDateOfBirth = dateOfBirth.toISOString().split("T")[0];
+
+      const formattedDateOfBirth = dayjs(values.dateOfBirth).format(
+        "YYYY-MM-DD"
+      );
+      
       await addNewUser({
         fullName: values.fullName,
         dateOfBirth: formattedDateOfBirth,

@@ -12,6 +12,9 @@ import siteReducer from "../feature/site/siteSlice.js";
 import companiesReducer from "../feature/company/companySlice.js";
 import cityReducer from "../feature/city/citySlice.js";
 import siteTypeReducer from "../feature/siteType/siteTypeSlice.js";
+import mapViewReducer from "../feature/mapView/mapViewSlice.js";
+import analysisReducer from "../feature/analysis/analysisSlice.js";
+import appReducer from "../feature/app/appSlice.js";
 
 const store = configureStore({
   reducer: {
@@ -27,10 +30,16 @@ const store = configureStore({
     companies: companiesReducer,
     city: cityReducer,
     siteType: siteTypeReducer,
+    mapView: mapViewReducer,
+    analysis: analysisReducer,
+    app: appReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(apiSlice.middleware),
-  devTools: true,
+    getDefaultMiddleware({
+      serializableCheck: false,
+      immutableCheck: false,
+    }).concat(apiSlice.middleware),
+  devTools: false,
 });
 
 setupListeners(store.dispatch);

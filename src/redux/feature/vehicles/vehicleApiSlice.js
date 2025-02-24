@@ -13,14 +13,13 @@ const initialState = vehicleAdapter.getInitialState();
 export const vehicleApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getVehicles: builder.query({
-      query: ({ pageNo = 1, pageSize = 20 }) => ({
+      query: ({ pageNo = 1, pageSize = 5 }) => ({
         url: `/vehicles?pageNo=${pageNo}&pageSize=${pageSize}`,
         validateStatus: (response, result) => {
           return response.status === 200 && !result.isError;
         },
       }),
       transformResponse: (responseData) => {
-        console.log("responseData: ", responseData);
         const loadVehicles = responseData.content.map((vehicle) => {
           vehicle.id = vehicle.uuid;
           return vehicle;
@@ -57,7 +56,6 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
         },
       }),
       transformResponse: (responseData) => {
-        console.log("responseData: ", responseData);
         const loadVehicles = responseData.content.map((vehicle) => {
           vehicle.id = vehicle.uuid;
           return vehicle;

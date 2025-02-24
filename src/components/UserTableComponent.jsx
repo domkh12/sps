@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import DataNotFound from "./DataNotFound";
 import UserRowComponent from "./UserRowComponent";
-import useTranslate from "../hook/useTranslate";
 
 function UserTableComponent({
   columns,
@@ -27,14 +26,11 @@ function UserTableComponent({
   pageSizeSearch,
   pageNoSearch,
   totalElementsSearch,
-  dispatch,
   handleChangePage,
   handleChangeRowsPerPage,
   entities,
   searchEntities,
 }) {
-  const { t } = useTranslate();
-  
   const tableContent =
     searchQuery !== "" ||
     roleFilter.length > 0 ||
@@ -91,7 +87,10 @@ function UserTableComponent({
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
+              <TableCell
+                sx={{ borderBottomStyle: "hidden", backgroundColor: "#F4F6F8" }}
+                padding="checkbox"
+              >
                 <Checkbox
                   sx={{
                     "&.Mui-checked": {
@@ -106,6 +105,10 @@ function UserTableComponent({
               </TableCell>
               {columns?.map((column) => (
                 <TableCell
+                  sx={{
+                    borderBottomStyle: "hidden",
+                    backgroundColor: "#F4F6F8",
+                  }}
                   key={column?.id}
                   align={column?.align}
                   style={{ minWidth: column?.minWidth, color: "gray" }}
@@ -122,14 +125,8 @@ function UserTableComponent({
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
         count={displayTotalElements || 0}
-        rowsPerPage={
-          pageSizeSearch != null && pageSizeSearch !== 0
-            ? pageSizeSearch
-            : pageSize
-        }
-        page={
-          pageNoSearch != null && pageNoSearch !== 0 ? pageNoSearch : pageNo
-        }
+        rowsPerPage={pageSize || pageSizeSearch}
+        page={pageNoSearch || pageNo}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />

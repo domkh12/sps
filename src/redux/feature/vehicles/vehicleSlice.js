@@ -6,7 +6,7 @@ const vehicleSlice = createSlice({
     uuid: "",
     status: "",
     pageNo: 1,
-    pageSize: 30,
+    pageSize: 5,
     totalPages: 0,
     licensePlateProvincesFetched: [],
     vehicleTypeFetched: [],
@@ -41,6 +41,9 @@ const vehicleSlice = createSlice({
     },
     setPageSize(state, action) {
       state.pageSize = action.payload;
+    },
+    setPageNo(state, action) {
+      state.pageNo = action.payload;
     },
     setTotalPages(state, action) {
       state.totalPages = action.payload;
@@ -81,6 +84,7 @@ const vehicleSlice = createSlice({
 });
 
 export const {
+  setPageNo,
   setUuid,
   setStatus,
   increasePageNo,

@@ -77,6 +77,14 @@ export const userApiSlice = apiSlice.injectEndpoints({
           pageSize: responseData.page.size,
         };
       },
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [
+            { type: "User", id: "LIST" },
+            ...result.ids.map((id) => ({ type: "User", id })),
+          ];
+        } else return [{ type: "User", id: "LIST" }];
+      },
     }),
 
     findUserByUuid: builder.query({
@@ -119,17 +127,6 @@ export const userApiSlice = apiSlice.injectEndpoints({
           ...initialUserData,
         },
       }),
-      async onQueryStarted(args, { dispatch, queryFulfilled, getState }) {
-        try {
-          const { data } = await queryFulfilled;
-          const userUuid = getState().users.uuid;
-          if (userUuid === data.uuid) {
-            dispatch(setUser(data));
-          }
-        } catch (error) {
-          console.error("Failed to fetch user:", error);
-        }
-      },
       invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
     }),
 
@@ -141,7 +138,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
           id,
         },
       }),
-      invalidatesTags: [{ type: "User", id: "LIST" }],
+      invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.id }],
     }),
 
     connectedUser: builder.mutation({
@@ -168,13 +165,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
         url: `/users/full-names`,
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-         try {
-           const { data } = await queryFulfilled;
-           dispatch(setAllFullNameUsersFetched({ data }));
-         } catch (error) {
-           console.log(error);
-         }
-      }
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setAllFullNameUsersFetched({ data }));
+        } catch (error) {
+          console.log(error);
+        }
+      },
     }),
 
     get2faSecretCode: builder.mutation({

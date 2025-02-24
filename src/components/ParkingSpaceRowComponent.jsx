@@ -10,40 +10,40 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import EditButtonComponent from "./EditButtonComponent";
 import MoreActionComponent from "./MoreActionComponent";
 import CustomizedProgressBarsComponent from "./CustomizedProgressBarsComponent";
 import { setIsOpenConfirmDelete } from "../redux/feature/actions/actionSlice";
 import { useDispatch } from "react-redux";
-import { setIdParkingToDelete } from "../redux/feature/parking/parkingSlice";
+import {
+  setIdParkingToDelete,
+  setIsOpenQuickEditParkingSpace,
+  setParkingSpaceToEdit,
+} from "../redux/feature/parking/parkingSlice";
 import useAuth from "../hook/useAuth";
+import useDateFormatter from "../hook/useDateFormatter";
 
-function ParkingSpaceRowComponent({ parkingId }) {
+function ParkingSpaceRowComponent({ parkingId, parkingSpace }) {
   const dispatch = useDispatch();
-  const { isAdmin } = useAuth();
-
-  const { parkingSpace } = useGetParkingSpacesQuery("parkingSpacesList", {
-    selectFromResult: ({ data }) => ({
-      parkingSpace: data?.entities[parkingId],
-    }),
-  });
+  const { isManager } = useAuth();
+  const navigate = useNavigate();
 
   const handleQuickEdit = () => {
-    dispatch(setIsOpenQuickEditVehicle(true));
-    dispatch(setVehicleForQuickEdit(vehicle));
+    dispatch(setIsOpenQuickEditParkingSpace(true));
+    dispatch(setParkingSpaceToEdit(parkingSpace));
   };
 
   if (parkingSpace) {
-    var handleEdit = () => navigate(`/dash/vehicles/${vehicleId}`);
-    var handleView = () => navigate(`/dash/vehicles/${vehicleId}/view`);
+    var handleEdit = () => navigate(`/dash/parkings/${parkingId}`);
+    var handleView = () => navigate(`/dash/parkings/${parkingId}/view`);
     const handleDelete = () => {
       dispatch(setIsOpenConfirmDelete(true));
       dispatch(setIdParkingToDelete(parkingSpace.uuid));
     };
 
     var menuActions = [
-      isAdmin
+      isManager
         ? {
             label: "Edit",
             icon: <FaPen className="w-5 h-5" />,
@@ -55,7 +55,7 @@ function ParkingSpaceRowComponent({ parkingId }) {
         icon: <FaEye className="w-5 h-5" />,
         onClick: handleView,
       },
-      isAdmin
+      isManager
         ? {
             label: "Delete",
             icon: <FaTrashCan className="w-5 h-5" />,
@@ -67,7 +67,9 @@ function ParkingSpaceRowComponent({ parkingId }) {
     ].filter(Boolean);
 
     const dateObj = new Date(parkingSpace.createdAt);
-    var formattedDate = dateObj.toLocaleDateString("en-GB");
+    var { formattedDateDDMMYYYYNoZeros } = useDateFormatter(
+      new Date(parkingSpace.createdAt)
+    );
     var formattedTime = dateObj.toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
@@ -88,6 +90,7 @@ function ParkingSpaceRowComponent({ parkingId }) {
                   src={parkingSpace?.image || "/images/imagePlaceholder.jpg"}
                   alt="car_image"
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
               <ListItemText
@@ -107,6 +110,10 @@ function ParkingSpaceRowComponent({ parkingId }) {
         </TableCell>
 
         <TableCell sx={{ borderBottomStyle: "dashed" }}>
+          <Typography variant="body1">{parkingSpace.site.siteName}</Typography>
+        </TableCell>
+
+        <TableCell sx={{ borderBottomStyle: "dashed" }}>
           <Typography variant="body1">{parkingSpace.lotQty}</Typography>
         </TableCell>
 
@@ -120,7 +127,9 @@ function ParkingSpaceRowComponent({ parkingId }) {
         </TableCell>
 
         <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          <Typography variant="body1">{formattedDate}</Typography>
+          <Typography variant="body1">
+            {formattedDateDDMMYYYYNoZeros}
+          </Typography>
           <Typography variant="body2" color="gray">
             {formattedTime}
           </Typography>
@@ -143,7 +152,6 @@ function ParkingSpaceRowComponent({ parkingId }) {
     return null;
   }
 }
-
 
 const memoizedParkingSpaceRow = memo(ParkingSpaceRowComponent);
 

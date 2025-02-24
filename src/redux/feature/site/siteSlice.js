@@ -5,6 +5,8 @@ const siteSlice = createSlice({
 
   // initial data
   initialState: {
+    pageNo: 1,
+    pageSize: 5,
     changedSite: false,
     sites: [],
     sitesForChange: [{}],
@@ -16,6 +18,12 @@ const siteSlice = createSlice({
 
   // function
   reducers: {
+    setPageSizeBranch: (state, action) => {
+      state.pageSize = action.payload;
+    },
+    setPageNoBranch:(state, action) => {
+      state.pageNo = action.payload;
+    },
     setSites: (state, action) => {
       state.sites = action.payload;
     },
@@ -36,18 +44,25 @@ const siteSlice = createSlice({
     },
     setSearchKeywords: (state, action) => {
       state.searchKeywords = action.payload;
-    }
+    },
+    setClearBranchFilter: (state, action) => {
+      state.searchKeywords = "";
+      state.branchTypeFilter = [];
+    },
   },
 });
 
 export const {
+  setPageNoBranch,
+  setPageSizeBranch,
   setSites,
   setChangedSite,
   setSitesForChange,
   setIsQuickEditBranchOpen,
   setBranchForQuickEdit,
   setBranchTypeFilter,
-  setSearchKeywords
+  setSearchKeywords,
+  setClearBranchFilter,
 } = siteSlice.actions;
 
 export default siteSlice.reducer;

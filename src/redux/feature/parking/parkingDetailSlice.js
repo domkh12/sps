@@ -3,15 +3,15 @@ import { createSlice } from "@reduxjs/toolkit";
 const parkingDetailSlice = createSlice({
   name: "parkingDetail",
   initialState: {
-    slotDetails : {}
+    parkingLotDetail : {}
   },
   reducers: {
-    setParkingSlot(state, action) {      
-      state.slotDetails = action.payload
-    },
+    setParkingLotDetail: (state, action) => {
+      state.parkingLotDetail = action.payload;
+    }
   },
 });
 
-export const { setParkingSlot } = parkingDetailSlice.actions;
+export const { setParkingLotDetail } = parkingDetailSlice.actions;
 
 export default parkingDetailSlice.reducer;

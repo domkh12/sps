@@ -51,6 +51,19 @@ export const selectMenuStyle = {
   },
 };
 
+export const drawerStyle = {
+  "& .MuiPaper-root": {
+    background: "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",    
+    padding: "6px",
+    boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)",    
+  },
+  "& .MuiList-root": {
+    padding: "0",
+    display: "grid",
+    gap: "6px",
+  },
+};
+
 export const listStyle = {
   minWidth: 0,
   width: "200px",

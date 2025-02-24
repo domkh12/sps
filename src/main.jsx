@@ -11,7 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import App from "./App";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { disableReactDevTools } from './../node_modules/@fvilers/disable-react-devtools/index';
+import { disableReactDevTools } from "./../node_modules/@fvilers/disable-react-devtools/index";
 
 if (process.env.NODE_ENV === "production") disableReactDevTools();
 
@@ -19,7 +19,6 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter
       future={{
-        v7_relativeSplatPath: true,
         v7_startTransition: true,
       }}
     >

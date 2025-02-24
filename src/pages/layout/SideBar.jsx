@@ -808,7 +808,7 @@ function SideBar() {
                                           }
                                         />
                                       </ListItemButton>
-                                      {isAdmin && (
+                                      {isManager && (
                                         <ListItemButton
                                           sx={{
                                             borderRadius: "6px",
@@ -947,7 +947,7 @@ function SideBar() {
                             </ListItemButton>
                           </li>
 
-                          {isAdmin && (
+                          {isManager && (
                             <li>
                               <img
                                 src="/images/nav_sublist.svg"
@@ -985,6 +985,7 @@ function SideBar() {
                         </ul>
                       </List>
                     </Collapse>
+
                     {/* Vehicle Menu */}
                     {isCollapsed ? (
                       <>
@@ -1574,7 +1575,7 @@ function SideBar() {
                                           textWrap: "nowrap",
                                         }}
                                       >
-                                        Report
+                                        {t("report")}
                                       </Typography>
                                     }
                                   />
@@ -1643,7 +1644,7 @@ function SideBar() {
                                             display: "inline",
                                           }}
                                         >
-                                          List
+                                          {t("list")}
                                         </Typography>
                                       }
                                     />
@@ -1677,7 +1678,7 @@ function SideBar() {
                                             display: "inline",
                                           }}
                                         >
-                                          Create
+                                          {t("create")}
                                         </Typography>
                                       }
                                     />
@@ -1721,7 +1722,7 @@ function SideBar() {
                                 variant="body1"
                                 sx={{ color: "#424242", display: "inline" }}
                               >
-                                Report
+                                {t("report")}
                               </Typography>
                             }
                           />
@@ -1766,7 +1767,7 @@ function SideBar() {
                                     variant="body1"
                                     sx={{ color: "#424242", display: "inline" }}
                                   >
-                                    List
+                                    {t("list")}
                                   </Typography>
                                 }
                               />
@@ -1796,7 +1797,7 @@ function SideBar() {
                                     variant="body1"
                                     sx={{ color: "#424242", display: "inline" }}
                                   >
-                                    Create
+                                    {t("create")}
                                   </Typography>
                                 }
                               />

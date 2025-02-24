@@ -12,7 +12,20 @@ export const parkingLotApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Parking", id: "LIST" }],
     }),
+    updateParkingLots: builder.mutation({
+      query: ({ uuid, ...initialParkingData }) => ({
+        url: `/parking-lots/${uuid}`,
+        method: "PATCH",
+        body: {
+          ...initialParkingData,
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "Parking", id: "LIST" },
+      ],
+    }),
   }),
 });
 
-export const {useAddNewParkingLotsMutation} = parkingLotApiSlice;
+export const { useAddNewParkingLotsMutation, useUpdateParkingLotsMutation } =
+  parkingLotApiSlice;

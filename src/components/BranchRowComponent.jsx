@@ -19,6 +19,7 @@ import {
   setBranchForQuickEdit,
   setIsQuickEditBranchOpen,
 } from "../redux/feature/site/siteSlice";
+import useDateFormatter from "../hook/useDateFormatter";
 
 function stringToColor(string) {
   let hash = 0;
@@ -66,19 +67,15 @@ function stringAvatar(name) {
   };
 }
 
-function BranchRowComponent({ siteId }) {
+function BranchRowComponent({ siteId, site }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { site } = useGetSitesQuery("sitesList", {
-    selectFromResult: ({ data }) => ({
-      site: data?.entities[siteId],
-    }),
-  });
-
   if (site) {
     const dateObj = new Date(site.createdAt);
-    var formattedDate = dateObj.toLocaleDateString("en-GB");
+    var { formattedDateDDMMYYYYNoZeros } = useDateFormatter(
+      new Date(site.createdAt)
+    );
     var formattedTime = dateObj.toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
@@ -160,7 +157,9 @@ function BranchRowComponent({ siteId }) {
         </TableCell>
 
         <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          <Typography variant="body1">{formattedDate}</Typography>
+          <Typography variant="body1">
+            {formattedDateDDMMYYYYNoZeros}
+          </Typography>
           <Typography variant="body2" color="gray">
             {formattedTime}
           </Typography>

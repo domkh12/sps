@@ -9,7 +9,7 @@ const initialState = sitesAdapter.getInitialState();
 export const sitesApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getSites: builder.query({
-      query: ({ pageNo = 1, pageSize = 20 }) => ({
+      query: ({ pageNo = 1, pageSize = 5 }) => ({
         url: `/sites?pageNo=${pageNo}&pageSize=${pageSize}`,
         validateStatus: (response, result) => {
           return response.status === 200 && !result.isError;
@@ -41,7 +41,7 @@ export const sitesApiSlice = apiSlice.injectEndpoints({
     filterSites: builder.query({
       query: ({
         pageNo = 1,
-        pageSize = 20,
+        pageSize = 5,
         keywords = "",
         cityId = "",
         siteTypeId = "",

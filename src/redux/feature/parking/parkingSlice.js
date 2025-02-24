@@ -6,6 +6,12 @@ const parkingSlice = createSlice({
     parking: {},
     labels: {},
     idParkingToDelete: "",
+    isOpenQuickEditParkingSpace: false,
+    parkingSpaceToEdit: {},
+    searchParkingSpace: "",
+    branchFilter: [],
+    pageNo: 1,
+    pageSize: 5,
   },
   reducers: {
     setParking: (state, action) => {
@@ -20,10 +26,47 @@ const parkingSlice = createSlice({
     clearParking: (state, action) => {
       state.parking = {};
     },
+    setIsOpenQuickEditParkingSpace: (state, action) => {
+      state.isOpenQuickEditParkingSpace = action.payload;
+    },
+    setParkingSpaceToEdit: (state, action) => {
+      state.parkingSpaceToEdit = action.payload;
+    },
+    setSearchParkingSpace: (state, action) => {
+      state.searchParkingSpace = action.payload;
+    },
+    setParkingFromWB: (state, action) => {
+      state.parking = { ...state.parking, ...action.payload };
+    },
+    setClearParkingFilter: (state, action) => {
+      state.searchParkingSpace = "";
+      state.branchFilter = [];
+    },
+    setPageNoParking: (state, action) => {
+      state.pageNo = action.payload;
+    },
+    setPageSizeParking: (state, action) => {
+      state.pageSize = action.payload;
+    },
+    setBranchFilterParking: (state, action) => {
+      state.branchFilter = action.payload;
+    },
   },
 });
 
-export const { setParking, setLabels, setIdParkingToDelete, clearParking } =
-  parkingSlice.actions;
+export const {
+  setPageSizeParking,
+  setPageNoParking,
+  setClearParkingFilter,
+  setParking,
+  setLabels,
+  setIdParkingToDelete,
+  clearParking,
+  setIsOpenQuickEditParkingSpace,
+  setParkingSpaceToEdit,
+  setSearchParkingSpace,
+  setParkingFromWB,
+  setBranchFilterParking,
+} = parkingSlice.actions;
 
 export default parkingSlice.reducer;

@@ -1,11 +1,18 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { createTheme, ThemeProvider, useMediaQuery } from "@mui/material";
-import LoadingComponent from "./components/LoadingComponent.jsx";
 import Aos from "aos";
 import "aos/dist/aos.css";
 import RequireAuth from "./pages/auth/RequireAuth.jsx";
 import { ROLES } from "./config/roles.js";
+const HistoryList = lazy(() => import("./pages/history/HistoryList.jsx"));
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword.jsx"));
+const ResetPassword = lazy(() => import("./pages/auth/ResetPassword.jsx"));
+const LoadingOneComponent = lazy(
+  () => import("./components/LoadingOneComponent.jsx")
+);
+const Security = lazy(() => import("./pages/profile/Security.jsx"));
+const Account = lazy(() => import("./pages/profile/Account.jsx"));
 const BranchList = lazy(() => import("./pages/branch/BranchList.jsx"));
 const AddNewBranch = lazy(() => import("./pages/branch/AddNewBranch.jsx"));
 const Error403Component = lazy(
@@ -26,25 +33,18 @@ const VehicleList = lazy(() => import("./pages/vehicle/VehicleList.jsx"));
 const AddNewVehicle = lazy(() => import("./pages/vehicle/AddNewVehicle.jsx"));
 const EditVehicle = lazy(() => import("./pages/vehicle/EditVehicle.jsx"));
 const ViewVehicle = lazy(() => import("./pages/vehicle/ViewVehicle.jsx"));
-const HistoryParking = lazy(() => import("./pages/parking/HistoryParking.jsx"));
-const ParkingAreasList = lazy(
-  () => import("./pages/parking/ParkingAreasList.jsx")
-);
+const ParkingEdit = lazy(() => import("./pages/parking/ParkingEdit.jsx"));
 const OAuth2RedirectHandler = lazy(
   () => import("./pages/auth/OAuth2RedirectHandler.jsx")
 );
 const UserList = lazy(() => import("./pages/user/UserList.jsx"));
 const AddNewParking = lazy(() => import("./pages/parking/AddNewParking.jsx"));
 const Profile = lazy(() => import("./pages/profile/Profile.jsx"));
-const ParkingAreas = lazy(
-  () => import("./pages/parking/components/ParkingAreas.jsx")
-);
 const MapViews = lazy(() => import("./pages/map_view/MapViews.jsx"));
 const ParkingList = lazy(() => import("./pages/parking/ParkingList.jsx"));
 const TestComponent = lazy(() => import("./components/TestComponent.jsx"));
 const ReportList = lazy(() => import("./pages/report/ReportList.jsx"));
 const CreateReport = lazy(() => import("./pages/report/CreateReport.jsx"));
-const History = lazy(() => import("./pages/history/History.jsx"));
 
 function App() {
   const [mode, setMode] = useState(false);
@@ -69,6 +69,11 @@ function App() {
     },
   });
 
+  window.addEventListener("vite:preloadError", (event) => {  
+    event.preventDefault();
+    window.location.reload();
+  });
+
   useEffect(() => {
     Aos.init({
       duration: 500,
@@ -77,13 +82,15 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Suspense fallback={<LoadingComponent />}>
+      <Suspense fallback={<LoadingOneComponent />}>
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/test" element={<TestComponent />} />
           <Route path="/login" element={<Login />} />
-          <Route path="unauthorize" element={<Error403Component />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/unauthorize" element={<Error403Component />} />
 
           {/* Protected routes */}
           <Route element={<PersistLogin />}>
@@ -95,7 +102,11 @@ function App() {
 
                 <Route path="/dash" element={<AdminLayout />}>
                   <Route index element={<Dashboard />} />
-                  <Route path="accounts" element={<Profile />} />
+
+                  <Route path="accounts" element={<Profile />}>
+                    <Route index element={<Account />} />
+                    <Route path="security" element={<Security />} />
+                  </Route>
 
                   <Route
                     element={
@@ -132,15 +143,14 @@ function App() {
 
                     <Route
                       element={
-                        <RequireAuth allowedRoles={[ROLES.ROLE_ADMIN]} />
+                        <RequireAuth allowedRoles={[ROLES.ROLE_MANAGER]} />
                       }
                     >
                       <Route path="new" element={<AddNewParking />} />
-                      <Route index path=":id" element={<ParkingAreas />} />
-                      <Route path=":id" element={<ParkingAreasList />} />
+                      <Route path=":id" element={<ParkingEdit />} />
                     </Route>
 
-                    <Route path="history" element={<HistoryParking />} />
+                    
                   </Route>
 
                   <Route path="reports">
@@ -149,7 +159,7 @@ function App() {
                   </Route>
 
                   <Route path="history">
-                    <Route index element={<History />} />
+                    <Route index element={<HistoryList />} />
                   </Route>
 
                   <Route

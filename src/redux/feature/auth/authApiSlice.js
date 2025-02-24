@@ -1,6 +1,11 @@
 import { apiSlice } from "../../app/api/apiSlice";
 import { setUser, setUuid } from "../users/userSlice";
-import { logOut, setCredentials, setQrCodeUrl } from "./authSlice";
+import {
+  logOut,
+  setCredentials,
+  setQrCodeUrl,
+  setUserProfile,
+} from "./authSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -78,18 +83,17 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
 
     verify2FALogin: builder.mutation({
-      query: ({ code, token }) => ({
-        url: `/auth/verify-2fa-login?code=${code}&token=${token}`,
+      query: ({ code, email }) => ({
+        url: `/auth/verify-2fa-login?code=${code}&email=${email}`,
         method: "POST",
       }),
     }),
 
     verifySites: builder.mutation({
-      query: ({ uuid, token }) => ({
-        url: `/auth/verify-sites?uuid=${uuid}&token=${token}`,
+      query: ({ uuid }) => ({
+        url: `/auth/verify-sites?uuid=${uuid}`,
         method: "POST",
       }),
-      
     }),
 
     getUserProfile: builder.mutation({
@@ -99,16 +103,60 @@ export const authApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          dispatch(setUser(data));
+          dispatch(setUserProfile(data));
         } catch (error) {
           console.error("Failed to fetch user:", error);
         }
       },
     }),
+
+    updateUserProfile: builder.mutation({
+      query: ({ ...initialUserData }) => ({
+        url: `/auth/profiles`,
+        method: "PUT",
+        body: { ...initialUserData },
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          console.log("data", data);
+          dispatch(setUserProfile(data));
+        } catch (error) {
+          console.error("Failed to fetch user:", error);
+        }
+      },
+    }),
+
+    changePassword: builder.mutation({
+      query: ({ ...initialUserData }) => ({
+        url: `/auth/change-password`,
+        method: "POST",
+        body: { ...initialUserData },
+      }),
+    }),
+
+    forgotPassword: builder.mutation({
+      query: ({ email }) => ({
+        url: `/auth/forgot-password?email=${email}`,
+        method: "POST",
+      }),
+    }),
+
+    resetPasssword: builder.mutation({
+      query: ({ token, newPassword }) => ({
+        url: `/auth/reset-password`,
+        method: "POST",
+        body: { token: token, newPassword: newPassword },
+      }),
+    }),
   }),
 });
 
 export const {
+  useResetPassswordMutation,
+  useForgotPasswordMutation,
+  useChangePasswordMutation,
+  useUpdateUserProfileMutation,
   useLoginMutation,
   useSendLogoutMutation,
   useRefreshMutation,

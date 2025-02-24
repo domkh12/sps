@@ -62,6 +62,7 @@ function EditUserForm({ user }) {
       error: errorUpdateUser,
     },
   ] = useUpdateUserMutation();
+  
   const [uploadImage] = useUploadImageMutation();
 
   const [
@@ -178,9 +179,13 @@ function EditUserForm({ user }) {
         profileImageUri = uploadResponse.uri;
       }
 
+      const formattedDateOfBirth = dayjs(values.dateOfBirth).format(
+              "YYYY-MM-DD"
+            );
+
       await updateUser({
         id: user.uuid,
-        dateOfBirth: values.dateOfBirth,
+        dateOfBirth: formattedDateOfBirth,
         fullName: values.fullName,
         genderId: values.genderId,
         address: values.address,

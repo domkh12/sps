@@ -8,21 +8,29 @@ function ButtonComponent({
   type,
   isLoading,
   loadingCaption,
+  backgroundColor,
+  hoverBackgroundColor,
 }) {
   return (
     <LoadingButton
       variant="contained"
       startIcon={icon ? <FiPlus /> : null}
       sx={{
+        backgroundColor: backgroundColor ? backgroundColor : "#333333",
         textTransform: "none",
         borderRadius: "10px",
         boxShadow: "none",
-        ":hover": { boxShadow: "none", backgroundColor: "#333333" },
+        ":hover": {
+          boxShadow: "none",
+          backgroundColor: hoverBackgroundColor
+            ? hoverBackgroundColor
+            : "#333333",
+        },
       }}
       onClick={onClick}
       type={type}
       loading={isLoading}
-      {...(loadingCaption && {loadingIndicator:  loadingCaption })}
+      {...(loadingCaption && { loadingIndicator: loadingCaption })}
     >
       {btnTitle}
     </LoadingButton>

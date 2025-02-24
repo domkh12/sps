@@ -17,6 +17,8 @@ import {
   setVehicleTypeFilter,
   setSearchKeywords,
   setClearVehicleFilter,
+  setPageSize,
+  setPageNo,
 } from "../../redux/feature/vehicles/vehicleSlice";
 import SeoComponent from "../../components/SeoComponent";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
@@ -28,6 +30,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from "@mui/material";
@@ -72,7 +75,14 @@ function VehicleList() {
     refetch,
     isFetching,
     error,
-  } = useGetVehiclesQuery("vehiclesList");
+  } = useGetVehiclesQuery(
+    { pageNo, pageSize },
+    {
+      pollingInterval: 60000,
+      refetchOnFocus: true,
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const {
     data: vehicleFilterData,
@@ -82,7 +92,6 @@ function VehicleList() {
     error: errorGetVehicleFilter,
   } = useFilterVehiclesQuery(
     {
-      query: "vehicleList",
       keywords: searchKeywords,
       vehiceTypeId: vehicleTypeFilter,
       branchId: branchFilter,
@@ -228,14 +237,14 @@ function VehicleList() {
     dispatch(setSearchKeywords(keyword));
   };
 
-  const isFiltered =
-    searchKeywords !== "" ||
-    branchFilter?.length > 0 ||
-    vehicleTypeFilter?.length > 0;
+  const handleChangePage = (event, newPage) => {
+    dispatch(setPageNo(newPage + 1));
+  };
 
-  useEffect(() => {
-    dispatch(setIsFiltered(isFiltered));
-  }, [isFiltered, dispatch]);
+  const handleChangeRowsPerPage = (event, newValue) => {
+    dispatch(setPageSize(event.target.value));
+    dispatch(setPageNo(1));
+  };
 
   let content;
 
@@ -246,13 +255,22 @@ function VehicleList() {
   }
 
   if (!isLoading && isSuccess) {
-    const { ids, totalPages, totalElements } = vehicles;
+    const { ids, entities, totalElements, pageSize, pageNo } = vehicles;
 
     const {
+      entities: searchEntities,
       ids: idsFilteredVehicles,
-      totalPages: totalFilteredVehicles,
-      totalElements: totalElementsFilteredVehicles,
+      totalElements: totalElementsSearch,
+      pageSize: pageSizeSearch,
+      pageNo: pageNoSearch,
     } = vehicleFilterData || {};
+
+    const displayTotalElements =
+      searchKeywords !== "" ||
+      vehicleTypeFilter.length > 0 ||
+      branchFilter.length > 0
+        ? totalElementsSearch
+        : totalElements;
 
     const tableContent =
       searchKeywords !== "" ||
@@ -261,7 +279,11 @@ function VehicleList() {
         <>
           {idsFilteredVehicles?.length ? (
             idsFilteredVehicles.map((vehicleId) => (
-              <VehicleRowComponent key={vehicleId} vehicleId={vehicleId} />
+              <VehicleRowComponent
+                key={vehicleId}
+                vehicleId={vehicleId}
+                vehicle={searchEntities[vehicleId]}
+              />
             ))
           ) : (
             <TableRow sx={{ bgcolor: "#f9fafb" }}>
@@ -275,7 +297,11 @@ function VehicleList() {
         <>
           {ids.length ? (
             ids.map((vehicleId) => (
-              <VehicleRowComponent key={vehicleId} vehicleId={vehicleId} />
+              <VehicleRowComponent
+                key={vehicleId}
+                vehicleId={vehicleId}
+                vehicle={entities[vehicleId]}
+              />
             ))
           ) : (
             <TableRow sx={{ bgcolor: "#f9fafb" }}>
@@ -319,14 +345,20 @@ function VehicleList() {
               handleVehicleTypeChange={handleVehicleTypeChange}
               handleSearchChange={handleSearchChange}
               handleBranchChange={handleBranchChange}
-              dispatch={dispatch}
               clearFilter={() => dispatch(setClearVehicleFilter())}
               clearSearch={() => dispatch(setSearchKeywords(""))}
-              t={t}
+              resultFound={
+                vehicleFilterData ? totalElementsSearch : totalElements
+              }
+              isFiltered={
+                searchKeywords !== "" ||
+                branchFilter?.length > 0 ||
+                vehicleTypeFilter?.length > 0
+              }
             />
             <TableContainer>
               <Table>
-                <TableHead>
+                <TableHead sx={{ backgroundColor: "#F4F6F8" }}>
                   <TableRow>
                     <TableCell padding="checkbox">
                       <Checkbox
@@ -355,175 +387,17 @@ function VehicleList() {
                 <TableBody sx={{ border: "none" }}>{tableContent}</TableBody>
               </Table>
             </TableContainer>
-            {/* <TablePagination
+            <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
-              count={totalElements}
-              rowsPerPage={pageSize}
-              page={pageNo}
-              // onPageChange={handleChangePage}
-              // onRowsPerPageChange={handleChangeRowsPerPage}
-            /> */}
+              count={displayTotalElements || 0}
+              rowsPerPage={pageSize || pageSizeSearch}
+              page={pageNoSearch || pageNo}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
           </Card>
         </div>
-
-        {/* <div className="flex flex-col w-full pb-16">
-          <h1 className="text-2xl font-medium dark:text-gray-50 py-4 px-8">
-            Vehicles List
-          </h1>
-
-          <table className="w-full">
-            <thead
-              className={`dark:bg-[#282828] ${isScrolling ? "shadow-md" : ""}`}
-            >
-              <tr className="p-0 w-full">
-                <th className="h-20" colSpan={6}>
-                  <div className="flex justify-between">
-                    <div className="flex items-center gap-2 justify-start ">
-                      <div className="relative">
-                        <TextInput
-                          value={search}
-                          onChange={(e) => setSearch(e.target.value)}
-                          placeholder="PlateNumber, Owner, Owner Phone"
-                          style={{
-                            backgroundColor: mode === "dark" ? "#161616" : "",
-                            color: mode === "dark" ? "#f2f2f2" : "#161616",
-                            fontWeight: "400",
-                          }}
-                        />
-                        {search && (
-                          <button
-                            onClick={handleClearSearch}
-                            className="absolute right-3 top-5 transform -translate-y-1/2"
-                          >
-                            <IoClose className="dark:text-[#f2f2f2] text-lg" />
-                          </button>
-                        )}
-                      </div>
-                      <Button
-                        onClick={handleBtnSearch}
-                        className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10 w-28 sm:w-14"
-                      >
-                        <FaSearch className="mr-2 sm:mr-0" />{" "}
-                        <span className="sm:hidden">Search</span>{" "}
-                      </Button>
-                    </div>
-                    <Button
-                      className="bg-primary flex justify-center items-center hover:bg-primary-hover ring-transparent h-10"
-                      onClick={handleBtnAddNewClicked}
-                    >
-                      <FaPlus className="mr-2 sm:mr-0" />
-                      <span className="sm:hidden">Create Vehicle</span>
-                    </Button>
-                  </div>
-                </th>
-              </tr>
-              <tr className="border-0 dark:text-white text-gray-500">
-                <th>Vehicle</th>
-                <th>License Plate Number</th>
-                <th>Owner</th>
-                <th className="text-right">Owner PhoneNumber</th>
-                <th className="text-right">Date</th>
-                <th className="text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody>{tableContent}</tbody>
-            <tfoot>
-              <tr>
-                <td colSpan={7} className="py-2 px-8">
-                  <div className="flex justify-end items-center gap-4">
-                    <div className="text-gray-500">
-                      <p>Rows per page: </p>
-                    </div>
-                    <div className="relative" ref={pageSizeRef}>
-                      <button
-                        className="hover:bg-gray-200 p-2 rounded-lg flex justify-center items-center gap-4"
-                        onClick={toggleDropdown}
-                      >
-                        <span className="text-gray-900 ml-3">{pageSize}</span>
-                        <PiCaretDownThin className="h-5 w-5" />
-                      </button>
-                      {isPageSizeOpen && (
-                        <div className="w-full h-28 absolute bottom-0 left-0 rounded-lg bg-gray-50 shadow-md border-[1px] flex flex-col justify-between items-center py-2">
-                          <button
-                            className="hover:bg-gray-200 w-full py-1 h-full"
-                            onClick={() => handleSetPageSize(10)}
-                          >
-                            10
-                          </button>
-                          <button
-                            className="hover:bg-gray-200 w-full py-1 h-full"
-                            onClick={() => handleSetPageSize(30)}
-                          >
-                            30
-                          </button>
-                          <button
-                            className="hover:bg-gray-200 w-full py-1 h-full"
-                            onClick={() => handleSetPageSize(50)}
-                          >
-                            50
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="text-gray-500 text-sm">
-                      <p>
-                        {calculateItemRange()} of about {totalPages}
-                      </p>
-                    </div>
-                    <button
-                      className={`p-2 rounded-full ${
-                        pageNo === 1
-                          ? "opacity-50 cursor-default"
-                          : "hover:bg-gray-200 "
-                      }`}
-                      disabled={pageNo === 1}
-                      onClick={handleResetPagination}
-                    >
-                      <PiCaretLineLeftThin className="h-5 w-5" />
-                    </button>
-                    <button
-                      className={`p-2 rounded-full ${
-                        pageNo === 1
-                          ? "opacity-50 cursor-default"
-                          : "hover:bg-gray-200 "
-                      }`}
-                      disabled={pageNo === 1}
-                      onClick={handleBackPagination}
-                    >
-                      <PiCaretLeftThin className="h-5 w-5" />
-                    </button>
-
-                    <button
-                      className={`p-2 rounded-full ${
-                        totalPages === pageNo
-                          ? "opacity-50 cursor-default"
-                          : "hover:bg-gray-200 "
-                      }`}
-                      onClick={handleNextPagination}
-                      disabled={totalPages == pageNo}
-                    >
-                      <PiCaretRightThin className="h-5 w-5" />
-                    </button>
-
-                    <button
-                      className={`p-2 rounded-full ${
-                        totalPages === pageNo
-                          ? "opacity-50 cursor-default"
-                          : "hover:bg-gray-200 "
-                      }`}
-                      onClick={handleLastPagination}
-                      disabled={totalPages == pageNo}
-                    >
-                      <PiCaretLineRightThin className="h-5 w-5" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-        </div> */}
         <QuickEditVehicleComponent />
       </div>
     );

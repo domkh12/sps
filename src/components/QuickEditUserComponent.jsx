@@ -173,14 +173,18 @@ function QuickEditUserComponent() {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      console.log("values", values);
+      
+      const formattedDateOfBirth = dayjs(values.dateOfBirth).format(
+        "YYYY-MM-DD"
+      );
+
       const data = await updateUser({
         id: user.uuid,
         fullName: values.fullName,
         email: values.email,
         phoneNumber: values.phoneNumber,
         address: values.address,
-        dateOfBirth: values.dateOfBirth,
+        dateOfBirth: formattedDateOfBirth,
         genderId: values.genderId,
         roleId: values.roleId,
         branchId: values.branchId,
@@ -262,7 +266,6 @@ function QuickEditUserComponent() {
             };
 
             const handleGenderChange = (value) => {
-              console.log("value", value);
               setFieldValue("genderId", value);
             };
 
@@ -507,7 +510,6 @@ function QuickEditUserComponent() {
           )}
 
           {content}
-          
         </Box>
       </Box>
     </Modal>

@@ -27,7 +27,7 @@ import useTranslate from "../hook/useTranslate";
 
 function ProfileDrawerComponent({ open: initialOpen, onClose }) {
   const { username, status } = useAuth();
-  const user = useSelector((state) => state.users.user);
+  const user = useSelector((state) => state.auth.userProfile);
   const [open, setOpen] = useState(initialOpen);
   const { t } = useTranslate();
   const navigate = useNavigate();
@@ -172,7 +172,7 @@ function ProfileDrawerComponent({ open: initialOpen, onClose }) {
                 }}
                 onClick={handleSendLogout}
               >
-                Logout
+                {t("logout")}
               </LoadingButton>
             </List>
           </div>

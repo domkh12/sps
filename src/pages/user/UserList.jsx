@@ -1,7 +1,6 @@
 import { Card, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
-
 import { cardStyle } from "../../assets/style";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -51,20 +50,23 @@ function UserList() {
   );
   const branchFetched = useSelector((state) => state.sites.sites);
   const branchFilter = useSelector((state) => state.users.branchFilter);
-  const { isAdmin, isManager } = useAuth();
+  const { isManager } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
-
+ 
   const {
     data: users,
     isLoading: isLoadingGetAllUsers,
     isSuccess,
     isError,
     error,
-  } = useGetUsersQuery({
-    query: "usersList",
-    pageNo,
-    pageSize,
-  });
+  } = useGetUsersQuery(
+    {pageNo, pageSize},
+    {
+      pollingInterval: 60000,
+      refetchOnFocus: true,
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const {
     data: searchData,
@@ -170,13 +172,14 @@ function UserList() {
       minWidth: 120,
       align: "left",
     },
-    isManager ? 
-    {
-      id: "branch",
-      label: "Branch",
-      minWidth: 120,
-      align: "left",
-    }: null,
+    isManager
+      ? {
+          id: "branch",
+          label: "Branch",
+          minWidth: 120,
+          align: "left",
+        }
+      : null,
     {
       id: "status",
       label: "Status",
@@ -216,6 +219,7 @@ function UserList() {
   const handleBranchChange = (branch) => {
     dispatch(setBranchFilter(branch));
   };
+
   const handleSearchChange = (statusFilter) => {
     dispatch(setSearchQuery(statusFilter));
   };
@@ -223,22 +227,11 @@ function UserList() {
   const handleChangePage = (event, newPage) => {
     dispatch(setPageNo(newPage + 1));
   };
-
-  const handleChangeRowsPerPage = (event) => {
+  
+  const handleChangeRowsPerPage = (event, newValue) => {
     dispatch(setPageSize(event.target.value));
     dispatch(setPageNo(1));
   };
-
-  const isFiltered =
-    searchQuery !== "" ||
-    roleFilter.length > 0 ||
-    signUpMethodFilter.length > 0 ||
-    statusFilter !== "" ||
-    branchFilter.length > 0;
-
-  useEffect(() => {
-    dispatch(setIsFiltered(isFiltered));
-  }, [isFiltered, dispatch]);
 
   let content;
 
@@ -250,7 +243,6 @@ function UserList() {
 
   if (isSuccess) {
     const {
-      ids,
       totalElements,
       pageSize,
       pageNo,
@@ -260,27 +252,13 @@ function UserList() {
       bannedCount,
     } = users;
     const {
-      ids: idsSearch,
       totalElements: totalElementsSearch,
       pageSize: pageSizeSearch,
       pageNo: pageNoSearch,
       entities: searchEntities,
     } = searchData || {};
 
-    // const displayTotalElements =
-    //   searchQuery !== "" ||
-    //   roleFilter.length > 0 ||
-    //   signUpMethodFilter.length > 0 ||
-    //   statusFilter !== "" ||
-    //   branchFilter.length > 0
-    //     ? totalElementsSearch
-    //     : totalElements;
-
-    // useEffect(() => {
-    //   if (displayTotalElements) {
-    //     dispatch(setResultFound(displayTotalElements));
-    //   }
-    // }, [displayTotalElements]);
+    const resultFound =searchData? totalElementsSearch : totalElements;
 
     content = (
       <div data-aos="fade-left">
@@ -288,7 +266,7 @@ function UserList() {
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
           title={t("list")}
-          btnTitle={"New user"}
+          btnTitle={t("newUser")}
           onClick={handleAddNewClick}
         />
         <Card sx={{ ...cardStyle }}>
@@ -325,7 +303,14 @@ function UserList() {
             handleMethodChange={handleMethodChange}
             clearFilter={() => dispatch(clearFilter())}
             clearSearch={() => dispatch(setClearSearchQuery())}
-            t={t}
+            resultFound={resultFound}
+            isFiltered={
+              searchQuery !== "" ||
+              roleFilter.length > 0 ||
+              signUpMethodFilter.length > 0 ||
+              statusFilter !== "" ||
+              branchFilter.length > 0
+            }
           />
           <UserTableComponent
             columns={columns}
@@ -347,7 +332,6 @@ function UserList() {
             handleChangeRowsPerPage={handleChangeRowsPerPage}
             entities={entities}
             searchEntities={searchEntities}
-            
           />
         </Card>
         <QuickEditUserComponent />

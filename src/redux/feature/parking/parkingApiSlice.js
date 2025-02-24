@@ -9,7 +9,7 @@ const initialState = parkingAdapter.getInitialState();
 export const parkingApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getParkingSpaces: builder.query({
-      query: ({ pageNo = 1, pageSize = 10 }) => ({
+      query: ({ pageNo = 1, pageSize = 5 }) => ({
         url: `/parking-spaces?pageNo=${pageNo}&pageSize=${pageSize}`,
         validateStatus: (response, result) => {
           return response.status === 200 && !result.isError;
@@ -20,7 +20,13 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
           parking.id = parking.uuid;
           return parking;
         });
-        return parkingAdapter.setAll(initialState, loadedParking);
+         return {
+           ...parkingAdapter.setAll(initialState, loadedParking),
+           totalPages: responseData.page.totalPages,
+           totalElements: responseData.page.totalElements,
+           pageNo: responseData.page.number,
+           pageSize: responseData.page.size,
+         };
       },
       providesTags: (result, error, arg) => {
         if (result?.ids) {
@@ -31,6 +37,42 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
         } else return [{ type: "Parking", id: "LIST" }];
       },
     }),
+
+    filterParkingSpaces: builder.query({
+      query: ({
+        pageNo = 1,
+        pageSize = 5,
+        keywords = "",
+        branchUuid = "",
+      }) => ({
+        url: `/parking-spaces/filters?pageNo=${pageNo}&pageSize=${pageSize}&keywords=${keywords}&branchUuid=${branchUuid}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError;
+        },
+      }),
+      transformResponse: (responseData) => {
+        const loadedParking = responseData.content.map((parking) => {
+          parking.id = parking.uuid;
+          return parking;
+        });
+         return {
+           ...parkingAdapter.setAll(initialState, loadedParking),
+           totalPages: responseData.page.totalPages,
+           totalElements: responseData.page.totalElements,
+           pageNo: responseData.page.number,
+           pageSize: responseData.page.size,
+         };
+      },
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [
+            { type: "Parking", id: "LIST" },
+            ...result.ids.map((id) => ({ type: "Parking", id })),
+          ];
+        } else return [{ type: "Parking", id: "LIST" }];
+      },
+    }),
+
     addNewParking: builder.mutation({
       query: (initialState) => ({
         url: "/parking-spaces",
@@ -42,15 +84,15 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: "Parking", id: "LIST" }],
     }),
     updateParking: builder.mutation({
-      query: ({ id, ...initialParkingData }) => ({
-        url: `/parking/${id}`,
+      query: ({ uuid, ...initialParkingData }) => ({
+        url: `/parking-spaces/${uuid}`,
         method: "PATCH",
         body: {
           ...initialParkingData,
         },
       }),
       invalidatesTags: (result, error, arg) => [
-        { type: "Parking", id: arg.id },
+        { type: "Parking", uuid: arg.uuid },
       ],
     }),
     deleteParking: builder.mutation({
@@ -65,42 +107,7 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
         { type: "Parking", id: arg.uuid },
       ],
     }),
-    searchParking: builder.mutation({
-      query: ({ query }) => ({
-        url: `/parking/search?q=${query}`,
-      }),
 
-      transformResponse: (responseData) => {
-        const loadedParking = responseData.content.map((parking) => ({
-          ...parking,
-          id: parking.uuid,
-        }));
-        return {
-          parking: loadedParking,
-          totalPages: responseData.page.totalPages,
-        };
-      },
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          console.log("data", data);
-          const { parking: newParking, totalPages: newTotalPages } = data;
-
-          dispatch(
-            parkingApiSlice.util.updateQueryData(
-              "getParking",
-              undefined,
-              (draft) => {
-                parkingAdapter.setAll(draft, newParking);
-                draft.totalPages = newTotalPages;
-              }
-            )
-          );
-        } catch (error) {
-          console.error("Failed to fetch paginated parking:", error);
-        }
-      },
-    }),
     findAllLabels: builder.mutation({
       query: () => ({
         url: `/parking-spaces/labels`,
@@ -127,19 +134,16 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
           console.error("Failed to fetch user:", error);
         }
       },
-      invalidatesTags: (result, error, arg) => [
-        { type: "Parking", id: "LIST" },
-      ],
     }),
   }),
 });
 
 export const {
   useGetParkingSpacesQuery,
+  useFilterParkingSpacesQuery,
   useAddNewParkingMutation,
   useUpdateParkingMutation,
   useDeleteParkingMutation,
-  useSearchParkingMutation,
   useFindAllLabelsMutation,
   useFindParkingByUuidMutation,
 } = parkingApiSlice;

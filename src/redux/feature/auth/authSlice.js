@@ -9,7 +9,8 @@ const authSlice = createSlice({
     qrCodeUrl: null,
     twoFASecretCode: null,
     isTwoFAEnabled: false,
-    userProfile: {}
+    userProfile: {},
+    isOpenTwoFaPopOver: false,
   },
 
   // function
@@ -38,11 +39,15 @@ const authSlice = createSlice({
     },
     setUserProfile: (state, action) => {
       state.userProfile = action.payload;
-    }
+    },
+    setIsOpenTwoFaPopOver: (state, action) => {
+      state.isOpenTwoFaPopOver = action.payload;
+    },
   },
 });
 
 export const {
+  setIsOpenTwoFaPopOver,
   setCredentials,
   logOut,
   setQrCodeUrl,

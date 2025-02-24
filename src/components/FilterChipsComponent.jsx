@@ -5,7 +5,7 @@ import {
   setClearSearchQuery,
   setClearStatusFilter,
 } from "../redux/feature/users/userSlice";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 function FilterChipsComponent({
   statusFilter = "",
@@ -13,23 +13,30 @@ function FilterChipsComponent({
   roleFilter,
   branchFilter,
   signUpMethodFilter,
+  companyFilter,
   vehicleTypeFilter,
   roleFetched,
+  companyFetched,
   branchFetched,
   signUpMethodsFetched,
   vehicleTypeFetched,
-  dispatch,
   handleRoleChange,
   handleBranchChange,
   handleMethodChange,
   handleVehicleTypeChange,
   clearFilter,
   clearSearch,
-  t,
+  resultFound,
+  isFiltered,
+  handleCompanyChange,
+  cityFetched,
+  cityFilter,
+  handleCityChange,
+  branchTypeFetched,
+  branchTypeFilter,
+  handleBranchTypeChange,
 }) {
-  const resultFound = useSelector((state) => state.users.resultFound);
-  const isFiltered = useSelector((state) => state.action.isFiltered);
-
+  const dispatch = useDispatch();
   return (
     <>
       {isFiltered && (
@@ -40,6 +47,92 @@ function FilterChipsComponent({
           </p>
 
           <div className="flex items-center gap-5  mt-3">
+            {branchTypeFilter?.length > 0 ? (
+              <div className="p-2 rounded-[7px] border-dashed border w-fit flex items-center">
+                <span className="font-medium mr-2">{`Branch${"\u00a0"}Type:${"\u00a0"}`}</span>
+                <div className="flex gap-3">
+                  {branchTypeFilter?.map((branchType) => {
+                    const matchedBranchType = branchTypeFetched?.find(
+                      (fetchedBranchType) =>
+                        fetchedBranchType.uuid === branchType
+                    );
+                    const branchTypeName = matchedBranchType
+                      ? matchedBranchType.name
+                      : branchType;
+                    return (
+                      <Chip
+                        key={branchType}
+                        size="small"
+                        sx={{ borderRadius: "8px" }}
+                        label={branchTypeName}
+                        onDelete={() =>
+                          handleBranchTypeChange(
+                            branchTypeFilter.filter((b) => b !== branchType)
+                          )
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+
+            {cityFilter?.length > 0 ? (
+              <div className="p-2 rounded-[7px] border-dashed border w-fit flex items-center">
+                <span className="font-medium mr-2">{`City:${"\u00a0"}`}</span>
+                <div className="flex gap-3">
+                  {cityFilter?.map((city) => {
+                    const matchedCity = cityFetched?.find(
+                      (fetchedCity) => fetchedCity.uuid === city
+                    );
+                    const cityName = matchedCity ? matchedCity.name : city;
+                    return (
+                      <Chip
+                        key={city}
+                        size="small"
+                        sx={{ borderRadius: "8px" }}
+                        label={cityName}
+                        onDelete={() =>
+                          handleCityChange(cityFilter.filter((b) => b !== city))
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+
+            {companyFilter?.length > 0 ? (
+              <div className="p-2 rounded-[7px] border-dashed border w-fit flex items-center">
+                <span className="font-medium mr-2">
+                  {`Company:${"\u00a0"}`}
+                </span>
+                <div className="flex gap-3">
+                  {companyFilter?.map((company) => {
+                    const matchedCompany = companyFetched?.find(
+                      (fetchedCompany) => fetchedCompany.uuid === company
+                    );
+                    const companyName = matchedCompany
+                      ? matchedCompany.companyName
+                      : company;
+                    return (
+                      <Chip
+                        key={company}
+                        size="small"
+                        sx={{ borderRadius: "8px" }}
+                        label={companyName}
+                        onDelete={() =>
+                          handleCompanyChange(
+                            companyFilter.filter((b) => b !== company)
+                          )
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+
             {statusFilter !== "" ? (
               <div className="p-2 rounded-[7px] border-dashed border w-fit">
                 <div>

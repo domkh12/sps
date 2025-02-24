@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { setClearBranchFilter } from "../site/siteSlice";
 
 const citySlice = createSlice({
   name: "city",
@@ -14,6 +15,11 @@ const citySlice = createSlice({
       state.cityFilter = action.payload;
     }
   },
+  extraReducers: (builder) => {
+      builder.addCase(setClearBranchFilter, (state) => {
+        state.cityFilter = [];
+      });
+    },
 });
 
 export const { setCityData, setCityFilter } = citySlice.actions;

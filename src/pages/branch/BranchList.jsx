@@ -6,13 +6,14 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from "@mui/material";
 import SeoComponent from "../../components/SeoComponent";
 import { useNavigate } from "react-router-dom";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
-import { cardStyle, listStyle } from "../../assets/style";
+import { cardStyle } from "../../assets/style";
 import useAuth from "../../hook/useAuth";
 import useTranslate from "../../hook/useTranslate";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,11 +31,18 @@ import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyA
 import { setCityFilter } from "../../redux/feature/city/citySlice";
 import {
   setBranchTypeFilter,
+  setClearBranchFilter,
+  setPageNoBranch,
+  setPageSizeBranch,
   setSearchKeywords,
 } from "../../redux/feature/site/siteSlice";
-import { setCompanyFilter } from "../../redux/feature/company/companySlice";
+import {
+  setClearCompanyFilter,
+  setCompanyFilter,
+} from "../../redux/feature/company/companySlice";
 import { useGetAllSiteTypesMutation } from "../../redux/feature/siteType/siteTypeApiSlice";
 import DataNotFound from "../../components/DataNotFound";
+import FilterChipsComponent from "../../components/FilterChipsComponent";
 
 function BranchList() {
   const navigate = useNavigate();
@@ -43,8 +51,8 @@ function BranchList() {
     (state) => state.sites.isQuickEditBranchOpen
   );
   const { t } = useTranslate();
-  const pageNo = useSelector((state) => state.companies.pageNo);
-  const pageSize = useSelector((state) => state.companies.pageSize);
+  const pageNo = useSelector((state) => state.sites.pageNo);
+  const pageSize = useSelector((state) => state.sites.pageSize);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const cityFilter = useSelector((state) => state.city.cityFilter);
@@ -66,7 +74,14 @@ function BranchList() {
     isLoading: isLoadingGetAllSite,
     isError,
     error,
-  } = useGetSitesQuery({ query: "usersList", pageNo, pageSize });
+  } = useGetSitesQuery(
+    { pageNo, pageSize },
+    {
+      pollingInterval: 60000,
+      refetchOnFocus: true,
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const {
     data: filterData,
@@ -215,6 +230,15 @@ function BranchList() {
     dispatch(setCompanyFilter(value));
   };
 
+  const handleChangePage = (event, newPage) => {
+    dispatch(setPageNoBranch(newPage + 1));
+  };
+
+  const handleChangeRowsPerPage = (event, newValue) => {
+    dispatch(setPageSizeBranch(event.target.value));
+    dispatch(setPageNoBranch(1));
+  };
+
   let content;
 
   if (isLoading) content = <LoadingFetchingDataComponent />;
@@ -224,10 +248,20 @@ function BranchList() {
   }
 
   if (isSuccess && !isLoading) {
-    const { ids, totalElements, pageSize, pageNo } = sites;
+    const { ids, entities, totalElements, pageSize, pageNo } = sites;
 
-    const { ids: idsFilterData } = filterData || {};
-    
+    const {
+      ids: idsFilterData,
+      entities: searchEntities,
+      totalElements: totalElementsSearch,
+      pageSize: pageSizeSearch,
+      pageNo: pageNoSearch,
+    } = filterData || {};
+
+    const displayTotalElements = filterData
+      ? totalElementsSearch
+      : totalElements;
+
     const tableContent =
       searchKeywords !== "" ||
       cityFilter.length > 0 ||
@@ -236,7 +270,11 @@ function BranchList() {
         <>
           {idsFilterData?.length ? (
             idsFilterData?.map((siteId) => (
-              <BranchRowComponent key={siteId} siteId={siteId} />
+              <BranchRowComponent
+                key={siteId}
+                siteId={siteId}
+                site={searchEntities[siteId]}
+              />
             ))
           ) : (
             <TableRow sx={{ bgcolor: "#f9fafb" }}>
@@ -249,8 +287,12 @@ function BranchList() {
       ) : (
         <>
           {ids?.length ? (
-            ids.map((siteId) => (
-              <BranchRowComponent key={siteId} siteId={siteId} />
+            ids?.map((siteId) => (
+              <BranchRowComponent
+                key={siteId}
+                siteId={siteId}
+                site={entities[siteId]}
+              />
             ))
           ) : (
             <TableRow sx={{ bgcolor: "#f9fafb" }}>
@@ -283,15 +325,38 @@ function BranchList() {
               cityFilter={cityFilter}
               branchTypeFilter={branchTypeFilter}
               companyFilter={companyFilter}
+              clearCompanyFilter={() => dispatch(setClearCompanyFilter())}
               handleCityChange={handleCityChange}
               handleBranchTypeChange={handleBranchTypeChange}
               handleSearchChange={handleSearchChange}
               handleCompanyChange={handleCompanyFilter}
             />
 
+            <FilterChipsComponent
+              branchTypeFetched={siteTypesFetchedData.data}
+              branchTypeFilter={branchTypeFilter}
+              cityFilter={cityFilter}
+              cityFetched={citiesFetchedData.data}
+              companyFetched={companiesFetchedData.data}
+              companyFilter={companyFilter}
+              handleCompanyChange={handleCompanyFilter}
+              searchQuery={searchKeywords}
+              clearSearch={() => dispatch(setSearchKeywords(""))}
+              handleSearchChange={handleSearchChange}
+              handleCityChange={handleCityChange}
+              handleBranchTypeChange={handleBranchTypeChange}
+              clearFilter={() => dispatch(setClearBranchFilter())}
+              isFiltered={
+                searchKeywords !== "" ||
+                cityFilter.length > 0 ||
+                branchTypeFilter.length > 0 ||
+                companyFilter.length > 0
+              }
+            />
+
             <TableContainer>
               <Table>
-                <TableHead>
+                <TableHead sx={{ backgroundColor: "#F4F6F8" }}>
                   <TableRow>
                     <TableCell padding="checkbox">
                       <Checkbox
@@ -320,15 +385,15 @@ function BranchList() {
                 <TableBody sx={{ border: "none" }}>{tableContent}</TableBody>
               </Table>
             </TableContainer>
-            {/* <TablePagination
+            <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
-              count={totalElements}
-              rowsPerPage={pageSize}
-              page={pageNo}
-              // onPageChange={handleChangePage}
-              // onRowsPerPageChange={handleChangeRowsPerPage}
-            /> */}
+              count={displayTotalElements || 0}
+              rowsPerPage={pageSize || pageSizeSearch}
+              page={pageNoSearch || pageNo}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
           </Card>
         </div>
         {openQuickEdit && <QuickEditBranchComponent />}

@@ -26,6 +26,7 @@ import {
 import { useGetUsersQuery } from "../redux/feature/users/userApiSlice";
 import { setIsOpenConfirmDelete } from "../redux/feature/actions/actionSlice";
 import useAuth from "../hook/useAuth";
+import useDateFormatter from "../hook/useDateFormatter";
 
 function stringToColor(string) {
   let hash = 0;
@@ -73,16 +74,10 @@ function stringAvatar(name) {
   };
 }
 
-function UserRowComponent({ userId }) {
+function UserRowComponent({ userId, user }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isManager } = useAuth();
-
-  const { user } = useGetUsersQuery("usersList", {
-    selectFromResult: ({ data }) => ({
-      user: data?.entities[userId],
-    }),
-  });
 
   const quickEditUserResponse = useSelector(
     (state) => state.users?.quickEditUserReponse
@@ -164,7 +159,9 @@ function UserRowComponent({ userId }) {
     ];
 
     const dateObj = new Date(loadedUser.createdAt);
-    var formattedDate = dateObj.toLocaleDateString("en-GB");
+    var { formattedDateDDMMYYYYNoZeros } = useDateFormatter(
+      new Date(loadedUser.createdAt)
+    );
     var formattedTime = dateObj.toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
@@ -201,10 +198,15 @@ function UserRowComponent({ userId }) {
     return (
       <>
         <TableRow hover>
-          <TableCell padding="checkbox" sx={{ borderBottomStyle: "dashed" }}>
+          <TableCell
+            padding="checkbox"
+            sx={{ borderTopStyle: "dashed", borderBottomStyle: "dashed" }}
+          >
             <Checkbox color="primary" />
           </TableCell>
-          <TableCell sx={{ borderBottomStyle: "dashed" }}>
+          <TableCell
+            sx={{ borderTopStyle: "dashed", borderBottomStyle: "dashed" }}
+          >
             <List sx={{ padding: "0" }}>
               <ListItem sx={{ padding: "0", gap: "10px" }}>
                 <StyledBadge
@@ -240,14 +242,20 @@ function UserRowComponent({ userId }) {
               </ListItem>
             </List>
           </TableCell>
-          <TableCell sx={{ borderBottomStyle: "dashed" }}>
+          <TableCell
+            sx={{ borderTopStyle: "dashed", borderBottomStyle: "dashed" }}
+          >
             {loadedUser.phoneNumber}
           </TableCell>
-          <TableCell sx={{ borderBottomStyle: "dashed" }}>
+          <TableCell
+            sx={{ borderTopStyle: "dashed", borderBottomStyle: "dashed" }}
+          >
             <div className="flex gap-5 items-center">{roles}</div>
           </TableCell>
           {isManager && (
-            <TableCell sx={{ borderBottomStyle: "dashed" }}>
+            <TableCell
+              sx={{ borderTopStyle: "dashed", borderBottomStyle: "dashed" }}
+            >
               <Stack direction="column" spacing={1}>
                 {loadedUser.sites.map((site) => (
                   <div key={site.uuid}>
@@ -269,17 +277,24 @@ function UserRowComponent({ userId }) {
             </TableCell>
           )}
 
-          <TableCell sx={{ borderBottomStyle: "dashed" }}>
+          <TableCell
+            sx={{ borderTopStyle: "dashed", borderBottomStyle: "dashed" }}
+          >
             <Chip sx={getChipStyles()} size="small" label={loadedUser.status} />
           </TableCell>
-          <TableCell sx={{ borderBottomStyle: "dashed" }}>
-            <Typography variant="body1">{formattedDate}</Typography>
+          <TableCell
+            sx={{ borderTopStyle: "dashed", borderBottomStyle: "dashed" }}
+          >
+            <Typography variant="body1">
+              {formattedDateDDMMYYYYNoZeros}
+            </Typography>
             <Typography variant="body2" color="gray">
               {formattedTime}
             </Typography>
           </TableCell>
           <TableCell
             sx={{
+              borderTopStyle: "dashed",
               borderBottomStyle: "dashed",
               px: 0,
             }}

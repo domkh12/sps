@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, Typography } from "@mui/material";
-import { Gauge } from "@mui/x-charts/Gauge";
 import { cardStyle } from "../../assets/style";
-import { BarChart } from "@mui/x-charts";
 import { useNavigate } from "react-router-dom";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
 import SearchComponent from "../../components/SearchComponent";
@@ -16,27 +14,49 @@ import ParkingSlotComponent from "../../components/ParkingSlotComponent";
 import useTranslate from "./../../hook/useTranslate";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import SeoComponent from "../../components/SeoComponent";
-import useWebSocket from "../../hook/useWebSocket";
 import DataNotFound from "../../components/DataNotFound";
 import SelectSingleComponent from "../../components/SelectSingleComponent";
-import { clearParking } from "../../redux/feature/parking/parkingSlice";
+import {
+  clearParking,
+  setParkingFromWB,
+} from "../../redux/feature/parking/parkingSlice";
+import MapViewStatisticsComponent from "../../components/MapViewStatisticsComponent";
+import ParkingDetailDrawerComponent from "../../components/ParkingDetailDrawerComponent";
+import { MdAnalytics } from "react-icons/md";
+import MapViewStatisticesDrawerComponent from "../../components/MapViewStatisticesDrawerComponent";
+import {
+  setIsSelectFistLabel,
+  setSelectFirstLabel,
+  toggleStatisticesDrawer,
+} from "../../redux/feature/mapView/mapViewSlice";
+import useWebSocket from "./../../hook/useWebSocket";
 
 function MapViews() {
-  const [valueGauge, setValueGauge] = useState(0);
-  const [label, setLabel] = useState("");
   const dispatch = useDispatch();
   const navitage = useNavigate();
   const { t } = useTranslate();
   const parkingLabels = useSelector((state) => state.parking.labels);
   const parkingData = useSelector((state) => state.parking.parking);
-  const [selectFirstLabel, setSelectedLabel] = useState(1);
-
+  const selectFirstLabel = useSelector(
+    (state) => state.mapView.selectFirstLabel
+  );
   const [searchTerm, setSearchTerm] = useState("");
+  const isSelectFirstLabel = useSelector(
+    (state) => state.mapView.isSelectFirstLabel
+  );
+  console.log("parkingData", parkingData);
+
   const {
     loading,
     error: websocketError,
     messages,
   } = useWebSocket("/topic/slot-update");
+
+  useEffect(() => {
+    if (messages) {
+      dispatch(setParkingFromWB(messages?.parkingSpace));
+    }
+  }, [messages]);
 
   const {
     data: parkings,
@@ -69,12 +89,13 @@ function MapViews() {
 
   useEffect(() => {
     if (isSuccessLabel) {
-      setSelectedLabel(parkingLabels?.data[0]?.uuid);
+      dispatch(setSelectFirstLabel(parkingLabels?.data[0]?.uuid));
+      dispatch(setIsSelectFistLabel(false));
     }
   }, [isSuccessLabel]);
 
   useEffect(() => {
-    if (selectFirstLabel !== 1) {
+    if (selectFirstLabel) {
       const fetchFistParking = async () => {
         await findParkingByUuid(selectFirstLabel);
       };
@@ -82,37 +103,16 @@ function MapViews() {
     } else {
       dispatch(clearParking());
     }
-  }, [selectFirstLabel]);
+  }, [selectFirstLabel, dispatch]);
 
   useEffect(() => {
-    if (parkingData) {
-      if (parkingData) {
-        const totalSlots = parkingData.filled + parkingData.empty;
-        let filledPercentage =
-          totalSlots > 0 ? (parkingData.filled / totalSlots) * 100 : 0;
-
-        filledPercentage = Math.round(filledPercentage);
-        setValueGauge(filledPercentage);
-      }
+    if (isSelectFirstLabel) {
+      const fetchAllLabels = async () => {
+        await findAllLabels();
+      };
+      fetchAllLabels();
     }
-  }, [parkingData]);
-
-  useEffect(() => {
-    const fetchAllLabels = async () => {
-      await findAllLabels();
-    };
-    fetchAllLabels();
-  }, []);
-
-  const calculateColor = () => {
-    if (valueGauge >= 90) {
-      return "#FF0000";
-    } else if (valueGauge >= 70) {
-      return "#FFC107";
-    } else {
-      return "#2C3092";
-    }
-  };
+  }, [isSelectFirstLabel]);
 
   const handleSearchChange = (value) => {
     setSearchTerm(value);
@@ -120,11 +120,7 @@ function MapViews() {
 
   const handleChange = async (value) => {
     await findParkingByUuid(value);
-    setSelectedLabel(0);
-    setLabel(value);
   };
-
-  const valueColor = calculateColor();
 
   const breadcrumbs = [
     <button
@@ -197,160 +193,21 @@ function MapViews() {
               </div>
             </Card>
           </div>
-          {/* Data Summary */}
-          <div className="lg:grid gap-5 hidden col-span-4">
-            <Card
-              sx={{
-                width: "100%",
-                padding: "20px",
-                ...cardStyle,
-              }}
-            >
-              <Typography variant="body1" component="div">
-                Space Status
-              </Typography>
-              <Gauge
-                width={200}
-                height={200}
-                value={valueGauge}
-                cornerRadius={50}
-                valueMin={0}
-                valueMax={100}
-                sx={{
-                  margin: "0 auto",
-                  "& .MuiGauge-valueText": {
-                    fontSize: 25,
-                  },
-                  "& .MuiGauge-referenceArc": {
-                    strokeWidth: 7,
-                    stroke: "#fff",
-                  },
-                  "& .MuiGauge-valueArc": {
-                    fill: valueColor,
-                  },
-                }}
-                text={({ value }) => `${value} %`}
-              />
 
-              <div className="flex justify-between items-center mb-3">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-5 h-5 rounded-[6px]"
-                    style={{ backgroundColor: valueColor }}
-                  ></div>
-                  <span>Fill</span>
-                </div>
-                <span>{parkingData.filled} Slot</span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-gray-300 rounded-[6px]"></div>
-                  <span>Empty</span>
-                </div>
-                <span>{parkingData.empty} Slot</span>
-              </div>
-            </Card>
-
-            <Card
-              sx={{
-                ...cardStyle,
-              }}
-            >
-              <Typography
-                variant="body1"
-                className="px-[20px] pt-[20px]"
-                component="div"
-              >
-                In and Out Summary
-              </Typography>
-              <div className="flex items-center gap-5 my-4 px-[20px]">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-primary"></div>
-                  <Typography variant="body1">IN</Typography>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-secondary"></div>
-                  <Typography variant="body1">OUT</Typography>
-                </div>
-              </div>
-              <BarChart
-                xAxis={[
-                  {
-                    scaleType: "band",
-                    data: [
-                      "group A",
-                      "group B",
-                      "group C",
-                      "group D",
-                      "group E",
-                      "group F",
-                    ],
-                  },
-                ]}
-                height={300}
-                width={300}
-                margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
-                series={[
-                  { data: [1, 6, 3, 4, 5, 6] },
-                  { data: [2, 5, 6, 4, 6, 18] },
-                ]}
-                grid={{ horizontal: true }}
-                borderRadius={5}
-                sx={{
-                  "& .MuiChartsGrid-root": {
-                    strokeDasharray: "3 3",
-                  },
-                  "& .MuiChartsAxis-directionY": {
-                    strokeOpacity: 0,
-                  },
-                  "& .MuiChartsAxis-directionX": {
-                    strokeOpacity: 0,
-                  },
-                }}
-              />
-            </Card>
-
-            <Card
-              sx={{
-                padding: "20px",
-                ...cardStyle,
-              }}
-            >
-              <Typography variant="body1" component="div" sx={{ mb: 2 }}>
-                Activity Logs
-              </Typography>
-              <div className="flex gap-3 relative mb-3">
-                <div className="w-[2px] h-[70%] absolute top-6 left-[9px] bg-light-gray"></div>
-                <div className="w-5 h-5 rounded-full bg-primary"></div>
-                <div className="flex flex-col">
-                  <span>ក្រោយអគារ IT</span>
-                  <span className="text-sm text-gray-500">
-                    13 Feb 2025 1:45pm
-                  </span>
-                  <p>
-                    <span className="text-primary">2KS-3456</span> is parked at{" "}
-                    <span className="text-primary">D12</span>
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-3 relative mb-3">
-                <div className="w-[2px] h-[70%] absolute top-6 left-[9px] bg-light-gray"></div>
-                <div className="w-5 h-5 rounded-full bg-primary"></div>
-                <div className="flex flex-col">
-                  <span>ក្រោយអគារ IT</span>
-                  <span className="text-sm text-gray-500">
-                    13 Feb 2025 1:45pm
-                  </span>
-                  <p>
-                    <span className="text-primary">2KS-3456</span> is parked at{" "}
-                    <span className="text-primary">D12</span>
-                  </p>
-                </div>
-              </div>
-            </Card>
+          <div className="hidden lg:grid  gap-5 col-span-4">
+            <MapViewStatisticsComponent />
           </div>
         </div>
+
+        <button
+          onClick={() => dispatch(toggleStatisticesDrawer(true))}
+          className="px-5 py-2 absolute top-[100px] right-[40px] lg:hidden bg-primary text-white  rounded-tl-lg rounded-bl-lg"
+        >
+          <MdAnalytics className="w-7 h-7" />
+        </button>
+
+        <MapViewStatisticesDrawerComponent />
+        <ParkingDetailDrawerComponent />
       </>
     );
   }

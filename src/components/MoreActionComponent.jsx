@@ -17,7 +17,7 @@ function MoreActionComponent({
   // textColor = "#424242",
   // buttonColor = "#424242",
 }) {
-  console.log("menuItems", menuItems)
+  
   return (
     <div>
       <PopupState variant="popover" popupId="more-action-popover">

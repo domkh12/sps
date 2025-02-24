@@ -36,7 +36,7 @@ import { toast } from "react-toastify";
 function Google2FAAuthenticator({ qrCodeUrl }) {
   const [copied, setCopied] = useState(false);
   const [shortUrl, setShortUrl] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null);
+   
   const [isOpeningPoppOverForm, setIsOpeningPopOverForm] = useState(false);
   const twoFASecretCode = useSelector(selectTwoFASecretCode);
   const isTwoFaEnabled = useSelector(selectIsTwoFAEnabled);
