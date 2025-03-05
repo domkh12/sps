@@ -14,14 +14,18 @@ const siteSlice = createSlice({
     branchForQuickEdit: {},
     branchTypeFilter: [],
     searchKeywords: "",
+    isSiteToDelete: "",
   },
 
   // function
   reducers: {
+    setIdSiteToDelete: (state, action) => {
+      state.isSiteToDelete = action.payload;
+    },
     setPageSizeBranch: (state, action) => {
       state.pageSize = action.payload;
     },
-    setPageNoBranch:(state, action) => {
+    setPageNoBranch: (state, action) => {
       state.pageNo = action.payload;
     },
     setSites: (state, action) => {
@@ -53,6 +57,7 @@ const siteSlice = createSlice({
 });
 
 export const {
+  setIdSiteToDelete,
   setPageNoBranch,
   setPageSizeBranch,
   setSites,

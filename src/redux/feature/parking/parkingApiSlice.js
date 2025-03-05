@@ -83,6 +83,7 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Parking", id: "LIST" }],
     }),
+
     updateParking: builder.mutation({
       query: ({ uuid, ...initialParkingData }) => ({
         url: `/parking-spaces/${uuid}`,
@@ -95,6 +96,7 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
         { type: "Parking", uuid: arg.uuid },
       ],
     }),
+    
     deleteParking: builder.mutation({
       query: ({ uuid }) => ({
         url: `/parking-spaces/${uuid}`,

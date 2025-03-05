@@ -14,6 +14,7 @@ const actionSlice = createSlice({
     isOpenConfirmDelete: false,
     isFiltered: false,
     isOpenDrawerProfiles: false,
+    isOpenSidebarDrawer: false,
   },
   reducers: {
     toggleCollapsed(state, action) {
@@ -48,11 +49,15 @@ const actionSlice = createSlice({
     },
     setIsOpenDrawerProfiles(state, action) {
       state.isOpenDrawerProfiles = action.payload;
-    }
+    },
+    setIsOpenSidebarDrawer(state, action) {
+      state.isOpenSidebarDrawer = action.payload;
+    },
   },
 });
 
 export const {
+  setIsOpenSidebarDrawer,
   toggleCollapsed,
   setIsLoadingBar,
   setIsPaginationSuccess,

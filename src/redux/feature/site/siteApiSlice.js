@@ -111,15 +111,24 @@ export const sitesApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [{ type: "Site", id: arg.uuid }],
     }),
+
+    deleteSite: builder.mutation({
+      query: ({ uuid }) => ({
+        url: `/sites/${uuid}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: "Site", id: arg.uuid }],
+    }),
   }),
 });
 
 export const {
+  useDeleteSiteMutation,
   useGetSitesQuery,
   useGetSitesListMutation,
   useCreateNewSiteMutation,
   useUpdateSiteMutation,
-  useFilterSitesQuery
+  useFilterSitesQuery,
 } = sitesApiSlice;
 
 // return the query result object

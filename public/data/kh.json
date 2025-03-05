@@ -89,7 +89,7 @@
   "createAParkingSpace": "បង្កើតទីធ្លាចតរថយន្តថ្មីមួយ",
   "lotQty": "ចំនួនចំណត",
   "createParkingSpace": "បង្កើតទីធ្លាចតរថយន្ត",
-  "addLots": "ចំណតរថយន្ត",
+  "lot": "ចំណតរថយន្ត",
   "editSuccess": "កែសម្រួលបានជោគជ័យ",
   "history": "ប្រវត្តិ",
   "account": "គណនី",
@@ -113,5 +113,9 @@
   "report": "របាយការណ៍",
   "timeInOut": "ពេលវេលា (ចូល - ចេញ)",
   "duration": "រយៈពេល",
-  "status": "ស្ថានភាព"
+  "status": "ស្ថានភាព",
+  "confirmPasswordIsRequired": "លេខសម្ងាត់ផ្ទៀងផ្ទាត់ត្រូវតែបំពេញ",
+  "passwordIsRequired": "លេខសម្ងាត់ត្រូវតែបំពេញ",
+  "overview": "ទិដ្ឋភាពទូទៅ",
+  "management": "ការគ្រប់គ្រង"
 }

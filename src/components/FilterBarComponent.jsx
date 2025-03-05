@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import useTranslate from "../hook/useTranslate";
 
 function FilterBarComponent({
+  parkingSpaceFetched,
   statusFilter,
   branchFilter,
   vehicleTypeFilter,
@@ -153,6 +154,19 @@ function FilterBarComponent({
       )}
 
       <div className="p-[20px] flex gap-[16px] 2xl:flex-nowrap flex-wrap flex-col xl:flex-row">
+        {parkingSpaceFetched && (
+          <SelectComponent
+            label={t("parkingSpace")}
+            labelId="parking_space_label"
+            id="parking_space"
+            options={parkingSpaceFetched?.data}
+            onChange={handleRoleChange}
+            optionLabelKey="label"
+            width60={"2xl:w-60"}
+            value={roleFilter}
+          />
+        )}
+
         {roleFetched && (
           <SelectComponent
             label={t("role")}

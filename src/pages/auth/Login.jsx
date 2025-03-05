@@ -15,9 +15,6 @@ import { MdKeyboardArrowLeft } from "react-icons/md";
 import {
   Alert,
   Box,
-  Button,
-  Card,
-  CardContent,
   Divider,
   FormControl,
   FormHelperText,
@@ -205,7 +202,7 @@ export default function Login() {
 
       const decoded = jwtDecode(accessToken);
       const { jti: email, scope, uuid, sites } = decoded;
-
+      console.log("sites", sites)
       const roles = scope ? scope.split(" ") : [];
 
       if (sites && sites?.length > 1) {
@@ -222,7 +219,7 @@ export default function Login() {
           }
         }
       } else {
-        if (!roles.includes(ROLES.ROLE_MANAGER)) {
+        if (!roles.includes(ROLES.ROLE_MANAGER) && sites.length == 1) {
           try {
             await verifySites({ uuid: sites });
             dispatch(setUuid(uuid));

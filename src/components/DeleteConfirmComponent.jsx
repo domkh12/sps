@@ -8,14 +8,30 @@ import { setIsOpenConfirmDelete } from "../redux/feature/actions/actionSlice";
 import { useDeleteUserMutation } from "../redux/feature/users/userApiSlice";
 import { useDeleteVehicleMutation } from "../redux/feature/vehicles/vehicleApiSlice";
 import { useDeleteParkingMutation } from "../redux/feature/parking/parkingApiSlice";
+import { setIdVehicleToDelete } from "../redux/feature/vehicles/vehicleSlice";
+import { setIdUserToDelete } from "../redux/feature/users/userSlice";
+import { setIdParkingToDelete } from "../redux/feature/parking/parkingSlice";
+import { useDeleteSiteMutation } from "../redux/feature/site/siteApiSlice";
+import { setIdSiteToDelete } from "../redux/feature/site/siteSlice";
 
 function DeleteConfirmComponent() {
-  const open = useSelector((state) => state.action.isOpenConfirmDelete);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const open = useSelector((state) => state.action.isOpenConfirmDelete);
   const userId = useSelector((state) => state.users.idUserToDelete);
   const vehicleId = useSelector((state) => state.vehicles.idVehicleToDelete);
   const parkingId = useSelector((state) => state.parking.idParkingToDelete);
-  const navigate = useNavigate();
+  const siteId = useSelector((state) => state.sites.isSiteToDelete);
+
+  const [
+    deleteSite,
+    {
+      isSuccess: isSuccessDeleteSite,
+      isLoading: isLoadingDeleteSite,
+      isError: isErrorDeleteSite,
+      error: errorDeleteSite,
+    },
+  ] = useDeleteSiteMutation();
 
   const [
     deleteUser,
@@ -66,28 +82,37 @@ function DeleteConfirmComponent() {
       await deleteVehicle({ id: vehicleId });
     } else if (parkingId) {
       await deleteParking({ uuid: parkingId });
+    }else if (siteId){
+      await deleteSite({ uuid: siteId });
     }
   };
 
   useEffect(() => {
     if (isUserDeleteSuccess) {
       navigate("/dash/users");
+      dispatch(setIdUserToDelete(""));
       handleClose();
     }
     if (isVehicleDeleteSuccess) {
       navigate("/dash/vehicles");
+      dispatch(setIdVehicleToDelete(""));
       handleClose();
     }
     if (isParkingDeleteSuccess) {
       navigate("/dash/parkings");
+      dispatch(setIdParkingToDelete(""));
       handleClose();
     }
-
-  }, [isUserDeleteSuccess, isVehicleDeleteSuccess, isParkingDeleteSuccess]);
+    if(isSuccessDeleteSite){
+      navigate("/dash/branches");
+      dispatch(setIdSiteToDelete(""));
+      handleClose();
+    }
+  }, [isUserDeleteSuccess, isVehicleDeleteSuccess, isParkingDeleteSuccess, isSuccessDeleteSite]);
 
   let loading = false;
 
-  if (isUserDeleteLoading || isVehicleDeleteLoading || isParkingDeleteLoading) {
+  if (isUserDeleteLoading || isVehicleDeleteLoading || isParkingDeleteLoading || isLoadingDeleteSite) {
     loading = true;
   }
 

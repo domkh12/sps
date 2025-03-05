@@ -32,46 +32,46 @@ function Dashboard() {
         <CardDashboardTotal
           img={"/images/userImg.png"}
           title={t("user")}
-          quantity={totalCount?.data.totalUserCount}
+          quantity={totalCount?.data?.totalUserCount}
           percentage={"+2.6%"}
           gradient1={"#BFDAF3"}
           gradient2={"#9DC0E0"}
           textColor={"#0C4C88"}
-          dateData={totalCount?.data.chartData.date}
-          values={totalCount.data.chartData.value}
+          dateData={totalCount?.data?.chartData?.date}
+          values={totalCount?.data?.chartData?.value}
         />
         <CardDashboardTotal
           img={"/images/carImg.png"}
-          title={"Vehicle"}
-          quantity={totalCount?.data.totalVehicleCount}
+          title={t("vehicle")}
+          quantity={totalCount?.data?.totalVehicleCount}
           percentage={"+2.6%"}
           gradient1={"#F3C8F7"}
           gradient2={"#DC9DE2"}
           textColor={"#6F0E78"}
-          dateData={totalCount?.data.chartData.date}
-          values={totalCount.data.chartData.value}
+          dateData={totalCount?.data?.chartData?.date}
+          values={totalCount?.data?.chartData?.value}
         />
         <CardDashboardTotal
           img={"/images/parkingImg.png"}
-          title={"Parking Space"}
-          quantity={totalCount.data.totalParkingSpaceCount}
+          title={t("parkingSpace")}
+          quantity={totalCount?.data?.totalParkingSpaceCount}
           percentage={"+2.6%"}
           gradient1={"#F6EACF"}
           gradient2={"#F9E3B0"}
           textColor={"#73550E"}
-          dateData={totalCount.data.chartData.date}
-          values={totalCount.data.chartData.value}
+          dateData={totalCount?.data?.chartData?.date}
+          values={totalCount?.data?.chartData?.value}
         />
         <CardDashboardTotal
           img={"/images/lotImg.png"}
-          title={"Lot"}
-          quantity={totalCount?.data.totalParkingLotCount}
+          title={t("lot")}
+          quantity={totalCount?.data?.totalParkingLotCount}
           percentage={"+2.6%"}
           gradient1={"#F7E0C5"}
           gradient2={"#E1C29E"}
           textColor={"#734005"}
-          dateData={totalCount.data.chartData.date}
-          values={totalCount.data.chartData.value}
+          dateData={totalCount?.data?.chartData?.date}
+          values={totalCount?.data?.chartData?.value}
         />
       </div>
     );

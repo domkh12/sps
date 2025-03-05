@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SeoComponent from "../../components/SeoComponent";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
 import { useNavigate } from "react-router-dom";
@@ -18,11 +18,17 @@ import { cardStyle } from "../../assets/style";
 import { useGetAllParkingDetailQuery } from "../../redux/feature/parking/parkingDetailApiSlice";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import HistoryRowComponent from "../../components/HistoryRowComponent";
+import DataNotFound from "../../components/DataNotFound";
+import FilterBarComponent from "../../components/FilterBarComponent";
+import { useFindAllLabelsMutation } from "../../redux/feature/parking/parkingApiSlice";
+import { useSelector } from "react-redux";
 
 function HistoryList() {
   const navigate = useNavigate();
   const { t } = useTranslate();
-
+  const [isLoading, setIsLoading] = useState(true);
+  const parkingSpaceFetched = useSelector(state => state.parking.labels)
+  console.log("parkingSpaceFetched", parkingSpaceFetched);
   const {
     data: parkingDetailData,
     isSuccess: isSuccessGetParkingDetail,
@@ -34,6 +40,22 @@ function HistoryList() {
     refetchOnFocus: true,
     refetchOnMountOrArgChange: true,
   });
+
+  const [findAllLabels] = useFindAllLabelsMutation();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([findAllLabels()]);
+      } catch (error) {
+        console.log("error: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const columns = [
     { id: "model", label: t("vehicleModel"), minWidth: 170, align: "left" },
@@ -88,17 +110,23 @@ function HistoryList() {
   ];
 
   let content;
-  if (isLoadingGetParkingDetail) content = <LoadingFetchingDataComponent />;
+  
+  if (isLoading) content = <LoadingFetchingDataComponent />;
 
-  if (isSuccessGetParkingDetail) {
+  if (!isLoading) {
     const { ids } = parkingDetailData;
-    console.log("ids", ids);
 
-    const tableContent = ids.length
-      ? ids.map((historyId) => (
-          <HistoryRowComponent key={historyId} historyId={historyId} />
-        ))
-      : null;
+    const tableContent = ids.length ? (
+      ids.map((historyId) => (
+        <HistoryRowComponent key={historyId} historyId={historyId} />
+      ))
+    ) : (
+      <TableRow sx={{ bgcolor: "#F4F6F8" }}>
+        <TableCell align="center" colSpan={10}>
+          <DataNotFound />
+        </TableCell>
+      </TableRow>
+    );
 
     content = (
       <div data-aos="fade-left">
@@ -106,14 +134,15 @@ function HistoryList() {
         <MainHeaderComponent breadcrumbs={breadcrumbs} title={t("list")} />
 
         <Card sx={{ ...cardStyle }}>
-          {/* <FilterBarComponent
-          showTabs={false}
-          branchFetched={branchFetched}
-          branchFilter={branchFilter}
-          searchQuery={searchKeywords}
-          handleBranchChange={handleBranchChange}
-          handleSearchChange={handleSearchChange}
-        /> */}
+          <FilterBarComponent
+            showTabs={false}
+            parkingSpaceFetched={parkingSpaceFetched}
+            // branchFetched={branchFetched}
+            // branchFilter={branchFilter}
+            // searchQuery={searchKeywords}
+            // handleBranchChange={handleBranchChange}
+            // handleSearchChange={handleSearchChange}
+          />
 
           {/* <FilterChipsComponent
           branchFilter={branchFilter}

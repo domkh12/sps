@@ -25,7 +25,7 @@ import * as Yup from "yup";
 function ResetPassword() {
   const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
-
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [open, setOpen] = useState(false);
   const { t } = useTranslate();
@@ -41,7 +41,10 @@ function ResetPassword() {
       .matches(/[a-z]/, "Password must contain at least one lowercase letter")
       .matches(/[0-9]/, "Password must contain at least one number")
       .matches(/[\W_]/, "Password must contain at least one special character")
-      .required("Password is required"),
+      .required(t("passwordIsRequired")),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref("newPassword"), null], t("passwordIsRequired"))
+      .required(t("confirmPasswordIsRequired")),
   });
 
   useEffect(() => {
@@ -51,7 +54,7 @@ function ResetPassword() {
   }, [isSuccess]);
 
   const handleSubmit = async (values) => {
-    console.log("values", values)
+    console.log("values", values);
     try {
       const token = searchParams.get("token");
       await resetPasssword({ token, newPassword: values.newPassword });
@@ -69,8 +72,18 @@ function ResetPassword() {
   };
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
+  const handleMouseDownConfirmPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpConfirmPassword = (event) => {
+    event.preventDefault();
+  };
+  const handleClickShowConfirmPassword = () =>
+    setShowConfirmPassword((show) => !show);
+
   let content;
-  
+
   content = (
     <>
       <SeoComponent title="Forgot Password" />
@@ -93,7 +106,7 @@ function ResetPassword() {
         }}
       >
         <Formik
-          initialValues={{ newPassword: "" }}
+          initialValues={{ newPassword: "", confirmPassword: "" }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
@@ -118,12 +131,9 @@ function ResetPassword() {
                   className="flex flex-col justify-start items-center lg:justify-center"
                 >
                   <div className="xs:min-w-[500px] max-w-[450px] flex flex-col gap-7">
-                    <Typography variant="h6" className="text-center">
-                      Forgot your password?
-                    </Typography>
-                    <Typography variant="body1" className="text-center">
-                      Please enter the email address associated with your
-                      account and we'll email you a link to reset your password.
+                    <Typography variant="h6">Reset Password</Typography>
+                    <Typography variant="body1">
+                      Just type it twice and try not to forget it.
                     </Typography>
                     {open && (
                       <Alert
@@ -134,7 +144,7 @@ function ResetPassword() {
                       </Alert>
                     )}
                     <FormControl
-                      sx={{ width: "100%", mb: 2, mt: 1 }}
+                      sx={{ width: "100%", mt: 1 }}
                       variant="outlined"
                       size="medium"
                       error={errors.newPassword && touched.newPassword}
@@ -154,7 +164,7 @@ function ResetPassword() {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         autoComplete="off"
-                        fullWidth                        
+                        fullWidth
                         value={values.newPassword}
                         type={showPassword ? "text" : "password"}
                         endAdornment={
@@ -182,12 +192,62 @@ function ResetPassword() {
                           : null}
                       </FormHelperText>
                     </FormControl>
+
+                    <FormControl
+                      sx={{ width: "100%" }}
+                      variant="outlined"
+                      size="medium"
+                      error={errors.confirmPassword && touched.confirmPassword}
+                    >
+                      <InputLabel htmlFor="confirmPassword">
+                        {t("confirmPassword")}
+                      </InputLabel>
+                      <OutlinedInput
+                        sx={{
+                          "& .MuiInputBase-input": {
+                            boxShadow: "none",
+                          },
+                          borderRadius: "6px",
+                        }}
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        autoComplete="off"
+                        fullWidth
+                        value={values.confirmPassword}
+                        type={showConfirmPassword ? "text" : "password"}
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label={
+                                showConfirmPassword
+                                  ? "hide the password"
+                                  : "display the password"
+                              }
+                              onClick={handleClickShowConfirmPassword}
+                              onMouseDown={handleMouseDownConfirmPassword}
+                              onMouseUp={handleMouseUpConfirmPassword}
+                              edge="end"
+                            >
+                              {showConfirmPassword ? <IoEye /> : <IoEyeOff />}
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                        label="Password"
+                      />
+                      <FormHelperText>
+                        {errors.confirmPassword && touched.confirmPassword
+                          ? errors.confirmPassword
+                          : null}
+                      </FormHelperText>
+                    </FormControl>
                     <LoadingButton
                       variant="contained"
                       size="large"
                       sx={{
                         textTransform: "none",
-                        borderRadius: "6px",                        
+                        borderRadius: "6px",
                         mb: 2,
                       }}
                       loading={isLoading}

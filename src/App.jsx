@@ -8,15 +8,15 @@ import { ROLES } from "./config/roles.js";
 const HistoryList = lazy(() => import("./pages/history/HistoryList.jsx"));
 const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword.jsx"));
 const ResetPassword = lazy(() => import("./pages/auth/ResetPassword.jsx"));
-const LoadingOneComponent = lazy(
-  () => import("./components/LoadingOneComponent.jsx")
+const LoadingOneComponent = lazy(() =>
+  import("./components/LoadingOneComponent.jsx")
 );
 const Security = lazy(() => import("./pages/profile/Security.jsx"));
 const Account = lazy(() => import("./pages/profile/Account.jsx"));
 const BranchList = lazy(() => import("./pages/branch/BranchList.jsx"));
 const AddNewBranch = lazy(() => import("./pages/branch/AddNewBranch.jsx"));
-const Error403Component = lazy(
-  () => import("./components/Error403Component.jsx")
+const Error403Component = lazy(() =>
+  import("./components/Error403Component.jsx")
 );
 const EditBranch = lazy(() => import("./pages/branch/EditBranch.jsx"));
 const AdminLayout = lazy(() => import("./pages/layout/AdminLayout.jsx"));
@@ -34,8 +34,8 @@ const AddNewVehicle = lazy(() => import("./pages/vehicle/AddNewVehicle.jsx"));
 const EditVehicle = lazy(() => import("./pages/vehicle/EditVehicle.jsx"));
 const ViewVehicle = lazy(() => import("./pages/vehicle/ViewVehicle.jsx"));
 const ParkingEdit = lazy(() => import("./pages/parking/ParkingEdit.jsx"));
-const OAuth2RedirectHandler = lazy(
-  () => import("./pages/auth/OAuth2RedirectHandler.jsx")
+const OAuth2RedirectHandler = lazy(() =>
+  import("./pages/auth/OAuth2RedirectHandler.jsx")
 );
 const UserList = lazy(() => import("./pages/user/UserList.jsx"));
 const AddNewParking = lazy(() => import("./pages/parking/AddNewParking.jsx"));
@@ -47,29 +47,22 @@ const ReportList = lazy(() => import("./pages/report/ReportList.jsx"));
 const CreateReport = lazy(() => import("./pages/report/CreateReport.jsx"));
 
 function App() {
-  const [mode, setMode] = useState(false);
   const theme = createTheme({
     typography: {
       fontFamily: ["Roboto", "Hanuman", "Arial", "sans-serif"].join(","),
     },
     palette: {
       primary: {
-        light: "#757ce8",
         main: "#000",
-        dark: "#000",
-        contrastText: "#fff",
       },
       secondary: {
-        light: "#ff7961",
         main: "#f44336",
-        dark: "#000",
-        contrastText: "#000",
       },
-      mode: mode ? "dark" : "light",
     },
+   
   });
 
-  window.addEventListener("vite:preloadError", (event) => {  
+  window.addEventListener("vite:preloadError", (event) => {
     event.preventDefault();
     window.location.reload();
   });
@@ -149,8 +142,6 @@ function App() {
                       <Route path="new" element={<AddNewParking />} />
                       <Route path=":id" element={<ParkingEdit />} />
                     </Route>
-
-                    
                   </Route>
 
                   <Route path="reports">

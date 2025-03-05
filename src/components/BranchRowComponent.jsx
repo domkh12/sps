@@ -17,9 +17,11 @@ import { useGetSitesQuery } from "../redux/feature/site/siteApiSlice";
 import { useDispatch } from "react-redux";
 import {
   setBranchForQuickEdit,
+  setIdSiteToDelete,
   setIsQuickEditBranchOpen,
 } from "../redux/feature/site/siteSlice";
 import useDateFormatter from "../hook/useDateFormatter";
+import { setIsOpenConfirmDelete } from "../redux/feature/actions/actionSlice";
 
 function stringToColor(string) {
   let hash = 0;
@@ -83,7 +85,8 @@ function BranchRowComponent({ siteId, site }) {
     });
 
     const handleDelete = () => {
-      console.log("Download action triggered");
+      dispatch(setIsOpenConfirmDelete(true));
+      dispatch(setIdSiteToDelete(site.uuid));
     };
     var handleEdit = () => navigate(`/dash/branches/${siteId}`);
     var handleView = () => navigate(`/dash/branches/${siteId}/view`);

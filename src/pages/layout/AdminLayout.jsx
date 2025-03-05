@@ -22,6 +22,7 @@ import {
   selectIsInitialLoading,
   setInitialLoading,
 } from "../../redux/feature/app/appSlice";
+import SidebarDrawerComponent from "../../components/SidebarDrawerComponent";
 
 function AdminLayout() {
   const isPaginationSuccess = useSelector(
@@ -105,7 +106,7 @@ function AdminLayout() {
       } catch (err) {
         //Error handled by RTK Query
         console.error("Failed to fetch data:", err);
-      } 
+      }
     };
     fetchData();
   }, [dispatch, getUserProfile, getSitesList, connectedUser]);
@@ -185,6 +186,7 @@ function AdminLayout() {
         isOpen={isOpenSnackBar}
       />
       <DeleteConfirmComponent />
+      <SidebarDrawerComponent />
     </div>
   );
 }

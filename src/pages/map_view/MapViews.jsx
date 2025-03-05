@@ -178,7 +178,7 @@ function MapViews() {
             >
               <div className="flex gap-5 flex-col lg:flex-row p-[20px]">
                 <SelectSingleComponent
-                  label="Parking spaces"
+                  label={t('parkingSpace')}
                   options={parkingLabels?.data}
                   onChange={handleChange}
                   className="lg:w-60 w-full shrink-0"
@@ -201,7 +201,7 @@ function MapViews() {
 
         <button
           onClick={() => dispatch(toggleStatisticesDrawer(true))}
-          className="px-5 py-2 absolute top-[100px] right-[40px] lg:hidden bg-primary text-white  rounded-tl-lg rounded-bl-lg"
+          className="px-5 py-2 absolute top-[100px] right-[0px] lg:hidden bg-primary text-white  rounded-tl-lg rounded-bl-lg"
         >
           <MdAnalytics className="w-7 h-7" />
         </button>

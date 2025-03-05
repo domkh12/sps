@@ -153,7 +153,7 @@ function SideBar() {
                     <p
                       className={`group-hover:translate-x-1 transition-[2s] duration-200`}
                     >
-                      OVERVIEW
+                      {t("overview")}
                     </p>
                   </ListSubheader>
                 )
@@ -375,7 +375,7 @@ function SideBar() {
                         <p
                           className={`group-hover:translate-x-1 transition-[2s] duration-200`}
                         >
-                          MANAGEMENT
+                          {t("management")}
                         </p>
                       </ListSubheader>
                     )

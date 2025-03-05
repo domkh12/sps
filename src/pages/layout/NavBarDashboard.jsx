@@ -14,10 +14,17 @@ import useAuth from "../../hook/useAuth";
 import { selectCurrentToken } from "../../redux/feature/auth/authSlice";
 import { useVerifySitesMutation } from "../../redux/feature/auth/authApiSlice";
 import { setChangedSite } from "../../redux/feature/site/siteSlice";
-import { setIsOpenDrawerProfiles } from "../../redux/feature/actions/actionSlice";
+import {
+  setIsOpenDrawerProfiles,
+  setIsOpenSidebarDrawer,
+} from "../../redux/feature/actions/actionSlice";
+import { CgMenuLeftAlt } from "react-icons/cg";
 
 function NavBarDashboard() {
   const drawerOpen = useSelector((state) => state.action.isOpenDrawerProfiles);
+  const sidebarDrawerOpen = useSelector(
+    (state) => state.action.isOpenSidebarDrawer
+  );
   const user = useSelector((state) => state.auth.userProfile);
   const sites = useSelector((state) => state.sites.sitesForChange);
   const { isAdmin, isManager, sites: currentSite } = useAuth();
@@ -33,21 +40,6 @@ function NavBarDashboard() {
       error: errorVerifySite,
     },
   ] = useVerifySitesMutation();
-
-  const listGroup1 = [
-    { text: "Inbox" },
-    { text: "Starred" },
-    { text: "Send email", onClick: () => console.log("Send email clicked") },
-    { text: "Drafts" },
-  ];
-
-  const listGroup2 = [
-    { text: "All mail" },
-    { text: "Trash" },
-    { text: "Spam", onClick: () => console.log("Spam Clicked") },
-  ];
-
-  const combinedLists = [listGroup1, listGroup2];
 
   const handleChange = async (value) => {
     console.log(value);
@@ -68,7 +60,11 @@ function NavBarDashboard() {
       <div className="h-[70px] bg-white text-white bg-opacity-50 backdrop-blur-md flex justify-between flex-nowrap items-center xl:px-[40px] px-[10px] sm:px-[20px]">
         <div className=" flex items-center gap-[10px]">
           <div className="xl:hidden">
-            <SidebarDrawerComponent listGroups={combinedLists} />
+            <ToolTipButtonComponent
+              title={"Collapse"}
+              icon={CgMenuLeftAlt}
+              onClick={() => dispatch(setIsOpenSidebarDrawer(true))}
+            />
           </div>
           {isAdmin && !isManager && (
             <SelectSiteComponent

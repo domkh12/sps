@@ -5,7 +5,7 @@ export const analysisApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getTotalCountAnalysis: builder.mutation({
       query: () => ({
-        url: "/analysis",
+        url: "/analysis/total-counts",
         method: "GET",
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {

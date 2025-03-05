@@ -1,12 +1,9 @@
 import { Typography } from "@mui/material";
 import {
   axisClasses,
-  ChartContainer,
   LineChart,
   lineElementClasses,
-  LinePlot,
   markElementClasses,
-  MarkPlot,
 } from "@mui/x-charts";
 import { HiMiniArrowTrendingUp } from "react-icons/hi2";
 
@@ -21,16 +18,15 @@ function CardDashboardTotal({
   dateData = [],
   values = [],
 }) {
-  // Function to format date to "13/2/2024" format
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate();
-    const month = date.getMonth() + 1; // Months are zero-based
+    const month = date.getMonth() + 1; 
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
 
-  // Format the dateData array
   const formattedDateData = dateData.map((date) => formatDate(date));
 
   return (
@@ -68,7 +64,7 @@ function CardDashboardTotal({
         </div>
 
         <LineChart
-          sx={(theme) => ({
+          sx={() => ({
             [`.${lineElementClasses.root}`]: {
               strokeWidth: 3,
             },

@@ -90,7 +90,7 @@
   "createAParkingSpace": "Create a new parking space",
   "lotQty" : "Lot qty",
   "createParkingSpace": "Create parking space",
-  "addLots": "Add lots",
+  "lot": "Add lots",
   "editSuccess": "Edit success",
   "history": "History",
   "account": "Account",
@@ -114,5 +114,9 @@
   "report": "Report",
   "timeInOut" : "Time (In Out)",
   "duration": "Duration",
-  "status": "Status"
+  "status": "Status",
+  "confirmPasswordIsRequired" : "Confirm password is required",
+  "passwordIsRequired" : "Password is required",
+  "overview": "Overview",
+  "management": "Management"
 }
