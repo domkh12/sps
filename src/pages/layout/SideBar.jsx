@@ -6,7 +6,9 @@ import SpaceDashboardTwoToneIcon from "@mui/icons-material/SpaceDashboardTwoTone
 import FmdGoodTwoToneIcon from "@mui/icons-material/FmdGoodTwoTone";
 import KeyboardArrowLeftRoundedIcon from "@mui/icons-material/KeyboardArrowLeftRounded";
 import ApartmentTwoToneIcon from "@mui/icons-material/ApartmentTwoTone";
-
+import SplitscreenIcon from '@mui/icons-material/Splitscreen';
+import EmojiTransportationIcon from '@mui/icons-material/EmojiTransportation';
+import CarRepairIcon from '@mui/icons-material/CarRepair';
 import {
   Box,
   Collapse,
@@ -42,6 +44,8 @@ function SideBar() {
   const [isParkingOpen, setIsParkingOpen] = useState(false);
   const [isVehicleOpen, setIsVehicleOpen] = useState(false);
   const [isBranchOpen, setIsBranchOpen] = useState(false);
+  const [isCompanyOpen,setIsCompanyOpen]=useState(false);
+  const [isSlotOpen,setIsSlotOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -60,6 +64,15 @@ function SideBar() {
   const isHistoryPage = location.pathname === "/dash/history";
   const isBranchListPage = location.pathname === "/dash/branches";
   const isBranchCreatePage = location.pathname === "/dash/branches/new";
+  const isParkingSlotPage=location.pathname === " /dash/slot";
+  const isCompanyCreatePage=location.pathname === " /dash/companys";
+  const isCompanyListPage=location.pathname === " /dash/companys/new";
+
+  const isSlotCreatePage = location.pathname === " /dash/slots";
+  const isSlotListPage = location.pathname === " /dash/slots/new";
+
+
+
   const { t } = useTranslate();
 
   const handleManagementClick = () => {
@@ -249,6 +262,7 @@ function SideBar() {
                       "flex flex-col justify-center items-center w-full"
                     }`}
                   >
+                   
                     <FmdGoodTwoToneIcon className="w-6 h-6" />
                     {isCollapsed && (
                       <ListItemText
@@ -386,7 +400,310 @@ function SideBar() {
                     timeout="auto"
                     unmountOnExit
                   >
-                    {/* Branch Menu */}
+             {/* Company  */}
+                   {isManager && (
+                      <>
+                        {isCollapsed ? (
+                          <>
+                            <PopupState variant="popover" popupId="demoPopover">
+                              {(popupState) => (
+                                <div>
+                                  <ListItemButton
+                                    {...bindHover(popupState)}
+                                    sx={{
+                                      borderRadius: "10px",
+                                      mb: "5px",
+                                      color: "#424242",
+                                      ...((isCompanyListPage ||
+                                        isCompanyCreatePage) &&
+                                        listItemButtonStyle),
+                                    }}
+                                    selected={
+                                      isBranchOpen
+                                        ? isCompanyListPage || isCompanyCreatePage
+                                        : isCompanyListPage || isCompanyCreatePage
+                                    }
+                                  >
+                                    <ListItemIcon
+                                      sx={{
+                                        minWidth: 0,
+                                      }}
+                                      className={`
+                                flex flex-col justify-center items-center w-full
+                              `}
+                                    >
+                                      < ApartmentTwoToneIcon  className="w-6 h-6" />
+
+                                      <KeyboardArrowRightRoundedIcon className="absolute top-2 right-0" />
+                                      <ListItemText
+                                        secondary={
+                                          <Typography
+                                            component="span"
+                                            variant="caption"
+                                            sx={{
+                                              color: "#424242",
+                                              display: "inline",
+                                              textWrap: "nowrap",
+                                            }}
+                                          >
+                                            {t("company")}
+                                          </Typography>
+                                        }
+                                      />
+                                    </ListItemIcon>
+                                  </ListItemButton>
+                                  <HoverPopover
+                                    {...bindPopover(popupState)}
+                                    slotProps={{
+                                      paper: {
+                                        style: {
+                                          padding: 10,
+                                          backgroundColor: "transparent",
+                                          boxShadow: "none",
+                                        },
+                                      },
+                                    }}
+                                    anchorOrigin={{
+                                      vertical: "center",
+                                      horizontal: "right",
+                                    }}
+                                    transformOrigin={{
+                                      vertical: "center",
+                                      horizontal: "left",
+                                    }}
+                                  >
+                                    <List
+                                      component="div"
+                                      disablePadding
+                                      dense={true}
+                                      sx={{
+                                        minWidth: 0,
+                                        width: "200px",
+                                        padding: "5px",
+                                        borderRadius: "10px",
+                                        background:
+                                          "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
+                                        boxShadow:
+                                          "0px 0px 15px rgba(0, 0, 0, 0.15)",
+                                      }}
+                                    >
+                                      <ListItemButton
+                                        sx={{
+                                          borderRadius: "6px",
+                                          color: "#424242",
+                                          mb: "5px",
+                                        }}
+                                        onClick={() => {
+                                          if (
+                                            location.pathname !==
+                                            "/dash/companys"
+                                          ) {
+                                            popupState.close();
+                                          }
+                                          navigate("/dash/companys");
+                                        }}
+                                        selected={
+                                          location.pathname === "/dash/companys"
+                                        }
+                                      >
+                                        <ListItemText
+                                          primary={
+                                            <Typography
+                                              component="span"
+                                              variant="body1"
+                                              sx={{
+                                                color: "#424242",
+                                                display: "inline",
+                                              }}
+                                            >
+                                              {t("list")}
+                                            </Typography>
+                                          }
+                                        />
+                                      </ListItemButton>
+
+                                      <ListItemButton
+                                        sx={{
+                                          borderRadius: "6px",
+                                          color: "#424242",
+                                        }}
+                                        onClick={() => {
+                                          if (
+                                            location.pathname !==
+                                            "/dash/companys/new"
+                                          ) {
+                                            popupState.close();
+                                          }
+                                          navigate("/dash/companys/new");
+                                        }}
+                                        selected={
+                                          location.pathname ===
+                                          "/dash/companys/new"
+                                        }
+                                      >
+                                        <ListItemText
+                                          primary={
+                                            <Typography
+                                              component="span"
+                                              variant="body1"
+                                              sx={{
+                                                color: "#424242",
+                                                display: "inline",
+                                              }}
+                                            >
+                                              {t("create")}
+                                            </Typography>
+                                          }
+                                        />
+                                      </ListItemButton>
+                                    </List>
+                                  </HoverPopover>
+                                </div>
+                              )}
+                            </PopupState>
+                          </>
+                        ) : (
+                          <>
+                            <ListItemButton
+                              sx={{
+                                borderRadius: "10px",
+                                color: "#424242",
+                                ...((isCompanyListPage || isCompanyCreatePage) &&
+                                  listItemButtonStyle),
+                              }}
+                              selected={
+                                isCompanyOpen
+                                  ? isCompanyOpen
+                                  : isCompanyListPage || isCompanyCreatePage
+                              }
+                              onClick={() => setIsCompanyOpen(!isCompanyOpen)}
+                              className="group relative"
+                              aria-owns={open ? "parkingPopover" : undefined}
+                              aria-haspopup="true"
+                              onMouseEnter={handlePopoverOpen}
+                              onMouseLeave={handlePopoverClose}
+                            >
+                              <ListItemIcon
+                                sx={{
+                                  minWidth: 0,
+                                  mr: 1,
+                                }}
+                              >
+                                < ApartmentTwoToneIcon  className="w-6 h-6" />
+                              </ListItemIcon>
+                              {!isCollapsed && (
+                                <ListItemText
+                                  primary={
+                                    <Typography
+                                      component="span"
+                                      variant="body1"
+                                      sx={{
+                                        color: "#424242",
+                                        display: "inline",
+                                      }}
+                                    >
+                                      {t("company")}
+                                    </Typography>
+                                  }
+                                />
+                              )}
+
+                              {isBranchOpen ? (
+                                <IoIosArrowDown />
+                              ) : (
+                                <IoIosArrowForward />
+                              )}
+                            </ListItemButton>
+                          </>
+                        )}
+
+                        <Collapse
+                          in={isCollapsed ? !isCollapsed : isCompanyOpen}
+                        >
+                          <List
+                            component="div"
+                            disablePadding
+                            sx={{ pt: 1 }}
+                            dense={true}
+                          >
+                            <ul className="ml-6 pl-[12px]">
+                              <div className="absolute h-[60px] border-l-[2px] bg-primary left-6 top-0"></div>
+                              <li>
+                                <img
+                                  src="/images/nav_sublist.svg"
+                                  alt="sub_list_img"
+                                  className="absolute top-[6px] left-6 h-[30px] w-[14px]"
+                                />
+                                <ListItemButton
+                                  sx={{
+                                    borderRadius: "10px",
+                                    color: "#424242",
+                                    mb: "5px",
+                                  }}
+                                  onClick={() => navigate("/dash/companys")}
+                                  selected={
+                                    location.pathname === "/dash/Company"
+                                  }
+                                >
+                                  <ListItemText
+                                    primary={
+                                      <Typography
+                                        component="span"
+                                        variant="body1"
+                                        sx={{
+                                          color: "#424242",
+                                          display: "inline",
+                                        }}
+                                      >
+                                        {t("list")}
+                                      </Typography>
+                                    }
+                                  />
+                                </ListItemButton>
+                              </li>
+                              <li>
+                                <img
+                                  src="/images/nav_sublist.svg"
+                                  alt="sub_list_img"
+                                  className="absolute top-[55px] left-6 h-[14px] w-[14px]"
+                                />
+                                <ListItemButton
+                                  sx={{
+                                    borderRadius: "10px",
+                                    color: "#424242",
+                                    mb: "5px",
+                                  }}
+                                  onClick={() => navigate("/dash/Companys/new")}
+                                  selected={
+                                    location.pathname === "/dash/Companys/new"
+                                  }
+                                >
+                                  <ListItemText
+                                    primary={
+                                      <Typography
+                                        component="span"
+                                        variant="body1"
+                                        sx={{
+                                          color: "#424242",
+                                          display: "inline",
+                                        }}
+                                      >
+                                        {t("create")}
+                                      </Typography>
+                                    }
+                                  />
+                                </ListItemButton>
+                              </li>
+                            </ul>
+                          </List>
+                        </Collapse>
+                      </>
+                    )}
+
+
+
+            
+                {/* Branch Menu */}
                     {isManager && (
                       <>
                         {isCollapsed ? (
@@ -418,7 +735,7 @@ function SideBar() {
                                 flex flex-col justify-center items-center w-full
                               `}
                                     >
-                                      <ApartmentTwoToneIcon className="w-6 h-6" />
+                                      <EmojiTransportationIcon className="w-6 h-6" />
 
                                       <KeyboardArrowRightRoundedIcon className="absolute top-2 right-0" />
                                       <ListItemText
@@ -575,7 +892,7 @@ function SideBar() {
                                   mr: 1,
                                 }}
                               >
-                                <ApartmentTwoToneIcon className="w-6 h-6" />
+                                <EmojiTransportationIcon className="w-6 h-6" />
                               </ListItemIcon>
                               {!isCollapsed && (
                                 <ListItemText
@@ -985,6 +1302,282 @@ function SideBar() {
                         </ul>
                       </List>
                     </Collapse>
+
+                    {/* Parking Slot menu */}
+                    {isCollapsed ? (
+                      <>
+                        <PopupState variant="popover" popupId="demoPopover">
+                          {(popupState) => (
+                            <div>
+                              <ListItemButton
+                                {...bindHover(popupState)}
+                                sx={{
+                                  borderRadius: "10px",
+                                  color: "#424242",
+                                  ...((isSlotListPage ||
+                                    isSlotCreatePage) &&
+                                    listItemButtonStyle),
+                                  mt: "5px",
+                                }}
+                                selected={
+                                  isSlotOpen
+                                    ? isSlotListPage || isSlotCreatePage
+                                    : isSlotListPage || isSlotCreatePage
+                                }
+                              >
+                                <ListItemIcon
+                                  sx={{
+                                    minWidth: 0,
+                                  }}
+                                  className={`
+                                flex flex-col justify-center items-center w-full
+                              `}
+                                >
+                                   <CarRepairIcon className="w-6 h-6" /> 
+                                 <KeyboardArrowRightRoundedIcon className="absolute top-2 right-0" />
+                                  <ListItemText
+                                    secondary={
+                                      <Typography
+                                        component="span"
+                                        variant="caption"
+                                        sx={{
+                                          color: "#424242",
+                                          display: "inline",
+                                          textWrap: "nowrap",
+                                        }}
+                                      >
+                                        {t("parkingslot")}
+                                      </Typography>
+                                    }
+                                  />
+                                </ListItemIcon>
+                              </ListItemButton>
+                              <HoverPopover
+                                {...bindPopover(popupState)}
+                                slotProps={{
+                                  paper: {
+                                    style: {
+                                      padding: 10,
+                                      backgroundColor: "transparent",
+                                      boxShadow: "none",
+                                    },
+                                  },
+                                }}
+                                anchorOrigin={{
+                                  vertical: "center",
+                                  horizontal: "right",
+                                }}
+                                transformOrigin={{
+                                  vertical: "center",
+                                  horizontal: "left",
+                                }}
+                              >
+                                <List
+                                  component="div"
+                                  disablePadding
+                                  dense={true}
+                                  sx={{
+                                    minWidth: 0,
+                                    width: "200px",
+                                    padding: "5px",
+                                    borderRadius: "10px",
+                                    background:
+                                      "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
+                                    boxShadow:
+                                      "0px 0px 15px rgba(0, 0, 0, 0.15)",
+                                  }}
+                                >
+                                  <ListItemButton
+                                    sx={{
+                                      borderRadius: "6px",
+                                      color: "#424242",
+                                      mb: "5px",
+                                    }}
+                                    onClick={() => {
+                                      if (
+                                        location.pathname !== "/dash/slots"
+                                      ) {
+                                        popupState.close();
+                                      }
+                                      navigate("/dash/slots");
+                                    }}
+                                    selected={
+                                      location.pathname === "/dash/slots"
+                                    }
+                                  >
+                                    <ListItemText
+                                      primary={
+                                        <Typography
+                                          component="span"
+                                          variant="body1"
+                                          sx={{
+                                            color: "#424242",
+                                            display: "inline",
+                                          }}
+                                        >
+                                          {t("list")}
+                                        </Typography>
+                                      }
+                                    />
+                                  </ListItemButton>
+
+                                  <ListItemButton
+                                    sx={{
+                                      borderRadius: "6px",
+                                      color: "#424242",
+                                    }}
+                                    onClick={() => {
+                                      if (
+                                        location.pathname !==
+                                        "/dash/slots/new"
+                                      ) {
+                                        popupState.close();
+                                      }
+                                      navigate("/dash/slots/new");
+                                    }}
+                                    selected={
+                                      location.pathname === "/dash/slots/new"
+                                    }
+                                  >
+                                    <ListItemText
+                                      primary={
+                                        <Typography
+                                          component="span"
+                                          variant="body1"
+                                          sx={{
+                                            color: "#424242",
+                                            display: "inline",
+                                          }}
+                                        >
+                                          {t("create")}
+                                        </Typography>
+                                      }
+                                    />
+                                  </ListItemButton>
+                                </List>
+                              </HoverPopover>
+                            </div>
+                          )}
+                        </PopupState>
+                      </>
+                    ) : (
+                      <>
+                        <ListItemButton
+                          sx={{
+                            borderRadius: "10px",
+                            color: "#424242",
+                            ...((isSlotListPage || isSlotCreatePage) &&
+                              listItemButtonStyle),
+                            mt: "5px",
+                          }}
+                          selected={
+                            isSlotOpen
+                              ? isSlotOpen
+                              : isSlotListPage || isSlotCreatePage
+                          }
+                          onClick={() => setIsSlotOpen(!isSlotOpen)}
+                        >
+                          <ListItemIcon
+                            sx={{
+                              minWidth: 0,
+                              mr: 1,
+                            }}
+                          >
+                            <CarRepairIcon className="w-6 h-6" />
+                          </ListItemIcon>
+
+                          <ListItemText
+                            primary={
+                              <Typography
+                                component="span"
+                                variant="body1"
+                                sx={{ color: "#424242", display: "inline" }}
+                              >
+                                {t("parkingslot")}
+                              </Typography>
+                            }
+                          />
+
+                          {isSlotOpen ? (
+                             <IoIosArrowDown />
+                          ) : (
+                            <IoIosArrowForward />
+                          )}
+                        </ListItemButton>
+                      </>
+                    )}
+
+                    <Collapse in={isCollapsed ? !isCollapsed : isSlotOpen}>
+                      <List
+                        component="div"
+                        disablePadding
+                        sx={{ pt: 1 }}
+                        dense={true}
+                      >
+                        <ul className="ml-6 pl-[12px]">
+                          <div className="absolute h-[60px] border-l-[2px] bg-primary left-6 top-0"></div>
+                          <li>
+                            <img
+                              src="/images/nav_sublist.svg"
+                              alt="sub_list_img"
+                              className="absolute top-[6px] left-6 h-[30px] w-[14px]"
+                            />
+                            <ListItemButton
+                              sx={{
+                                borderRadius: "10px",
+                                color: "#424242",
+                                mb: "5px",
+                              }}
+                              onClick={() => navigate("/dash/slots")}
+                              selected={location.pathname === "/dash/slots"}
+                            >
+                              <ListItemText
+                                primary={
+                                  <Typography
+                                    component="span"
+                                    variant="body1"
+                                    sx={{ color: "#424242", display: "inline" }}
+                                  >
+                                    {t("list")}
+                                  </Typography>
+                                }
+                              />
+                            </ListItemButton>
+                          </li>
+                          <li>
+                            <img
+                              src="/images/nav_sublist.svg"
+                              alt="sub_list_img"
+                              className="absolute top-[55px] left-6 h-[14px] w-[14px]"
+                            />
+                            <ListItemButton
+                              sx={{
+                                borderRadius: "10px",
+                                color: "#424242",
+                                mb: "5px",
+                              }}
+                              onClick={() => navigate("/dash/slots/new")}
+                              selected={
+                                location.pathname === "/dash/slots/new"
+                              }
+                            >
+                              <ListItemText
+                                primary={
+                                  <Typography
+                                    component="span"
+                                    variant="body1"
+                                    sx={{ color: "#424242", display: "inline" }}
+                                  >
+                                    {t("create")}
+                                  </Typography>
+                                }
+                              />
+                            </ListItemButton>
+                          </li>
+                        </ul>
+                      </List>
+                    </Collapse>
+
 
                     {/* Vehicle Menu */}
                     {isCollapsed ? (

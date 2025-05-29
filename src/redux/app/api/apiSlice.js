@@ -67,6 +67,7 @@ export const apiSlice = createApi({
     "SignUpMethod",
     "Site",
     "ParkingDetail",
+    // "slot"
   ],
   endpoints: (builder) => ({}),
 });

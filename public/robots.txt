@@ -6,6 +6,6 @@ Disallow: /forgot-password
 Disallow: /reset-password
 Disallow: /reset-password
 Allow: /unauthorize
-Craw-delay: 10
+Crawl-delay: 10
 
 Sitemap: https://www.sps.iot.npic.edu.kh/sitemap.xml

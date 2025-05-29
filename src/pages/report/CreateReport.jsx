@@ -3,7 +3,7 @@ import React from 'react'
 function CreateReport() {
   return (
     <div>
-      Create Report
+      create report
     </div>
   )
 }

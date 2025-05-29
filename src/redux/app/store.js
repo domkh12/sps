@@ -15,7 +15,7 @@ import siteTypeReducer from "../feature/siteType/siteTypeSlice.js";
 import mapViewReducer from "../feature/mapView/mapViewSlice.js";
 import analysisReducer from "../feature/analysis/analysisSlice.js";
 import appReducer from "../feature/app/appSlice.js";
-
+// import slotReducer from "../feature/slot/slotSlice.js"
 const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,
@@ -33,6 +33,7 @@ const store = configureStore({
     mapView: mapViewReducer,
     analysis: analysisReducer,
     app: appReducer,
+    // slot:slotReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

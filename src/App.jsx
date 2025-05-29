@@ -1,10 +1,14 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
 import { createTheme, ThemeProvider, useMediaQuery } from "@mui/material";
 import Aos from "aos";
 import "aos/dist/aos.css";
-import RequireAuth from "./pages/auth/RequireAuth.jsx";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { ROLES } from "./config/roles.js";
+import RequireAuth from "./pages/auth/RequireAuth.jsx";
+import EditCompany from "./pages/company/EditCompany.jsx";
+import ViewCompany from "./pages/company/ViewCompany.jsx";
+
+const ParkingView = lazy(() => import("./pages/parking/ParkingView.jsx"));
 const HistoryList = lazy(() => import("./pages/history/HistoryList.jsx"));
 const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword.jsx"));
 const ResetPassword = lazy(() => import("./pages/auth/ResetPassword.jsx"));
@@ -46,6 +50,16 @@ const TestComponent = lazy(() => import("./components/TestComponent.jsx"));
 const ReportList = lazy(() => import("./pages/report/ReportList.jsx"));
 const CreateReport = lazy(() => import("./pages/report/CreateReport.jsx"));
 
+const SlotList =lazy (()=> import ("./pages/slot/SlotList.jsx"));
+const AddNewSlot =lazy(()=>import("./pages/slot/AddNewSlot.jsx"));
+const SlotEditeForm=lazy (()=> import ("./pages/slot/SlotEditeForm.jsx"));
+const SlotView=lazy(()=>import ("./pages/slot/SlotView.jsx"));
+const SlotDetail =lazy (()=> import ("./pages/slot/SlotDetail.jsx"));
+
+
+const AddCompany =lazy (()=>import ("./pages/company/AddCompany.jsx"));
+const ListCompany =lazy(()=>import("./pages/company/ListCompany.jsx"));
+// const ViewCompany =lazy (()=>import("./pages/company/ViewCompany.jsx"));
 function App() {
   const theme = createTheme({
     typography: {
@@ -114,6 +128,22 @@ function App() {
                       <Route path=":id" element={<EditUser />} />
                       <Route path=":id/view" element={<ViewUser />} />
                     </Route>
+
+                  </Route>
+
+                    
+                    <Route path="companys">
+                    <Route index element={<ListCompany/>} />
+
+                    <Route
+                      element={
+                        <RequireAuth allowedRoles={[ROLES.ROLE_MANAGER]} />
+                      }
+                    >
+                      <Route path="new" element={<AddCompany/>} />
+                      <Route path=":id" element={<EditCompany />} />
+                      <Route path=":id/view" element={<ViewCompany/>} />
+                    </Route>
                   </Route>
 
                   <Route path="vehicles">
@@ -141,9 +171,28 @@ function App() {
                     >
                       <Route path="new" element={<AddNewParking />} />
                       <Route path=":id" element={<ParkingEdit />} />
+                      <Route path=":id/view" element={<ParkingView/>} />
                     </Route>
                   </Route>
 
+
+                      {/* Path slot */}
+                  
+                      <Route path="slots">
+                    <Route index element={<SlotList/>} />
+
+                    <Route
+                      element={
+                        <RequireAuth allowedRoles={[ROLES.ROLE_MANAGER]} />
+                      }
+                    >
+                      <Route path="new" element={<AddNewSlot/>} />
+                      <Route path=":id" element={<SlotEditeForm />} />
+                      <Route path=":id/view" element={<SlotView/>} />
+                    </Route>
+                  </Route>
+
+                      
                   <Route path="reports">
                     <Route index element={<ReportList />} />
                     <Route path="new" element={<CreateReport />} />
@@ -163,7 +212,7 @@ function App() {
                       <Route path="new" element={<AddNewBranch />} />
                       <Route path=":id" element={<EditBranch />} />
                     </Route>
-                  </Route>
+                  </Route>  
                 </Route>
                 {/* End dash */}
               </Route>

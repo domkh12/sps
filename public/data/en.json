@@ -118,5 +118,17 @@
   "confirmPasswordIsRequired" : "Confirm password is required",
   "passwordIsRequired" : "Password is required",
   "overview": "Overview",
-  "management": "Management"
+  "management": "Management",
+  "parkingslot" :"parkingslot",
+  "companyname":"CompanyName",
+  "companytype":"CompanyType",
+  "newcompany":"NewCompany",
+  "createat":"Create At",
+  "slotname":"SlotName",
+  "slotid":"SlotID",
+  "createby":"Create By",
+  "slot":"Slot",
+  "newslot":"NewSlot",
+  "addslot":"AddSlot"
+ 
 }

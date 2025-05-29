@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import EditButtonComponent from "./EditButtonComponent";
 import MoreActionComponent from "./MoreActionComponent";
-import { FaPen, FaTrashCan } from "react-icons/fa6";
+import { FaEye, FaPen, FaTrashCan } from "react-icons/fa6";
 import {
   setIdUserToDelete,
   setIsOpenQuickEdit,
@@ -141,13 +141,18 @@ function UserRowComponent({ userId, user }) {
 
   if (user) {
     var handleEdit = () => navigate(`/dash/users/${userId}`);
-    // var handleView = () => navigate(`/dash/users/${userId}/view`);
+    var handleView = () => navigate(`/dash/users/${userId}/view`);
 
     var menuActions = [
       {
         label: "Edit",
         icon: <FaPen className="w-5 h-5" />,
         onClick: handleEdit,
+      },
+      {
+        label: "View",
+        icon: <FaEye className="w-5 h-5" />,
+        onClick: handleView,
       },
       {
         label: "Delete",

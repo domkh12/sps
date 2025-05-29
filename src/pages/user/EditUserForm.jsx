@@ -320,7 +320,7 @@ function EditUserForm({ user }) {
     content = (
       <div data-aos="fade-left">
         <SeoComponent title={"Create a new user"} />
-        <MainHeaderComponent
+        <MainHeaderCo mponent
           breadcrumbs={breadcrumbs}
           title={t("edit")}
           handleBackClick={() => navigate("/dash/users")}

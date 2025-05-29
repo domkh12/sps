@@ -1,18 +1,28 @@
-import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import { selectUserById } from "../../redux/feature/users/userApiSlice";
-
-import ViewDetailUser from "./ViewDetailUser";
+import React from 'react'
+import { useParams } from 'react-router-dom'
+import { useGetUsersQuery } from '../../redux/feature/users/userApiSlice';
+import LoadingFetchingDataComponent from '../../components/LoadingFetchingDataComponent';
+import ViewDetailUser from './ViewDetailUser';
 
 function ViewUser() {
-  const { id } = useParams();
-  const user = useSelector((state) => selectUserById(state, id));
-  console.log("user", user);
-  if (!user) {
-    return <p>Not Available</p>;
-  } else if (user) {
-    return <ViewDetailUser user={user} />;
+  const { id }= useParams() 
+
+   const { user } = useGetUsersQuery("usersList", {
+     selectFromResult: ({ data }) => ({
+       user: data?.entities[id],
+     }),
+   });   
+
+   let content;
+ 
+  
+   if (!user) {
+    content = <LoadingFetchingDataComponent />;
   }
+
+  content = <ViewDetailUser user={user} />;
+
+  return content;
 }
 
-export default ViewUser;
+export default ViewUser
