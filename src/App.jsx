@@ -1,7 +1,7 @@
-import { createTheme, ThemeProvider, useMediaQuery } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material";
 import Aos from "aos";
 import "aos/dist/aos.css";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ROLES } from "./config/roles.js";
 import RequireAuth from "./pages/auth/RequireAuth.jsx";
@@ -131,15 +131,13 @@ function App() {
 
                   </Route>
 
-                    
-                    <Route path="companys">
-                    <Route index element={<ListCompany/>} />
-
-                    <Route
+                  <Route
                       element={
                         <RequireAuth allowedRoles={[ROLES.ROLE_MANAGER]} />
                       }
-                    >
+                  >
+                    <Route path="companies">
+                    <Route index element={<ListCompany/>} />
                       <Route path="new" element={<AddCompany/>} />
                       <Route path=":id" element={<EditCompany />} />
                       <Route path=":id/view" element={<ViewCompany/>} />

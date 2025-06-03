@@ -313,7 +313,7 @@ function ListCompany() {
           breadcrumbs={breadcrumbs}
           title={t("list")}
           btnTitle={t("newCompany")}
-          onClick={() => navigate("/dash/companys/new")}
+          onClick={() => navigate("/dash/companies/new")}
         />
 
         <div>
