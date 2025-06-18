@@ -69,27 +69,14 @@ function stringAvatar(name) {
   };
 }
 
-function CompanyRowComponent({ siteId, site }) {
+function CompanyRowComponent({ companyId, company }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  if (site) {
-    const dateObj = new Date(site.createdAt);
-    var { formattedDateDDMMYYYYNoZeros } = useDateFormatter(
-      new Date(site.createdAt)
-    );
-    var formattedTime = dateObj.toLocaleTimeString("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-
-    const handleDelete = () => {
-      dispatch(setIsOpenConfirmDelete(true));
-      dispatch(setIdSiteToDelete(site.uuid));
-    };
-    var handleEdit = () => navigate(`/dash/branches/${siteId}`);
-    var handleView = () => navigate(`/dash/branches/${siteId}/view`);
+  if (company) {
+    const handleDelete = () => {};
+    var handleEdit = () => navigate(`/dash/companies/${companyId}`);
+    var handleView = () => navigate(`/dash/companies/${companyId}/view`);
 
     var menuActions = [
       {
@@ -121,9 +108,9 @@ function CompanyRowComponent({ siteId, site }) {
           <List sx={{ padding: "0" }}>
             <ListItem sx={{ padding: "0", gap: "10px" }}>
               <Avatar
-                alt={site?.siteName}
-                src={site?.image}
-                {...stringAvatar(site?.siteName)}
+                alt={company?.companyName}
+                src={company?.image}
+                {...stringAvatar(company?.companyName)}
                 sx={{
                   "& .MuiAvatar-img": {
                     objectFit: "contain",
@@ -134,7 +121,7 @@ function CompanyRowComponent({ siteId, site }) {
                 primary={
                   (
                     <Link className="hover:underline" to={"/dash"}>
-                      {site?.siteName}
+                      {company?.companyName}
                     </Link>
                   ) || "N/A"
                 }
@@ -144,28 +131,7 @@ function CompanyRowComponent({ siteId, site }) {
         </TableCell>
 
         <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          {site.company?.companyName}
-        </TableCell>
-
-        <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          {site.siteType?.name}
-        </TableCell>
-
-        <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          {site.city?.name}
-        </TableCell>
-
-        <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          {site?.siteAddress}
-        </TableCell>
-
-        <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          <Typography variant="body1">
-            {formattedDateDDMMYYYYNoZeros}
-          </Typography>
-          <Typography variant="body2" color="gray">
-            {formattedTime}
-          </Typography>
+          {company?.createdAt || "N/A"}
         </TableCell>
 
         <TableCell
@@ -177,8 +143,8 @@ function CompanyRowComponent({ siteId, site }) {
           <div className="flex justify-center items-center">
             <EditButtonComponent
               handleQuickEdit={() => {
-                dispatch(setIsQuickEditBranchOpen(true));
-                dispatch(setBranchForQuickEdit(site));
+                // dispatch(setIsQuickEditBranchOpen(true));
+                // dispatch(setBranchForQuickEdit(site));
               }}
             />
             <MoreActionComponent menuItems={menuActions} />
