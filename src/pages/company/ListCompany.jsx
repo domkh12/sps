@@ -21,29 +21,30 @@ import {
   useFilterSitesQuery,
   useGetSitesQuery,
 } from "../../redux/feature/site/siteApiSlice";
-import BranchRowComponent from "../../components/BranchRowComponent";
 import { useEffect, useState } from "react";
 import QuickEditBranchComponent from "../../components/QuickEditBranchComponent";
 import FilterBarComponent from "../../components/FilterBarComponent";
-import { useGetAllCitiesMutation } from "../../redux/feature/city/cityApiSlice";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
+<<<<<<< HEAD
 import {useGetAllCompaniesMutation, useGetCompanyQuery} from "../../redux/feature/company/companyApiSlice";
 import { setCityFilter } from "../../redux/feature/city/citySlice";
+=======
+import { useGetCompanyQuery } from "../../redux/feature/company/companyApiSlice";
+>>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
 import {
-  setBranchTypeFilter,
+ 
   setClearBranchFilter,
   setPageNoBranch,
   setPageSizeBranch,
   setSearchKeywords,
 } from "../../redux/feature/site/siteSlice";
-import {
-  setClearCompanyFilter,
-  setCompanyFilter,
-} from "../../redux/feature/company/companySlice";
-import { useGetAllSiteTypesMutation } from "../../redux/feature/siteType/siteTypeApiSlice";
 import DataNotFound from "../../components/DataNotFound";
 import FilterChipsComponent from "../../components/FilterChipsComponent";
+<<<<<<< HEAD
 import CompanyRowComponent from "../../components/CompanyRowComponent.jsx";
+=======
+import CompanyRowComponent from "../../components/CompanyRowComponent";
+>>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
 
 function ListCompany() {
   const navigate = useNavigate();
@@ -55,6 +56,10 @@ function ListCompany() {
   const pageSize = useSelector((state) => state.sites.pageSize);
   const [searchTerm, setSearchTerm] = useState("");
   const cityFilter = useSelector((state) => state.city.cityFilter);
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
   const companyFilter = useSelector((state) => state.companies.companyFilter);
   const branchTypeFilter = useSelector((state) => state.sites.branchTypeFilter);
   const searchKeywords = useSelector((state) => state.sites.searchKeywords);
@@ -111,6 +116,13 @@ function ListCompany() {
 
   const columns = [
     { id: "companyName", label: t("companyname"), minWidth: 230, align: "left" },
+<<<<<<< HEAD
+=======
+    { id: "companyType", label: t("companyType"), minWidth: 230, align: "left" },
+    { id: "branchQty", label: t("branchQty"), minWidth: 150, align: "left" },
+    { id: "city", label: t("city"), minWidth: 150, align: "left" },
+    { id: "address", label: t("address"), minWidth: 150, align: "left" },
+>>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
     {
       id: "createdAt",
       label: t("createdAt"),
@@ -131,6 +143,11 @@ function ListCompany() {
     dispatch(setSearchKeywords(keyword));
   };
 
+<<<<<<< HEAD
+=======
+ 
+
+>>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
   const handleChangePage = (event, newPage) => {
     dispatch(setPageNoBranch(newPage + 1));
   };
@@ -148,7 +165,11 @@ function ListCompany() {
     content = <p>Error: {error?.message}</p>;
   }
 
+<<<<<<< HEAD
   if (isSuccess) {
+=======
+  if (isSuccess ) {
+>>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
     const { ids, entities, totalElements, pageSize, pageNo } = companies;
 
     const {
@@ -186,11 +207,19 @@ function ListCompany() {
         <>
           {ids?.length ? (
             ids?.map((companyId) => (
+<<<<<<< HEAD
                 <CompanyRowComponent
                     key={companyId}
                     companyId={companyId}
                     company={entities[companyId]}
                 />
+=======
+              <CompanyRowComponent
+                key={companyId}
+                companyId={companyId}
+                company={entities[companyId]}
+              />
+>>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
             ))
           ) : (
             <TableRow sx={{ bgcolor: "#f9fafb" }}>
@@ -218,15 +247,27 @@ function ListCompany() {
               showTabs={false}
               searchQuery={searchKeywords}
               handleSearchChange={handleSearchChange}
+<<<<<<< HEAD
             />
 
             <FilterChipsComponent
+=======
+              
+            />
+
+            <FilterChipsComponent
+             
+>>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
               searchQuery={searchKeywords}
               clearSearch={() => dispatch(setSearchKeywords(""))}
               handleSearchChange={handleSearchChange}
               clearFilter={() => dispatch(setClearBranchFilter())}
               isFiltered={
+<<<<<<< HEAD
                 searchKeywords !== ""
+=======
+                searchKeywords !== "" 
+>>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
               }
             />
 

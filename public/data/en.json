@@ -121,7 +121,7 @@
   "management": "Management",
   "parkingslot" :"parkingslot",
   "companyname":"CompanyName",
-  "companytype":"CompanyType",
+  "companyType":"CompanyType",
   "newcompany":"NewCompany",
   "createat":"Create At",
   "slotname":"SlotName",
@@ -129,6 +129,7 @@
   "createby":"Create By",
   "slot":"Slot",
   "newslot":"NewSlot",
-  "addslot":"AddSlot"
+  "addslot":"AddSlot",
+  "branchQty": "Branch quantity"
  
 }
