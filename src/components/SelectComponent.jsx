@@ -34,7 +34,7 @@ const SelectComponent = ({
         let initialValues = [];
         let initialUUIDs = [];
         if (groupLabelKey) {
-          options.forEach((group) => {
+          options?.forEach((group) => {
             const items = group[itemsLabelKey] || [];
             items.forEach((item) => {
               if (selectFistValue.includes(item.uuid)) {
@@ -57,7 +57,7 @@ const SelectComponent = ({
       let initialUUIDs = [];
 
       if (groupLabelKey) {
-        options.forEach((group) => {
+        options?.forEach((group) => {
           const items = group[itemsLabelKey] || [];
           items.forEach((item) => {
             if (value.includes(item.uuid)) {
@@ -130,7 +130,7 @@ const SelectComponent = ({
     let menuItems = [];
 
     if (!groupLabelKey) {
-      menuItems = options.map((option) => (
+      menuItems = options?.map((option) => (
         <MenuItem
           key={option.uuid}
           value={option[optionLabelKey]}

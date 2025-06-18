@@ -7,6 +7,9 @@ import { vehicleApiSlice } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { sitesApiSlice } from "../../redux/feature/site/siteApiSlice";
 import { parkingApiSlice } from "../../redux/feature/parking/parkingApiSlice";
 import { parkingDetailApiSlice } from "../../redux/feature/parking/parkingDetailApiSlice";
+import { companiesApiSlice } from "../../redux/feature/company/companyApiSlice";
+import { cityApiSlice } from "../../redux/feature/city/cityApiSlice";
+
 
 function Prefetch() {
   const { isManager, isAdmin } = useAuth();
@@ -16,6 +19,14 @@ function Prefetch() {
       store.dispatch(
         sitesApiSlice.util.prefetch("getSites", "sitesList", { force: true })
       );
+      store.dispatch(
+        companiesApiSlice.util.prefetch("getCompany","companiesList", {
+          force: true,
+        }
+      ));
+      store.dispatch(
+        cityApiSlice.util.prefetch("getAllCities", "citiesList", {force: true }
+      ))
     }
 
     if (isManager || isAdmin) {
