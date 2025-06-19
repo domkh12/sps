@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useState } from "react";
 import SeoComponent from "../../components/SeoComponent";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
 import { Card, Grid2, TextField, Typography } from "@mui/material";
@@ -10,26 +10,20 @@ import ProfileUploadComponent from "../../components/ProfileUploadComponent";
 import { Form, Formik } from "formik";
 import SelectSingleComponent from "../../components/SelectSingleComponent";
 import ButtonComponent from "../../components/ButtonComponent";
-import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice";
 import LoadingFetchingDataComponent from "./../../components/LoadingFetchingDataComponent";
 import { useDispatch, useSelector } from "react-redux";
-import { useGetAllCitiesMutation } from "../../redux/feature/city/cityApiSlice";
-import { useGetAllSiteTypesMutation } from "../../redux/feature/siteType/siteTypeApiSlice";
+import { useGetAllCitiesQuery } from "../../redux/feature/city/cityApiSlice";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { useCreateNewSiteMutation } from "../../redux/feature/site/siteApiSlice";
-import {
-  setCaptionSnackBar,
-  setErrorSnackbar,
-  setIsOpenSnackBar,
-} from "../../redux/feature/actions/actionSlice";
+import {useGetCompanyTypeQuery} from "../../redux/feature/companyType/CompanyTypeApiSlice.jsx";
 
 function AddCompany() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [profileImageFile, setProfileImageFile] = useState(null);
-  const companiesFetchedData = useSelector(
-    (state) => state.companies.companiesData
-  );
+  const {data:cityName, isSuccess}= useGetAllCitiesQuery("citiesList");
+  const {data:companyTypeData, isSuccess: isSuccessCompanyType} = useGetCompanyTypeQuery("companyTypeList");
+  console.log("companyTypeData", companyTypeData);
   const citiesFetchedData = useSelector((state) => state.city.cityData);
   const siteTypesFetchedData = useSelector(
     (state) => state.siteType.siteTypeData
@@ -41,107 +35,14 @@ function AddCompany() {
   const [uploadImage] = useUploadImageMutation();
 
   const [
-    createNewSite,
+    createCompany,
     {
-      isSuccess: isSuccessCreateNewSite,
-      isLoading: isLoadingCreateNewSite,
-      isError: isErrorCreateNewSite,
-      error: errorCreateNewSite,
+      isSuccess: isSuccessCreateCompany,
+      isLoading: isLoadingCreateCompany,
+      isError: isErrorCreateCompany,
+      error: errorCreateCompany,
     },
   ] = useCreateNewSiteMutation();
-
-  const [
-    getAllSiteTypes,
-    {
-      isSuccess: isSuccessGetAllSiteTypes,
-      isLoading: isLoadingGetAllSiteTypes,
-      isError: isErrorGetAllSiteTypes,
-      error: errorGetAllSiteType,
-    },
-  ] = useGetAllSiteTypesMutation();
-
-  const [
-    getAllCompanies,
-    {
-      isSuccess: isSuccessGetAllCompanies,
-      isLoading: isLoadingGetAllCompanies,
-      isError: isErrorGetAllCompanies,
-      error: errorGetAllCompanies,
-    },
-  ] = useGetAllCompaniesMutation();
-
-  const [
-    getAllCities,
-    {
-      isSuccess: isSuccessGetAllCities,
-      isLoading: isLoadingGetAllCities,
-      isError: isErrorGetAllCities,
-      error: errorGetAllCities,
-    },
-  ] = useGetAllCitiesMutation();
-
-  useEffect(() => {
-    if (isErrorGetAllCompanies) {
-      setError(errorGetAllCompanies);
-    } else if (isErrorGetAllCities) {
-      setError(errorGetAllCities);
-    } else if (isErrorGetAllSiteTypes) {
-      setError(errorGetAllSiteType);
-    }
-  }, [
-    isErrorGetAllCompanies,
-    isErrorGetAllCities,
-    isErrorGetAllSiteTypes,
-    errorGetAllCities,
-    errorGetAllCompanies,
-    errorGetAllSiteType,
-  ]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        await Promise.all([
-          getAllCompanies(),
-          getAllCities(),
-          getAllSiteTypes(),
-        ]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    if (isSuccessGetAllCompanies) {
-      navigate("/dash/companys");
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setCaptionSnackBar(t("createSuccess")));
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
-    }
-  }, [isSuccessCreateNewSite, navigate]);
-
-  useEffect(() => {
-    if (isErrorCreateNewSite) {
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setErrorSnackbar(true));
-      dispatch(
-        setCaptionSnackBar(`${errorCreateNewSite?.data?.error?.description}`)
-      );
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
-
-      setTimeout(() => {
-        dispatch(setErrorSnackbar(false));
-      }, 3500);
-    }
-  }, [isErrorCreateNewSite]);
 
   const validationSchema = Yup.object().shape({
     siteName: Yup.string().required(t("branchNameIsRequired")),
@@ -178,7 +79,7 @@ function AddCompany() {
         profileImageUri = uploadResponse.uri;
       }
 
-      await createNewSite({
+      await createCompany({
         siteName: values.siteName,
         siteAddress: values.branchAddress,
         image: profileImageUri,
@@ -187,6 +88,7 @@ function AddCompany() {
         companyUuid: values.companyId,
       });
     } catch (error) {
+      console.error("Error creating company:", error);
     } finally {
       setSubmitting(false);
     }
@@ -198,7 +100,7 @@ function AddCompany() {
 
   if (error) content = <p>Error : {error?.message}</p>;
 
-  if (!isLoading && !error && isSuccessGetAllCompanies) {
+  if (isSuccess) {
     content = (
       <>
         <div data-aos="fade-left">
@@ -325,7 +227,7 @@ function AddCompany() {
 
                           <SelectSingleComponent
                             label={t("city")}
-                            options={citiesFetchedData.data}
+                            options={cityName}
                             onChange={handleCityChange}
                             fullWidth={true}
                             // error={errors.cityId}
@@ -356,7 +258,7 @@ function AddCompany() {
                             btnTitle={t("newcompany")}
                             type={"submit"}
                             loadingCaption={t("creating")}
-                            isLoading={isLoadingCreateNewSite}
+                          //  isLoading={isLoadingCreateNewSite}
                           />
                         </div>
                       </Card>

@@ -1,23 +1,23 @@
 import { apiSlice } from "../../app/api/apiSlice";
-import { setCityData } from "./citySlice";
+
 
 export const cityApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getAllCities: builder.mutation({
+    getAllCities: builder.query({
       query: () => ({
         url: "/cities",
         method: "GET",
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setCityData({ data }));
-        } catch (error) {
-          console.log(error);
-        }
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [
+            { type: "CityName", id: "LIST" },
+            ...result.ids.map((id) => ({ type: "CityName", id })),
+          ];
+        } else return [{ type: "CityName", id: "LIST" }];
       },
     }),
   }),
 });
 
-export const { useGetAllCitiesMutation } = cityApiSlice;
+export const { useGetAllCitiesQuery } = cityApiSlice;
