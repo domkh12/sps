@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useGetAllCitiesQuery } from "../../redux/feature/city/cityApiSlice";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { useCreateNewSiteMutation } from "../../redux/feature/site/siteApiSlice";
-import {useGetCompanyTypeQuery} from "../../redux/feature/companyType/CompanyTypeApiSlice.jsx";
+import {useGetCompanyTypeQuery} from "../../redux/feature/companyType/CompanyTypeApiSlice.js";
 
 function AddCompany() {
   const navigate = useNavigate();

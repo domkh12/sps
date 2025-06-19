@@ -9,7 +9,7 @@ import { parkingApiSlice } from "../../redux/feature/parking/parkingApiSlice";
 import { parkingDetailApiSlice } from "../../redux/feature/parking/parkingDetailApiSlice";
 import { companiesApiSlice } from "../../redux/feature/company/companyApiSlice";
 import { cityApiSlice } from "../../redux/feature/city/cityApiSlice";
-import {companyTypeApiSlice} from "../../redux/feature/companyType/CompanyTypeApiSlice.jsx";
+import {companyTypeApiSlice} from "../../redux/feature/companyType/CompanyTypeApiSlice.js";
 
 
 function Prefetch() {

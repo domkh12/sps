@@ -8,7 +8,7 @@ const initialState = companyTypeAdapter.getInitialState();
 export const companyTypeApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getCompanyType: builder.query({
-            query: ({ pageNo = 1, pageSize = 5 }) => ({
+            query: () => ({
                 url: `/company-types`,
                 validateStatus: (response, result) => {
                     return response.status === 200 && !result.isError;
