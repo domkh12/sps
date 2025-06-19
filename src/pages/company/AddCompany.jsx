@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useState } from "react";
 import SeoComponent from "../../components/SeoComponent";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
 import { Card, Grid2, TextField, Typography } from "@mui/material";
@@ -10,25 +10,20 @@ import ProfileUploadComponent from "../../components/ProfileUploadComponent";
 import { Form, Formik } from "formik";
 import SelectSingleComponent from "../../components/SelectSingleComponent";
 import ButtonComponent from "../../components/ButtonComponent";
-import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice";
 import LoadingFetchingDataComponent from "./../../components/LoadingFetchingDataComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetAllCitiesQuery } from "../../redux/feature/city/cityApiSlice";
-import { useGetAllSiteTypesMutation } from "../../redux/feature/siteType/siteTypeApiSlice";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { useCreateNewSiteMutation } from "../../redux/feature/site/siteApiSlice";
-import {
-  setCaptionSnackBar,
-  setErrorSnackbar,
-  setIsOpenSnackBar,
-} from "../../redux/feature/actions/actionSlice";
+import {useGetCompanyTypeQuery} from "../../redux/feature/companyType/CompanyTypeApiSlice.jsx";
 
 function AddCompany() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [profileImageFile, setProfileImageFile] = useState(null);
   const {data:cityName, isSuccess}= useGetAllCitiesQuery("citiesList");
-  
+  const {data:companyTypeData, isSuccess: isSuccessCompanyType} = useGetCompanyTypeQuery("companyTypeList");
+  console.log("companyTypeData", companyTypeData);
   const citiesFetchedData = useSelector((state) => state.city.cityData);
   const siteTypesFetchedData = useSelector(
     (state) => state.siteType.siteTypeData

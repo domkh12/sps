@@ -69,23 +69,15 @@ function stringAvatar(name) {
   };
 }
 
-<<<<<<< HEAD
-function CompanyRowComponent({ companyId, company }) {
-=======
 function CompanyRowComponent({companyId, company }) {
->>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   if (company) {
-<<<<<<< HEAD
-    const handleDelete = () => {};
-=======
 
     const handleDelete = () => {
       
     };
->>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
     var handleEdit = () => navigate(`/dash/companies/${companyId}`);
     var handleView = () => navigate(`/dash/companies/${companyId}/view`);
 
@@ -156,15 +148,21 @@ function CompanyRowComponent({companyId, company }) {
           <TableCell sx={{ borderBottomStyle: "dashed" }}>
           {company?.companyAddress || "N/A"}
           </TableCell>
-       
-       
-        <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          {company?.createdAt || "N/A"}
-        </TableCell>
-<<<<<<< HEAD
-=======
 
->>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
+        <TableCell sx={{borderBottomStyle: "dashed"}}>
+          <Typography variant="body1">
+            {company.createdAt.substring(
+                0,
+                company.createdAt.lastIndexOf(" ")
+            )}
+          </Typography>
+          <Typography variant="body2" color="gray">
+            {company.createdAt.substring(
+                company.createdAt.lastIndexOf(" "),
+                company.createdAt.length
+            )}
+          </Typography>
+        </TableCell>
 
         <TableCell
           sx={{

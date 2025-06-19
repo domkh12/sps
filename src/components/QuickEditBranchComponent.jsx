@@ -6,7 +6,7 @@ import SelectSingleComponent from "./SelectSingleComponent";
 import * as Yup from "yup";
 import useTranslate from "../hook/useTranslate";
 import { useGetAllCompaniesMutation } from "../redux/feature/company/companyApiSlice";
-import { useGetAllCitiesMutation } from "../redux/feature/city/cityApiSlice";
+
 import { useGetAllSiteTypesMutation } from "../redux/feature/siteType/siteTypeApiSlice";
 import { useUpdateSiteMutation } from "../redux/feature/site/siteApiSlice";
 import { buttonStyleContained, buttonStyleOutlined } from "../assets/style";

@@ -1,10 +1,6 @@
 import { apiSlice } from "../../app/api/apiSlice";
 import { setCompaniesData } from "./companySlice";
-<<<<<<< HEAD
-import {createEntityAdapter} from "@reduxjs/toolkit";
-=======
 import { createEntityAdapter } from "@reduxjs/toolkit";
->>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
 
 const companiesAdapter = createEntityAdapter({});
 
@@ -12,10 +8,6 @@ const initialState = companiesAdapter.getInitialState();
 
 export const companiesApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-<<<<<<< HEAD
-=======
-
->>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
     getCompany: builder.query({
       query: ({ pageNo = 1, pageSize = 5 }) => ({
         url: `/companies?pageNo=${pageNo}&pageSize=${pageSize}`,
@@ -46,8 +38,6 @@ export const companiesApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
-<<<<<<< HEAD
-=======
      createCompany: builder.mutation({
       query: (initialState) => ({
         url: "/companies",
@@ -60,7 +50,6 @@ export const companiesApiSlice = apiSlice.injectEndpoints({
     }),
 
 
->>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
     getAllCompanies: builder.mutation({
       query: () => ({
         url: "/companies",
@@ -78,8 +67,4 @@ export const companiesApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-<<<<<<< HEAD
-export const { useGetAllCompaniesMutation, useGetCompanyQuery } = companiesApiSlice;
-=======
 export const { useGetAllCompaniesMutation , useGetCompanyQuery , useCreateCompanyMutation } = companiesApiSlice;
->>>>>>> 1850411fe91dbd7aa638d410c9ea6d3ecd53b085
