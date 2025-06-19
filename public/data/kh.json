@@ -110,7 +110,7 @@
   "sendRequest": "ដាក់ស្នើ",
   "returnToLogin": "ត្រឡប់ទៅកាន់ Login",
   "logout": "ចាកចេញ",
-  "report": "របាយការណ៍",
+  
   "timeInOut": "ពេលវេលា (ចូល - ចេញ)",
   "duration": "រយៈពេល",
   "status": "ស្ថានភាព",
@@ -128,6 +128,8 @@
   "createby":"អ្នកបង្កើត",
   "slot":"ចំណត",
   "newslot":"បន្ថែមចំណត",
-  "addslot":"បង្កើតចំណត"
+  "addslot":"បង្កើតចំណត",
+  "report":"របាយការណ៏"
+  
 
 }

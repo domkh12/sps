@@ -16,6 +16,7 @@ function Prefetch() {
       store.dispatch(
         sitesApiSlice.util.prefetch("getSites", "sitesList", { force: true })
       );
+      
     }
 
     if (isManager || isAdmin) {

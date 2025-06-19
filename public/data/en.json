@@ -111,7 +111,7 @@
   "sendRequest" : "Send request",
   "returnToLogin" : "Return to login",
   "logout": "Logout",
-  "report": "Report",
+
   "timeInOut" : "Time (In Out)",
   "duration": "Duration",
   "status": "Status",
@@ -129,6 +129,7 @@
   "createby":"Create By",
   "slot":"Slot",
   "newslot":"NewSlot",
-  "addslot":"AddSlot"
+  "addslot":"AddSlot",
+  "report":"report"
  
 }

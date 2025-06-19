@@ -307,11 +307,11 @@ function AddCompany() {
                             id="Address"
                             name="Address"
                             fullWidth
-                            value={values.branchAddress}
+                            //value={values.branchAddress}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             autoComplete="off"
-                            // error={
+                           // error={
                             //   errors.branchAddress && touched.branchAddress
                             // }
                             // helperText={
@@ -373,4 +373,4 @@ function AddCompany() {
   return content;
 }
 
-export default AddCompany;
+export default AddCompany; 
