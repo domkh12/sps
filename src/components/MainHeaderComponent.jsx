@@ -13,22 +13,26 @@ function MainHeaderComponent({
   return (
     <div className="pb-10 pt-1 flex flex-wrap justify-between items-center gap-5">
       <div className="flex flex-col gap-5">
-        <div className="relative">
-          {handleBackClick && (
-            <IconButton
+        <div>
+          {handleBackClick && (<IconButton
               aria-label="back"
               onClick={handleBackClick}
               size="small"
               disableRipple
-              sx={{ position: "absolute", top: "2px", left: "-20px" }}
-            >
-              <IoIosArrowBack className="text-gray-700"/>
-            </IconButton>
-          )}
-
-          <Typography variant="h5" sx={{ fontSize: "24px", fontWeight: "500" }}>
+              sx={{
+                backgroundColor: "transparent", "&:hover": {backgroundColor: "transparent"},
+                color: "#0A0A0A"
+              }}
+          >
+            <IoIosArrowBack className="text-gray-700"/>
+            <Typography variant="h5" sx={{fontSize: "24px", fontWeight: "500"}}>
+              {title}
+            </Typography>
+          </IconButton>)}
+          {!handleBackClick && (<Typography variant="h5" sx={{fontSize: "24px", fontWeight: "500"}}>
             {title}
-          </Typography>
+          </Typography>)}
+
         </div>
         <Breadcrumbs
           separator={

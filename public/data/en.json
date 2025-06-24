@@ -120,9 +120,9 @@
   "overview": "Overview",
   "management": "Management",
   "parkingslot" :"parkingslot",
-  "companyname":"CompanyName",
+  "companyName":"CompanyName",
   "companyType":"CompanyType",
-  "newcompany":"NewCompany",
+  "newcompany":"Create company",
   "createat":"Create At",
   "slotname":"SlotName",
   "slotid":"SlotID",
@@ -130,6 +130,11 @@
   "slot":"Slot",
   "newslot":"NewSlot",
   "addslot":"AddSlot",
-  "branchQty": "Branch quantity"
- 
+  "branchQty": "Branch quantity",
+  "establishedDate": "Established Date",
+  "companyNameIsRequired": "Company name is required",
+  "companyAddressIsRequired": "Company address is required",
+  "companyTypeIsRequired": "Company type is required",
+  "establishedDateIsRequired": "Established date is required",
+  "updateSuccess": "Update success"
 }

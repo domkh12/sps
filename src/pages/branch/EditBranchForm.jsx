@@ -15,7 +15,7 @@ import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadIm
 import { useDispatch, useSelector } from "react-redux";
 import { useGetAllSiteTypesMutation } from "../../redux/feature/siteType/siteTypeApiSlice";
 import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice";
-import { useGetAllCitiesMutation } from "../../redux/feature/city/cityApiSlice";
+import { useGetAllCitiesQuery } from "../../redux/feature/city/cityApiSlice";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import {
   setCaptionSnackBar,
@@ -31,7 +31,6 @@ function EditBranchForm({ branch }) {
   const companiesFetchedData = useSelector(
     (state) => state.companies.companiesData
   );
-  const citiesFetchedData = useSelector((state) => state.city.cityData);
   const siteTypesFetchedData = useSelector(
     (state) => state.siteType.siteTypeData
   );
@@ -67,15 +66,7 @@ function EditBranchForm({ branch }) {
     },
   ] = useGetAllCompaniesMutation();
 
-  const [
-    getAllCities,
-    {
-      isSuccess: isSuccessGetAllCities,
-      isLoading: isLoadingGetAllCities,
-      isError: isErrorGetAllCities,
-      error: errorGetAllCities,
-    },
-  ] = useGetAllCitiesMutation();
+  const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
 
   const [uploadImage] = useUploadImageMutation();
 
@@ -93,7 +84,6 @@ function EditBranchForm({ branch }) {
       try {
         await Promise.all([
           getAllCompanies(),
-          getAllCities(),
           getAllSiteTypes(),
         ]);
       } catch (error) {
@@ -300,7 +290,7 @@ function EditBranchForm({ branch }) {
 
                         <SelectSingleComponent
                           label={t("city")}
-                          options={citiesFetchedData.data}
+                          options={cityName}
                           onChange={handleCityChange}
                           fullWidth={true}
                           error={errors.cityId}

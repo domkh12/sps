@@ -38,7 +38,7 @@ export const companiesApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
-     createCompany: builder.mutation({
+    createCompany: builder.mutation({
       query: (initialState) => ({
         url: "/companies",
         method: "POST",
@@ -49,22 +49,39 @@ export const companiesApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: "Company", id: "LIST" }],
     }),
 
+    updateCompany: builder.mutation({
+      query: ({uuid, ...initialCompanyData}) => ({
+        url: `/companies/${uuid}`,
+        method: "PUT",
+        body: {
+          ...initialCompanyData,
+        },
+      }),
+      invalidatesTags: [{type: "Company", id: "LIST"}],
+    }),
 
-    getAllCompanies: builder.mutation({
+    getAllCompanies: builder.query({
       query: () => ({
-        url: "/companies",
+        url: "/companies/names",
         method: "GET",
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setCompaniesData({ data }));
-        } catch (error) {
-          console.log(error);
-        }
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "CompanyName", id: "LIST"}, ...result.ids.map((id) => ({type: "CompanyName", id})),];
+        } else return [{type: "CompanyName", id: "LIST"}];
       },
     }),
+
+    getCompanyByUuid: builder.query({
+      query: (uuid) => `companies/${uuid}`,
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "CompanyByUuid", id: "LIST"}, ...result.ids.map((id) => ({type: "CompanyByUuid", id})),];
+        } else return [{type: "CompanyByUuid", id: "LIST"}];
+      },
+    })
+
   }),
 });
 
-export const { useGetAllCompaniesMutation , useGetCompanyQuery , useCreateCompanyMutation } = companiesApiSlice;
+export const { useGetAllCompaniesQuery , useGetCompanyQuery , useCreateCompanyMutation, useGetCompanyByUuidQuery, useUpdateCompanyMutation } = companiesApiSlice;

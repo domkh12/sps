@@ -98,7 +98,7 @@ export const sitesApiSlice = apiSlice.injectEndpoints({
           ...initialState,
         },
       }),
-      invalidatesTags: [{ type: "Site", id: "LIST" }],
+      invalidatesTags: [{ type: "Site", id: "LIST" },{ type: "Company", id: "LIST"}],
     }),
 
     updateSite: builder.mutation({

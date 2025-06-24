@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SeoComponent from "../../components/SeoComponent";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
 import { Card, Grid2, TextField, Typography } from "@mui/material";
@@ -10,10 +10,9 @@ import ProfileUploadComponent from "../../components/ProfileUploadComponent";
 import { Form, Formik } from "formik";
 import SelectSingleComponent from "../../components/SelectSingleComponent";
 import ButtonComponent from "../../components/ButtonComponent";
-import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice";
 import LoadingFetchingDataComponent from "./../../components/LoadingFetchingDataComponent";
 import { useDispatch, useSelector } from "react-redux";
-import { useGetAllCitiesMutation } from "../../redux/feature/city/cityApiSlice";
+import {useGetAllCitiesQuery} from "../../redux/feature/city/cityApiSlice";
 import { useGetAllSiteTypesMutation } from "../../redux/feature/siteType/siteTypeApiSlice";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { useCreateNewSiteMutation } from "../../redux/feature/site/siteApiSlice";
@@ -22,14 +21,12 @@ import {
   setErrorSnackbar,
   setIsOpenSnackBar,
 } from "../../redux/feature/actions/actionSlice";
+import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
 
 function AddNewBranch() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [profileImageFile, setProfileImageFile] = useState(null);
-  const companiesFetchedData = useSelector(
-    (state) => state.companies.companiesData
-  );
   const citiesFetchedData = useSelector((state) => state.city.cityData);
   const siteTypesFetchedData = useSelector(
     (state) => state.siteType.siteTypeData
@@ -39,7 +36,8 @@ function AddNewBranch() {
   const [error, setError] = useState(null);
 
   const [uploadImage] = useUploadImageMutation();
-
+  const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
+  const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
   const [
     createNewSite,
     {
@@ -60,40 +58,13 @@ function AddNewBranch() {
     },
   ] = useGetAllSiteTypesMutation();
 
-  const [
-    getAllCompanies,
-    {
-      isSuccess: isSuccessGetAllCompanies,
-      isLoading: isLoadingGetAllCompanies,
-      isError: isErrorGetAllCompanies,
-      error: errorGetAllCompanies,
-    },
-  ] = useGetAllCompaniesMutation();
-
-  const [
-    getAllCities,
-    {
-      isSuccess: isSuccessGetAllCities,
-      isLoading: isLoadingGetAllCities,
-      isError: isErrorGetAllCities,
-      error: errorGetAllCities,
-    },
-  ] = useGetAllCitiesMutation();
 
   useEffect(() => {
-    if (isErrorGetAllCompanies) {
-      setError(errorGetAllCompanies);
-    } else if (isErrorGetAllCities) {
-      setError(errorGetAllCities);
-    } else if (isErrorGetAllSiteTypes) {
+    if (isErrorGetAllSiteTypes) {
       setError(errorGetAllSiteType);
     }
   }, [
-    isErrorGetAllCompanies,
-    isErrorGetAllCities,
     isErrorGetAllSiteTypes,
-    errorGetAllCities,
-    errorGetAllCompanies,
     errorGetAllSiteType,
   ]);
 
@@ -102,8 +73,6 @@ function AddNewBranch() {
       setIsLoading(true);
       try {
         await Promise.all([
-          getAllCompanies(),
-          getAllCities(),
           getAllSiteTypes(),
         ]);
       } catch (error) {
@@ -116,7 +85,7 @@ function AddNewBranch() {
   }, []);
 
   useEffect(() => {
-    if (isSuccessGetAllCompanies) {
+    if (isSuccessCreateNewSite) {
       navigate("/dash/branches");
       dispatch(setIsOpenSnackBar(true));
       dispatch(setCaptionSnackBar(t("createSuccess")));
@@ -194,11 +163,11 @@ function AddNewBranch() {
 
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoading || isLoadingGetCompanyName) content = <LoadingFetchingDataComponent />;
 
   if (error) content = <p>Error : {error?.message}</p>;
 
-  if (!isLoading && !error && isSuccessGetAllCompanies) {
+  if (!isLoading && !error && isSuccessGetCompanyName) {
     content = (
       <>
         <div data-aos="fade-left">
@@ -206,6 +175,7 @@ function AddNewBranch() {
           <MainHeaderComponent
             breadcrumbs={breadcrumbs}
             title={t("createNewBranch")}
+            handleBackClick={() => navigate("/dash/branches")}
           />
           <Formik
             initialValues={{
@@ -325,7 +295,7 @@ function AddNewBranch() {
 
                           <SelectSingleComponent
                             label={t("company")}
-                            options={companiesFetchedData.data}
+                            options={companyName}
                             onChange={handleCompanyChange}
                             fullWidth={true}
                             error={errors.companyId}
@@ -335,7 +305,7 @@ function AddNewBranch() {
 
                           <SelectSingleComponent
                             label={t("city")}
-                            options={citiesFetchedData.data}
+                            options={cityName}
                             onChange={handleCityChange}
                             fullWidth={true}
                             error={errors.cityId}

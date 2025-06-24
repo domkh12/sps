@@ -21,6 +21,7 @@ function Prefetch() {
       store.dispatch(companiesApiSlice.util.prefetch("getCompany","companiesList", {force: true}));
       store.dispatch(cityApiSlice.util.prefetch("getAllCities", "citiesList", {force: true }));
       store.dispatch(companyTypeApiSlice.util.prefetch("getCompanyType", "companyTypeList", {force: true }));
+      store.dispatch(companiesApiSlice.util.prefetch("getAllCompanies", "companyNameList", {force: true}));
     }
 
     if (isManager || isAdmin) {

@@ -30,7 +30,6 @@ import FilterBarComponent from "../../components/FilterBarComponent";
 import FilterChipsComponent from "../../components/FilterChipsComponent";
 import UserTableComponent from "../../components/UserTableComponent";
 import QuickEditUserComponent from "../../components/QuickEditUserComponent";
-import { setIsFiltered } from "../../redux/feature/actions/actionSlice";
 
 function UserList() {
   const statusFilter = useSelector((state) => state.users.statusFilter);
@@ -52,7 +51,8 @@ function UserList() {
   const branchFilter = useSelector((state) => state.users.branchFilter);
   const { isManager } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
- 
+  // const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
+
   const {
     data: users,
     isLoading: isLoadingGetAllUsers,

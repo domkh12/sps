@@ -37,6 +37,9 @@ function FilterBarComponent({
   totalElements,
   handleChange,
   showTabs = true,
+  companyTypeFetched,
+  companyTypeFilter,
+  handleCompanyTypeChange,
 }) {
   const roleFilter = useSelector((state) => state.users.roleFilter);
   const signUpMethodFilter = useSelector(
@@ -154,6 +157,20 @@ function FilterBarComponent({
       )}
 
       <div className="p-[20px] flex gap-[16px] 2xl:flex-nowrap flex-wrap flex-col xl:flex-row">
+
+        {companyTypeFetched && (
+            <SelectComponent
+              label={t("companyType")}
+              labelId="company_type_label"
+              id="company_type"
+              options={companyTypeFetched}
+              onChange={handleCompanyTypeChange}
+              optionLabelKey="name"
+              width60={"2xl:w-60"}
+              value={companyTypeFilter}
+            />
+        )}
+
         {parkingSpaceFetched && (
           <SelectComponent
             label={t("parkingSpace")}
@@ -185,7 +202,7 @@ function FilterBarComponent({
             label={t("company")}
             labelId="company_label"
             id="company"
-            options={companyFetched?.data}
+            options={companyFetched}
             onChange={handleCompanyChange}
             optionLabelKey="companyName"
             width60={"2xl:w-60"}
@@ -198,7 +215,7 @@ function FilterBarComponent({
             label={t("city")}
             labelId="city_label"
             id="city"
-            options={cityFetched?.data}
+            options={cityFetched}
             onChange={handleCityChange}
             optionLabelKey="name"
             width60={"2xl:w-60"}

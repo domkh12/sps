@@ -14,7 +14,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useTranslate from "../hook/useTranslate";
 import { useUpdateParkingMutation } from "../redux/feature/parking/parkingApiSlice";
-import { useGetAllCompaniesMutation } from "../redux/feature/company/companyApiSlice";
 import { useUploadImageMutation } from "../redux/feature/uploadImage/uploadImageApiSlice";
 import * as Yup from "yup";
 import SelectSingleComponent from "./SelectSingleComponent";
@@ -25,6 +24,7 @@ import {
   setErrorSnackbar,
   setIsOpenSnackBar,
 } from "../redux/feature/actions/actionSlice";
+import {useGetAllCompaniesQuery} from "../redux/feature/company/companyApiSlice.js";
 
 function QuickEditParkingSpaceComponent() {
   const open = useSelector(
@@ -36,6 +36,7 @@ function QuickEditParkingSpaceComponent() {
   const { t } = useTranslate();
   const dispatch = useDispatch();
   const companyFetched = useSelector((state) => state.companies.companiesData);
+  const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
 
   const style = {
     display: "flex",
@@ -55,16 +56,6 @@ function QuickEditParkingSpaceComponent() {
     },
   ] = useUpdateParkingMutation();
 
-  const [
-    getAllCompanies,
-    {
-      isSuccess: isGetAllCompaniesSuccess,
-      isLoading: isLoadingGetAllCompanies,
-      isError: isErrorGetAllCompanies,
-      error: errorGetAllCompanies,
-    },
-  ] = useGetAllCompaniesMutation();
-
   const [uploadImage] = useUploadImageMutation();
 
   const validationSchema = Yup.object().shape({
@@ -72,25 +63,6 @@ function QuickEditParkingSpaceComponent() {
     lotName: Yup.array().min(1, t("lotNameValidate")),
     siteUuid: Yup.string().required("Branch is required!"),
   });
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const promises = [];
-        if (isManager) {
-          promises.push(getAllCompanies());
-        }
-
-        await Promise.all(promises);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   useEffect(() => {
     if (isSuccessUpdateParking) {
@@ -192,7 +164,7 @@ function QuickEditParkingSpaceComponent() {
 
                   <SelectSingleComponent
                     label={t("branch")}
-                    options={companyFetched.data}
+                    options={companyName}
                     onChange={handleBranchChange}
                     fullWidth={true}
                     error={errors.siteUuid}

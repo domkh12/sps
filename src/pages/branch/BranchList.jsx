@@ -25,9 +25,9 @@ import BranchRowComponent from "../../components/BranchRowComponent";
 import { useEffect, useState } from "react";
 import QuickEditBranchComponent from "../../components/QuickEditBranchComponent";
 import FilterBarComponent from "../../components/FilterBarComponent";
-import { useGetAllCitiesMutation } from "../../redux/feature/city/cityApiSlice";
+import { useGetAllCitiesQuery } from "../../redux/feature/city/cityApiSlice";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
-import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice";
+import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice";
 import { setCityFilter } from "../../redux/feature/city/citySlice";
 import {
   setBranchTypeFilter,
@@ -46,7 +46,6 @@ import FilterChipsComponent from "../../components/FilterChipsComponent";
 
 function BranchList() {
   const navigate = useNavigate();
-  const { isManager } = useAuth();
   const openQuickEdit = useSelector(
     (state) => state.sites.isQuickEditBranchOpen
   );
@@ -56,7 +55,6 @@ function BranchList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const cityFilter = useSelector((state) => state.city.cityFilter);
-  const citiesFetchedData = useSelector((state) => state.city.cityData);
   const siteTypesFetchedData = useSelector(
     (state) => state.siteType.siteTypeData
   );
@@ -67,7 +65,8 @@ function BranchList() {
   const branchTypeFilter = useSelector((state) => state.sites.branchTypeFilter);
   const searchKeywords = useSelector((state) => state.sites.searchKeywords);
   const dispatch = useDispatch();
-
+  const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
+  const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
   const {
     data: sites,
     isSuccess,
@@ -108,16 +107,6 @@ function BranchList() {
   );
 
   const [
-    getAllCities,
-    {
-      isSuccess: isSuccessGetAllCities,
-      isLoading: isLoadingGetAllCities,
-      isError: isErrorGetAllCities,
-      error: errorGetAllCities,
-    },
-  ] = useGetAllCitiesMutation();
-
-  const [
     getAllSiteTypes,
     {
       isSuccess: isSuccessGetAllSiteTypes,
@@ -127,23 +116,11 @@ function BranchList() {
     },
   ] = useGetAllSiteTypesMutation();
 
-  const [
-    getAllCompanies,
-    {
-      isSuccess: isSuccessGetAllCompanies,
-      isLoading: isLoadingGetAllCompanies,
-      isError: isErrorGetAllCompanies,
-      error: errorGetAllCompanies,
-    },
-  ] = useGetAllCompaniesMutation();
-
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
         await Promise.all([
-          getAllCompanies(),
-          getAllCities(),
           getAllSiteTypes(),
         ]);
       } catch (error) {
@@ -241,13 +218,13 @@ function BranchList() {
 
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetCity || isLoadingGetAllSite || isLoadingGetCompanyName) content = <LoadingFetchingDataComponent />;
 
   if (isError) {
     content = <p>Error: {error?.message}</p>;
   }
 
-  if (isSuccess && !isLoading) {
+  if (isSuccessGetCity && isSuccess && isSuccessGetCompanyName) {
     const { ids, entities, totalElements, pageSize, pageNo } = sites;
 
     const {
@@ -319,9 +296,9 @@ function BranchList() {
             <FilterBarComponent
               showTabs={false}
               searchQuery={searchKeywords}
-              cityFetched={citiesFetchedData}
+              cityFetched={cityName}
               branchTypeFetched={siteTypesFetchedData}
-              companyFetched={companiesFetchedData}
+              companyFetched={companyName}
               cityFilter={cityFilter}
               branchTypeFilter={branchTypeFilter}
               companyFilter={companyFilter}
@@ -336,8 +313,8 @@ function BranchList() {
               branchTypeFetched={siteTypesFetchedData.data}
               branchTypeFilter={branchTypeFilter}
               cityFilter={cityFilter}
-              cityFetched={citiesFetchedData.data}
-              companyFetched={companiesFetchedData.data}
+              cityFetched={cityName}
+              companyFetched={companyName}
               companyFilter={companyFilter}
               handleCompanyChange={handleCompanyFilter}
               searchQuery={searchKeywords}

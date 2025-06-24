@@ -69,6 +69,7 @@ export const apiSlice = createApi({
     "ParkingDetail",
     "Company",
     "CompanyType",
+    "CompanyName"
     // "slot"
   ],
   endpoints: (builder) => ({}),

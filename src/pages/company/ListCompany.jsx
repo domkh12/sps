@@ -14,14 +14,12 @@ import SeoComponent from "../../components/SeoComponent";
 import { useNavigate } from "react-router-dom";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
 import { cardStyle } from "../../assets/style";
-import useAuth from "../../hook/useAuth";
 import useTranslate from "../../hook/useTranslate";
 import { useDispatch, useSelector } from "react-redux";
 import {
   useFilterSitesQuery,
-  useGetSitesQuery,
 } from "../../redux/feature/site/siteApiSlice";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import QuickEditBranchComponent from "../../components/QuickEditBranchComponent";
 import FilterBarComponent from "../../components/FilterBarComponent";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
@@ -36,6 +34,11 @@ import {
 import DataNotFound from "../../components/DataNotFound";
 import FilterChipsComponent from "../../components/FilterChipsComponent";
 import CompanyRowComponent from "../../components/CompanyRowComponent";
+import {useGetCompanyTypeQuery} from "../../redux/feature/companyType/CompanyTypeApiSlice.js";
+import {setBranchFilter} from "../../redux/feature/users/userSlice.js";
+import {setCompanyTypeFilter} from "../../redux/feature/companyType/companyTypeSlice.js";
+import {useGetAllCitiesQuery} from "../../redux/feature/city/cityApiSlice.js";
+import {setCityFilter} from "../../redux/feature/city/citySlice.js";
 
 function ListCompany() {
   const navigate = useNavigate();
@@ -45,9 +48,11 @@ function ListCompany() {
   const { t } = useTranslate();
   const pageNo = useSelector((state) => state.sites.pageNo);
   const pageSize = useSelector((state) => state.sites.pageSize);
+  const companyTypeFilter = useSelector((state) => state.companyType.companyTypeFilter);
   const [searchTerm, setSearchTerm] = useState("");
   const cityFilter = useSelector((state) => state.city.cityFilter);
- 
+  const {data:companyTypeData, isSuccess: isSuccessGetCompanyType, isLoading: isLoadingGetCompanyType} = useGetCompanyTypeQuery("companyTypeList");
+  const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
   const companyFilter = useSelector((state) => state.companies.companyFilter);
   const branchTypeFilter = useSelector((state) => state.sites.branchTypeFilter);
   const searchKeywords = useSelector((state) => state.sites.searchKeywords);
@@ -103,7 +108,7 @@ function ListCompany() {
   ];
 
   const columns = [
-    { id: "companyName", label: t("companyname"), minWidth: 230, align: "left" },
+    { id: "companyName", label: t("companyName"), minWidth: 230, align: "left" },
     { id: "companyType", label: t("companyType"), minWidth: 230, align: "left" },
     { id: "branchQty", label: t("branchQty"), minWidth: 150, align: "left" },
     { id: "city", label: t("city"), minWidth: 150, align: "left" },
@@ -128,8 +133,6 @@ function ListCompany() {
     dispatch(setSearchKeywords(keyword));
   };
 
- 
-
   const handleChangePage = (event, newPage) => {
     dispatch(setPageNoBranch(newPage + 1));
   };
@@ -139,15 +142,23 @@ function ListCompany() {
     dispatch(setPageNoBranch(1));
   };
 
+  const handleCompanyTypeChange = (companyType) => {
+    dispatch(setCompanyTypeFilter(companyType));
+  };
+
+  const handleCityChange = (value) => {
+    dispatch(setCityFilter(value));
+  }
+
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetCompanyType || isLoadingGetCity) content = <LoadingFetchingDataComponent />;
 
   if (isError) {
     content = <p>Error: {error?.message}</p>;
   }
 
-  if (isSuccess ) {
+  if (isSuccess && isSuccessGetCompanyType && isSuccessGetCity) {
     const { ids, entities, totalElements, pageSize, pageNo } = companies;
 
     const {
@@ -217,11 +228,15 @@ function ListCompany() {
               showTabs={false}
               searchQuery={searchKeywords}
               handleSearchChange={handleSearchChange}
-              
+              companyTypeFetched={companyTypeData}
+              companyTypeFilter={companyTypeFilter}
+              handleCompanyTypeChange={handleCompanyTypeChange}
+              cityFetched={cityName}
+              cityFilter={cityFilter}
+              handleCityChange={handleCityChange}
             />
 
             <FilterChipsComponent
-             
               searchQuery={searchKeywords}
               clearSearch={() => dispatch(setSearchKeywords(""))}
               handleSearchChange={handleSearchChange}
@@ -229,6 +244,7 @@ function ListCompany() {
               isFiltered={
                 searchKeywords !== "" 
               }
+
             />
 
             <TableContainer>

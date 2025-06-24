@@ -35,6 +35,9 @@ function FilterChipsComponent({
   branchTypeFetched,
   branchTypeFilter,
   handleBranchTypeChange,
+  companyTypeFetched,
+  companyTypeFilter,
+  handleCompanyTypeChange,
 }) {
   const dispatch = useDispatch();
   return (
@@ -75,6 +78,31 @@ function FilterChipsComponent({
                   })}
                 </div>
               </div>
+            ) : null}
+
+            {companyTypeFilter?.length > 0 ? (
+                <div className="p-2 rounded-[7px] border-dashed border w-fit flex items-center">
+                  <span className="font-medium mr-2">{`City:${"\u00a0"}`}</span>
+                  <div className="flex gap-3">
+                    {companyTypeFilter?.map((companyType) => {
+                      const matchedCompanyType = companyTypeFetched?.find(
+                          (fetchedCompanyType) => fetchedCompanyType.uuid === companyType
+                      );
+                      const companyTypeName = matchedCompanyType ? matchedCompanyType.name : companyType;
+                      return (
+                          <Chip
+                              key={companyType}
+                              size="small"
+                              sx={{ borderRadius: "8px" }}
+                              label={companyTypeName}
+                              onDelete={() =>
+                                  handleCompanyTypeChange(companyTypeFilter.filter((b) => b !== companyType))
+                              }
+                          />
+                      );
+                    })}
+                  </div>
+                </div>
             ) : null}
 
             {cityFilter?.length > 0 ? (

@@ -26,7 +26,7 @@ import {
   useGetAllRolesMutation,
   useUpdateUserMutation,
 } from "../redux/feature/users/userApiSlice";
-import { useGetAllCompaniesMutation } from "../redux/feature/company/companyApiSlice";
+import {useGetAllCompaniesQuery} from "../redux/feature/company/companyApiSlice";
 import { useEffect, useState } from "react";
 import LoadingFetchingDataComponent from "./LoadingFetchingDataComponent";
 import {
@@ -44,10 +44,10 @@ function QuickEditUserComponent() {
   const genderFetched = useSelector((state) => state.users.genders);
   const rolesFetched = useSelector((state) => state.users.roles);
   const [isLoading, setIsLoading] = useState(true);
-  const companyData = useSelector((state) => state.companies.companiesData);
   const [error, setError] = useState(null);
   const { t } = useTranslate();
   const { isManager, isAdmin } = useAuth();
+  const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
 
   const [
     updateUser,
@@ -70,16 +70,6 @@ function QuickEditUserComponent() {
   ] = useFindAllGenderMutation();
 
   const [
-    getAllCompanies,
-    {
-      isSuccess: isGetAllCompaniesSuccess,
-      isLoading: isGetAllCompaniesLoading,
-      isError: isGetAllCompaniesError,
-      error: getAllCompaniesError,
-    },
-  ] = useGetAllCompaniesMutation();
-
-  const [
     getAllRoles,
     {
       isSuccess: isGetAllRolesSuccess,
@@ -96,7 +86,6 @@ function QuickEditUserComponent() {
         const promises = [];
         if (isManager) {
           promises.push(getAllRoles());
-          promises.push(getAllCompanies());
         }
         promises.push(findAllGender());
 
@@ -108,7 +97,7 @@ function QuickEditUserComponent() {
       }
     };
     fetchData();
-  }, [isManager, getAllRoles, getAllCompanies, findAllGender]);
+  }, [isManager, getAllRoles, findAllGender]);
 
   const style = {
     display: "flex",
@@ -229,8 +218,7 @@ function QuickEditUserComponent() {
     !error &&
     (isManager
       ? isFindAllGenderSuccess &&
-        isGetAllRolesSuccess &&
-        isGetAllCompaniesSuccess
+        isGetAllRolesSuccess
       : isFindAllGenderSuccess)
   )
     content = (
@@ -436,7 +424,7 @@ function QuickEditUserComponent() {
                   {isManager && (
                     <SelectComponent
                       label={t("branch")}
-                      options={companyData.data}
+                      options={companyName}
                       onChange={handleBranchChange}
                       fullWidth={true}
                       error={errors.roleId}

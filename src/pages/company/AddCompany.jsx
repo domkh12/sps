@@ -1,7 +1,7 @@
-import  { useState } from "react";
+import {useEffect, useState} from "react";
 import SeoComponent from "../../components/SeoComponent";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
-import { Card, Grid2, TextField, Typography } from "@mui/material";
+import {Card, FormControl, Grid2, TextField, Typography} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import useTranslate from "../../hook/useTranslate";
 import { cardStyle } from "../../assets/style";
@@ -11,25 +11,20 @@ import { Form, Formik } from "formik";
 import SelectSingleComponent from "../../components/SelectSingleComponent";
 import ButtonComponent from "../../components/ButtonComponent";
 import LoadingFetchingDataComponent from "./../../components/LoadingFetchingDataComponent";
-import { useDispatch, useSelector } from "react-redux";
 import { useGetAllCitiesQuery } from "../../redux/feature/city/cityApiSlice";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
-import { useCreateNewSiteMutation } from "../../redux/feature/site/siteApiSlice";
 import {useGetCompanyTypeQuery} from "../../redux/feature/companyType/CompanyTypeApiSlice.js";
+import {DatePicker} from "@mui/x-date-pickers";
+import {useCreateCompanyMutation} from "../../redux/feature/company/companyApiSlice.js";
+import dayjs from "dayjs";
+import {toast, Slide} from "react-toastify";
 
 function AddCompany() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [profileImageFile, setProfileImageFile] = useState(null);
-  const {data:cityName, isSuccess}= useGetAllCitiesQuery("citiesList");
-  const {data:companyTypeData, isSuccess: isSuccessCompanyType} = useGetCompanyTypeQuery("companyTypeList");
-  console.log("companyTypeData", companyTypeData);
-  const citiesFetchedData = useSelector((state) => state.city.cityData);
-  const siteTypesFetchedData = useSelector(
-    (state) => state.siteType.siteTypeData
-  );
+  const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
+  const {data:companyTypeData, isSuccess: isSuccessGetCompanyType, isLoading: isLoadingGetCompanyType} = useGetCompanyTypeQuery("companyTypeList");
   const { t } = useTranslate();
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [uploadImage] = useUploadImageMutation();
@@ -42,14 +37,44 @@ function AddCompany() {
       isError: isErrorCreateCompany,
       error: errorCreateCompany,
     },
-  ] = useCreateNewSiteMutation();
+  ] = useCreateCompanyMutation();
+
+  useEffect(() => {
+    if (isSuccessCreateCompany) {
+      navigate("/dash/companies")
+      toast.success(t("createSuccess"), {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
+    }
+  }, [isSuccessCreateCompany]);
+
+  useEffect(() => {
+    if (isErrorCreateCompany) {
+      toast.error(`${errorCreateCompany?.data?.error?.description}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
+    }
+  }, [isErrorCreateCompany]);
+
 
   const validationSchema = Yup.object().shape({
-    siteName: Yup.string().required(t("branchNameIsRequired")),
-    branchAddress: Yup.string().required(t("branchAddressIsRequired")),
-    companyId: Yup.string().required(t("companyIsRequired")),
-    cityId: Yup.string().required(t("cityIsRequired")),
-    siteTypeId: Yup.string().required(t("branchTypeIsRequired")),
+    companyName: Yup.string().required(t("companyNameIsRequired")),
+    companyAddress: Yup.string().required(t("companyAddressIsRequired")),
+    companyTypeUuid: Yup.string().required(t("companyTypeIsRequired")),
+    cityUuid: Yup.string().required(t("cityIsRequired")),
+    establishedDate: Yup.string().required(t("establishedDateIsRequired")),
   });
 
   const breadcrumbs = [
@@ -70,7 +95,6 @@ function AddCompany() {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      console.log("values", values);
       const formData = new FormData();
       let profileImageUri = null;
       if (profileImageFile) {
@@ -78,14 +102,17 @@ function AddCompany() {
         const uploadResponse = await uploadImage(formData).unwrap();
         profileImageUri = uploadResponse.uri;
       }
+      const formattedDate = dayjs(values.dateOfBirth).format(
+          "YYYY-MM-DD"
+      );
 
       await createCompany({
-        siteName: values.siteName,
-        siteAddress: values.branchAddress,
+        companyName: values.companyName,
+        companyAddress: values.companyAddress,
+        companyTypeUuid: values.companyTypeUuid,
+        cityUuid: values.cityUuid,
+        establishedDate: formattedDate,
         image: profileImageUri,
-        cityUuid: values.cityId,
-        siteTypeUuid: values.siteTypeId,
-        companyUuid: values.companyId,
       });
     } catch (error) {
       console.error("Error creating company:", error);
@@ -96,11 +123,11 @@ function AddCompany() {
 
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetCompanyType || isLoadingGetCity) content = <LoadingFetchingDataComponent />;
 
   if (error) content = <p>Error : {error?.message}</p>;
 
-  if (isSuccess) {
+  if (isSuccessGetCity && isSuccessGetCompanyType) {
     content = (
       <>
         <div data-aos="fade-left">
@@ -108,14 +135,15 @@ function AddCompany() {
           <MainHeaderComponent
             breadcrumbs={breadcrumbs}
             title={t("newcompany")}
+            handleBackClick={() => navigate("/dash/companies")}
           />
           <Formik
             initialValues={{
-              siteName: "",
-              branchAddress: "",
-              companyId: "",
-              cityId: "",
-              siteTypeId: "",
+              companyName: "",
+              companyAddress: "",
+              companyTypeUuid: "",
+              cityUuid: "",
+              establishedDate: null
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
@@ -128,19 +156,14 @@ function AddCompany() {
               handleBlur,
               setFieldValue,
             }) => {
-              const handleCompanyChange = (value) => {
-                console.log("value", value);
-                setFieldValue("companyId", value);
-              };
+              const errorDateOfBirth = errors.dateOfBirth && touched.dateOfBirth;
 
               const handleCityChange = (value) => {
-                console.log("value", value);
-                setFieldValue("cityId", value);
+                setFieldValue("cityUuid", value);
               };
 
-              const handleSiteTypeChange = (value) => {
-                console.log("value", value);
-                setFieldValue("siteTypeId", value);
+              const handleCompanyTypeChange = (value) => {
+                setFieldValue("companyTypeUuid", value);
               };
 
               return (
@@ -172,8 +195,8 @@ function AddCompany() {
                       >
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                           <TextField
-                            label={t("companyname")}
-                           variant="outlined"
+                            label={t("companyName")}
+                            variant="outlined"
                             sx={{
                               "& .MuiInputBase-input": {
                                 boxShadow: "none",
@@ -182,83 +205,100 @@ function AddCompany() {
                             }}
                             type="text"
                             id="companyName"
-                            name="CompanyName"
-                            onChange={handleCompanyChange}
-                            onBlur={handleBlur}
-                            error={errors.companyId}
-                            touched={touched.companyId}
-                            size="medium"
-                          />
-                          <SelectSingleComponent
-                            label={t("CompanyType")}
-                             options={siteTypesFetchedData.data}
-                            onChange={handleSiteTypeChange}
-                            fullWidth={true}
-                          />
-                          <TextField
-                            label={t("address")}
-                            variant="outlined"
-                            sx={{
-                              "& .MuiInputBase-input": {
-                                boxShadow: "none",
-                              },
-                              borderRadius: "6px",
-                            }}
-                            
-                            type="text"
-                            id="Address"
-                            name="Address"
-                            fullWidth
-                            value={values.branchAddress}
+                            name="companyName"
                             onChange={handleChange}
-                            onBlur={handleBlur}
-                            autoComplete="off"
-                            // error={
-                            //   errors.branchAddress && touched.branchAddress
-                            // }
-                            // helperText={
-                            //   errors.branchAddress && touched.branchAddress
-                            //     ? errors.branchAddress
-                            //     : null
-                            // }
+                            value={values.companyName}
+                            error={errors.companyName && touched.companyName}
+                            helperText={errors.companyName && touched.companyName ? errors.companyName : null}
                             size="medium"
                           />
 
+                          <TextField
+                              label={t("address")}
+                              variant="outlined"
+                              sx={{
+                                "& .MuiInputBase-input": {
+                                  boxShadow: "none",
+                                },
+                                borderRadius: "6px",
+                              }}
+                              type="text"
+                              id="companyAddress"
+                              name="companyAddress"
+                              fullWidth
+                              value={values.companyAddress}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              autoComplete="off"
+                              error={
+                                errors.companyAddress && touched.companyAddress
+                              }
+                              helperText={
+                                errors.companyAddress && touched.companyAddress
+                                  ? errors.companyAddress
+                                  : null
+                              }
+                              size="medium"
+                          />
+
+                          <SelectSingleComponent
+                            label={t("companyType")}
+                            options={companyTypeData}
+                            onChange={handleCompanyTypeChange}
+                            fullWidth={true}
+                            error={errors.companyTypeUuid}
+                            touched={touched.companyTypeUuid}
+                            optionLabelKey={"name"}
+                          />
 
                           <SelectSingleComponent
                             label={t("city")}
                             options={cityName}
                             onChange={handleCityChange}
                             fullWidth={true}
-                            // error={errors.cityId}
-                            // touched={touched.cityId}
+                            error={errors.cityUuid}
+                            touched={touched.cityUuid}
                             optionLabelKey="name"
                           />
 
-                         <TextField
-                            label={t("createat")}
-                            options={siteTypesFetchedData.data}
-                            onChange={handleSiteTypeChange}
-                            fullWidth={true}
+                          <FormControl
+                              sx={{ width: "100%" }}
                               variant="outlined"
-                            sx={{
-                              "& .MuiInputBase-input": {
-                                boxShadow: "none",
-                              },
-                              borderRadius: "6px",
-                            }}
-                            // error={errors.siteTypeId}
-                            // touched={touched.siteTypeId}
-                            // optionLabelKey="name"
-                          />
+                              size="medium"
+                          >
+                            <DatePicker
+                                sx={{
+                                  "& .MuiInputBase-input": {
+                                    boxShadow: "none",
+                                  },
+                                  ...(errorDateOfBirth && {
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                      borderColor: "#f44336",
+                                      color: "white",
+                                    },
+                                  }),
+                                  "& .MuiInputLabel-root ": {
+                                    ...(errorDateOfBirth && {color: "#f44336"}),
+                                  },
+                                }}
+                                label={t("establishedDate")}
+                                value={values.establishedDate}
+                                id="establishedDate"
+                                name="establishedDate"
+                                onChange={(value) => {
+                                  setFieldValue("establishedDate", value);
+                                }}
+                                format="DD-MM-YYYY"
+                            />
+                          </FormControl>
+
                         </div>
 
                         <div className="col-span-2 flex justify-end mt-[20px]">
                           <ButtonComponent
                             btnTitle={t("newcompany")}
                             type={"submit"}
-                            loadingCaption={t("creating")}
-                          //  isLoading={isLoadingCreateNewSite}
+                            isLoading={isLoadingCreateCompany}
                           />
                         </div>
                       </Card>

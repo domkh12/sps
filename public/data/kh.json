@@ -64,7 +64,7 @@
   "branchNameIsRequired": "ឈ្មោះសាខាគឺត្រូវតែមាន",
   "branchAddressIsRequired": "អាសយដ្ឋានរបស់សាខាគឺត្រូវតែមាន",
   "companyIsRequired": "ក្រុមហ៊ុនគឺត្រូវតែមាន",
-  "cityIsRequired": "ទីក្រុងគឺត្រូវតែមាន",
+  "cityIsRequired": "ទីក្រុងគឺត្រូវតែបំពេញ",
   "branchTypeIsRequired": "ប្រភេទនៃសាខាត្រូវតែមាន",
   "createSuccess": "បង្កើតបានជោគជ័យ!",
   "vehicle": "រថយន្ត",
@@ -119,7 +119,7 @@
   "overview": "ទិដ្ឋភាពទូទៅ",
   "management": "ការគ្រប់គ្រង",
   "parkingslot":"ចំណតរថយន្ត",
-  "companyname":"ឈ្មោះក្រុមហ៊ុន",
+  "companyName":"ឈ្មោះក្រុមហ៊ុន",
   "companyType":"ប្រភេទក្រុមហ៊ុន",
   "newcompany":"បង្កើតក្រុមហ៊ុនថ្មី",
   "createat":"ថ្ងៃទីបង្កើត",
@@ -129,6 +129,12 @@
   "slot":"ចំណត",
   "newslot":"បន្ថែមចំណត",
   "addslot":"បង្កើតចំណត",
-  "branchQty": "ចំនួនសាខា"
+  "branchQty": "ចំនួនសាខា",
+  "establishedDate": "កាលបរិច្ឆេទនៃការបញ្ចូល",
+  "companyNameIsRequired": "ឈ្មោះក្រុមហ៊ុនត្រូវតែបំពេញ",
+  "companyAddressIsRequired": "អាសយដ្ឋានក្រុមហ៊ុនត្រូវតែបំពេញ",
+  "companyTypeIsRequired": "ប្រភេទក្រុមហ៊ុនត្រូវតែបំពេញ",
+  "establishedDateIsRequired": "កាលបរិច្ឆេទថ្ងៃបង្កើតក្រុមហ៊ុនត្រូវតែបំពេញ",
+  "updateSuccess": "កែប្រែបានជោគជ័យ"
 
 }

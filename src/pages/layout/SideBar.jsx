@@ -871,6 +871,7 @@ function SideBar() {
                               sx={{
                                 borderRadius: "10px",
                                 color: "#424242",
+                                  mt:"5px",
                                 ...((isBranchListPage || isBranchCreatePage) &&
                                   listItemButtonStyle),
                               }}

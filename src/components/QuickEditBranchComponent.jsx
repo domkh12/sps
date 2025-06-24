@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import SelectSingleComponent from "./SelectSingleComponent";
 import * as Yup from "yup";
 import useTranslate from "../hook/useTranslate";
-import { useGetAllCompaniesMutation } from "../redux/feature/company/companyApiSlice";
+import {useGetAllCompaniesQuery} from "../redux/feature/company/companyApiSlice";
 
 import { useGetAllSiteTypesMutation } from "../redux/feature/siteType/siteTypeApiSlice";
 import { useUpdateSiteMutation } from "../redux/feature/site/siteApiSlice";
@@ -22,9 +22,7 @@ function QuickEditBranchComponent() {
   const open = useSelector((state) => state.sites.isQuickEditBranchOpen);
   const branch = useSelector((state) => state.sites.branchForQuickEdit);
   const [isLoading, setIsLoading] = useState(true);
-  const companiesFetchedData = useSelector(
-    (state) => state.companies.companiesData
-  );
+  const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
   const citiesFetchedData = useSelector((state) => state.city.cityData);
   const siteTypesFetchedData = useSelector(
     (state) => state.siteType.siteTypeData
@@ -53,16 +51,6 @@ function QuickEditBranchComponent() {
   ] = useGetAllSiteTypesMutation();
 
   const [
-    getAllCompanies,
-    {
-      isSuccess: isSuccessGetAllCompanies,
-      isLoading: isLoadingGetAllCompanies,
-      isError: isErrorGetAllCompanies,
-      error: errorGetAllCompanies,
-    },
-  ] = useGetAllCompaniesMutation();
-
-  const [
     getAllCities,
     {
       isSuccess: isSuccessGetAllCities,
@@ -77,7 +65,6 @@ function QuickEditBranchComponent() {
       setIsLoading(true);
       try {
         await Promise.all([
-          getAllCompanies(),
           getAllCities(),
           getAllSiteTypes(),
         ]);
@@ -238,7 +225,7 @@ function QuickEditBranchComponent() {
 
                   <SelectSingleComponent
                     label={t("company")}
-                    options={companiesFetchedData.data}
+                    options={companyName}
                     onChange={handleCompanyChange}
                     fullWidth={true}
                     error={errors.companyId}
