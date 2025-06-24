@@ -4,8 +4,7 @@ import { Typography } from "@mui/material";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import SeoComponent from "./../../components/SeoComponent";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
-import useTranslate from "../../hook/useTranslate";
-
+ import useTranslate from "../../hook/useTranslate";
 function ReportList() {
   const { t } = useTranslate();
   const navigate = useNavigate();
@@ -41,7 +40,7 @@ function ReportList() {
           breadcrumbs={breadcrumbs}
           title={t("list")}
         />
-        {/* Add your report list UI here */}
+        
       </>
     );
   }

@@ -315,4 +315,4 @@ function AddCompany() {
   return content;
 }
 
-export default AddCompany;
+export default AddCompany; 
