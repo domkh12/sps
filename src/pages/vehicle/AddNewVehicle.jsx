@@ -197,6 +197,7 @@ function AddNewVehicle() {
       <MainHeaderComponent
         breadcrumbs={breadcrumbs}
         title={t("createNewVehicle")}
+        handleBackClick={() => navigate("/dash/vehicles")}
       />
       <div>
         <Formik

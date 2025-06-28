@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
-import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice";
 import useAuth from "../../hook/useAuth";
 import useTranslate from "../../hook/useTranslate";
 import {

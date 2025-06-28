@@ -13,6 +13,8 @@ import { setIdUserToDelete } from "../redux/feature/users/userSlice";
 import { setIdParkingToDelete } from "../redux/feature/parking/parkingSlice";
 import { useDeleteSiteMutation } from "../redux/feature/site/siteApiSlice";
 import { setIdSiteToDelete } from "../redux/feature/site/siteSlice";
+import {setIdCompanyToDelete} from "../redux/feature/company/companySlice.js";
+import {useDeleteCompanyMutation} from "../redux/feature/company/companyApiSlice.js";
 
 function DeleteConfirmComponent() {
   const navigate = useNavigate();
@@ -22,6 +24,17 @@ function DeleteConfirmComponent() {
   const vehicleId = useSelector((state) => state.vehicles.idVehicleToDelete);
   const parkingId = useSelector((state) => state.parking.idParkingToDelete);
   const siteId = useSelector((state) => state.sites.isSiteToDelete);
+  const companyId = useSelector((state) => state.companies.idCompanyToDelete);
+
+  const [
+      deleteCompany,
+    {
+        isSuccess: isCompanyDeleteSuccess,
+        isLoading: isCompanyDeleteLoading,
+        isError: isCompanyDeleteError,
+        error: companyDeleteError,
+    }
+  ] = useDeleteCompanyMutation();
 
   const [
     deleteSite,
@@ -84,6 +97,8 @@ function DeleteConfirmComponent() {
       await deleteParking({ uuid: parkingId });
     }else if (siteId){
       await deleteSite({ uuid: siteId });
+    }else if (companyId){
+        await deleteCompany({ uuid: companyId });
     }
   };
 
@@ -99,7 +114,7 @@ function DeleteConfirmComponent() {
       handleClose();
     }
     if (isParkingDeleteSuccess) {
-      navigate("/dash/parkings");
+      navigate("/dash/parking-spaces");
       dispatch(setIdParkingToDelete(""));
       handleClose();
     }
@@ -108,11 +123,16 @@ function DeleteConfirmComponent() {
       dispatch(setIdSiteToDelete(""));
       handleClose();
     }
-  }, [isUserDeleteSuccess, isVehicleDeleteSuccess, isParkingDeleteSuccess, isSuccessDeleteSite]);
+    if (isCompanyDeleteSuccess){
+        navigate("/dash/companies");
+        dispatch(setIdCompanyToDelete(""));
+        handleClose();
+    }
+  }, [isUserDeleteSuccess, isVehicleDeleteSuccess, isParkingDeleteSuccess, isSuccessDeleteSite, isCompanyDeleteSuccess]);
 
   let loading = false;
 
-  if (isUserDeleteLoading || isVehicleDeleteLoading || isParkingDeleteLoading || isLoadingDeleteSite) {
+  if (isUserDeleteLoading || isVehicleDeleteLoading || isParkingDeleteLoading || isLoadingDeleteSite || isCompanyDeleteLoading) {
     loading = true;
   }
 

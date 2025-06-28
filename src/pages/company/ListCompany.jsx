@@ -16,52 +16,44 @@ import MainHeaderComponent from "../../components/MainHeaderComponent";
 import { cardStyle } from "../../assets/style";
 import useTranslate from "../../hook/useTranslate";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  useFilterSitesQuery,
-} from "../../redux/feature/site/siteApiSlice";
-import { useState } from "react";
-import QuickEditBranchComponent from "../../components/QuickEditBranchComponent";
 import FilterBarComponent from "../../components/FilterBarComponent";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
-import { useGetCompanyQuery } from "../../redux/feature/company/companyApiSlice";
+import {useFilterCompanyQuery, useGetCompanyQuery} from "../../redux/feature/company/companyApiSlice";
 import {
- 
-  setClearBranchFilter,
-  setPageNoBranch,
-  setPageSizeBranch,
   setSearchKeywords,
 } from "../../redux/feature/site/siteSlice";
 import DataNotFound from "../../components/DataNotFound";
 import FilterChipsComponent from "../../components/FilterChipsComponent";
 import CompanyRowComponent from "../../components/CompanyRowComponent";
 import {useGetCompanyTypeQuery} from "../../redux/feature/companyType/CompanyTypeApiSlice.js";
-import {setBranchFilter} from "../../redux/feature/users/userSlice.js";
 import {setCompanyTypeFilter} from "../../redux/feature/companyType/companyTypeSlice.js";
 import {useGetAllCitiesQuery} from "../../redux/feature/city/cityApiSlice.js";
 import {setCityFilter} from "../../redux/feature/city/citySlice.js";
+import QuickEditCompanyComponent from "../../components/QuickEditCompanyComponent.jsx";
+import {useDebounce} from "use-debounce";
+import {
+  setCompanySearchKeywords,
+  setPageNoCompany,
+  setPageSizeCompany
+} from "../../redux/feature/company/companySlice.js";
+import SkeletonTableRowComponent from "../../components/SkeletonTableRowComponent.jsx";
 
 function ListCompany() {
   const navigate = useNavigate();
-  const openQuickEdit = useSelector(
-    (state) => state.sites.isQuickEditBranchOpen
-  );
+  const openQuickEdit = useSelector((state) => state.companies.isQuickEditCompanyOpen);
+  const pageSize = useSelector((state) => state.companies.pageSize);
+  const pageNo = useSelector((state) => state.companies.pageNo);
   const { t } = useTranslate();
-  const pageNo = useSelector((state) => state.sites.pageNo);
-  const pageSize = useSelector((state) => state.sites.pageSize);
-  const companyTypeFilter = useSelector((state) => state.companyType.companyTypeFilter);
-  const [searchTerm, setSearchTerm] = useState("");
   const cityFilter = useSelector((state) => state.city.cityFilter);
+  const companyTypeFilter = useSelector((state) => state.companyType.companyTypeFilter);
   const {data:companyTypeData, isSuccess: isSuccessGetCompanyType, isLoading: isLoadingGetCompanyType} = useGetCompanyTypeQuery("companyTypeList");
   const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
-  const companyFilter = useSelector((state) => state.companies.companyFilter);
-  const branchTypeFilter = useSelector((state) => state.sites.branchTypeFilter);
-  const searchKeywords = useSelector((state) => state.sites.searchKeywords);
+  const searchKeywords = useSelector((state) => state.companies.companySearchKeywords);
+  const [debounceInputSearch] = useDebounce(searchKeywords, 1000);
   const dispatch = useDispatch();
-
   const {
     data: companies,
     isSuccess,
-    isLoading,
     isError,
     error,
   } = useGetCompanyQuery(
@@ -74,22 +66,17 @@ function ListCompany() {
   );
 
   const {
-    data: filterData,
-    isSuccess: isSuccessFilter,
-    isLoading: isLoadingFilter,
-    isError: isErrorFilter,
-    error: errorFilter,
-  } = useFilterSitesQuery(
-    {
-      pageNo,
-      pageSize,
-      keywords: searchKeywords,
-    },
-    {
-      skip:
-        searchKeywords === ""
-    }
-  );
+    data: companyDataFilter,
+    isFetching: isFetchingGetCompanyFilter
+  } = useFilterCompanyQuery({
+    pageNo, pageSize,
+    keywords: debounceInputSearch,
+    companyTypeUuid: companyTypeFilter,
+    cityUuid: cityFilter,
+  }, {skip: debounceInputSearch === "" &&
+        companyTypeFilter.length === 0 &&
+        cityFilter.length === 0
+  });
 
   const breadcrumbs = [
     <button
@@ -109,8 +96,9 @@ function ListCompany() {
 
   const columns = [
     { id: "companyName", label: t("companyName"), minWidth: 230, align: "left" },
-    { id: "companyType", label: t("companyType"), minWidth: 230, align: "left" },
+    { id: "companyType", label: t("companyType"), minWidth: 150, align: "left" },
     { id: "branchQty", label: t("branchQty"), minWidth: 150, align: "left" },
+    { id: "establishedDate", label: t("establishedDate"), minWidth: 170, align: "left" },
     { id: "city", label: t("city"), minWidth: 150, align: "left" },
     { id: "address", label: t("address"), minWidth: 150, align: "left" },
     {
@@ -130,16 +118,16 @@ function ListCompany() {
   ];
 
   const handleSearchChange = (keyword) => {
-    dispatch(setSearchKeywords(keyword));
+    dispatch(setCompanySearchKeywords(keyword));
   };
 
   const handleChangePage = (event, newPage) => {
-    dispatch(setPageNoBranch(newPage + 1));
+    dispatch(setPageNoCompany(newPage + 1));
   };
 
   const handleChangeRowsPerPage = (event, newValue) => {
-    dispatch(setPageSizeBranch(event.target.value));
-    dispatch(setPageNoBranch(1));
+    dispatch(setPageSizeCompany(event.target.value));
+    dispatch(setPageNoCompany(1));
   };
 
   const handleCompanyTypeChange = (companyType) => {
@@ -162,28 +150,20 @@ function ListCompany() {
     const { ids, entities, totalElements, pageSize, pageNo } = companies;
 
     const {
-      ids: idsFilterData,
-      entities: searchEntities,
-      totalElements: totalElementsSearch,
-      pageSize: pageSizeSearch,
-      pageNo: pageNoSearch,
-    } = filterData || {};
+      ids: idsDataFilter,
+      entities: entitiesFilter,
+      totalElementsFilter,
+      pageSizeFilter,
+      pageNoFilter
+    } = companyDataFilter || {};
 
-    const displayTotalElements = filterData
-      ? totalElementsSearch
-      : totalElements;
+    const displayTotalElements = debounceInputSearch !== "" || companyTypeFilter.length > 0 || cityFilter.length > 0 ? totalElementsFilter : totalElements;
 
-    const tableContent =
-      searchKeywords !== "" ? (
+    const tableContent = debounceInputSearch !== "" || companyTypeFilter.length > 0 || cityFilter.length > 0 ? (
         <>
-          {idsFilterData?.length ? (
-            idsFilterData?.map((companyId) => (
-              <CompanyRowComponent
-                key={companyId}
-                companyId={companyId}
-                company={searchEntities[companyId]}
-              />
-            ))
+          {idsDataFilter?.length ? (
+              idsDataFilter?.map((companyId) => (
+              <CompanyRowComponent key={companyId} companyId={companyId} company={entitiesFilter[companyId]}/>))
           ) : (
             <TableRow sx={{ bgcolor: "#f9fafb" }}>
               <TableCell align="center" colSpan={8}>
@@ -195,16 +175,10 @@ function ListCompany() {
       ) : (
         <>
           {ids?.length ? (
-            ids?.map((companyId) => (
-              <CompanyRowComponent
-                key={companyId}
-                companyId={companyId}
-                company={entities[companyId]}
-              />
-            ))
+            ids?.map((companyId) => (<CompanyRowComponent key={companyId} companyId={companyId} company={entities[companyId]}/>))
           ) : (
             <TableRow sx={{ bgcolor: "#f9fafb" }}>
-              <TableCell align="center" colSpan={6}>
+              <TableCell align="center" colSpan={8}>
                 <DataNotFound />
               </TableCell>
             </TableRow>
@@ -237,14 +211,24 @@ function ListCompany() {
             />
 
             <FilterChipsComponent
+              resultFound={displayTotalElements}
               searchQuery={searchKeywords}
               clearSearch={() => dispatch(setSearchKeywords(""))}
               handleSearchChange={handleSearchChange}
-              clearFilter={() => dispatch(setClearBranchFilter())}
+              cityFetched={cityName}
+              cityFilter={cityFilter}
+              handleCityChange={handleCityChange}
+              companyTypeFetched={companyTypeData}
+              companyTypeFilter={companyTypeFilter}
+              handleCompanyTypeChange={handleCompanyTypeChange}
+              clearFilter={() => {
+                dispatch(setCompanySearchKeywords(""))
+                dispatch(setCompanyTypeFilter([]));
+                dispatch(setCityFilter([]));
+              }}
               isFiltered={
-                searchKeywords !== "" 
+                searchKeywords !== "" || companyTypeFilter.length > 0 || cityFilter.length > 0
               }
-
             />
 
             <TableContainer>
@@ -275,21 +259,26 @@ function ListCompany() {
                     ))}
                   </TableRow>
                 </TableHead>
-                <TableBody sx={{ border: "none" }}>{tableContent}</TableBody>
+                <TableBody sx={{ border: "none" }}>
+                  {isFetchingGetCompanyFilter && idsDataFilter?.length === 0 ? (Array.from({length: pageSize}).map((_, index) => (
+                      <SkeletonTableRowComponent key={index} cellCount={4}/>
+                  ))) : (<>{tableContent}</>)}
+                </TableBody>
               </Table>
             </TableContainer>
             <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={displayTotalElements || 0}
-              rowsPerPage={pageSize || pageSizeSearch}
-              page={pageNoSearch || pageNo}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={displayTotalElements || 0}
+                rowsPerPage={pageSizeFilter != null && pageSizeFilter !== 0 ? pageSizeFilter : pageSize}
+                labelRowsPerPage={t('rowPerPage')}
+                page={pageNoFilter != null && pageNoFilter !== 0 ? pageNoFilter : pageNo}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </Card>
         </div>
-        {openQuickEdit && <QuickEditBranchComponent />}
+        {openQuickEdit && <QuickEditCompanyComponent />}
       </div>
     );
   }

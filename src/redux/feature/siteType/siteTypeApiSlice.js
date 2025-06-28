@@ -3,21 +3,21 @@ import { setSiteTypeData } from "./siteTypeSlice";
 
 export const siteTypeApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getAllSiteTypes: builder.mutation({
+    getAllSiteTypes: builder.query({
       query: () => ({
         url: "/site-types",
         method: "GET",
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setSiteTypeData({ data }));
-        } catch (error) {
-          console.log(error);
-        }
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [
+            { type: "BranchType", id: "LIST" },
+            ...result.ids.map((id) => ({ type: "BranchType", id })),
+          ];
+        } else return [{ type: "BranchType", id: "LIST" }];
       },
     }),
   }),
 });
 
-export const { useGetAllSiteTypesMutation } = siteTypeApiSlice;
+export const { useGetAllSiteTypesQuery } = siteTypeApiSlice;

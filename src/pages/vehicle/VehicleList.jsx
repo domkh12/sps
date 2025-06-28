@@ -49,7 +49,7 @@ import FilterBarComponent from "../../components/FilterBarComponent";
 
 function VehicleList() {
   const dispatch = useDispatch();
-  const navigator = useNavigate();
+  const navigate = useNavigate();
   const pageNo = useSelector((state) => state.vehicles.pageNo);
   const pageSize = useSelector((state) => state.vehicles.pageSize);
   const totalPages = useSelector((state) => state.vehicles.totalPages);
@@ -174,16 +174,16 @@ function VehicleList() {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navitage("/dash")}
+      onClick={() => navigate("/dash")}
       key={1}
     >
-      Dashboard
+      {t("dashboard")}
     </button>,
     <Typography color="inherit" key={2}>
-      Vehicle
+      {t("vehicle")}
     </Typography>,
     <Typography color="inherit" key={3}>
-      List
+      {t("list")}
     </Typography>,
   ];
 
@@ -318,9 +318,9 @@ function VehicleList() {
         <SeoComponent title={"Vehicles List"} />
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
-          title={"List"}
+          title={t('list')}
           btnTitle={t("newVehicle")}
-          onClick={() => navigator("/dash/vehicles/new")}
+          onClick={() => navigate("/dash/vehicles/new")}
         />
         <div>
           <Card sx={{ ...cardStyle }}>

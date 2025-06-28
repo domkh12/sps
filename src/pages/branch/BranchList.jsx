@@ -14,7 +14,6 @@ import SeoComponent from "../../components/SeoComponent";
 import { useNavigate } from "react-router-dom";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
 import { cardStyle } from "../../assets/style";
-import useAuth from "../../hook/useAuth";
 import useTranslate from "../../hook/useTranslate";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -22,7 +21,6 @@ import {
   useGetSitesQuery,
 } from "../../redux/feature/site/siteApiSlice";
 import BranchRowComponent from "../../components/BranchRowComponent";
-import { useEffect, useState } from "react";
 import QuickEditBranchComponent from "../../components/QuickEditBranchComponent";
 import FilterBarComponent from "../../components/FilterBarComponent";
 import { useGetAllCitiesQuery } from "../../redux/feature/city/cityApiSlice";
@@ -40,33 +38,28 @@ import {
   setClearCompanyFilter,
   setCompanyFilter,
 } from "../../redux/feature/company/companySlice";
-import { useGetAllSiteTypesMutation } from "../../redux/feature/siteType/siteTypeApiSlice";
+import {useGetAllSiteTypesQuery} from "../../redux/feature/siteType/siteTypeApiSlice";
 import DataNotFound from "../../components/DataNotFound";
 import FilterChipsComponent from "../../components/FilterChipsComponent";
+import SkeletonTableRowComponent from "../../components/SkeletonTableRowComponent.jsx";
+import {useDebounce} from "use-debounce";
 
 function BranchList() {
   const navigate = useNavigate();
-  const openQuickEdit = useSelector(
-    (state) => state.sites.isQuickEditBranchOpen
-  );
+  const openQuickEdit = useSelector((state) => state.sites.isQuickEditBranchOpen);
   const { t } = useTranslate();
   const pageNo = useSelector((state) => state.sites.pageNo);
   const pageSize = useSelector((state) => state.sites.pageSize);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const cityFilter = useSelector((state) => state.city.cityFilter);
-  const siteTypesFetchedData = useSelector(
-    (state) => state.siteType.siteTypeData
-  );
-  const companiesFetchedData = useSelector(
-    (state) => state.companies.companiesData
-  );
   const companyFilter = useSelector((state) => state.companies.companyFilter);
   const branchTypeFilter = useSelector((state) => state.sites.branchTypeFilter);
   const searchKeywords = useSelector((state) => state.sites.searchKeywords);
   const dispatch = useDispatch();
   const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
   const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
+  const {data:getAllSiteTypes, isSuccess: isSuccessGetAllSiteTypes, isLoading: isLoadingGetAllSiteTypes} = useGetAllSiteTypesQuery("siteTypeList");
+  const [debounceInputSearch] = useDebounce(searchKeywords, 1000);
+
   const {
     data: sites,
     isSuccess,
@@ -84,53 +77,24 @@ function BranchList() {
 
   const {
     data: filterData,
-    isSuccess: isSuccessFilter,
-    isLoading: isLoadingFilter,
-    isError: isErrorFilter,
-    error: errorFilter,
+    isFetching: isFetchingGetCompanyFilter
   } = useFilterSitesQuery(
     {
       pageNo,
       pageSize,
-      keywords: searchKeywords,
+      keywords: debounceInputSearch,
       cityId: cityFilter,
       siteTypeId: branchTypeFilter,
       companyId: companyFilter,
     },
     {
       skip:
-        searchKeywords === "" &&
+        debounceInputSearch === "" &&
         cityFilter === "" &&
         branchTypeFilter.length === 0 &&
         companyFilter.length === 0,
     }
   );
-
-  const [
-    getAllSiteTypes,
-    {
-      isSuccess: isSuccessGetAllSiteTypes,
-      isLoading: isLoadingGetAllSiteTypes,
-      isError: isErrorGetAllSiteTypes,
-      error: errorGetAllSiteType,
-    },
-  ] = useGetAllSiteTypesMutation();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        await Promise.all([
-          getAllSiteTypes(),
-        ]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   const breadcrumbs = [
     <button
@@ -153,13 +117,19 @@ function BranchList() {
     {
       id: "company",
       label: t("company"),
-      minWidth: 120,
+      minWidth: 250,
+      align: "left",
+    },
+    {
+      id: "parkingSpaceQty",
+      label: t("parkingSpaceQty"),
+      minWidth: 140,
       align: "left",
     },
     {
       id: "branchType",
       label: t("branchType"),
-      minWidth: 100,
+      minWidth: 120,
       align: "left",
     },
     {
@@ -171,14 +141,14 @@ function BranchList() {
     {
       id: "address",
       label: t("address"),
-      minWidth: 230,
+      minWidth: 180,
       align: "left",
       format: (value) => value.toLocaleString("en-US"),
     },
     {
       id: "createdAt",
       label: t("createdAt"),
-      minWidth: 120,
+      minWidth: 160,
       align: "left",
       format: (value) => value.toFixed(2),
     },
@@ -218,29 +188,27 @@ function BranchList() {
 
   let content;
 
-  if (isLoadingGetCity || isLoadingGetAllSite || isLoadingGetCompanyName) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetCity || isLoadingGetAllSite || isLoadingGetCompanyName || isLoadingGetAllSiteTypes) content = <LoadingFetchingDataComponent />;
 
   if (isError) {
     content = <p>Error: {error?.message}</p>;
   }
 
-  if (isSuccessGetCity && isSuccess && isSuccessGetCompanyName) {
+  if (isSuccessGetCity && isSuccess && isSuccessGetCompanyName && isSuccessGetAllSiteTypes) {
     const { ids, entities, totalElements, pageSize, pageNo } = sites;
 
     const {
       ids: idsFilterData,
       entities: searchEntities,
       totalElements: totalElementsSearch,
-      pageSize: pageSizeSearch,
-      pageNo: pageNoSearch,
+      pageSize: pageSizeFilter,
+      pageNo: pageNoFilter,
     } = filterData || {};
 
-    const displayTotalElements = filterData
-      ? totalElementsSearch
-      : totalElements;
+    const displayTotalElements = debounceInputSearch !== "" || cityFilter.length > 0 || branchTypeFilter.length > 0 || companyFilter.length > 0 ? totalElementsSearch : totalElements;
 
     const tableContent =
-      searchKeywords !== "" ||
+      debounceInputSearch !== "" ||
       cityFilter.length > 0 ||
       branchTypeFilter.length > 0 ||
       companyFilter.length > 0 ? (
@@ -255,7 +223,7 @@ function BranchList() {
             ))
           ) : (
             <TableRow sx={{ bgcolor: "#f9fafb" }}>
-              <TableCell align="center" colSpan={8}>
+              <TableCell align="center" colSpan={20}>
                 <DataNotFound />
               </TableCell>
             </TableRow>
@@ -273,7 +241,7 @@ function BranchList() {
             ))
           ) : (
             <TableRow sx={{ bgcolor: "#f9fafb" }}>
-              <TableCell align="center" colSpan={6}>
+              <TableCell align="center" colSpan={20}>
                 <DataNotFound />
               </TableCell>
             </TableRow>
@@ -297,7 +265,7 @@ function BranchList() {
               showTabs={false}
               searchQuery={searchKeywords}
               cityFetched={cityName}
-              branchTypeFetched={siteTypesFetchedData}
+              branchTypeFetched={getAllSiteTypes}
               companyFetched={companyName}
               cityFilter={cityFilter}
               branchTypeFilter={branchTypeFilter}
@@ -310,7 +278,8 @@ function BranchList() {
             />
 
             <FilterChipsComponent
-              branchTypeFetched={siteTypesFetchedData.data}
+              resultFound={displayTotalElements}
+              branchTypeFetched={getAllSiteTypes}
               branchTypeFilter={branchTypeFilter}
               cityFilter={cityFilter}
               cityFetched={cityName}
@@ -352,24 +321,29 @@ function BranchList() {
                       <TableCell
                         key={column.id}
                         align={column.align}
-                        style={{ minWidth: column.minWidth, color: "gray" }}
+                        style={{ minWidth: column.minWidth, color: "gray", whiteSpace: "nowrap" }}
                       >
                         {column.label}
                       </TableCell>
                     ))}
                   </TableRow>
                 </TableHead>
-                <TableBody sx={{ border: "none" }}>{tableContent}</TableBody>
+                <TableBody sx={{ border: "none" }}>
+                  {isFetchingGetCompanyFilter && idsFilterData?.length === 0 ? (Array.from({length: pageSize}).map((_, index) => (
+                      <SkeletonTableRowComponent key={index} cellCount={4}/>
+                  ))) : (<>{tableContent}</>)}
+                </TableBody>
               </Table>
             </TableContainer>
             <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={displayTotalElements || 0}
-              rowsPerPage={pageSize || pageSizeSearch}
-              page={pageNoSearch || pageNo}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={displayTotalElements || 0}
+                rowsPerPage={pageSizeFilter != null && pageSizeFilter !== 0 ? pageSizeFilter : pageSize}
+                labelRowsPerPage={t('rowPerPage')}
+                page={pageNoFilter != null && pageNoFilter !== 0 ? pageNoFilter : pageNo}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </Card>
         </div>

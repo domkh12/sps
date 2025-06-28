@@ -22,6 +22,11 @@ import {
 } from "../redux/feature/site/siteSlice";
 import useDateFormatter from "../hook/useDateFormatter";
 import { setIsOpenConfirmDelete } from "../redux/feature/actions/actionSlice";
+import {
+  setCompanyDataForQuickEdit,
+  setIdCompanyToDelete,
+  setIsQuickEditCompanyOpen
+} from "../redux/feature/company/companySlice.js";
 
 function stringToColor(string) {
   let hash = 0;
@@ -76,7 +81,8 @@ function CompanyRowComponent({companyId, company }) {
   if (company) {
 
     const handleDelete = () => {
-      
+      dispatch(setIsOpenConfirmDelete(true));
+      dispatch(setIdCompanyToDelete(companyId));
     };
     var handleEdit = () => navigate(`/dash/companies/${companyId}`);
     var handleView = () => navigate(`/dash/companies/${companyId}/view`);
@@ -123,7 +129,7 @@ function CompanyRowComponent({companyId, company }) {
               <ListItemText
                 primary={
                   (
-                    <Link className="hover:underline" to={"/dash"}>
+                    <Link className="hover:underline" to={`/dash/companies/${companyId}/view`}>
                       {company?.companyName}
                     </Link>
                   ) || "N/A"
@@ -140,6 +146,10 @@ function CompanyRowComponent({companyId, company }) {
           <TableCell sx={{ borderBottomStyle: "dashed" }}>
           {company?.siteQty}
           </TableCell>
+
+        <TableCell sx={{ borderBottomStyle: "dashed" }}>
+          {company?.establishedDate || "N/A"}
+        </TableCell>
 
           <TableCell sx={{ borderBottomStyle: "dashed" }}>
           {company?.city.name || "N/A"}
@@ -167,14 +177,14 @@ function CompanyRowComponent({companyId, company }) {
         <TableCell
           sx={{
             borderBottomStyle: "dashed",
-            px: 0,
+            pr: 3,
           }}
         >
           <div className="flex justify-center items-center">
             <EditButtonComponent
               handleQuickEdit={() => {
-                // dispatch(setIsQuickEditBranchOpen(true));
-                // dispatch(setBranchForQuickEdit(site));
+                dispatch(setIsQuickEditCompanyOpen(true));
+                dispatch(setCompanyDataForQuickEdit(company));
               }}
             />
             <MoreActionComponent menuItems={menuActions} />

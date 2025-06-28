@@ -13,24 +13,16 @@ import ButtonComponent from "../../components/ButtonComponent";
 import LoadingFetchingDataComponent from "./../../components/LoadingFetchingDataComponent";
 import { useDispatch, useSelector } from "react-redux";
 import {useGetAllCitiesQuery} from "../../redux/feature/city/cityApiSlice";
-import { useGetAllSiteTypesMutation } from "../../redux/feature/siteType/siteTypeApiSlice";
+import {useGetAllSiteTypesQuery} from "../../redux/feature/siteType/siteTypeApiSlice";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import { useCreateNewSiteMutation } from "../../redux/feature/site/siteApiSlice";
-import {
-  setCaptionSnackBar,
-  setErrorSnackbar,
-  setIsOpenSnackBar,
-} from "../../redux/feature/actions/actionSlice";
 import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
+import {Slide, toast} from "react-toastify";
 
 function AddNewBranch() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [profileImageFile, setProfileImageFile] = useState(null);
-  const citiesFetchedData = useSelector((state) => state.city.cityData);
-  const siteTypesFetchedData = useSelector(
-    (state) => state.siteType.siteTypeData
-  );
   const { t } = useTranslate();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,6 +30,8 @@ function AddNewBranch() {
   const [uploadImage] = useUploadImageMutation();
   const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
   const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
+  const {data:getAllSiteTypes, isSuccess: isSuccessGetAllSiteTypes, isLoading: isLoadingGetAllSiteTypes} = useGetAllSiteTypesQuery("siteTypeList");
+
   const [
     createNewSite,
     {
@@ -48,67 +42,32 @@ function AddNewBranch() {
     },
   ] = useCreateNewSiteMutation();
 
-  const [
-    getAllSiteTypes,
-    {
-      isSuccess: isSuccessGetAllSiteTypes,
-      isLoading: isLoadingGetAllSiteTypes,
-      isError: isErrorGetAllSiteTypes,
-      error: errorGetAllSiteType,
-    },
-  ] = useGetAllSiteTypesMutation();
-
-
-  useEffect(() => {
-    if (isErrorGetAllSiteTypes) {
-      setError(errorGetAllSiteType);
-    }
-  }, [
-    isErrorGetAllSiteTypes,
-    errorGetAllSiteType,
-  ]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        await Promise.all([
-          getAllSiteTypes(),
-        ]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
   useEffect(() => {
     if (isSuccessCreateNewSite) {
       navigate("/dash/branches");
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setCaptionSnackBar(t("createSuccess")));
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
+      toast.success(t("createSuccess"), {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
-  }, [isSuccessCreateNewSite, navigate]);
+  }, [isSuccessCreateNewSite]);
 
   useEffect(() => {
     if (isErrorCreateNewSite) {
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setErrorSnackbar(true));
-      dispatch(
-        setCaptionSnackBar(`${errorCreateNewSite?.data?.error?.description}`)
-      );
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
-
-      setTimeout(() => {
-        dispatch(setErrorSnackbar(false));
-      }, 3500);
+      toast.error(`${errorCreateNewSite?.data?.error?.description}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
   }, [isErrorCreateNewSite]);
 
@@ -138,7 +97,6 @@ function AddNewBranch() {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      console.log("values", values);
       const formData = new FormData();
       let profileImageUri = null;
       if (profileImageFile) {
@@ -156,6 +114,7 @@ function AddNewBranch() {
         companyUuid: values.companyId,
       });
     } catch (error) {
+      console.log("Error creating new site:", error);
     } finally {
       setSubmitting(false);
     }
@@ -163,11 +122,11 @@ function AddNewBranch() {
 
   let content;
 
-  if (isLoading || isLoadingGetCompanyName) content = <LoadingFetchingDataComponent />;
+  if (isLoading || isLoadingGetCompanyName || isLoadingGetCity || isLoadingGetAllSiteTypes) content = <LoadingFetchingDataComponent />;
 
   if (error) content = <p>Error : {error?.message}</p>;
 
-  if (!isLoading && !error && isSuccessGetCompanyName) {
+  if (isSuccessGetCompanyName && isSuccessGetCity && isSuccessGetAllSiteTypes) {
     content = (
       <>
         <div data-aos="fade-left">
@@ -197,17 +156,14 @@ function AddNewBranch() {
               setFieldValue,
             }) => {
               const handleCompanyChange = (value) => {
-                console.log("value", value);
                 setFieldValue("companyId", value);
               };
 
               const handleCityChange = (value) => {
-                console.log("value", value);
                 setFieldValue("cityId", value);
               };
 
               const handleSiteTypeChange = (value) => {
-                console.log("value", value);
                 setFieldValue("siteTypeId", value);
               };
 
@@ -315,7 +271,7 @@ function AddNewBranch() {
 
                           <SelectSingleComponent
                             label={t("branchType")}
-                            options={siteTypesFetchedData.data}
+                            options={getAllSiteTypes}
                             onChange={handleSiteTypeChange}
                             fullWidth={true}
                             error={errors.siteTypeId}
@@ -328,7 +284,6 @@ function AddNewBranch() {
                           <ButtonComponent
                             btnTitle={t("createBranch")}
                             type={"submit"}
-                            loadingCaption={t("creating")}
                             isLoading={isLoadingCreateNewSite}
                           />
                         </div>

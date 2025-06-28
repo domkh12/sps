@@ -1,6 +1,6 @@
 import { createEntityAdapter, createSelector } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
-import { setLabels, setSlot } from "./slotSlice";
+import { setSlot } from "./slotSlice";
 
 const slotAdapter = createEntityAdapter({});
 
@@ -79,6 +79,17 @@ export const slotApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: "Slot", id: "LIST" }],
     }),
 
+    addMultipleSlot: builder.mutation({
+      query: (initialState) => ({
+        url: "/parking-lots/multiple",
+        method: "POST",
+        body: {
+          ...initialState,
+        },
+      }),
+      invalidatesTags: [{ type: "Slot", id: "LIST" }],
+    }),
+
     updateSlot: builder.mutation({
       query: ({ uuid, ...initialSlotData }) => ({
         url: `/parking-lots/${uuid}`,
@@ -134,6 +145,7 @@ export const slotApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
+  useAddMultipleSlotMutation,
   useGetSlotsQuery,
   useFilterSlotsQuery,
   useAddNewSlotMutation,

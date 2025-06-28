@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useUpdateSiteMutation } from "../../redux/feature/site/siteApiSlice";
 import SeoComponent from "../../components/SeoComponent";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
@@ -12,29 +12,25 @@ import SelectSingleComponent from "../../components/SelectSingleComponent";
 import ButtonComponent from "../../components/ButtonComponent";
 import * as Yup from "yup";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { useGetAllSiteTypesMutation } from "../../redux/feature/siteType/siteTypeApiSlice";
-import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice";
+import { useDispatch } from "react-redux";
+import { useGetAllSiteTypesQuery} from "../../redux/feature/siteType/siteTypeApiSlice";
 import { useGetAllCitiesQuery } from "../../redux/feature/city/cityApiSlice";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import {
   setCaptionSnackBar,
   setIsOpenSnackBar,
 } from "../../redux/feature/actions/actionSlice";
+import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
+import {Slide, toast} from "react-toastify";
 
 function EditBranchForm({ branch }) {
   const { t } = useTranslate();
   const navigate = useNavigate();
-  const [profileImageFile, setProfileImageFile] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const companiesFetchedData = useSelector(
-    (state) => state.companies.companiesData
-  );
-  const siteTypesFetchedData = useSelector(
-    (state) => state.siteType.siteTypeData
-  );
   const dispatch = useDispatch();
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const {data:getAllSiteTypes, isSuccess: isSuccessGetAllSiteTypes, isLoading: isLoadingGetAllSiteTypes} = useGetAllSiteTypesQuery("siteTypeList");
+  const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
+  const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
 
   const [
     updateSite,
@@ -46,28 +42,6 @@ function EditBranchForm({ branch }) {
     },
   ] = useUpdateSiteMutation();
 
-  const [
-    getAllSiteTypes,
-    {
-      isSuccess: isSuccessGetAllSiteTypes,
-      isLoading: isLoadingGetAllSiteTypes,
-      isError: isErrorGetAllSiteTypes,
-      error: errorGetAllSiteType,
-    },
-  ] = useGetAllSiteTypesMutation();
-
-  const [
-    getAllCompanies,
-    {
-      isSuccess: isSuccessGetAllCompanies,
-      isLoading: isLoadingGetAllCompanies,
-      isError: isErrorGetAllCompanies,
-      error: errorGetAllCompanies,
-    },
-  ] = useGetAllCompaniesMutation();
-
-  const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
-
   const [uploadImage] = useUploadImageMutation();
 
   const validationSchema = Yup.object().shape({
@@ -78,33 +52,36 @@ function EditBranchForm({ branch }) {
     siteTypeId: Yup.string().required(t("branchTypeIsRequired")),
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        await Promise.all([
-          getAllCompanies(),
-          getAllSiteTypes(),
-        ]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+
 
   useEffect(() => {
     if (isSuccessUpdateSite) {
       navigate("/dash/branches");
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setCaptionSnackBar(t("editSuccess")));
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
+      toast.success(t("updateSuccess"), {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
   }, [isSuccessUpdateSite]);
+
+    useEffect(() => {
+      if (isErrorUpdateSite){
+        toast.error(`${errorUpdateSite?.data?.error?.description}`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: false,
+          transition: Slide,
+        });
+      }
+    },[isErrorUpdateSite])
 
   const breadcrumbs = [
     <button
@@ -143,6 +120,7 @@ function EditBranchForm({ branch }) {
         companyUuid: values?.companyId,
       });
     } catch (error) {
+      console.log("Error updating site:", error);
     } finally {
       setSubmitting(false);
     }
@@ -150,9 +128,9 @@ function EditBranchForm({ branch }) {
 
   let content;
 
-  if (isLoading) <LoadingFetchingDataComponent />;
+  if (isLoadingGetCity || isLoadingGetCompanyName || isLoadingGetAllSiteTypes) <LoadingFetchingDataComponent />;
 
-  if (!isLoading && branch) {
+  if (isSuccessGetCompanyName && isSuccessGetCity && isSuccessGetAllSiteTypes) {
     content = (
       <>
         <SeoComponent title={t("edit")} />
@@ -183,17 +161,14 @@ function EditBranchForm({ branch }) {
             setFieldValue,
           }) => {
             const handleCompanyChange = (value) => {
-              console.log("value", value);
               setFieldValue("companyId", value);
             };
 
             const handleCityChange = (value) => {
-              console.log("value", value);
               setFieldValue("cityId", value);
             };
 
             const handleSiteTypeChange = (value) => {
-              console.log("value", value);
               setFieldValue("siteTypeId", value);
             };
 
@@ -279,7 +254,7 @@ function EditBranchForm({ branch }) {
 
                         <SelectSingleComponent
                           label={t("company")}
-                          options={companiesFetchedData.data}
+                          options={companyName}
                           onChange={handleCompanyChange}
                           fullWidth={true}
                           error={errors.companyId}
@@ -301,7 +276,7 @@ function EditBranchForm({ branch }) {
 
                         <SelectSingleComponent
                           label={t("branchType")}
-                          options={siteTypesFetchedData.data}
+                          options={getAllSiteTypes}
                           onChange={handleSiteTypeChange}
                           fullWidth={true}
                           error={errors.siteTypeId}

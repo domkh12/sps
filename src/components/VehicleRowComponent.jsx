@@ -23,6 +23,7 @@ import {
 import useDateFormatter from "../hook/useDateFormatter";
 
 function VehicleRowComponent({ vehicleId, vehicle }) {
+  console.log("VehicleRowComponent rendered", vehicle);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -114,14 +115,14 @@ function VehicleRowComponent({ vehicleId, vehicle }) {
           <div className="w-[250px]  rounded-[12px] border-blue-600 border-[3px] px-3 py-2 flex items-center justify-between">
             <div className="flex flex-col">
               <Typography variant="body1" className="text-blue-600">
-                {vehicle?.licensePlateProvince?.provinceNameKh}
+                {vehicle?.licensePlateProvince?.provinceNameKh || "N/A"}
               </Typography>
               <Typography variant="body1" className="text-red-600">
-                {vehicle?.licensePlateProvince?.provinceNameEn}
+                {vehicle?.licensePlateProvince?.provinceNameEn || "N/A"}
               </Typography>
             </div>
             <Typography variant="h5" className="underline text-blue-600">
-              {vehicle?.numberPlate}
+              {vehicle?.numberPlate || "N/A"}
             </Typography>
           </div>
         </TableCell>

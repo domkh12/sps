@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { setIsOpenQuickEdit, setPageNo, setPageSize, setStatus, setTotalPages, setUuid } from "../users/userSlice";
 
 const slotSlice= createSlice ({
     name:"slot",
@@ -15,11 +14,29 @@ const slotSlice= createSlice ({
         slotToEdit:{},
         searchSlotToEdit:{},
         slotFilter:[],
-
-
+        localSlotData:[],
+        slotUpdateLocalData: [],
+        isOpenAddNewSlot:false,
     },
     reducers :{
-        setslot:(state,action)=>{
+        appendSlotLocalData(state, action) {
+            state.slotUpdateLocalData = action.payload
+        },
+        clearLocalSlotData:(state)=>{
+            state.localSlotData=[];
+            state.slotUpdateLocalData = [];
+        },
+        setNewLocalSlotData:(state, action) => {
+          state.localSlotData = action.payload;
+        },
+        setIsOpenAddNewSlot:(state,action)=>{
+            state.isOpenAddNewSlot=action.payload;
+        },
+        setLocalSlotData:(state,action)=>{
+            state.localSlotData = [...state.localSlotData, action.payload];
+            state.slotUpdateLocalData = [...state.slotUpdateLocalData, action.payload];
+        },
+        setSlot:(state,action)=>{
             state.slot=action.payload;
         },
         setStatus:(state,action)=>{
@@ -52,9 +69,12 @@ const slotSlice= createSlice ({
     }
 })  
 export const{
-    setslot,
-    setStatus,
-    setPageNo,
+    appendSlotLocalData,
+    clearLocalSlotData,
+    setNewLocalSlotData,
+    setIsOpenAddNewSlot,
+    setLocalSlotData,
+    setSlot,
     setPageSize,
     setTotalPages,
     setIdSlotToDelete,

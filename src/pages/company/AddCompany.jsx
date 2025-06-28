@@ -25,7 +25,6 @@ function AddCompany() {
   const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
   const {data:companyTypeData, isSuccess: isSuccessGetCompanyType, isLoading: isLoadingGetCompanyType} = useGetCompanyTypeQuery("companyTypeList");
   const { t } = useTranslate();
-  const [error, setError] = useState(null);
 
   const [uploadImage] = useUploadImageMutation();
 
@@ -102,7 +101,7 @@ function AddCompany() {
         const uploadResponse = await uploadImage(formData).unwrap();
         profileImageUri = uploadResponse.uri;
       }
-      const formattedDate = dayjs(values.dateOfBirth).format(
+      const formattedDate = dayjs(values.establishedDate).format(
           "YYYY-MM-DD"
       );
 
@@ -124,8 +123,6 @@ function AddCompany() {
   let content;
 
   if (isLoadingGetCompanyType || isLoadingGetCity) content = <LoadingFetchingDataComponent />;
-
-  if (error) content = <p>Error : {error?.message}</p>;
 
   if (isSuccessGetCity && isSuccessGetCompanyType) {
     content = (

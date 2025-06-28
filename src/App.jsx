@@ -1,4 +1,4 @@
-import { createTheme, ThemeProvider } from "@mui/material";
+import { ThemeProvider } from "@mui/material";
 import Aos from "aos";
 import "aos/dist/aos.css";
 import { lazy, Suspense, useEffect } from "react";
@@ -7,7 +7,9 @@ import { ROLES } from "./config/roles.js";
 import RequireAuth from "./pages/auth/RequireAuth.jsx";
 import EditCompany from "./pages/company/EditCompany.jsx";
 import ViewCompany from "./pages/company/ViewCompany.jsx";
-
+import {useSelector} from "react-redux";
+import {getTheme} from "./config/themeConfig.js";
+const ViewBranch = lazy(() => import("./pages/branch/ViewBranch.jsx"));
 const ParkingView = lazy(() => import("./pages/parking/ParkingView.jsx"));
 const HistoryList = lazy(() => import("./pages/history/HistoryList.jsx"));
 const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword.jsx"));
@@ -61,20 +63,9 @@ const AddCompany =lazy (()=>import ("./pages/company/AddCompany.jsx"));
 const ListCompany =lazy(()=>import("./pages/company/ListCompany.jsx"));
 // const ViewCompany =lazy (()=>import("./pages/company/ViewCompany.jsx"));
 function App() {
-  const theme = createTheme({
-    typography: {
-      fontFamily: ["Roboto", "Hanuman", "Arial", "sans-serif"].join(","),
-    },
-    palette: {
-      primary: {
-        main: "#000",
-      },
-      secondary: {
-        main: "#f44336",
-      },
-    },
-   
-  });
+
+  const mode = useSelector((state) => state.theme.mode);
+  const theme = getTheme(mode);
 
   window.addEventListener("vite:preloadError", (event) => {
     event.preventDefault();
@@ -159,7 +150,7 @@ function App() {
                     <Route index element={<MapViews />} />
                   </Route>
 
-                  <Route path="parkings">
+                  <Route path="parking-spaces">
                     <Route index element={<ParkingList />} />
 
                     <Route
@@ -209,6 +200,7 @@ function App() {
                       <Route index element={<BranchList />} />
                       <Route path="new" element={<AddNewBranch />} />
                       <Route path=":id" element={<EditBranch />} />
+                      <Route path=":id/view" element={<ViewBranch />} />
                     </Route>
                   </Route>  
                 </Route>

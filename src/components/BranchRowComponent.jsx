@@ -121,9 +121,9 @@ function BranchRowComponent({ siteId, site }) {
           <List sx={{ padding: "0" }}>
             <ListItem sx={{ padding: "0", gap: "10px" }}>
               <Avatar
-                alt={site?.siteName}
+                alt={site?.siteName || "N/A"}
                 src={site?.image}
-                {...stringAvatar(site?.siteName)}
+                {...stringAvatar(site?.siteName || "N/A")}
                 sx={{
                   "& .MuiAvatar-img": {
                     objectFit: "contain",
@@ -133,8 +133,8 @@ function BranchRowComponent({ siteId, site }) {
               <ListItemText
                 primary={
                   (
-                    <Link className="hover:underline" to={"/dash"}>
-                      {site?.siteName}
+                    <Link className="hover:underline" to={`/dash/branches/${siteId}/view`}>
+                      {site?.siteName || "N/A"}
                     </Link>
                   ) || "N/A"
                 }
@@ -144,19 +144,23 @@ function BranchRowComponent({ siteId, site }) {
         </TableCell>
 
         <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          {site.company?.companyName}
+          {site.company?.companyName || "N/A"}
         </TableCell>
 
         <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          {site.siteType?.name}
+          {site.parkingSpacesQty}
         </TableCell>
 
         <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          {site.city?.name}
+          {site.siteType?.name || "N/A"}
         </TableCell>
 
         <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          {site?.siteAddress}
+          {site.city?.name || "N/A"}
+        </TableCell>
+
+        <TableCell sx={{ borderBottomStyle: "dashed" }}>
+          {site?.siteAddress || "N/A"}
         </TableCell>
 
         <TableCell sx={{ borderBottomStyle: "dashed" }}>
@@ -171,7 +175,7 @@ function BranchRowComponent({ siteId, site }) {
         <TableCell
           sx={{
             borderBottomStyle: "dashed",
-            px: 0,
+            pr: 3,
           }}
         >
           <div className="flex justify-center items-center">

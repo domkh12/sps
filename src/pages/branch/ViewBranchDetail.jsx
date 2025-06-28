@@ -5,8 +5,9 @@ import MainHeaderComponent from "../../components/MainHeaderComponent.jsx";
 import {cardStyle} from "../../assets/style.js";
 import ImageDetailComponent from "../../components/ImageDetailComponent.jsx";
 
-function ViewCompanyDetail({company}) {
+function ViewBranchDetail({branch}){
     const navigate = useNavigate();
+    console.log("branch", branch);
     const { t } = useTranslate();
     const breadcrumbs = [
         <Paper
@@ -19,46 +20,46 @@ function ViewCompanyDetail({company}) {
             {t("dashboard")}
         </Paper>,
         <Typography color="inherit" key={2}>
-            {t("companyType")}
+            {t("branchType")}
         </Typography>,
         <Typography color="inherit" key={3}>
-            {company?.companyName}
+            {branch?.siteName}
         </Typography>,
     ];
     return (
         <>
             <MainHeaderComponent
                 breadcrumbs={breadcrumbs}
-                title={company.companyName}
-                handleBackClick={() => navigate("/dash/companies")}
+                title={branch.siteName}
+                handleBackClick={() => navigate("/dash/branches")}
             />
             <Card sx={{...cardStyle, p: "16px"}}>
-                <Typography variant="h6" sx={{pb: 1}}>{t('companyInfo')}</Typography>
-                <ImageDetailComponent image={company?.image}/>
+                <Typography variant="h6" sx={{pb: 1}}>{t('branchInfo')}</Typography>
+                <ImageDetailComponent image={branch?.image}/>
                 <div className="flex flex-col gap-3 mt-5">
                     <Typography variant="body1">
-                        <span >{t('companyName')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.companyName}`}
+                        <span >{t('branchName')} </span>
+                        {`${"\u00a0"}:${"\u00a0"}${branch?.siteName || "N/A"}`}
                     </Typography>
                     <Typography variant="body1">
-                        <span >{t('branchQty')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.siteQty}`}
+                        <span >{t('branchType')} </span>
+                        {`${"\u00a0"}:${"\u00a0"}${branch?.siteType.name || "N/A"}`}
                     </Typography>
                     <Typography variant="body1">
-                        <span >{t('companyAddress')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.companyAddress}`}
+                        <span >{t('parkingSpaceQty')} </span>
+                        {`${"\u00a0"}:${"\u00a0"}${branch?.parkingSpacesQty}`}
+                    </Typography>
+                    <Typography variant="body1">
+                        <span >{t('branchAddress')} </span>
+                        {`${"\u00a0"}:${"\u00a0"}${branch?.siteAddress || "N/A"}`}
                     </Typography>
                     <Typography variant="body1">
                         <span >{t('city')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.city.name}`}
+                        {`${"\u00a0"}:${"\u00a0"}${branch?.city.name || "N/A"}`}
                     </Typography>
                     <Typography variant="body1">
-                        <span >{t('companyType')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.companyType.name}`}
-                    </Typography>
-                    <Typography variant="body1">
-                        <span >{t('establishedDate')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.establishedDate}`}
+                        <span >{t('company')} </span>
+                        {`${"\u00a0"}:${"\u00a0"}${branch?.company.companyName || "N/A"}`}
                     </Typography>
                 </div>
             </Card>
@@ -66,4 +67,4 @@ function ViewCompanyDetail({company}) {
     );
 }
 
-export default ViewCompanyDetail;
+export default ViewBranchDetail;

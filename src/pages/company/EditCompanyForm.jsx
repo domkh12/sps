@@ -4,7 +4,7 @@ import {useGetAllCitiesQuery} from "../../redux/feature/city/cityApiSlice.js";
 import {useGetCompanyTypeQuery} from "../../redux/feature/companyType/CompanyTypeApiSlice.js";
 import useTranslate from "../../hook/useTranslate.jsx";
 import {useUploadImageMutation} from "../../redux/feature/uploadImage/uploadImageApiSlice.js";
-import {useCreateCompanyMutation, useUpdateCompanyMutation} from "../../redux/feature/company/companyApiSlice.js";
+import {useUpdateCompanyMutation} from "../../redux/feature/company/companyApiSlice.js";
 import {Slide, toast} from "react-toastify";
 import * as Yup from "yup";
 import {Card, FormControl, Grid2, TextField, Typography} from "@mui/material";
@@ -20,13 +20,11 @@ import {DatePicker} from "@mui/x-date-pickers";
 import ButtonComponent from "../../components/ButtonComponent.jsx";
 
 function EditCompanyForm({company}){
-    console.log("company",company)
     const navigate = useNavigate();
     const [profileImageFile, setProfileImageFile] = useState(null);
     const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
     const {data:companyTypeData, isSuccess: isSuccessGetCompanyType, isLoading: isLoadingGetCompanyType} = useGetCompanyTypeQuery("companyTypeList");
     const { t } = useTranslate();
-    const [error, setError] = useState(null);
 
     const [uploadImage] = useUploadImageMutation();
 
@@ -103,7 +101,7 @@ function EditCompanyForm({company}){
                 const uploadResponse = await uploadImage(formData).unwrap();
                 profileImageUri = uploadResponse.uri;
             }
-            const formattedDate = dayjs(values.dateOfBirth).format(
+            const formattedDate = dayjs(values.establishedDate).format(
                 "YYYY-MM-DD"
             );
 
@@ -127,8 +125,6 @@ function EditCompanyForm({company}){
 
     if (isLoadingGetCompanyType || isLoadingGetCity) content = <LoadingFetchingDataComponent />;
 
-    if (error) content = <p>Error : {error?.message}</p>;
-
     if (isSuccessGetCity && isSuccessGetCompanyType) {
         content = (
             <>
@@ -137,7 +133,7 @@ function EditCompanyForm({company}){
                     <MainHeaderComponent
                         breadcrumbs={breadcrumbs}
                         title={t("newcompany")}
-                        handleBackClick={() => navigate("/dash/companies")}
+                        handleBackClick={() => navigate("/dash/branches")}
                     />
                     <Formik
                         initialValues={{

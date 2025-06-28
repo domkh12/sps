@@ -7,7 +7,7 @@ function ImageDetailComponent({name, image}) {
                 <div className="p-1 border-dashed border rounded-[12px]">
                     <div className="w-48 h-28 rounded-[12px] overflow-hidden">
                         <img
-                            src={image || "/images/img_placeholder.jpg"}
+                            src={image || "/images/img_placeholder.png"}
                             alt="roomImage"
                             className="w-full h-full object-cover"
                         />

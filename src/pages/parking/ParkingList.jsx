@@ -132,7 +132,7 @@ function ParkingList() {
   ];
 
   const columns = [
-    { id: "location", label: "Location", minWidth: 170, align: "left" },
+    { id: "parkingSpaceName", label: t('parkingSpaceName'), minWidth: 170, align: "left" },
     {
       id: "branch",
       label: t("branch"),
@@ -141,19 +141,19 @@ function ParkingList() {
     },
     {
       id: "quantity",
-      label: "Quantity\u00a0lots",
+      label: t('lotQty'),
       minWidth: 120,
       align: "left",
     },
     {
-      id: "filled",
-      label: "Filled",
+      id: "occupied",
+      label: t('occupied'),
       minWidth: 120,
       align: "left",
     },
     {
       id: "created_at",
-      label: "Created\u00a0at",
+      label: t('createdAt'),
       minWidth: 120,
       align: "left",
     },

@@ -25,10 +25,10 @@ import {
 } from "../../redux/feature/actions/actionSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
-import SelectSingleComponent from "./../../components/SelectSingleComponent";
-import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice";
+
 import useAuth from "../../hook/useAuth";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
+import ModalAddSlotComponent from "../../components/ModalAddSlotComponent.jsx";
 
 export default function AddNewSlot() {
   const [profileImageFile, setProfileImageFile] = useState(null);

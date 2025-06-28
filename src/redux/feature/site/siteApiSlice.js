@@ -119,10 +119,23 @@ export const sitesApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [{ type: "Site", id: arg.uuid }],
     }),
+
+    getSiteByUuid: builder.query({
+        query: (uuid) => ({
+            url: `/sites/${uuid}`,
+        }),
+        providesTags: (result, error, arg) => {
+          if (result?.ids) {
+            return [{type: "BranchByUuid", id: "LIST"}, ...result.ids.map((id) => ({type: "BranchByUuid", id})),];
+          } else return [{type: "BranchByUuid", id: "LIST"}];
+        },
+    })
+
   }),
 });
 
 export const {
+  useGetSiteByUuidQuery,
   useDeleteSiteMutation,
   useGetSitesQuery,
   useGetSitesListMutation,

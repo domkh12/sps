@@ -41,8 +41,8 @@ import {
   setErrorSnackbar,
   setIsOpenSnackBar,
 } from "../../redux/feature/actions/actionSlice.js";
-import { useGetAllCompaniesMutation } from "../../redux/feature/company/companyApiSlice.js";
 import useAuth from "../../hook/useAuth.jsx";
+import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
 
 function AddNewUser() {
   const navigate = useNavigate();
@@ -54,11 +54,11 @@ function AddNewUser() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const genderFetched = useSelector((state) => state.users.genders);
   const rolesFetched = useSelector((state) => state.users.roles);
-  const companyData = useSelector((state) => state.companies.companiesData);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { t } = useTranslate();
   const { isManager, isAdmin } = useAuth();
+  const {data:companyData, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
 
   const [
     addNewUser,
@@ -81,16 +81,6 @@ function AddNewUser() {
       error: findAllGenderError,
     },
   ] = useFindAllGenderMutation();
-
-  const [
-    getAllCompanies,
-    {
-      isSuccess: isGetAllCompaniesSuccess,
-      isLoading: isGetAllCompaniesLoading,
-      isError: isGetAllCompaniesError,
-      error: getAllCompaniesError,
-    },
-  ] = useGetAllCompaniesMutation();
 
   const [
     getAllRoles,
@@ -237,7 +227,6 @@ function AddNewUser() {
         const promises = [];
         if (isManager) {
           promises.push(getAllRoles());
-          promises.push(getAllCompanies());
         }
         promises.push(findAllGender());
 
@@ -249,7 +238,7 @@ function AddNewUser() {
       }
     };
     fetchData();
-  }, [isManager, getAllRoles, getAllCompanies, findAllGender]);
+  }, [isManager, getAllRoles, findAllGender]);
 
   useEffect(() => {
     if (isSuccessAddNewUser) {
@@ -341,7 +330,7 @@ function AddNewUser() {
     (isManager
       ? isFindAllGenderSuccess &&
         isGetAllRolesSuccess &&
-        isGetAllCompaniesSuccess
+        isSuccessGetCompanyName
       : isFindAllGenderSuccess)
   ) {
     content = (

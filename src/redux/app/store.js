@@ -16,10 +16,12 @@ import mapViewReducer from "../feature/mapView/mapViewSlice.js";
 import analysisReducer from "../feature/analysis/analysisSlice.js";
 import appReducer from "../feature/app/appSlice.js";
 import companyTypeReducer from "../feature/companyType/companyTypeSlice.js";
-// import slotReducer from "../feature/slot/slotSlice.js"
+import themeReducer from "../feature/theme/themeSlice.js";
+import slotReducer from "../feature/slot/slotSlice.js"
 const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,
+    theme: themeReducer,
     auth: authReducer,
     users: userReducer,
     action: actionReducer,
@@ -34,7 +36,8 @@ const store = configureStore({
     mapView: mapViewReducer,
     analysis: analysisReducer,
     app: appReducer,
-    companyType: companyTypeReducer
+    companyType: companyTypeReducer,
+    slot: slotReducer
     // slot:slotReducer,
   },
   middleware: (getDefaultMiddleware) =>

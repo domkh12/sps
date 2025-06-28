@@ -10,6 +10,7 @@ import { parkingDetailApiSlice } from "../../redux/feature/parking/parkingDetail
 import { companiesApiSlice } from "../../redux/feature/company/companyApiSlice";
 import { cityApiSlice } from "../../redux/feature/city/cityApiSlice";
 import {companyTypeApiSlice} from "../../redux/feature/companyType/CompanyTypeApiSlice.js";
+import {siteTypeApiSlice} from "../../redux/feature/siteType/siteTypeApiSlice.js";
 
 
 function Prefetch() {
@@ -22,6 +23,7 @@ function Prefetch() {
       store.dispatch(cityApiSlice.util.prefetch("getAllCities", "citiesList", {force: true }));
       store.dispatch(companyTypeApiSlice.util.prefetch("getCompanyType", "companyTypeList", {force: true }));
       store.dispatch(companiesApiSlice.util.prefetch("getAllCompanies", "companyNameList", {force: true}));
+      store.dispatch(siteTypeApiSlice.util.prefetch("getAllSiteTypes", "siteTypeList", {force: true}));
     }
 
     if (isManager || isAdmin) {

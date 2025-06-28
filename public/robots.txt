@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Allow: /login
+Allow: /images/logo.png
 Disallow: /dash
 Disallow: /forgot-password
 Disallow: /reset-password

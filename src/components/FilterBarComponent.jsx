@@ -1,5 +1,4 @@
 import { Box, Tab } from "@mui/material";
-import React from "react";
 import { TabContext, TabList } from "@mui/lab";
 import SelectComponent from "./SelectComponent";
 import SearchComponent from "./SearchComponent";
@@ -156,7 +155,7 @@ function FilterBarComponent({
         </TabContext>
       )}
 
-      <div className="p-[20px] flex gap-[16px] 2xl:flex-nowrap flex-wrap flex-col xl:flex-row">
+      <div className={`p-[20px] gap-[16px] flex flex-col lg:flex-row`}>
 
         {companyTypeFetched && (
             <SelectComponent
@@ -166,7 +165,7 @@ function FilterBarComponent({
               options={companyTypeFetched}
               onChange={handleCompanyTypeChange}
               optionLabelKey="name"
-              width60={"2xl:w-60"}
+              width60={true}
               value={companyTypeFilter}
             />
         )}
@@ -179,7 +178,7 @@ function FilterBarComponent({
             options={parkingSpaceFetched?.data}
             onChange={handleRoleChange}
             optionLabelKey="label"
-            width60={"2xl:w-60"}
+            width60={true}
             value={roleFilter}
           />
         )}
@@ -192,7 +191,7 @@ function FilterBarComponent({
             options={roleFetched?.data}
             onChange={handleRoleChange}
             optionLabelKey="name"
-            width60={"2xl:w-60"}
+            width60={true}
             value={roleFilter}
           />
         )}
@@ -205,7 +204,7 @@ function FilterBarComponent({
             options={companyFetched}
             onChange={handleCompanyChange}
             optionLabelKey="companyName"
-            width60={"2xl:w-60"}
+            width60={true}
             value={companyFilter}
           />
         )}
@@ -218,7 +217,7 @@ function FilterBarComponent({
             options={cityFetched}
             onChange={handleCityChange}
             optionLabelKey="name"
-            width60={"2xl:w-60"}
+            width60={true}
             value={cityFilter}
           />
         )}
@@ -228,10 +227,10 @@ function FilterBarComponent({
             label={t("branchType")}
             labelId="branchType_label"
             id="branchType"
-            options={branchTypeFetched?.data}
+            options={branchTypeFetched}
             onChange={handleBranchTypeChange}
             optionLabelKey="name"
-            width60={"2xl:w-60"}
+            width60={true}
             value={branchTypeFilter}
           />
         )}
@@ -244,7 +243,7 @@ function FilterBarComponent({
             options={signUpMethodsFetched?.data}
             onChange={handleMethodChange}
             optionLabelKey="name"
-            width60={"2xl:w-60"}
+            width60={true}
             value={signUpMethodFilter}
           />
         )}
@@ -257,7 +256,7 @@ function FilterBarComponent({
             options={vehicleTypeFetched?.data}
             onChange={handleVehicleTypeChange}
             optionLabelKey="name"
-            width60={"2xl:w-60"}
+            width60={true}
             value={vehicleTypeFilter}
           />
         )}
@@ -270,7 +269,7 @@ function FilterBarComponent({
             options={branchFetched}
             onChange={handleBranchChange}
             optionLabelKey="siteName"
-            width60={"2xl:w-60"}
+            width60={true}
             value={branchFilter}
           />
         )}

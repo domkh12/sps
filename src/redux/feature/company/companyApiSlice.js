@@ -38,6 +38,31 @@ export const companiesApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
+    filterCompany: builder.query({
+      query: ({keywords, pageNo, pageSize, companyTypeUuid, cityUuid}) => ({
+        url: `/companies/filters?pageNo=${pageNo}&pageSize=${pageSize}&keywords=${keywords}&companyTypeUuid=${companyTypeUuid}&cityUuid=${cityUuid}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError;
+        },
+      }), transformResponse: (responseData) => {
+        const loadedCompany = responseData.content.map((company) => {
+          company.id = company.uuid;
+          return company;
+        });
+        return {
+          ...companiesAdapter.setAll(initialState, loadedCompany),
+          totalPagesFilter: responseData.page.totalPages,
+          totalElementsFilter: responseData.page.totalElements,
+          pageNoFilter: responseData.page.number,
+          pageSizeFilter: responseData.page.size,
+        };
+      }, providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "Company", id: "LIST"}, ...result.ids.map((id) => ({type: "Company", id})),];
+        } else return [{type: "Company", id: "LIST"}];
+      },
+    }),
+
     createCompany: builder.mutation({
       query: (initialState) => ({
         url: "/companies",
@@ -58,6 +83,14 @@ export const companiesApiSlice = apiSlice.injectEndpoints({
         },
       }),
       invalidatesTags: [{type: "Company", id: "LIST"}],
+    }),
+
+    deleteCompany: builder.mutation({
+      query: ({ uuid }) => ({
+        url: `/companies/${uuid}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: "Company", id: arg.uuid }],
     }),
 
     getAllCompanies: builder.query({
@@ -84,4 +117,4 @@ export const companiesApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetAllCompaniesQuery , useGetCompanyQuery , useCreateCompanyMutation, useGetCompanyByUuidQuery, useUpdateCompanyMutation } = companiesApiSlice;
+export const { useFilterCompanyQuery , useDeleteCompanyMutation, useGetAllCompaniesQuery , useGetCompanyQuery , useCreateCompanyMutation, useGetCompanyByUuidQuery, useUpdateCompanyMutation } = companiesApiSlice;

@@ -1,13 +1,13 @@
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
 import { Form, Formik } from "formik";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import SelectSingleComponent from "./SelectSingleComponent";
 import * as Yup from "yup";
 import useTranslate from "../hook/useTranslate";
 import {useGetAllCompaniesQuery} from "../redux/feature/company/companyApiSlice";
 
-import { useGetAllSiteTypesMutation } from "../redux/feature/siteType/siteTypeApiSlice";
+import {useGetAllSiteTypesQuery} from "../redux/feature/siteType/siteTypeApiSlice";
 import { useUpdateSiteMutation } from "../redux/feature/site/siteApiSlice";
 import { buttonStyleContained, buttonStyleOutlined } from "../assets/style";
 import { setIsQuickEditBranchOpen } from "../redux/feature/site/siteSlice";
@@ -17,18 +17,17 @@ import {
   setIsOpenSnackBar,
 } from "../redux/feature/actions/actionSlice";
 import AlertMessageComponent from "./AlertMessageComponent";
+import {useGetAllCitiesQuery} from "../redux/feature/city/cityApiSlice.js";
+import {Slide, toast} from "react-toastify";
 
 function QuickEditBranchComponent() {
   const open = useSelector((state) => state.sites.isQuickEditBranchOpen);
   const branch = useSelector((state) => state.sites.branchForQuickEdit);
-  const [isLoading, setIsLoading] = useState(true);
-  const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
-  const citiesFetchedData = useSelector((state) => state.city.cityData);
-  const siteTypesFetchedData = useSelector(
-    (state) => state.siteType.siteTypeData
-  );
   const { t } = useTranslate();
   const dispatch = useDispatch();
+  const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
+  const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
+  const {data:getAllSiteTypes, isSuccess: isSuccessGetAllSiteTypes, isLoading: isLoadingGetAllSiteTypes} = useGetAllSiteTypesQuery("siteTypeList");
 
   const [
     updateSite,
@@ -40,59 +39,32 @@ function QuickEditBranchComponent() {
     },
   ] = useUpdateSiteMutation();
 
-  const [
-    getAllSiteTypes,
-    {
-      isSuccess: isSuccessGetAllSiteTypes,
-      isLoading: isLoadingGetAllSiteTypes,
-      isError: isErrorGetAllSiteTypes,
-      error: errorGetAllSiteType,
-    },
-  ] = useGetAllSiteTypesMutation();
-
-  const [
-    getAllCities,
-    {
-      isSuccess: isSuccessGetAllCities,
-      isLoading: isLoadingGetAllCities,
-      isError: isErrorGetAllCities,
-      error: errorGetAllCities,
-    },
-  ] = useGetAllCitiesMutation();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        await Promise.all([
-          getAllCities(),
-          getAllSiteTypes(),
-        ]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
   useEffect(() => {
     if (isSuccessUpdateSite) {
       dispatch(setIsQuickEditBranchOpen(false));
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setCaptionSnackBar(t("editSuccess")));
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
+      toast.success(t("updateSuccess"), {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
   }, [isSuccessUpdateSite]);
 
   useEffect(() => {
     if (isErrorUpdateSite) {
-      dispatch(
-        setCaptionSnackBar(`${errorUpdateSite?.data?.error?.description}`)
-      );
+      toast.error(`${errorUpdateSite?.data?.error?.description}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
   }, [isErrorUpdateSite]);
 
@@ -123,15 +95,16 @@ function QuickEditBranchComponent() {
         companyUuid: values?.companyId,
       });
     } catch (error) {
+      console.log("Error updating site:", error);
     } finally {
       setSubmitting(false);
     }
   };
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetCity || isLoadingGetCompanyName || isLoadingGetAllSiteTypes) content = <LoadingFetchingDataComponent />;
 
-  if (!isLoading) {
+  if (isSuccessGetCity && isSuccessGetCompanyName && isSuccessGetAllSiteTypes) {
     content = (
       <Box>
         <Formik
@@ -236,7 +209,7 @@ function QuickEditBranchComponent() {
 
                   <SelectSingleComponent
                     label={t("city")}
-                    options={citiesFetchedData.data}
+                    options={cityName}
                     onChange={handleCityChange}
                     fullWidth={true}
                     error={errors.cityId}
@@ -247,7 +220,7 @@ function QuickEditBranchComponent() {
 
                   <SelectSingleComponent
                     label={t("branchType")}
-                    options={siteTypesFetchedData.data}
+                    options={getAllSiteTypes}
                     onChange={handleSiteTypeChange}
                     fullWidth={true}
                     error={errors.siteTypeId}
@@ -272,14 +245,14 @@ function QuickEditBranchComponent() {
                       ...buttonStyleOutlined,
                     }}
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                   <Button
                     variant="contained"
                     sx={{ ...buttonStyleContained, ml: 1 }}
                     type="submit"
                   >
-                    Update
+                    {t('update')}
                   </Button>
                 </Box>
               </Form>
@@ -293,19 +266,28 @@ function QuickEditBranchComponent() {
   return (
     <Modal
       open={open}
+      onClose={() => dispatch(setIsQuickEditBranchOpen(false))}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
       closeAfterTransition
     >
-      <Box sx={style}>
+      <Box>
         <Box
-          sx={{
-            backgroundColor: "background.paper",
-            borderRadius: "16px",
-            width: "100%",
-            mx: 5,
-            maxWidth: "720px",
-          }}
+            sx={{
+              backgroundColor: "background.paper",
+              borderRadius: "16px",
+              width: "95%",
+              maxWidth: "720px",
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              overflow: "auto",
+              maxHeight: "90vh",
+              boxShadow: "0px 10px 15px -3px rgb(0 0 0 / 20%), 0px 4px 6px -2px rgb(0 0 0 / 15%)",
+              display: "flex",
+              flexDirection: "column",
+            }}
         >
           <Typography
             id="modal-modal-title"
@@ -313,14 +295,8 @@ function QuickEditBranchComponent() {
             component="h2"
             sx={{ padding: "24px" }}
           >
-            Quick update
+            {t("quickUpdate")}
           </Typography>
-          {isErrorUpdateSite && (
-            <Box sx={{ px: "24px" }}>
-              <AlertMessageComponent />
-            </Box>
-          )}
-
           {content}
         </Box>
       </Box>
