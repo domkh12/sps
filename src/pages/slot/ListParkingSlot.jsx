@@ -37,8 +37,10 @@ import {
 } from "../../redux/feature/parking/parkingSlice";
 import DataNotFound from "../../components/DataNotFound";
 import FilterChipsComponent from "../../components/FilterChipsComponent";
+import {useFilterSlotsQuery, useGetSlotsQuery} from "../../redux/feature/slot/slotApiSlice.js";
+import ParkingSlotRowComponent from "../../components/ParkingSlotRowComponent.jsx";
 
-function SlotList() {
+function ListParkingSlot() {
   const navigate = useNavigate();
   const { t } = useTranslate();
   const { isManager } = useAuth();
@@ -61,7 +63,7 @@ function SlotList() {
     isLoading: isLoadingGetParkingSpaces,
     isError: isErrorGetParkingSpaces,
     error: errorGetParkingSpaces,
-  } = useGetParkingSpacesQuery(
+  } = useGetSlotsQuery(
     {
       pageNo,
       pageSize,
@@ -79,7 +81,7 @@ function SlotList() {
     isLoading: isLoadingFilterParkingSpaces,
     isError: isErrorFilterParkingSpaces,
     error: errorFilterParkingSpaces,
-  } = useFilterParkingSpacesQuery(
+  } = useFilterSlotsQuery(
     {
       pageNo,
       pageSize,
@@ -124,7 +126,7 @@ function SlotList() {
       {t("dashboard")}
     </button>,
     <Typography color="inherit" key={2}>
-      {t("slot")}
+      {t("slotName")}
     </Typography>,
     <Typography color="inherit" key={3}>
       {t("list")}
@@ -132,32 +134,32 @@ function SlotList() {
   ];
 
   const columns = [
-    { id: "SlotID", label: t("slotid"), minWidth: 120, align: "left" },
+    { id: "slotNumber", label: t("slotNumber"), minWidth: 120, align: "left" },
     {
-      id: "Slot-Name",
-      label: t("slotname"),
+      id: "parkingSpaceName",
+      label: t("parkingSpaceName"),
       minWidth: 120,
       align: "left",
     },
     {
-      id: "Location",
-      label: t("location"),
+      id: "status",
+      label:t("status"),
       minWidth: 120,
       align: "left",
     },
-     {
-      id: "Create BY",
-      label: t("createby"),
+    {
+      id: "createdAt",
+      label:t("createdAt"),
       minWidth: 120,
       align: "left",
     },
-     {
-      id: "Create At",
-      label:t("createat"),
-      minWidth: 120,
+    {
+      id: "action",
+      label: "",
+      minWidth: 30,
       align: "left",
+      format: (value) => value.toFixed(2),
     },
-   
   ];
 
   const handleBranchChange = (branch) => {
@@ -212,11 +214,11 @@ function SlotList() {
       searchKeywords !== "" || branchFilter.length > 0 ? (
         <>
           {idsFilter?.length ? (
-            idsFilter.map((parkingId) => (
-              <ParkingSpaceRowComponent
-                parkingId={parkingId}
-                key={parkingId}
-                parkingSpace={searchEntities[parkingId]}
+            idsFilter.map((parkingSlotId) => (
+              <ParkingSlotRowComponent
+                parkingSlotId={parkingSlotId}
+                key={parkingSlotId}
+                parkingSlot={searchEntities[parkingSlotId]}
               />
             ))
           ) : (
@@ -230,11 +232,11 @@ function SlotList() {
       ) : (
         <>
           {ids.length ? (
-            ids.map((parkingId) => (
-              <ParkingSpaceRowComponent
-                parkingId={parkingId}
-                key={parkingId}
-                parkingSpace={entities[parkingId]}
+            ids.map((parkingSlotId) => (
+              <ParkingSlotRowComponent
+                  parkingSlotId={parkingSlotId}
+                key={parkingSlotId}
+                  parkingSlot={entities[parkingSlotId]}
               />
             ))
           ) : (
@@ -326,4 +328,4 @@ function SlotList() {
   return content;
 }
 
-export default SlotList;
+export default ListParkingSlot;

@@ -9,8 +9,11 @@ import EditCompany from "./pages/company/EditCompany.jsx";
 import ViewCompany from "./pages/company/ViewCompany.jsx";
 import {useSelector} from "react-redux";
 import {getTheme} from "./config/themeConfig.js";
+const ViewSlot = lazy(() => import("./pages/slot/ViewSlot.jsx"));
+const EditSlot = lazy(() => import("./pages/slot/EditSlot.jsx"));
+const ListParkingSlot = lazy(() => import("./pages/slot/ListParkingSlot"));
 const ViewBranch = lazy(() => import("./pages/branch/ViewBranch.jsx"));
-const ParkingView = lazy(() => import("./pages/parking/ParkingView.jsx"));
+const ParkingView = lazy(() => import("./pages/parking/./ViewParkingSpace"));
 const HistoryList = lazy(() => import("./pages/history/HistoryList.jsx"));
 const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword.jsx"));
 const ResetPassword = lazy(() => import("./pages/auth/ResetPassword.jsx"));
@@ -52,7 +55,6 @@ const TestComponent = lazy(() => import("./components/TestComponent.jsx"));
 const ReportList = lazy(() => import("./pages/report/ReportList.jsx"));
 const CreateReport = lazy(() => import("./pages/report/CreateReport.jsx"));
 
-const SlotList =lazy (()=> import ("./pages/slot/SlotList.jsx"));
 const AddNewSlot =lazy(()=>import("./pages/slot/AddNewSlot.jsx"));
 const SlotEditeForm=lazy (()=> import ("./pages/slot/SlotEditeForm.jsx"));
 const SlotView=lazy(()=>import ("./pages/slot/SlotView.jsx"));
@@ -165,20 +167,12 @@ function App() {
                   </Route>
 
 
-                      {/* Path slot */}
-                  
-                      <Route path="slots">
-                    <Route index element={<SlotList/>} />
-
-                    <Route
-                      element={
-                        <RequireAuth allowedRoles={[ROLES.ROLE_MANAGER]} />
-                      }
-                    >
+                  {/* Path slot */}
+                  <Route path="parking-slots">
+                     <Route index element={<ListParkingSlot/>} />
                       <Route path="new" element={<AddNewSlot/>} />
-                      <Route path=":id" element={<SlotEditeForm />} />
-                      <Route path=":id/view" element={<SlotView/>} />
-                    </Route>
+                      <Route path=":id" element={<EditSlot />} />
+                      <Route path=":id/view" element={<ViewSlot/>} />
                   </Route>
 
                       

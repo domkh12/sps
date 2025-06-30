@@ -12,8 +12,12 @@ const parkingSlice = createSlice({
     branchFilter: [],
     pageNo: 1,
     pageSize: 5,
+    idParkingSpaceToDelete: "",
   },
   reducers: {
+    setIdParkingSpaceToDelete: (state, action) => {
+      state.idParkingSpaceToDelete = action.payload;
+    },
     setParking: (state, action) => {
       state.parking = action.payload;
     },
@@ -55,6 +59,7 @@ const parkingSlice = createSlice({
 });
 
 export const {
+  setIdParkingSpaceToDelete,
   setPageSizeParking,
   setPageNoParking,
   setClearParkingFilter,

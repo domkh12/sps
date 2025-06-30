@@ -151,5 +151,16 @@
   "slotNameIsRequired": "ចំណតត្រូវតែបំពេញ",
   "slotName": "ឈ្មោះចំណត",
   "parkingSpaceIsRequired": "ទីធ្លាចតរថយន្តត្រូវតែបំពេញ",
-  "updateAParkingSpace": "ធ្វើបច្ចុប្បន្នភាពទីធ្លាចតរថយន្ត"
+  "updateAParkingSpace": "ធ្វើបច្ចុប្បន្នភាពទីធ្លាចតរថយន្ត",
+  "slotQty": "ចំនួនចំណត",
+  "parkingSpaceInfo": "ព័ត៌មានទីធ្លាចតរថយន្ត",
+  "delete": "លុប",
+  "deleteConfirm": "តើអ្នកពិតជាចង់លុបមែនទេ?",
+  "view": "មើល",
+  "lotNameRequired": "ឈ្មោះចំណតត្រូវតែបំពេញ",
+  "parkingSpaceRequired": "ទីធ្លាចតរថយន្តត្រូវតែបំពេញ",
+  "parkingSlotName": "ឈ្មោះចំណតរថយន្ត",
+  "parkingSlotInfo": "ព័ត៌មានចំណតរថយន្ត",
+  "slotNumber": "លេខចំណត",
+  "slotNumberRequired": "លេខចំណតត្រូវតែបំពេញ"
 }

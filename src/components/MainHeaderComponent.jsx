@@ -51,7 +51,6 @@ function MainHeaderComponent({
             textTransform: "none",
             borderRadius: "10px",
             boxShadow: "none",
-            ":hover": { boxShadow: "none", backgroundColor: "#333333" },
           }}
           onClick={onClick}
         >

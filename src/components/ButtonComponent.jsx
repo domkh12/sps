@@ -1,5 +1,5 @@
 import { LoadingButton } from "@mui/lab";
-import React from "react";
+import {FiPlus} from "react-icons/fi";
 
 function ButtonComponent({
   onClick,
@@ -16,16 +16,9 @@ function ButtonComponent({
       variant="contained"
       startIcon={icon ? <FiPlus /> : null}
       sx={{
-        backgroundColor: backgroundColor ? backgroundColor : "#333333",
         textTransform: "none",
         borderRadius: "10px",
         boxShadow: "none",
-        ":hover": {
-          boxShadow: "none",
-          backgroundColor: hoverBackgroundColor
-            ? hoverBackgroundColor
-            : "#333333",
-        },
       }}
       onClick={onClick}
       type={type}

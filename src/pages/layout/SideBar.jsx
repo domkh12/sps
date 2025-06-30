@@ -64,12 +64,11 @@ function SideBar() {
   const isHistoryPage = location.pathname === "/dash/history";
   const isBranchListPage = location.pathname === "/dash/branches";
   const isBranchCreatePage = location.pathname === "/dash/branches/new";
-  const isParkingSlotPage=location.pathname === " /dash/slot";
   const isCompanyCreatePage=location.pathname === "/dash/companies";
   const isCompanyListPage=location.pathname === "/dash/companies/new";
 
-  const isSlotCreatePage = location.pathname === " /dash/slots";
-  const isSlotListPage = location.pathname === " /dash/slots/new";
+  const isSlotCreatePage = location.pathname === "/dash/parking-slots";
+  const isSlotListPage = location.pathname === "/dash/parking-slots/new";
 
 
 
@@ -1180,11 +1179,7 @@ function SideBar() {
                                   isParkingCreatePage) &&
                                   listItemButtonStyle),
                               }}
-                              selected={
-                                isParkingOpen
-                                  ? isParkingOpen
-                                  : isParkingListPage || isParkingCreatePage
-                              }
+                              selected={isParkingOpen ? isParkingOpen : isParkingListPage || isParkingCreatePage}
                               onClick={() => setIsParkingOpen(!isParkingOpen)}
                               className="group relative"
                               aria-owns={open ? "parkingPopover" : undefined}
@@ -1316,24 +1311,17 @@ function SideBar() {
                                 sx={{
                                   borderRadius: "10px",
                                   color: "#424242",
-                                  ...((isSlotListPage ||
-                                    isSlotCreatePage) &&
+                                  ...((isSlotListPage || isSlotCreatePage) &&
                                     listItemButtonStyle),
                                   mt: "5px",
                                 }}
-                                selected={
-                                  isSlotOpen
-                                    ? isSlotListPage || isSlotCreatePage
-                                    : isSlotListPage || isSlotCreatePage
-                                }
+                                selected={isSlotOpen ? isSlotListPage || isSlotCreatePage : isSlotListPage || isSlotCreatePage}
                               >
                                 <ListItemIcon
                                   sx={{
                                     minWidth: 0,
                                   }}
-                                  className={`
-                                flex flex-col justify-center items-center w-full
-                              `}
+                                  className={`flex flex-col justify-center items-center w-full`}
                                 >
                                    <CarRepairIcon className="w-6 h-6" /> 
                                  <KeyboardArrowRightRoundedIcon className="absolute top-2 right-0" />
@@ -1397,14 +1385,14 @@ function SideBar() {
                                     }}
                                     onClick={() => {
                                       if (
-                                        location.pathname !== "/dash/slots"
+                                        location.pathname !== "/dash/parking-slots"
                                       ) {
                                         popupState.close();
                                       }
-                                      navigate("/dash/slots");
+                                      navigate("/dash/parking-slots");
                                     }}
                                     selected={
-                                      location.pathname === "/dash/slots"
+                                      location.pathname === "/dash/parking-slots"
                                     }
                                   >
                                     <ListItemText
@@ -1431,14 +1419,14 @@ function SideBar() {
                                     onClick={() => {
                                       if (
                                         location.pathname !==
-                                        "/dash/slots/new"
+                                        "/dash/parking-slots/new"
                                       ) {
                                         popupState.close();
                                       }
-                                      navigate("/dash/slots/new");
+                                      navigate("/dash/parking-slots/new");
                                     }}
                                     selected={
-                                      location.pathname === "/dash/slots/new"
+                                      location.pathname === "/dash/parking-slots/new"
                                     }
                                   >
                                     <ListItemText
@@ -1472,11 +1460,7 @@ function SideBar() {
                               listItemButtonStyle),
                             mt: "5px",
                           }}
-                          selected={
-                            isSlotOpen
-                              ? isSlotOpen
-                              : isSlotListPage || isSlotCreatePage
-                          }
+                          selected={isSlotOpen ? isSlotOpen : isSlotListPage || isSlotCreatePage}
                           onClick={() => setIsSlotOpen(!isSlotOpen)}
                         >
                           <ListItemIcon
@@ -1530,8 +1514,8 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/dash/slots")}
-                              selected={location.pathname === "/dash/slots"}
+                              onClick={() => navigate("/dash/parking-slots")}
+                              selected={location.pathname === "/dash/parking-slots"}
                             >
                               <ListItemText
                                 primary={
@@ -1558,10 +1542,8 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/dash/slots/new")}
-                              selected={
-                                location.pathname === "/dash/slots/new"
-                              }
+                              onClick={() => navigate("/dash/parking-slots/new")}
+                              selected={location.pathname === "/dash/parking-slots/new"}
                             >
                               <ListItemText
                                 primary={

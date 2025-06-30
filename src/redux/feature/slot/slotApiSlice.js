@@ -1,6 +1,7 @@
 import { createEntityAdapter, createSelector } from "@reduxjs/toolkit";
 import { apiSlice } from "../../app/api/apiSlice";
 import { setSlot } from "./slotSlice";
+import {setLabels} from "../parking/parkingSlice.js";
 
 const slotAdapter = createEntityAdapter({});
 
@@ -40,7 +41,7 @@ export const slotApiSlice = apiSlice.injectEndpoints({
 
     filterSlots: builder.query({
       query: ({ pageNo = 1, pageSize = 5, keywords = "", branchUuid = "" }) => ({
-        url: `/parking-lots/filters?pageNo=${pageNo}&pageSize=${pageSize}&keywords=${keywords}&branchUuid=${branchUuid}`,
+        url: `/parking-lots/filter?pageNo=${pageNo}&pageSize=${pageSize}&keywords=${keywords}&branchUuid=${branchUuid}`,
         validateStatus: (response, result) => {
           return response.status === 200 && !result.isError;
         },
@@ -87,13 +88,13 @@ export const slotApiSlice = apiSlice.injectEndpoints({
           ...initialState,
         },
       }),
-      invalidatesTags: [{ type: "Slot", id: "LIST" }],
+      invalidatesTags: [{ type: "Slot", id: "LIST" }, {type: "Parking", id: "LIST"}],
     }),
 
     updateSlot: builder.mutation({
       query: ({ uuid, ...initialSlotData }) => ({
         url: `/parking-lots/${uuid}`,
-        method: "PATCH",
+        method: "PUT",
         body: {
           ...initialSlotData,
         },
@@ -141,10 +142,26 @@ export const slotApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
+
+    getParkingSlotByUuid: builder.query({
+        query: (uuid) => ({
+            url: `/parking-lots/${uuid}`,
+            validateStatus: (response, result) => {
+            return response.status === 200 && !result.isError;
+            },
+        }),
+        providesTags: (result, error, arg) => {
+          if (result?.ids) {
+            return [{ type: "SlotByUuid", id: "LIST" }, ...result.ids.map((id) => ({ type: "SlotByUuid", id }))];
+          } else return [{ type: "SlotByUuid", id: "LIST" }];
+        },
+    })
+
   }),
 });
 
 export const {
+  useGetParkingSlotByUuidQuery,
   useAddMultipleSlotMutation,
   useGetSlotsQuery,
   useFilterSlotsQuery,

@@ -152,5 +152,16 @@
   "slotNameIsRequired": "Slot name is required",
   "slotName": "Slot name",
   "parkingSpaceIsRequired": "Parking space is required",
-  "updateAParkingSpace": "Update a parking space"
+  "updateAParkingSpace": "Update a parking space",
+  "slotQty": "Slot quantity",
+  "parkingSpaceInfo": "Parking space information",
+  "delete": "Delete",
+  "deleteConfirm": "Are you sure want to delete?",
+  "view": "View",
+  "lotNameRequired": "ParkingLot name is required",
+  "parkingSpaceRequired": "Parking space is required",
+  "parkingSlotName": "Parking slot name",
+  "parkingSlotInfo": "Parking slot information",
+  "slotNumber": "Slot number",
+  "slotNumberRequired": "Slot number is required"
 }

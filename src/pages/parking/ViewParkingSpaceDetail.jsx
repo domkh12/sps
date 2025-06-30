@@ -5,9 +5,8 @@ import MainHeaderComponent from "../../components/MainHeaderComponent.jsx";
 import {cardStyle} from "../../assets/style.js";
 import ImageDetailComponent from "../../components/ImageDetailComponent.jsx";
 
-function ViewBranchDetail({branch}){
+function ViewParkingSpaceDetail({parkingSpace}){
     const navigate = useNavigate();
-    console.log("branch", branch);
     const { t } = useTranslate();
     const breadcrumbs = [
         <Paper
@@ -20,49 +19,52 @@ function ViewBranchDetail({branch}){
             {t("dashboard")}
         </Paper>,
         <Typography color="inherit" key={2}>
-            {t("branchType")}
+            {t("parkingSpace")}
         </Typography>,
         <Typography color="inherit" key={3}>
-            {branch?.siteName}
+            {parkingSpace?.label || "N/A"}
         </Typography>,
     ];
     return (
         <>
             <MainHeaderComponent
                 breadcrumbs={breadcrumbs}
-                title={branch.siteName}
-                handleBackClick={() => navigate("/dash/branches")}
+                title={parkingSpace.label || "N/A"}
+                handleBackClick={() => navigate("/dash/parking-spaces")}
             />
             <Card sx={{...cardStyle, p: "16px"}}>
-                <Typography variant="h6" sx={{pb: 1}}>{t('branchInfo')}</Typography>
-                <ImageDetailComponent image={branch?.image}/>
+                <Typography variant="h6" sx={{pb: 1}}>{t('parkingSpaceInfo')}</Typography>
+                <ImageDetailComponent image={parkingSpace?.image}/>
                 <div className="flex flex-col gap-3 mt-5">
                     <Typography variant="body1">
-                        <span >{t('branchName')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${branch?.siteName || "N/A"}`}
+                        <span >{t('parkingSpaceName')} </span>
+                        {`${"\u00a0"}:${"\u00a0"}${parkingSpace?.label || "N/A"}`}
                     </Typography>
                     <Typography variant="body1">
-                        <span >{t('branchType')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${branch?.siteType.name || "N/A"}`}
+                        <span >{t('slotQty')} </span>
+                        {`${"\u00a0"}:${"\u00a0"}${parkingSpace?.lotQty}`}
                     </Typography>
                     <Typography variant="body1">
-                        <span >{t('parkingSpaceQty')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${branch?.parkingSpacesQty}`}
+                        <span >{t('occupied')} </span>
+                        {`${"\u00a0"}:${"\u00a0"}${parkingSpace?.filled}`}
                     </Typography>
                     <Typography variant="body1">
-                        <span >{t('branchAddress')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${branch?.siteAddress || "N/A"}`}
+                        <span >{t('createdAt')} </span>
+                        {`${"\u00a0"}:${"\u00a0"}${parkingSpace?.createdAt}`}
                     </Typography>
-                    <Typography variant="body1">
-                        <span >{t('city')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${branch?.city.name || "N/A"}`}
-                    </Typography>
-                    <Link to={`/dash/companies/${branch?.company?.uuid}/view`}>
+                    <Link to={`/dash/companies/${parkingSpace?.site?.company?.uuid}/view`}>
                         <Typography variant="body1">
                             <span>{t('company')} </span>
                             <span>{`${"\u00a0"}:${"\u00a0"}`}</span>
                             <span
-                                className="text-blue-700 hover:underline">{branch?.company?.companyName || "N/A"}</span>
+                                className="text-blue-700 hover:underline">{parkingSpace?.site?.company?.companyName || "N/A"}</span>
+                        </Typography>
+                    </Link>
+                    <Link to={`/dash/branches/${parkingSpace?.site?.uuid}/view`}>
+                        <Typography variant="body1">
+                            <span >{t('branch')} </span>
+                            <span>{`${"\u00a0"}:${"\u00a0"}`}</span>
+                            <span className="text-blue-700 hover:underline">{parkingSpace?.site?.siteName || "N/A"}</span>
                         </Typography>
                     </Link>
                 </div>
@@ -71,4 +73,4 @@ function ViewBranchDetail({branch}){
     );
 }
 
-export default ViewBranchDetail;
+export default ViewParkingSpaceDetail;

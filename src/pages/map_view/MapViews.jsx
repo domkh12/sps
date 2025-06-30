@@ -44,7 +44,7 @@ function MapViews() {
   const isSelectFirstLabel = useSelector(
     (state) => state.mapView.isSelectFirstLabel
   );
-  console.log("parkingData", parkingData);
+
 
   const {
     loading,

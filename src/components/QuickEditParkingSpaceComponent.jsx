@@ -1,42 +1,44 @@
 import {
-  Autocomplete,
+  Autocomplete, Backdrop,
   Box,
   Button,
-  Chip,
+  CircularProgress,
   Modal,
   TextField,
   Typography,
 } from "@mui/material";
 import { buttonStyleContained, buttonStyleOutlined } from "../assets/style";
 import { Form, Formik } from "formik";
-import LoadingFetchingDataComponent from "./LoadingFetchingDataComponent";
-import { useEffect, useState } from "react";
+import {useEffect, useRef} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useTranslate from "../hook/useTranslate";
 import { useUpdateParkingMutation } from "../redux/feature/parking/parkingApiSlice";
-import { useUploadImageMutation } from "../redux/feature/uploadImage/uploadImageApiSlice";
 import * as Yup from "yup";
 import SelectSingleComponent from "./SelectSingleComponent";
-import useAuth from "../hook/useAuth";
 import { setIsOpenQuickEditParkingSpace } from "../redux/feature/parking/parkingSlice";
-import {
-  setCaptionSnackBar,
-  setErrorSnackbar,
-  setIsOpenSnackBar,
-} from "../redux/feature/actions/actionSlice";
 import {useGetAllCompaniesQuery} from "../redux/feature/company/companyApiSlice.js";
+import {appendSlotLocalData, clearLocalSlotData, setIsOpenAddNewSlot} from "../redux/feature/slot/slotSlice.js";
+import {FiPlus} from "react-icons/fi";
+import ModalAddSlotComponent from "./ModalAddSlotComponent.jsx";
+import {Slide, toast} from "react-toastify";
+import {useAddMultipleSlotMutation} from "../redux/feature/slot/slotApiSlice.js";
 
 function QuickEditParkingSpaceComponent() {
-  const open = useSelector(
-    (state) => state.parking.isOpenQuickEditParkingSpace
-  );
+  const open = useSelector((state) => state.parking.isOpenQuickEditParkingSpace);
   const parkingSpace = useSelector((state) => state.parking.parkingSpaceToEdit);
-  const [isLoading, setIsLoading] = useState(true);
-  const { isManager } = useAuth();
   const { t } = useTranslate();
   const dispatch = useDispatch();
-  const companyFetched = useSelector((state) => state.companies.companiesData);
+  const slotUpdateLocalData = useSelector((state) => state.slot.slotUpdateLocalData);
+  const slotsLoadedRef = useRef(false);
   const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
+  const handleClose = () => {dispatch(setIsOpenQuickEditParkingSpace(false));};
+
+  useEffect(() => {
+      if (open) {
+          dispatch(appendSlotLocalData(parkingSpace.parkingLots));
+          slotsLoadedRef.current = true;
+      }
+  }, [open]);
 
   const style = {
     display: "flex",
@@ -45,6 +47,13 @@ function QuickEditParkingSpaceComponent() {
     width: "100%",
     height: "100vh",
   };
+
+    const [addMultipleSlot,{
+        isSuccess: isAddMultipleSlotSuccess,
+        isLoading: isLoadingAddMultipleSlot,
+        error: errorAddMultipleSlot,
+        isError: isErrorAddMultipleSlot,
+    }] = useAddMultipleSlotMutation();
 
   const [
     updateParking,
@@ -56,67 +65,81 @@ function QuickEditParkingSpaceComponent() {
     },
   ] = useUpdateParkingMutation();
 
-  const [uploadImage] = useUploadImageMutation();
-
   const validationSchema = Yup.object().shape({
-    location: Yup.string().required(t("locationIsRequired")),
-    lotName: Yup.array().min(1, t("lotNameValidate")),
-    siteUuid: Yup.string().required("Branch is required!"),
+      parkingSpaceName: Yup.string().required(t("parkingSpaceNameRequired")),
+      siteUuid: Yup.string().required("Branch is required!"),
   });
 
   useEffect(() => {
     if (isSuccessUpdateParking) {
       dispatch(setIsOpenQuickEditParkingSpace(false));
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setCaptionSnackBar(t("createSuccess")));
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
+        toast.success(t("updateSuccess"), {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: false,
+            transition: Slide,
+        });
     }
   }, [isSuccessUpdateParking]);
 
   useEffect(() => {
     if (isErrorUpdateParking) {
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setErrorSnackbar(true));
-      dispatch(
-        setCaptionSnackBar(`${errorUpdateParking?.data?.error?.description}`)
-      );
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
-
-      setTimeout(() => {
-        dispatch(setErrorSnackbar(false));
-      }, 3500);
+        toast.error(`${errorUpdateParking?.data?.error?.description}`, {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: false,
+            transition: Slide,
+        });
     }
   }, [isErrorUpdateParking]);
 
   const handleSubmit = async (values) => {
-    try {
-      await updateParking({
-        uuid: parkingSpace.uuid,
-        label: values.location,
-        siteUuid: values.siteUuid,
-        lotName: values.lotName,
-      });
-    } catch (err) {
-      console.log(err);
-    }
+      try {
+          const res = await updateParking({
+              uuid: parkingSpace.uuid,
+              label: values.parkingSpaceName,
+              image: parkingSpace.image,
+              siteUuid: values.siteUuid
+          });
+          const parkingSpaceUuid = res.data.uuid;
+          const updatedSlotLocalData = slotUpdateLocalData.map(slot => {
+              return { ...slot, parkingSpaceUuid: parkingSpaceUuid };
+          });
+
+          await addMultipleSlot({slots: updatedSlotLocalData});
+
+          dispatch(clearLocalSlotData());
+      } catch (err) {
+          console.log(err);
+      }
   };
 
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetCompanyName) content = (
+      <Backdrop
+          sx={(theme) => ({color: '#fff', zIndex: theme.zIndex.drawer + 1})}
+          open={open}
+          onClick={handleClose}>
+        <CircularProgress color="inherit"/>
+      </Backdrop>
+  );
 
-  if (!isLoading) {
+  if (isSuccessGetCompanyName) {
     content = (
       <Box>
         <Formik
+          enableReinitialize
           initialValues={{
-            location: parkingSpace.label,
-            lotName: parkingSpace.parkingLots.map((lot) => lot.lotName),
-            siteUuid: parkingSpace.site.uuid,
+            parkingSpaceName: parkingSpace?.label,
+            slots: slotUpdateLocalData,
+            siteUuid: parkingSpace?.site?.uuid
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -134,85 +157,89 @@ function QuickEditParkingSpaceComponent() {
             };
 
             return (
-              <Form>
-                <Box className="grid grid-cols-1 sm:grid-cols-2 gap-5 px-[24px]">
+              <Form className="px-[24px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <TextField
-                    label={t("location")}
-                    variant="outlined"
-                    sx={{
-                      "& .MuiInputBase-input": {
-                        boxShadow: "none",
-                      },
-                      borderRadius: "6px",
-                    }}
-                    type="text"
-                    id="location"
-                    name="location"
-                    fullWidth
-                    value={values.location}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    autoComplete="off"
-                    error={errors.location && touched.location}
-                    helperText={
-                      errors.location && touched.location
-                        ? errors.location
-                        : null
-                    }
-                    size="medium"
+                      label={t("parkingSpaceName")}
+                      variant="outlined"
+                      sx={{
+                        "& .MuiInputBase-input": {
+                          boxShadow: "none",
+                        },
+                        borderRadius: "6px",
+                      }}
+                      type="text"
+                      id="parkingSpaceName"
+                      name="parkingSpaceName"
+                      fullWidth
+                      value={values.parkingSpaceName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      autoComplete="off"
+                      error={errors.parkingSpaceName && touched.parkingSpaceName}
+                      helperText={
+                        errors.parkingSpaceName && touched.parkingSpaceName
+                            ? errors.parkingSpaceName
+                            : null
+                      }
+                      size="medium"
                   />
 
                   <SelectSingleComponent
-                    label={t("branch")}
-                    options={companyName}
-                    onChange={handleBranchChange}
-                    fullWidth={true}
-                    error={errors.siteUuid}
-                    touched={touched.siteUuid}
-                    itemsLabelKey="sites"
-                    optionLabelKey="siteName"
-                    groupLabelKey="companyName"
-                    selectFistValue={values.siteUuid}
+                      label={t("branch")}
+                      options={companyName}
+                      onChange={handleBranchChange}
+                      fullWidth={true}
+                      error={errors.siteUuid}
+                      touched={touched.siteUuid}
+                      itemsLabelKey="sites"
+                      optionLabelKey="siteName"
+                      groupLabelKey="companyName"
+                      selectFistValue={values.siteUuid}
                   />
-
+                </div>
+                <div className="flex flex-col justify-end items-end">
+                  <Button
+                      onClick={() => dispatch(setIsOpenAddNewSlot(true))}
+                      startIcon={<FiPlus/>}
+                      disableRipple
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "transparent",
+                          textDecoration: "underline",
+                        },
+                      }}
+                  >
+                    {t("addSlot")}
+                  </Button>
                   <Autocomplete
-                    sx={{
-                      "& .MuiInputBase-input": {
-                        boxShadow: "none",
-                      },
-                    }}
-                    clearIcon={false}
-                    options={values.lotName}
-                    freeSolo
-                    multiple
-                    getOptionLabel={(option) => option}
-                    onChange={(event, newValue) => {
-                      setFieldValue("lotName", newValue);
-                    }}
-                    value={values.lotName}
-                    renderTags={(value, props) =>
-                      value.map((option, index) => (
-                        <Chip label={option} {...props({ index })} />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        label={t("addLots")}
-                        {...params}
-                        error={errors.lotName && touched.lotName}
-                        helperText={
-                          errors.lotName && touched.lotName
-                            ? errors.lotName
-                            : null
-                        }
-                      />
-                    )}
+                      multiple
+                      id="slot_tage"
+                      options={values.slots}
+                      disableClearable
+                      readOnly
+                      fullWidth={true}
+                      getOptionLabel={(option) => option.lotName}
+                      value={values.slots}
+                      renderInput={(params) => (
+                          <TextField
+                              sx={{
+                                "& .MuiInputBase-input": {
+                                  boxShadow: "none",
+                                },
+                                borderRadius: "6px",
+                              }}
+                              {...params}
+                              label={t("slot")}
+                              placeholder="Add"
+                          />
+                      )}
                   />
-                </Box>
+                </div>
 
                 <Box
                   sx={{
-                    padding: "24px",
+                    paddingY: "24px",
                     display: "flex",
                     justifyContent: "end",
                   }}
@@ -225,14 +252,14 @@ function QuickEditParkingSpaceComponent() {
                       ...buttonStyleOutlined,
                     }}
                   >
-                    Cancel
+                      {t('cancel')}
                   </Button>
                   <Button
                     variant="contained"
                     sx={{ ...buttonStyleContained, ml: 1 }}
                     type="submit"
                   >
-                    Update
+                      {t('update')}
                   </Button>
                 </Box>
               </Form>
@@ -243,7 +270,7 @@ function QuickEditParkingSpaceComponent() {
     );
   }
 
-  return (
+  return (<>
     <Modal
       open={open}
       aria-labelledby="modal-modal-title"
@@ -252,13 +279,21 @@ function QuickEditParkingSpaceComponent() {
     >
       <Box sx={style}>
         <Box
-          sx={{
-            backgroundColor: "background.paper",
-            borderRadius: "16px",
-            width: "100%",
-            mx: 5,
-            maxWidth: "720px",
-          }}
+            sx={{
+                backgroundColor: "background.paper",
+                borderRadius: "16px",
+                width: "95%",
+                maxWidth: "720px",
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                overflow: "auto",
+                maxHeight: "90vh",
+                boxShadow: "0px 10px 15px -3px rgb(0 0 0 / 20%), 0px 4px 6px -2px rgb(0 0 0 / 15%)",
+                display: "flex",
+                flexDirection: "column",
+            }}
         >
           <Typography
             id="modal-modal-title"
@@ -266,18 +301,14 @@ function QuickEditParkingSpaceComponent() {
             component="h2"
             sx={{ padding: "24px" }}
           >
-            Quick update
+              {t('quickUpdate')}
           </Typography>
-          {/* {isErrorUpdateSite && (
-            <Box sx={{ px: "24px" }}>
-              <AlertMessageComponent />
-            </Box>
-          )} */}
-
           {content}
         </Box>
       </Box>
     </Modal>
+    <ModalAddSlotComponent/>
+    </>
   );
 }
 

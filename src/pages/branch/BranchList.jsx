@@ -86,13 +86,6 @@ function BranchList() {
       cityId: cityFilter,
       siteTypeId: branchTypeFilter,
       companyId: companyFilter,
-    },
-    {
-      skip:
-        debounceInputSearch === "" &&
-        cityFilter === "" &&
-        branchTypeFilter.length === 0 &&
-        companyFilter.length === 0,
     }
   );
 
@@ -270,7 +263,6 @@ function BranchList() {
               cityFilter={cityFilter}
               branchTypeFilter={branchTypeFilter}
               companyFilter={companyFilter}
-              clearCompanyFilter={() => dispatch(setClearCompanyFilter())}
               handleCityChange={handleCityChange}
               handleBranchTypeChange={handleBranchTypeChange}
               handleSearchChange={handleSearchChange}

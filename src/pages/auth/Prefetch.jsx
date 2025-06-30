@@ -11,6 +11,7 @@ import { companiesApiSlice } from "../../redux/feature/company/companyApiSlice";
 import { cityApiSlice } from "../../redux/feature/city/cityApiSlice";
 import {companyTypeApiSlice} from "../../redux/feature/companyType/CompanyTypeApiSlice.js";
 import {siteTypeApiSlice} from "../../redux/feature/siteType/siteTypeApiSlice.js";
+import {slotApiSlice} from "../../redux/feature/slot/slotApiSlice.js";
 
 
 function Prefetch() {
@@ -24,6 +25,9 @@ function Prefetch() {
       store.dispatch(companyTypeApiSlice.util.prefetch("getCompanyType", "companyTypeList", {force: true }));
       store.dispatch(companiesApiSlice.util.prefetch("getAllCompanies", "companyNameList", {force: true}));
       store.dispatch(siteTypeApiSlice.util.prefetch("getAllSiteTypes", "siteTypeList", {force: true}));
+      store.dispatch(sitesApiSlice.util.prefetch("getBranchList", "branchNameList", { force: true }));
+      store.dispatch(slotApiSlice.util.prefetch("getSlots", "slotsList", { force: true }));
+      store.dispatch(sitesApiSlice.util.prefetch("getListBranch", "branchList", { force: true }));
     }
 
     if (isManager || isAdmin) {

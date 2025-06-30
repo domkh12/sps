@@ -70,7 +70,11 @@ export const apiSlice = createApi({
     "Company",
     "CompanyType",
     "CompanyName",
-    "BranchType"
+    "BranchType",
+    "BranchName",
+    "Slot",
+    "BranchList",
+    "SlotByUuid"
     // "slot"
   ],
   endpoints: (builder) => ({}),

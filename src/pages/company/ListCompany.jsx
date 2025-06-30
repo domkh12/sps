@@ -73,9 +73,6 @@ function ListCompany() {
     keywords: debounceInputSearch,
     companyTypeUuid: companyTypeFilter,
     cityUuid: cityFilter,
-  }, {skip: debounceInputSearch === "" &&
-        companyTypeFilter.length === 0 &&
-        cityFilter.length === 0
   });
 
   const breadcrumbs = [

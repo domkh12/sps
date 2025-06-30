@@ -81,7 +81,11 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
           ...initialState,
         },
       }),
-      invalidatesTags: [{ type: "Parking", id: "LIST" }],
+      invalidatesTags: (result, error, arg) =>
+          [
+            { type: "Parking", id: "LIST" },
+            { type: "BranchList", id: "LIST" }
+          ],
     }),
 
     updateParking: builder.mutation({
@@ -92,9 +96,10 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
           ...initialParkingData,
         },
       }),
-      invalidatesTags: (result, error, arg) => [
-        { type: "Parking", uuid: arg.uuid },
-      ],
+      invalidatesTags: (result, error, arg) =>
+          [
+            { type: "Parking", uuid: arg.uuid },
+          ]
     }),
     
     deleteParking: builder.mutation({
@@ -112,7 +117,7 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
 
     findAllLabels: builder.mutation({
       query: () => ({
-        url: `/parking-spaces/labels`,
+        url: `/parking-spaces/list`,
       }),
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
@@ -137,6 +142,17 @@ export const parkingApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
+
+    findParkingSpaceByUuid: builder.query({
+      query: (uuid) => ({
+        url: `/parking-spaces/${uuid}`,
+      }),
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "ParkingSpaceByUuid", id: "LIST"}, ...result.ids.map((id) => ({type: "ParkingSpaceByUuid", id})),];
+        } else return [{type: "ParkingSpaceByUuid", id: "LIST"}];
+      },
+    }),
   }),
 });
 
@@ -148,11 +164,12 @@ export const {
   useDeleteParkingMutation,
   useFindAllLabelsMutation,
   useFindParkingByUuidMutation,
+  useFindParkingSpaceByUuidQuery,
 } = parkingApiSlice;
 
 // return the query result object
 export const selectParkingResult = parkingApiSlice.endpoints.getParkingSpaces.select();
-// create momorized selector
+// create memorized selector
 const selectParkingData = createSelector(
   selectParkingResult,
   (parkingResult) => parkingResult.data // normalized state object with ids & entities

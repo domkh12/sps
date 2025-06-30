@@ -1,26 +1,27 @@
 import { useParams } from "react-router-dom";
-import { useGetParkingSpacesQuery } from "../../redux/feature/parking/parkingApiSlice";
+import {useFindParkingSpaceByUuidQuery} from "../../redux/feature/parking/parkingApiSlice";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import ParkingEditForm from "./ParkingEditForm";
+import {useEffect} from "react";
 
 function ParkingEdit() {
-  const { id } = useParams();
+  const {id} = useParams();
 
-  const { parkingSpace } = useGetParkingSpacesQuery(
-    "parkingparkingSpacesList",
-    {
-      selectFromResult: ({ data }) => ({
-        parkingSpace: data?.entities[id],
-      }),
-    }
-  );
+  const {data: parkingSpace, isFetching, isSuccess, isError, error, refetch} = useFindParkingSpaceByUuidQuery(id);
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   let content;
 
-  if (!parkingSpace) content = <LoadingFetchingDataComponent />;
+  if (isFetching) content = <LoadingFetchingDataComponent/>;
 
-  if (parkingSpace) content = <ParkingEditForm parkingSpace={parkingSpace}/>;
-
+  else if (isSuccess && parkingSpace) content = <ParkingEditForm parkingSpace={parkingSpace}/>;
+  else if (isError) {
+    content = <div>Error: {error.message}</div>;
+  } else {
+    content = <div>Unexpected state: No parking space data found.</div>;
+  }
   return content;
 }
 

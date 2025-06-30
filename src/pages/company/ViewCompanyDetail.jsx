@@ -22,14 +22,14 @@ function ViewCompanyDetail({company}) {
             {t("companyType")}
         </Typography>,
         <Typography color="inherit" key={3}>
-            {company?.companyName}
+            {company?.companyName || "N/A"}
         </Typography>,
     ];
     return (
         <>
             <MainHeaderComponent
                 breadcrumbs={breadcrumbs}
-                title={company.companyName}
+                title={company.companyName || "N/A"}
                 handleBackClick={() => navigate("/dash/companies")}
             />
             <Card sx={{...cardStyle, p: "16px"}}>
@@ -38,7 +38,7 @@ function ViewCompanyDetail({company}) {
                 <div className="flex flex-col gap-3 mt-5">
                     <Typography variant="body1">
                         <span >{t('companyName')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.companyName}`}
+                        {`${"\u00a0"}:${"\u00a0"}${company?.companyName || "N/A"}`}
                     </Typography>
                     <Typography variant="body1">
                         <span >{t('branchQty')} </span>
@@ -46,19 +46,19 @@ function ViewCompanyDetail({company}) {
                     </Typography>
                     <Typography variant="body1">
                         <span >{t('companyAddress')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.companyAddress}`}
+                        {`${"\u00a0"}:${"\u00a0"}${company?.companyAddress || "N/A"}`}
                     </Typography>
                     <Typography variant="body1">
                         <span >{t('city')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.city.name}`}
+                        {`${"\u00a0"}:${"\u00a0"}${company?.city.name || "N/A"}`}
                     </Typography>
                     <Typography variant="body1">
                         <span >{t('companyType')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.companyType.name}`}
+                        {`${"\u00a0"}:${"\u00a0"}${company?.companyType.name || "N/A"}`}
                     </Typography>
                     <Typography variant="body1">
                         <span >{t('establishedDate')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.establishedDate}`}
+                        {`${"\u00a0"}:${"\u00a0"}${company?.establishedDate || "N/A"}`}
                     </Typography>
                 </div>
             </Card>

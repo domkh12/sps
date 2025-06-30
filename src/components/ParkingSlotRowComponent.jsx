@@ -1,7 +1,7 @@
 import {memo} from "react";
 import {FaEye, FaPen, FaTrashCan} from "react-icons/fa6";
 import {
-    Checkbox,
+    Checkbox, Chip,
     List,
     ListItem,
     ListItemText,
@@ -12,40 +12,35 @@ import {
 import {Link, useNavigate} from "react-router-dom";
 import EditButtonComponent from "./EditButtonComponent";
 import MoreActionComponent from "./MoreActionComponent";
-import CustomizedProgressBarsComponent from "./CustomizedProgressBarsComponent";
 import {setIsOpenConfirmDelete} from "../redux/feature/actions/actionSlice";
 import {useDispatch} from "react-redux";
-import {
-    setIdParkingSpaceToDelete,
-    setIsOpenQuickEditParkingSpace,
-    setParkingSpaceToEdit,
-} from "../redux/feature/parking/parkingSlice";
 import useTranslate from "../hook/useTranslate.jsx";
 
-function ParkingSpaceRowComponent({parkingId, parkingSpace}) {
+function ParkingSlotRowComponent({parkingSlotId, parkingSlot}) {
+
     const dispatch = useDispatch();
     const {t} = useTranslate();
     const navigate = useNavigate();
 
     const handleQuickEdit = () => {
-        dispatch(setIsOpenQuickEditParkingSpace(true));
-        dispatch(setParkingSpaceToEdit(parkingSpace));
+        // dispatch(setIsOpenQuickEditParkingSlot(true));
+        // dispatch(setParkingSlotToEdit(parkingSlot));
     };
 
-    if (parkingSpace) {
-        var handleEdit = () => navigate(`/dash/parking-spaces/${parkingId}`);
-        var handleView = () => navigate(`/dash/parking-spaces/${parkingId}/view`);
+    if (parkingSlot) {
+        var handleEdit = () => navigate(`/dash/parking-slots/${parkingSlotId}`);
+        var handleView = () => navigate(`/dash/parking-slots/${parkingSlotId}/view`);
         const handleDelete = () => {
-            dispatch(setIsOpenConfirmDelete(true));
-            dispatch(setIdParkingSpaceToDelete(parkingSpace.uuid));
+            // dispatch(setIsOpenConfirmDelete(true));
+            // dispatch(setIdParkingSlotToDelete(parkingSlot.uuid));
         };
 
         var menuActions = [
-             {
-                 label: t('edit'),
-                 icon: <FaPen className="w-5 h-5"/>,
-                 onClick: handleEdit,
-             },
+            {
+                label: t('edit'),
+                icon: <FaPen className="w-5 h-5"/>,
+                onClick: handleEdit,
+            },
             {
                 label: t('view'),
                 icon: <FaEye className="w-5 h-5"/>,
@@ -71,7 +66,7 @@ function ParkingSpaceRowComponent({parkingId, parkingSpace}) {
                         <ListItem sx={{padding: "0", gap: "10px"}}>
                             <div className="w-32 h-20 rounded-[12px] overflow-hidden">
                                 <img
-                                    src={parkingSpace?.image || "/images/imagePlaceholder.jpg"}
+                                    src={parkingSlot?.image || "/images/imagePlaceholder.jpg"}
                                     alt="car_image"
                                     className="w-full h-full object-cover"
                                     loading="lazy"
@@ -82,9 +77,9 @@ function ParkingSpaceRowComponent({parkingId, parkingSpace}) {
                                     (
                                         <Link
                                             className="hover:underline"
-                                            to={`/dash/parking-spaces/${parkingId}/view`}
+                                            to={`/dash/parking-slots/${parkingSlotId}/view`}
                                         >
-                                            {parkingSpace?.label || "N/A"}
+                                            {parkingSlot?.lotName || "N/A"}
                                         </Link>
                                     ) || "N/A"
                                 }
@@ -94,33 +89,24 @@ function ParkingSpaceRowComponent({parkingId, parkingSpace}) {
                 </TableCell>
 
                 <TableCell sx={{borderBottomStyle: "dashed"}}>
-                    <Typography variant="body1">{parkingSpace?.site?.siteName || "N/A"}</Typography>
+                    <Typography variant="body1">{parkingSlot?.parkingSpace?.label || "N/A"}</Typography>
                 </TableCell>
 
                 <TableCell sx={{borderBottomStyle: "dashed"}}>
-                    <Typography variant="body1">{parkingSpace.lotQty}</Typography>
-                </TableCell>
-
-                <TableCell sx={{borderBottomStyle: "dashed"}}>
-                    <div>
-                        <CustomizedProgressBarsComponent value={100}/>
-                        <Typography variant="body1" className="text-center" color="gray">
-                            {`${parkingSpace?.filled} Free`}
-                        </Typography>
-                    </div>
+                    <Chip color="success" label={`${parkingSlot?.isAvailable ? "Available" : "Occupied"}`}/>
                 </TableCell>
 
                 <TableCell sx={{borderBottomStyle: "dashed"}}>
                     <Typography variant="body1">
-                        {parkingSpace.createdAt.substring(
+                        {parkingSlot?.createdAt?.substring(
                             0,
-                            parkingSpace.createdAt.lastIndexOf(" ")
+                            parkingSlot.createdAt?.lastIndexOf(" ")
                         )}
                     </Typography>
                     <Typography variant="body2" color="gray">
-                        {parkingSpace.createdAt.substring(
-                            parkingSpace.createdAt.lastIndexOf(" "),
-                            parkingSpace.createdAt.length
+                        {parkingSlot?.createdAt?.substring(
+                            parkingSlot?.createdAt.lastIndexOf(" "),
+                            parkingSlot?.createdAt.length
                         )}
                     </Typography>
                 </TableCell>
@@ -143,6 +129,6 @@ function ParkingSpaceRowComponent({parkingId, parkingSpace}) {
     }
 }
 
-const memoizedParkingSpaceRow = memo(ParkingSpaceRowComponent);
+const memoizedParkingSlotRow = memo(ParkingSlotRowComponent);
 
-export default memoizedParkingSpaceRow;
+export default memoizedParkingSlotRow;

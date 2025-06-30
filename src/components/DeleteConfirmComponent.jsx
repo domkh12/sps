@@ -10,19 +10,21 @@ import { useDeleteVehicleMutation } from "../redux/feature/vehicles/vehicleApiSl
 import { useDeleteParkingMutation } from "../redux/feature/parking/parkingApiSlice";
 import { setIdVehicleToDelete } from "../redux/feature/vehicles/vehicleSlice";
 import { setIdUserToDelete } from "../redux/feature/users/userSlice";
-import { setIdParkingToDelete } from "../redux/feature/parking/parkingSlice";
+import { setIdParkingSpaceToDelete } from "../redux/feature/parking/parkingSlice";
 import { useDeleteSiteMutation } from "../redux/feature/site/siteApiSlice";
 import { setIdSiteToDelete } from "../redux/feature/site/siteSlice";
 import {setIdCompanyToDelete} from "../redux/feature/company/companySlice.js";
 import {useDeleteCompanyMutation} from "../redux/feature/company/companyApiSlice.js";
+import useTranslate from "../hook/useTranslate.jsx";
 
 function DeleteConfirmComponent() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t } = useTranslate();
   const open = useSelector((state) => state.action.isOpenConfirmDelete);
   const userId = useSelector((state) => state.users.idUserToDelete);
   const vehicleId = useSelector((state) => state.vehicles.idVehicleToDelete);
-  const parkingId = useSelector((state) => state.parking.idParkingToDelete);
+  const parkingSpaceId = useSelector((state) => state.parking.idParkingSpaceToDelete);
   const siteId = useSelector((state) => state.sites.isSiteToDelete);
   const companyId = useSelector((state) => state.companies.idCompanyToDelete);
 
@@ -67,12 +69,12 @@ function DeleteConfirmComponent() {
   ] = useDeleteVehicleMutation();
 
   const [
-    deleteParking,
+    deleteParkingSpace,
     {
-      isSuccess: isParkingDeleteSuccess,
-      isLoading: isParkingDeleteLoading,
-      isError: isParkingDeleteError,
-      error: parkingDeleteError,
+      isSuccess: isParkingSpaceDeleteSuccess,
+      isLoading: isParkingSpaceDeleteLoading,
+      isError: isParkingSpaceDeleteError,
+      error: parkingSpaceDeleteError,
     },
   ] = useDeleteParkingMutation();
 
@@ -93,8 +95,8 @@ function DeleteConfirmComponent() {
       await deleteUser({ id: userId });
     } else if (vehicleId) {
       await deleteVehicle({ id: vehicleId });
-    } else if (parkingId) {
-      await deleteParking({ uuid: parkingId });
+    } else if (parkingSpaceId) {
+      await deleteParkingSpace({ uuid: parkingSpaceId });
     }else if (siteId){
       await deleteSite({ uuid: siteId });
     }else if (companyId){
@@ -113,9 +115,9 @@ function DeleteConfirmComponent() {
       dispatch(setIdVehicleToDelete(""));
       handleClose();
     }
-    if (isParkingDeleteSuccess) {
+    if (isParkingSpaceDeleteSuccess) {
       navigate("/dash/parking-spaces");
-      dispatch(setIdParkingToDelete(""));
+      dispatch(setIdParkingSpaceToDelete(""));
       handleClose();
     }
     if(isSuccessDeleteSite){
@@ -128,11 +130,11 @@ function DeleteConfirmComponent() {
         dispatch(setIdCompanyToDelete(""));
         handleClose();
     }
-  }, [isUserDeleteSuccess, isVehicleDeleteSuccess, isParkingDeleteSuccess, isSuccessDeleteSite, isCompanyDeleteSuccess]);
+  }, [isUserDeleteSuccess, isVehicleDeleteSuccess, isParkingSpaceDeleteSuccess, isSuccessDeleteSite, isCompanyDeleteSuccess]);
 
   let loading = false;
 
-  if (isUserDeleteLoading || isVehicleDeleteLoading || isParkingDeleteLoading || isLoadingDeleteSite || isCompanyDeleteLoading) {
+  if (isUserDeleteLoading || isVehicleDeleteLoading || isParkingSpaceDeleteLoading || isLoadingDeleteSite || isCompanyDeleteLoading) {
     loading = true;
   }
 
@@ -159,7 +161,7 @@ function DeleteConfirmComponent() {
             component="h2"
             sx={{ padding: "24px" }}
           >
-            Delete
+            {t('delete')}
           </Typography>
 
           <Typography
@@ -167,7 +169,7 @@ function DeleteConfirmComponent() {
             variant="body1"
             sx={{ paddingX: "24px" }}
           >
-            Are you sure want to delete?
+            {t('deleteConfirm')}
           </Typography>
 
           <Box
@@ -191,7 +193,7 @@ function DeleteConfirmComponent() {
               loading={loading}
               onClick={handleDelete}
             >
-              Delete
+              {t('delete')}
             </LoadingButton>
             <Button
               onClick={handleClose}
@@ -199,7 +201,7 @@ function DeleteConfirmComponent() {
                 ...buttonStyleOutlined,
               }}
             >
-              Cancel
+                {t('cancel')}
             </Button>
           </Box>
         </Box>

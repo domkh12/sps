@@ -75,7 +75,6 @@ function ParkingEditForm({parkingSpace}) {
         siteUuid: Yup.string().required("Branch is required!"),
     });
 
-    console.log("localSlotData",localSlotData)
     useEffect(() => {
         if (parkingSpace && !slotsLoadedRef.current) {
             dispatch(appendSlotLocalData(parkingSpace.parkingLots));
@@ -133,7 +132,7 @@ function ParkingEditForm({parkingSpace}) {
             const updatedSlotLocalData = slotUpdateLocalData.map(slot => {
                 return { ...slot, parkingSpaceUuid: parkingSpaceUuid };
             });
-            console.log("updatedSlotLocalData", updatedSlotLocalData);
+
             await addMultipleSlot({slots: updatedSlotLocalData});
 
             dispatch(clearLocalSlotData());
@@ -157,7 +156,6 @@ function ParkingEditForm({parkingSpace}) {
             {parkingSpace.label}
         </Typography>,
     ];
-    console.log("slotUpdateLocalData", slotUpdateLocalData);
 
     let content;
 
@@ -179,6 +177,7 @@ function ParkingEditForm({parkingSpace}) {
                             parkingSpaceName: parkingSpace.label,
                             slots: slotUpdateLocalData,
                             siteUuid: parkingSpace.site.uuid,
+                            image: parkingSpace.image
                         }}
                         validationSchema={validationSchema}
                         onSubmit={handleSubmit}

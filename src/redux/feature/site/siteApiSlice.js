@@ -90,6 +90,17 @@ export const sitesApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
+    getBranchList: builder.query({
+        query: () => ({
+            url: `/sites/all`,
+        }),
+        providesTags: (result, error, arg) => {
+            if (result?.ids) {
+            return [{ type: "BranchName", id: "LIST" }, ...result.ids.map((id) => ({ type: "BranchName", id }))];
+            } else return [{ type: "BranchName", id: "LIST" }];
+        },
+    }),
+
     createNewSite: builder.mutation({
       query: (initialState) => ({
         url: "/sites",
@@ -98,7 +109,13 @@ export const sitesApiSlice = apiSlice.injectEndpoints({
           ...initialState,
         },
       }),
-      invalidatesTags: [{ type: "Site", id: "LIST" },{ type: "Company", id: "LIST"}],
+      invalidatesTags: (result, error, arg) =>
+          [
+            { type: "Site", id: "LIST" },
+            { type: "BranchName", id: "LIST" },
+            { type: "Company", id: "LIST" },
+            { type: "CompanyName", id: "LIST" }
+          ],
     }),
 
     updateSite: builder.mutation({
@@ -109,7 +126,13 @@ export const sitesApiSlice = apiSlice.injectEndpoints({
           ...initialState,
         },
       }),
-      invalidatesTags: (result, error, arg) => [{ type: "Site", id: arg.uuid }],
+      invalidatesTags: (result, error, arg) =>
+          [
+            { type: "Site", id: arg.uuid },
+            { type: "BranchName", id: "LIST" },
+            { type: "Company", id: "LIST" },
+            { type: "CompanyName", id: "LIST" }
+          ],
     }),
 
     deleteSite: builder.mutation({
@@ -117,7 +140,13 @@ export const sitesApiSlice = apiSlice.injectEndpoints({
         url: `/sites/${uuid}`,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, arg) => [{ type: "Site", id: arg.uuid }],
+      invalidatesTags: (result, error, arg) =>
+          [
+            { type: "Site", id: arg.uuid },
+            { type: "BranchName", id: "LIST" },
+            { type: "Company", id: "LIST" },
+            { type: "CompanyName", id: "LIST" }
+          ],
     }),
 
     getSiteByUuid: builder.query({
@@ -129,12 +158,26 @@ export const sitesApiSlice = apiSlice.injectEndpoints({
             return [{type: "BranchByUuid", id: "LIST"}, ...result.ids.map((id) => ({type: "BranchByUuid", id})),];
           } else return [{type: "BranchByUuid", id: "LIST"}];
         },
-    })
+    }),
+
+    getListBranch: builder.query({
+        query: () => ({
+            url: `/sites/list`,
+        }),
+        providesTags: (result, error, arg) => {
+            if (result?.ids) {
+            return [{ type: "BranchList", id: "LIST" }, ...result.ids.map((id) => ({ type: "BranchList", id }))];
+            } else return [{ type: "BranchList", id: "LIST" }];
+        },
+    }),
+
 
   }),
 });
 
 export const {
+  useGetListBranchQuery,
+  useGetBranchListQuery,
   useGetSiteByUuidQuery,
   useDeleteSiteMutation,
   useGetSitesQuery,

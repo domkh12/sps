@@ -1,9 +1,6 @@
 import {
-  Autocomplete,
   Card,
-  Chip,
   Grid2,
-  styled,
   TextField,
   Typography,
 } from "@mui/material";
@@ -23,95 +20,66 @@ import {
   setErrorSnackbar,
   setIsOpenSnackBar,
 } from "../../redux/feature/actions/actionSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
-
-import useAuth from "../../hook/useAuth";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
-import ModalAddSlotComponent from "../../components/ModalAddSlotComponent.jsx";
+import {useGetListBranchQuery} from "../../redux/feature/site/siteApiSlice.js";
+import {toast, Slide} from "react-toastify";
+import {useAddNewSlotMutation} from "../../redux/feature/slot/slotApiSlice.js";
+import SelectSingleComponent from "../../components/SelectSingleComponent.jsx";
 
 export default function AddNewSlot() {
   const [profileImageFile, setProfileImageFile] = useState(null);
   const { t } = useTranslate();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(true);
-  const { isManager } = useAuth();
-  const companyFetched = useSelector((state) => state.companies.companiesData);
+  const { data: branchList, isSuccess: isSuccessGetBranchList, isLoading: isLoadingGetBranchList } = useGetListBranchQuery("branchList");
 
   const [
-    addNewParking,
+    addNewParkingSlot,
     {
-      isSuccess: isAddNewParkingSuccess,
-      isError: isErrorAddNewParking,
-      error: errorAddNewParking,
+      isSuccess: isSuccessAddNewParkingSlot,
+      isLoading: isLoadingAddNewParkingSlot,
+      isError: isErrorAddNewParkingSlot,
+      error: errorCreateParkingSlot
     },
-  ] = useAddNewParkingMutation();
-
-  const [
-    getAllCompanies,
-    {
-      isSuccess: isGetAllCompaniesSuccess,
-      isLoading: isLoadingGetAllCompanies,
-      isError: isErrorGetAllCompanies,
-      error: errorGetAllCompanies,
-    },
-  ] = useGetAllCompaniesMutation();
+  ] = useAddNewSlotMutation();
 
   const [uploadImage] = useUploadImageMutation();
 
   const validationSchema = Yup.object().shape({
-    location: Yup.string().required(t("locationIsRequired")),
-    lotName: Yup.array().min(1, t("lotNameValidate")),
-    siteUuid: Yup.string().required("Branch is required!"),
+    lotName: Yup.string().required(t("slotNumberRequired")),
+    parkingSpaceUuid: Yup.string().required(t('parkingSpaceRequired'))
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const promises = [];
-        if (isManager) {
-          promises.push(getAllCompanies());
-        }
-
-        await Promise.all(promises);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+    if (isSuccessAddNewParkingSlot) {
+      navigate("/dash/parking-slots");
+      toast.success(t("createSuccess"), {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
+    }
+  }, [isSuccessAddNewParkingSlot]);
 
   useEffect(() => {
-    if (isAddNewParkingSuccess) {
-      navigate("/dash/parkings");
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setCaptionSnackBar(t("createSuccess")));
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
+    if (isErrorAddNewParkingSlot) {
+      toast.error(`${errorCreateParkingSlot?.data?.error?.description}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
-  }, [isAddNewParkingSuccess]);
-
-  useEffect(() => {
-    if (isErrorAddNewParking) {
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setErrorSnackbar(true));
-      dispatch(
-        setCaptionSnackBar(`${errorAddNewParking?.data?.error?.description}`)
-      );
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
-
-      setTimeout(() => {
-        dispatch(setErrorSnackbar(false));
-      }, 3500);
-    }
-  }, [isErrorAddNewParking]);
+  }, [isErrorAddNewParkingSlot]);
 
   const handleSubmit = async (values) => {
     try {
@@ -124,12 +92,11 @@ export default function AddNewSlot() {
         profileImageUri = uploadResponse.uri;
       }
 
-       await addNewParking({
-        label: values.location,
-        image: profileImageUri,
-        siteUuid: values.siteUuid,
+     await addNewParkingSlot({
         lotName: values.lotName,
-      });
+        parkingSpaceUuid: values.parkingSpaceUuid,
+        image: profileImageUri,
+     });
 
     } catch (err) {
       console.log(err);
@@ -148,25 +115,27 @@ export default function AddNewSlot() {
       {t("slot")}
     </Typography>,
     <Typography color="inherit" key={3}>
-      {t("addslot")}
+      {t("addSlot")}
     </Typography>,
   ];
 
+  console.log({branchList})
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetBranchList) content = <LoadingFetchingDataComponent />;
 
-  if (!isLoading) {
+  if (isSuccessGetBranchList) {
     content = (
       <>
-        <SeoComponent title={"addslot"} />
+        <SeoComponent title={"Create Parking Slot"} />
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
-          title={t("addslot")}
+          title={t("addSlot")}
+          handleBackClick={() => navigate("/dash/parking-slots")}
         />
         <div>
           <Formik
-            initialValues={{ location: "", lotName: [], siteUuid: "" }}
+            initialValues={{ lotName: "", parkingSpaceUuid: "" }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
@@ -178,8 +147,9 @@ export default function AddNewSlot() {
               handleBlur,
               setFieldValue,
             }) => {
-              const handleBranchChange = (value) => {
-                setFieldValue("siteUuid", value);
+
+              const handleParkingSpaceChange = (value) => {
+                setFieldValue("parkingSpaceUuid", value);
               };
 
               return (
@@ -199,73 +169,44 @@ export default function AddNewSlot() {
                     <Grid2 size={{ xs: 12, md: 8 }}>
                       <Card sx={{ ...cardStyle, padding: "24px" }}>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                          <Autocomplete
-                            sx={{
-                              "& .MuiInputBase-input": {
-                                boxShadow: "none",
-                              },
-                            }}
-                            clearIcon={false}
-                            options={values.lotName}
-                            freeSolo
-                            multiple
-                            getOptionLabel={(option) => option}
-                            onChange={(event, newValue) => {
-                              setFieldValue("slotname", newValue);
-                            }}
-                            renderTags={(value, props) =>
-                              value.map((option, index) => (
-                                <Chip label={option} {...props({ index })} />
-                              ))
-                            }
-                            renderInput={(params) => (
-                              <TextField
-                                label={t("slotname")}
-                                {...params}
-                                error={errors.lotName && touched.lotName}
-                                helperText={
-                                  errors.lotName && touched.lotName
-                                    ? errors.lotName
-                                    : null
-                                }
-                              />
-                            )}
-                          />
                           <TextField
-                            label={t("location")}
-                            variant="outlined"
-                            sx={{
-                              "& .MuiInputBase-input": {
-                                boxShadow: "none",
-                              },
-                              borderRadius: "6px",
-                            }}
-                            type="text"
-                            id="location"
-                            name="location"
-                            fullWidth
-                            value={values.location}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            autoComplete="off"
-                            error={errors.location && touched.location}
-                            helperText={
-                              errors.location && touched.location
-                                ? errors.location
-                                : null
-                            }
-                            size="medium"
+                              label={t("slotNumber")}
+                              variant="outlined"
+                              sx={{
+                                "& .MuiInputBase-input": {
+                                  boxShadow: "none",
+                                },
+                                borderRadius: "6px",
+                              }}
+                              type="text"
+                              id="lotName"
+                              name="lotName"
+                              onChange={handleChange}
+                              value={values.lotName}
+                              error={errors.lotName && touched.lotName}
+                              helperText={errors.lotName && touched.lotName ? errors.lotName : null}
+                              size="medium"
                           />
 
-                         
-                          
+                          <SelectSingleComponent
+                              label={t("parkingSpace")}
+                              options={branchList}
+                              onChange={handleParkingSpaceChange}
+                              fullWidth={true}
+                              error={errors.parkingSpaceUuid}
+                              touched={touched.parkingSpaceUuid}
+                              groupLabelKey="siteName"
+                              itemsLabelKey="parkingSpaces"
+                              optionLabelKey="label"
+                              branchLabel="siteName"
+                              companyLabel="company"
+                          />
                         </div>
                         <div className="col-span-2 flex justify-end mt-[20px]">
                           <ButtonComponent
-                            btnTitle={t("addslot")}
+                            btnTitle={t("addSlot")}
                             type={"submit"}
-                            loadingCaption={t("creating")}
-                            // isLoading={isLoading}
+                            isLoading={isLoadingAddNewParkingSlot}
                           />
                         </div>
                       </Card>
