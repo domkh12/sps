@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
@@ -10,7 +10,7 @@ import {
   Stack,
   Badge,
   Grid,
-  Card,
+  Card, Grid2, List, ListItem, ListItemText, Chip,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import EditButtonComponent from "../../components/EditButtonComponent";
@@ -19,136 +19,213 @@ import {
   setUserForQuickEdit,
 } from "../../redux/feature/users/userSlice";
 import QuickEditUserComponent from "../../components/QuickEditUserComponent";
+import useTranslate from "../../hook/useTranslate.jsx";
+import useAuth from "../../hook/useAuth.jsx";
+import {cardStyle} from "../../assets/style.js";
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(2),
-  color: theme.palette.text.secondary,
-}));
+function stringToColor(string) {
+  let hash = 0;
+  let i;
 
-const StyledBadge = styled(Badge)(({ theme }) => ({
-  "& .MuiBadge-badge": {
-    backgroundColor: "#44b700",
-    color: "#44b700",
-    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-    "&::after": {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      borderRadius: "50%",
-      animation: "ripple 1.2s infinite ease-in-out",
-      border: "1px solid currentColor",
-      content: '""',
+  /* eslint-disable no-bitwise */
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  let color = "#";
+
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+  /* eslint-enable no-bitwise */
+
+  return color;
+}
+
+function stringAvatar(name) {
+  if (!name || typeof name !== "string" || name.trim() === "") {
+    return {
+      sx: {
+        bgcolor: "#9E9E9E",
+      },
+      children: "?",
+    };
+  }
+  const parts = name.trim().split(" ");
+  let initials = "";
+
+  if (parts.length >= 2) {
+    initials = `${parts[0][0]}${parts[1][0]}`;
+  } else if (parts.length === 1) {
+    initials = parts[0].slice(0, 2);
+  }
+
+  return {
+    sx: {
+      bgcolor: stringToColor(name),
     },
-  },
-  "@keyframes ripple": {
-    "0%": { transform: "scale(.8)", opacity: 1 },
-    "100%": { transform: "scale(2.4)", opacity: 0 },
-  },
-}));
+    children: initials,
+  };
+}
+
 
 function ViewDetailUser({ user }) {
+  const userActive = useSelector((state) => state.users.isOnlineUser);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const { t } = useTranslate();
+  const [user, setUser] = useState(user?.user || {});
+  const {isAdmin, isManager} = useAuth();
+  console.log({user})
+  useEffect(() => {
+    if (userActive?.uuid === user?.user?.uuid) {
+      setUser({ ...user?.user, isOnline: userActive.isOnline });
+    }
+  }, [userActive]);
 
-  const isOpenQuickEditUser = useSelector(
-    (state) => state.users.isOpenQuickEdit
-  );
+  const StyledBadge = styled(Badge)(({ theme, isonline }) => ({
+    "& .MuiBadge-badge": {
+      backgroundColor: isonline === "true" ? "#44b700" : "#9E9E9E",
+      color: isonline === "true" ? "#44b700" : "#9E9E9E",
+      boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+      "&::after": {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        borderRadius: "50%",
+        animation:
+            isonline === "true" ? "ripple 1.2s infinite ease-in-out" : "none",
+        border: "1px solid currentColor",
+        content: '""',
+      },
+    },
+    "@keyframes ripple": {
+      "0%": {
+        transform: "scale(.8)",
+        opacity: 1,
+      },
+      "100%": {
+        transform: "scale(2.4)",
+        opacity: 0,
+      },
+    },
+  }));
 
   const breadcrumbs = [
     <button
-      key="dashboard"
-      className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+        className="text-black hover:underline"
+        onClick={() => navigate(`${isAdmin ? "/admin" : "/dash"}`)}
+        key={1}
     >
-      Dashboard
+      {t("dashboard")}
     </button>,
-    <Typography key="user">User</Typography>,
-    <Typography key="user-fullName">{user?.fullName || "N/A"}</Typography>,
+    <Typography color="inherit" key={2}>
+      {t("user")}
+    </Typography>,
+    <Typography color="inherit" key={3}>
+      {user?.fullName}
+    </Typography>,
   ];
+  const getChipStyles = () => {
+    let backgroundColor = "#D2E3D6";
+    let color = "#207234";
+
+    if (user.status === "Banned") {
+      backgroundColor = "#FFD6D6";
+      color = "#981212";
+    } else if (user.status === "Pending") {
+      backgroundColor = "#FFF5D6";
+      color = "#B68D0F";
+    } else if (user.status === "Active") {
+      backgroundColor = "#D2E3D6";
+      color = "#207234";
+    }
+
+    return {
+      backgroundColor,
+      color,
+      borderRadius: "6px",
+      fontWeight: "500",
+    };
+  };
 
   return (
-    <div>
-      <Box sx={{ padding: 3 }}>
+      <div>
         <MainHeaderComponent
-          breadcrumbs={breadcrumbs}
-          title={user?.fullName || "User Details"}
-          handleBackClick={() => navigate("/dash")}
+            breadcrumbs={breadcrumbs}
+            title={user?.fullName}
+            handleBackClick={() => navigate(`/${isAdmin ? "admin" : "dash"}/users`)}
         />
-        {/* <Grid container spacing={2}> */}
-          {/* Profile Section */}
-          <Grid item xs={12} md={4}>
-            <Item>
-              <Card sx={{ padding: 2 }}>
-                <Stack direction="row" spacing={2}>
-                  <StyledBadge
-                    overlap="circular"
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                    variant="dot"
-                  >
-                   <Avatar
-                      alt={user?.fullName}
-                      src={
-                        user?.avatarUrl ||"https://www.anthropics.com/portraitpro/img/page-images/homepage/v24/out-now.jpg"
-                      }
-                      sx={{ width: 100, height: 100 }}
-                    />
-                    </StyledBadge>
-                      <div >
-                        <Typography variant="h6" sx={{ marginTop: 2, fontWeight: "bold" }}>{user?.fullName || "N/A"} </Typography>
-                        <Typography className=" flex float: left;"> {user?.email|| "N/A"} </Typography>
-                      </div>
-                </Stack>
-              </Card>
-            </Item>
-          </Grid>
+        <Grid2 container spacing={2}>
 
-          {/* User Details Section */}
-          <Grid item xs={12} md={8}>
-            <Item>
-              <EditButtonComponent
-                handleQuickEdit={() => {
-                  dispatch(setIsOpenQuickEdit(true));
-                  dispatch(setUserForQuickEdit(user));
-                }}
-              />
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Card sx={{ ...cardStyle, p: "16px", width: "100%" }}>
+              <div className="flex justify-between items-center mb-5">
+                <Typography variant="h6">User info</Typography>
+              </div>
+              <div className="flex justify-between">
+                <List sx={{ padding: "0" }}>
+                  <ListItem sx={{ padding: "0", gap: "10px" }}>
+                    <StyledBadge
+                        overlap="circular"
+                        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                        variant="dot"
+                        isonline={String(user?.isOnline)}
+                    >
+                      <Avatar
+                          alt={user?.fullName}
+                          src={user?.profileImage}
+                          {...stringAvatar(user?.fullName)}
+                      />
+                    </StyledBadge>
+                    <ListItemText
+                        primary={<>{user?.fullName}</> || "N/A"}
+                        secondary={
+                          <Typography
+                              component="span"
+                              variant="body2"
+                              sx={{ color: "gray", display: "inline" }}
+                          >
+                            {user?.email || "N/A"}
+                          </Typography>
+                        }
+                    />
+                  </ListItem>
+                </List>
+
+                <Chip
+                    sx={getChipStyles()}
+                    size="small"
+                    label={user?.status}
+                />
+              </div>
+
+              <div className="flex flex-col gap-3 mt-5">
                 <Typography variant="body1">
-                  <strong>Full Name:</strong> {user?.fullName || "N/A"}
+                  <span className="text-gray-cus">{t('gender')}</span>
+                  {`${"\u00a0"}:${"\u00a0"}${user?.user?.gender?.gender || "N/A"}`}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Gender:</strong> {user?.gender?.gender || "N/A"}
+                  <span className="text-gray-cus">{t('dateOfBirth')}</span>
+                  {`${"\u00a0"}:${"\u00a0"}${user?.user?.dateOfBirth || "N/A"}`}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Date of Birth:</strong> {user?.dateOfBirth || "N/A"}
+                  <span className="text-gray-cus">{t('phoneNumber')}</span>
+                  {`${"\u00a0"}:${"\u00a0"}${user?.user?.phoneNumber || "N/A"}`}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Email:</strong> {user?.email || "N/A"}
+                  <span className="text-gray-cus">{t('role')}</span>
+                  {`${"\u00a0"}:${"\u00a0"}${user?.user?.roles?.length ? user?.user?.roles?.map((role) => role?.name) : "N/A"}`}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Phone Number:</strong> {user?.phoneNumber || "N/A"}
+                  <span className="text-gray-cus">{t('branch')}</span>
+                  {`${"\u00a0"}:${"\u00a0"}${user?.user?.sites?.length > 0 ? user?.user?.sites?.map((site) => site?.siteName) : "N/A"}`}
                 </Typography>
-                <Typography variant="body1">
-                  <strong>Address:</strong> {user?.address || "N/A"}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Branch:</strong>{" "}
-                  {user?.sites?.map((site) => site.siteName).join(", ") || "N/A"}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Roles:</strong>{" "}
-                  {user?.roles?.map((role) => role.name).join(", ") || "N/A"}
-                </Typography>
-              </Box>
-            </Item>
-          </Grid>
-        {/* </Grid> */}
-      </Box>
-      {isOpenQuickEditUser && <QuickEditUserComponent />}
-    </div>
+              </div>
+            </Card>
+          </Grid2>
+      </div>
   );
 }
 

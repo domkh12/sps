@@ -1,20 +1,21 @@
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import useTranslate from "../../hook/useTranslate.jsx";
 import {Card, Chip, Paper, Typography} from "@mui/material";
 import MainHeaderComponent from "../../components/MainHeaderComponent.jsx";
 import {cardStyle} from "../../assets/style.js";
 import ImageDetailComponent from "../../components/ImageDetailComponent.jsx";
+import useAuth from "../../hook/useAuth.jsx";
 
 function ViewSlotDetail({parkingSlot}){
     const navigate = useNavigate();
-    console.log({parkingSlot});
+    const {isAdmin} = useAuth();
     const { t } = useTranslate();
     const breadcrumbs = [
         <Paper
             elevation={0}
             component="button"
             className="text-black hover:underline"
-            onClick={() => navigate("/dash")}
+            onClick={() => navigate(`/${isAdmin ? "admin" : "dash"}`)}
             key={1}
         >
             {t("dashboard")}
@@ -31,7 +32,7 @@ function ViewSlotDetail({parkingSlot}){
             <MainHeaderComponent
                 breadcrumbs={breadcrumbs}
                 title={parkingSlot.lotName || "N/A"}
-                handleBackClick={() => navigate("/dash/parking-slots")}
+                handleBackClick={() => navigate(`/${isAdmin ? "admin" : "dash"}/parking-slots`)}
             />
             <Card sx={{...cardStyle, p: "16px"}}>
                 <Typography variant="h6" sx={{pb: 1}}>{t('parkingSlotInfo')}</Typography>
@@ -41,10 +42,25 @@ function ViewSlotDetail({parkingSlot}){
                         <span >{t('parkingSlotName')} </span>
                         {`${"\u00a0"}:${"\u00a0"}${parkingSlot?.lotName || "N/A"}`}
                     </Typography>
-                    <Typography variant="body1">
-                        <span >{t('parkingSpaceName')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${parkingSlot?.parkingSpace?.label || "N/A"}`}
-                    </Typography>
+                    {
+                        isAdmin ? (
+                            <Link to={`/admin/parking-spaces/${parkingSlot?.parkingSpace?.uuid}/view`}>
+                                <Typography variant="body1">
+                                    <span>{t('parkingSpaceName')} </span>
+                                    <span>{`${"\u00a0"}:${"\u00a0"}`}</span>
+                                    <span
+                                        className="text-blue-700 hover:underline">{parkingSlot?.parkingSpace?.label || "N/A"}</span>
+                                </Typography>
+                            </Link>
+                        ): (
+                            <Typography variant="body1">
+                                <span>{t('parkingSpaceName')} </span>
+                                <span>{`${"\u00a0"}:${"\u00a0"}`}</span>
+                                <span>{parkingSlot?.parkingSpace?.label || "N/A"}</span>
+                            </Typography>
+                        )
+                    }
+
                     <Typography variant="body1">
                         <span >{t('status')} </span>
                         {`${"\u00a0"}:${"\u00a0"}${parkingSlot?.isAvailable ? "Available" : "Occupied"}`}

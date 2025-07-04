@@ -1,9 +1,8 @@
 import {useEffect, useState} from "react";
 import useTranslate from "../../hook/useTranslate.jsx";
 import {useNavigate} from "react-router-dom";
-import {useDispatch} from "react-redux";
 import {useGetListBranchQuery} from "../../redux/feature/site/siteApiSlice.js";
-import {useAddNewSlotMutation, useUpdateSlotMutation} from "../../redux/feature/slot/slotApiSlice.js";
+import {useUpdateSlotMutation} from "../../redux/feature/slot/slotApiSlice.js";
 import {useUploadImageMutation} from "../../redux/feature/uploadImage/uploadImageApiSlice.js";
 import * as Yup from "yup";
 import {Slide, toast} from "react-toastify";
@@ -21,7 +20,6 @@ function EditSlotForm({parkingSlot}){
     const [profileImageFile, setProfileImageFile] = useState(null);
     const { t } = useTranslate();
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     const { data: branchList, isSuccess: isSuccessGetBranchList, isLoading: isLoadingGetBranchList } = useGetListBranchQuery("branchList");
 
     const [
@@ -43,7 +41,7 @@ function EditSlotForm({parkingSlot}){
 
     useEffect(() => {
         if (isSuccessUpdateParkingSlot) {
-            navigate("/dash/parking-slots");
+            navigate("/admin/parking-slots");
             toast.success(t("createSuccess"), {
                 position: "top-right",
                 autoClose: 2000,
@@ -96,7 +94,7 @@ function EditSlotForm({parkingSlot}){
     const breadcrumbs = [
         <button
             className="text-black hover:underline"
-            onClick={() => navigate("/dash")}
+            onClick={() => navigate("/admin")}
             key={1}
         >
             {t("dashboard")}
@@ -120,7 +118,7 @@ function EditSlotForm({parkingSlot}){
                 <MainHeaderComponent
                     breadcrumbs={breadcrumbs}
                     title={parkingSlot?.lotName || "N/A"}
-                    handleBackClick={() => navigate("/dash/parking-slots")}
+                    handleBackClick={() => navigate("/admin/parking-slots")}
                 />
                 <div>
                     <Formik

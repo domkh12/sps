@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   useAddNewUserMutation,
-  useFindAllGenderMutation,
-  useGetAllRolesMutation,
+  useFindAllGenderQuery,
+  useGetAllRolesQuery,
 } from "../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
 import { Form, Formik } from "formik";
@@ -11,7 +11,6 @@ import { IoEye, IoEyeOff } from "react-icons/io5";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import MainHeaderComponent from "./../../components/MainHeaderComponent";
 import {
-  Button,
   Card,
   FormControl,
   FormHelperText,
@@ -36,30 +35,22 @@ import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataCo
 import { useDispatch, useSelector } from "react-redux";
 import ProfileUploadComponent from "../../components/ProfileUploadComponent.jsx";
 import SeoComponent from "../../components/SeoComponent.jsx";
-import {
-  setCaptionSnackBar,
-  setErrorSnackbar,
-  setIsOpenSnackBar,
-} from "../../redux/feature/actions/actionSlice.js";
 import useAuth from "../../hook/useAuth.jsx";
 import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
+import {Slide, toast} from "react-toastify";
 
 function AddNewUser() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [profileImageFile, setProfileImageFile] = useState(null);
-  const [cboRolesToggle, setCboRolesToggle] = useState(false);
-  const dropdownRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const genderFetched = useSelector((state) => state.users.genders);
-  const rolesFetched = useSelector((state) => state.users.roles);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { t } = useTranslate();
-  const { isManager, isAdmin } = useAuth();
-  const {data:companyData, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
-
+  const { isManager, isAdmin , sites} = useAuth();
+  const {data:companyData, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList", {skip: !isAdmin});
+  const {data: role, isSuccess: isSuccessGetRole, isLoading: isLoadingGetRole} = useGetAllRolesQuery("roleList");
+  const {data: gender, isSuccess: isSuccessGetGender, isLoading: isLoadingGetGender} = useFindAllGenderQuery("genderList");
   const [
     addNewUser,
     {
@@ -72,40 +63,20 @@ function AddNewUser() {
 
   const [uploadImage] = useUploadImageMutation();
 
-  const [
-    findAllGender,
-    {
-      isSuccess: isFindAllGenderSuccess,
-      isLoading: isFindAllGenderLoading,
-      isError: isFindAllGenderError,
-      error: findAllGenderError,
-    },
-  ] = useFindAllGenderMutation();
-
-  const [
-    getAllRoles,
-    {
-      isSuccess: isGetAllRolesSuccess,
-      isLoading: isGetAllRolesLoading,
-      isError: isGetAllRolesError,
-      error: getAllRolesError,
-    },
-  ] = useGetAllRolesMutation();
-
   const validationSchema = Yup.object().shape({
     fullName: Yup.string()
       .matches(
         /^[\u1780-\u17FF\sA-Za-z]+$/,
-        "Full name must contain only Khmer and English letters and spaces"
+        t("fullNameMustContainOnlyKhmerOrEnglishCharacters")
       )
-      .min(2, "Full name must 2 characters")
-      .max(100, "Full name must 300 characters")
-      .required("Full name is required"),
+      .min(2, t("fullNameMustBeAtLeast2Characters"))
+      .max(100, t("fullNameMustNotExceed100Characters"))
+      .required(t("fullNameRequired")),
     dateOfBirth: Yup.date()
-      .required("Date of birth is required")
+      .required(t("dateOfBirthRequired"))
       .test(
         "is-valid-age",
-        "Must be between 10 and 120 years old",
+        t("ageMustBeBetween10And100"),
         function (value) {
           if (!value) {
             return false;
@@ -113,46 +84,46 @@ function AddNewUser() {
           const today = dayjs();
           const birthDate = dayjs(value);
           const age = today.diff(birthDate, "year");
-          return age >= 10 && age <= 120;
+          return age >= 10 && age <= 100;
         }
       ),
     email: Yup.string()
-      .email("Invalid email format")
-      .required("Email is required"),
+      .email(t("invalidEmail"))
+      .required(t("emailRequired")),
     password: Yup.string()
-      .min(8, "Password must be at least 8 characters")
-      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-      .matches(/[0-9]/, "Password must contain at least one number")
-      .matches(/[\W_]/, "Password must contain at least one special character")
-      .required("Password is required"),
+      .min(8, t("passwordMustBeAtLeast8Characters"))
+      .matches(/[A-Z]/, t("passwordMustContainAtLeastOneUppercaseLetter"))
+      .matches(/[a-z]/, t("passwordMustContainAtLeastOneLowercaseLetter"))
+      .matches(/[0-9]/, t("passwordMustContainAtLeastOneNumber"))
+      .matches(/[\W_]/, t("passwordMustContainAtLeastOneSpecialCharacter"))
+      .required(t("passwordRequired")),
     confirmPassword: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Confirm password is required"),
+      .oneOf([Yup.ref("password"), null], t("passwordsMustMatch"))
+      .required(t("confirmPasswordRequired")),
     phoneNumber: Yup.string()
-      .matches(/^\+?\d+$/, "Phone number must be numbers with an optional '+'")
-      .test("len", "Must be between 7 and 15 digits", (val) => {
+      .matches(/^\+?\d+$/, t("phoneNumberMustContainOnlyNumbers"))
+      .test("len", t("lengthMustBeBetween7And15Digits"), (val) => {
         if (val) {
           const digitsOnly = val.replace(/\D/g, "");
           return digitsOnly.length >= 7 && digitsOnly.length <= 15;
         }
         return true;
       })
-      .required("Phone number is required"),
-    genderId: Yup.string().required("Gender is required"),
+      .required(t("phoneNumberRequired")),
+    genderId: Yup.string().required(t("genderRequired")),
 
-    ...(isManager
+    ...(isAdmin
       ? {
           roleId: Yup.array()
-            .test("len", "Role must not be empty", (val) => {
+            .test("len", t("roleMustNotEmpty"), (val) => {
               return val ? val.length !== 0 : false;
             })
-            .required("Role is required"),
+            .required(t("roleRequired")),
           branchId: Yup.array()
             .test("len", "Branch must not be empty", (val) => {
               return val ? val.length !== 0 : false;
             })
-            .required("Branch is required"),
+            .required(t("branchRequired")),
         }
       : {}),
   });
@@ -221,50 +192,31 @@ function AddNewUser() {
   }));
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const promises = [];
-        if (isManager) {
-          promises.push(getAllRoles());
-        }
-        promises.push(findAllGender());
-
-        await Promise.all(promises);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, [isManager, getAllRoles, findAllGender]);
-
-  useEffect(() => {
     if (isSuccessAddNewUser) {
-      navigate("/dash/users");
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setCaptionSnackBar(t("createSuccess")));
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
+      navigate(`/${isAdmin ? "admin" : "dash"}/users`);
+      toast.success(t("createSuccess"), {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
   }, [isSuccessAddNewUser, navigate, dispatch]);
 
   useEffect(() => {
     if (isErrorAddNewUser) {
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setErrorSnackbar(true));
-      dispatch(
-        setCaptionSnackBar(`${errorAddNewUser?.data?.error?.description}`)
-      );
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
-
-      setTimeout(() => {
-        dispatch(setErrorSnackbar(false));
-      }, 3500);
+      toast.error(`${errorAddNewUser?.data?.error?.description}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
   }, [isErrorAddNewUser, dispatch]);
 
@@ -290,12 +242,13 @@ function AddNewUser() {
         password: values.password,
         confirmPassword: values.confirmPassword,
         phoneNumber: values.phoneNumber,
-        roleId: values.roleId,
+        roleId: isAdmin ? values.roleId : [role[0].uuid],
         profileImage: profileImageUri,
         isVerified: values.isVerified,
-        branchId: values.branchId,
+        branchId: isAdmin ? values.branchId : [sites[0]],
       });
     } catch (error) {
+      console.log("Error submitting form:", error);
     } finally {
       setSubmitting(false);
     }
@@ -304,7 +257,7 @@ function AddNewUser() {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate(`${isAdmin ? "admin" : "dash"}`)}
       key={1}
     >
       {t("dashboard")}
@@ -319,26 +272,22 @@ function AddNewUser() {
 
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetCompanyName || isLoadingGetGender || isLoadingGetRole) content = <LoadingFetchingDataComponent />;
 
   if (error) {
     content = "Error";
   }
-  if (
-    !isLoading &&
-    !error &&
-    (isManager
-      ? isFindAllGenderSuccess &&
-        isGetAllRolesSuccess &&
-        isSuccessGetCompanyName
-      : isFindAllGenderSuccess)
-  ) {
+  if (isSuccessGetRole &&
+      isSuccessGetGender &&
+      (isAdmin ? isSuccessGetCompanyName : true) &&
+      isSuccessGetGender) {
     content = (
       <div data-aos="fade-left">
         <SeoComponent title={"Create a new user"} />
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
           title={t("createANewUser")}
+          handleBackClick={() => navigate(`/${isAdmin ? "admin" : "dash"}/users`)}
         />
         <Formik
           initialValues={{
@@ -369,7 +318,7 @@ function AddNewUser() {
             const errorDateOfBirth = errors.dateOfBirth && touched.dateOfBirth;
 
             const handleRoleChange = (value) => {
-              setFieldValue("roleId", value);
+              setFieldValue("roleId", [value]);
             };
 
             const handleBranchChange = (value) => {
@@ -377,7 +326,6 @@ function AddNewUser() {
             };
 
             const handleGenderChange = (value) => {
-              console.log("value", value);
               setFieldValue("genderId", value);
             };
 
@@ -485,7 +433,7 @@ function AddNewUser() {
 
                         <SelectSingleComponent
                           label={t("gender")}
-                          options={genderFetched.data}
+                          options={gender}
                           onChange={handleGenderChange}
                           fullWidth={true}
                           error={errors.genderId}
@@ -687,10 +635,10 @@ function AddNewUser() {
                           </FormHelperText>
                         </FormControl>
 
-                        {isManager && (
-                          <SelectComponent
+                        {isAdmin && (
+                          <SelectSingleComponent
                             label={t("role")}
-                            options={rolesFetched.data}
+                            options={role}
                             onChange={handleRoleChange}
                             fullWidth={true}
                             error={errors.roleId}
@@ -699,14 +647,14 @@ function AddNewUser() {
                           />
                         )}
 
-                        {isManager && (
+                        {isAdmin && (
                           <SelectComponent
                             label={t("branch")}
-                            options={companyData.data}
+                            options={companyData}
                             onChange={handleBranchChange}
                             fullWidth={true}
-                            error={errors.roleId}
-                            touched={touched.roleId}
+                            error={errors.branchId}
+                            touched={touched.branchId}
                             itemsLabelKey="sites"
                             optionLabelKey="siteName"
                             groupLabelKey="companyName"

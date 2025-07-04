@@ -94,17 +94,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
           return response.status === 200 && !result.isError;
         },
       }),
-      transformResponse: (responseData) => {
-        responseData.id = responseData.uuid;
-        return usersAdapter.setOne(initialState, responseData);
-      },
       providesTags: (result, error, arg) => {
         if (result?.ids) {
           return [
-            { type: "User", id: "LIST" },
-            ...result.ids.map((id) => ({ type: "User", id })),
+            { type: "UserByUuid", id: "LIST" },
+            ...result.ids.map((id) => ({ type: "UserByUuid", id })),
           ];
-        } else return [{ type: "User", id: "LIST" }];
+        } else return [{ type: "UserByUuid", id: "LIST" }];
       },
     }),
 
@@ -160,17 +156,14 @@ export const userApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, arg) => [{ type: "User", id: arg.uuid }],
     }),
 
-    getAllFullNameUsers: builder.mutation({
+    getAllFullNameUsers: builder.query({
       query: () => ({
         url: `/users/full-names`,
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setAllFullNameUsersFetched({ data }));
-        } catch (error) {
-          console.log(error);
-        }
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "FullNameUser", id: "LIST"}, ...result.ids.map((id) => ({type: "FullNameUser", id})),];
+        } else return [{type: "FullNameUser", id: "LIST"}];
       },
     }),
 
@@ -204,67 +197,59 @@ export const userApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
-    findAllGender: builder.mutation({
+    findAllGender: builder.query({
       query: () => ({
         url: "/genders",
         method: "GET",
       }),
-      async onQueryStarted(args, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setGender({ data }));
-        } catch (error) {
-          console.log(error);
-        }
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "Gender", id: "LIST"}, ...result.ids.map((id) => ({type: "Gender", id})),];
+        } else return [{type: "Gender", id: "LIST"}];
       },
     }),
 
-    getAllRoles: builder.mutation({
+    getAllRoles: builder.query({
       query: () => ({
         url: "/roles",
         method: "GET",
       }),
-      async onQueryStarted(args, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setRoles({ data }));
-        } catch (error) {
-          console.log(error);
-        }
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "Role", id: "LIST"}, ...result.ids.map((id) => ({type: "Role", id})),];
+        } else return [{type: "Role", id: "LIST"}];
       },
     }),
 
-    getAllSignUpMethods: builder.mutation({
+    getAllSignUpMethods: builder.query({
       query: () => ({
         url: "/sign-up-methods",
         method: "GET",
       }),
-      async onQueryStarted(args, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setSignUpMethods({ data }));
-        } catch (error) {
-          console.log(error);
-        }
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "SignupMethod", id: "LIST"}, ...result.ids.map((id) => ({type: "SignupMethod", id})),];
+        } else return [{type: "SignupMethod", id: "LIST"}];
       },
     }),
+
   }),
 });
 
 export const {
   useSearchUserQuery,
-  useGetAllSignUpMethodsMutation,
-  useGetAllRolesMutation,
+  useGetAllSignUpMethodsQuery,
+  useGetAllRolesQuery,
   useGetUsersQuery,
   useFindUserByUuidQuery,
   useAddNewUserMutation,
-  useGetAllFullNameUsersMutation,
+  useGetAllFullNameUsersQuery,
   useUpdateUserMutation,
   useConnectedUserMutation,
   useGet2faSecretCodeMutation,
   useGet2faStatusMutation,
   useDeleteUserMutation,
-  useFindAllGenderMutation,
+  useFindAllGenderQuery,
 } = userApiSlice;
 
 // return the query result object

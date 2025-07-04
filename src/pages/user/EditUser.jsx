@@ -1,23 +1,27 @@
 import { useParams } from "react-router-dom";
-import { useGetUsersQuery } from "../../redux/feature/users/userApiSlice";
+import {useFindUserByUuidQuery} from "../../redux/feature/users/userApiSlice";
 import EditUserForm from "./EditUserForm";
 import LoadingFetchingDataComponent from "./../../components/LoadingFetchingDataComponent";
+import {useEffect} from "react";
 
 function EditUser() {
-  const { id } = useParams();
+  const {id} = useParams();
 
-  const { user } = useGetUsersQuery("usersList", {
-    selectFromResult: ({ data }) => ({
-      user: data?.entities[id],
-    }),
-  });
+  const {data: user, isFetching, isSuccess, isError, error, refetch} = useFindUserByUuidQuery(id);
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   let content;
 
-  if (!user) content = <LoadingFetchingDataComponent />;
+  if (isFetching) content = <LoadingFetchingDataComponent/>;
 
-  content = <EditUserForm user={user} />;
-
+  else if (isSuccess && user) content = <EditUserForm user={user} />;
+  else if (isError) {
+    content = <div>Error: {error.message}</div>;
+  } else {
+    content = <div>Unexpected state: No user data found.</div>;
+  }
   return content;
 }
 

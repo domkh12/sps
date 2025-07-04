@@ -1,11 +1,8 @@
-import React from 'react'
 import {
   Card,
   FormControl,
   FormHelperText,
   Grid2,
-  Tab,
-  Tabs,
   TextField,
   Typography,
 } from "@mui/material";
@@ -14,33 +11,25 @@ import dayjs from "dayjs";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useFindAllGenderMutation } from "../../redux/feature/users/userApiSlice";
+import {useFindAllGenderQuery} from "../../redux/feature/users/userApiSlice";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
-import { Outlet, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import SeoComponent from "../../components/SeoComponent";
 import useTranslate from "../../hook/useTranslate";
-import MainHeaderComponent from "../../components/MainHeaderComponent";
 import ProfileUploadComponent from "../../components/ProfileUploadComponent";
 import { cardStyle } from "../../assets/style";
 import * as Yup from "yup";
 import SelectSingleComponent from "../../components/SelectSingleComponent";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import ButtonComponent from "../../components/ButtonComponent";
-import { useUpdateUserProfileMutation } from "../../redux/feature/auth/authApiSlice";
-import {
-  setCaptionSnackBar,
-  setErrorSnackbar,
-  setIsOpenSnackBar,
-} from "../../redux/feature/actions/actionSlice";
-import { FaAddressCard } from "react-icons/fa6";
+import {useGetUserProfileQuery, useUpdateUserProfileMutation} from "../../redux/feature/auth/authApiSlice";
+import {Slide, toast} from "react-toastify";
 function Account() {
   const { t } = useTranslate();
-  const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
   const [profileImageFile, setProfileImageFile] = useState(null);
-  const genderFetched = useSelector((state) => state.users.genders);
-  const userProfile = useSelector((state) => state.auth.userProfile);
-  const dispatch = useDispatch();
+  const {data: gender, isSuccess: isSuccessGetGender, isLoading: isLoadingGetGender} = useFindAllGenderQuery("genderList");
+  const {data: userProfile, isSuccess: isSuccessGetUserProfile, isLoading: isLoadingGetUserProfile} = useGetUserProfileQuery("userProfile");
+
   const [uploadImage] = useUploadImageMutation();
 
   const [
@@ -53,64 +42,33 @@ function Account() {
     },
   ] = useUpdateUserProfileMutation();
 
-  const [findAllGender] = useFindAllGenderMutation();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const promises = [];
-        promises.push(findAllGender());
-
-        await Promise.all(promises);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
   useEffect(() => {
     if (isSuccessUpdateUser) {
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setCaptionSnackBar(t("createSuccess")));
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
+      toast.success(t("updateSuccess"), {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
   }, [isSuccessUpdateUser]);
 
   useEffect(() => {
     if (isErrorUpdateUser) {
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setErrorSnackbar(true));
-      dispatch(
-        setCaptionSnackBar(`${errorUpdateUser?.data?.error?.description}`)
-      );
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
-
-      setTimeout(() => {
-        dispatch(setErrorSnackbar(false));
-      }, 3500);
+      toast.error(`${errorUpdateUser?.data?.error?.description}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
   }, [isErrorUpdateUser]);
-
-  const breadcrumbs = [
-    <button
-      className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
-      key={1}
-    >
-      {t("dashboard")}
-    </button>,
-    <Typography color="inherit" key={3}>
-      {t("account")}
-    </Typography>,
-  ];
 
   const validationSchema = Yup.object().shape({
     fullName: Yup.string()
@@ -183,9 +141,9 @@ function Account() {
 
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetGender || isLoadingGetUserProfile) content = <LoadingFetchingDataComponent />;
 
-  if (!isLoading) {
+  if (isSuccessGetGender && isSuccessGetUserProfile) {
     content = (
       <>
         <SeoComponent title={"Account"} />
@@ -272,7 +230,7 @@ function Account() {
 
                         <SelectSingleComponent
                           label={t("gender")}
-                          options={genderFetched.data}
+                          options={gender}
                           onChange={handleGenderChange}
                           fullWidth={true}
                           error={errors.genderId}

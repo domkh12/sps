@@ -1,6 +1,6 @@
 import {buttonStyleContained, buttonStyleOutlined} from "../assets/style.js";
 import {LoadingButton} from "@mui/lab";
-import {Box, Button, FormControl, Modal, TextField, Typography} from "@mui/material";
+import {Backdrop, Box, Button, CircularProgress, FormControl, Modal, TextField, Typography} from "@mui/material";
 import {Form, Formik} from "formik";
 import * as Yup from "yup";
 import {useEffect} from "react";
@@ -72,13 +72,9 @@ function QuickEditCompanyComponent() {
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
-            const formData = new FormData();
-            let profileImageUri = null;
-
             const formattedDate = dayjs(values.establishedDate).format(
                 "YYYY-MM-DD"
             );
-
             await updateCompany({
                 uuid: company.uuid,
                 companyName: values.companyName,
@@ -97,201 +93,216 @@ function QuickEditCompanyComponent() {
 
     let content;
 
-    content = (
-        <Modal
-            open={isQuickEditCompanyOpen}
-            onClose={() => dispatch(setIsQuickEditCompanyOpen(false))}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-            closeAfterTransition
-        >
-            <Box>
-                <Box
-                    sx={{
-                        backgroundColor: "background.paper",
-                        borderRadius: "16px",
-                        width: "95%",
-                        maxWidth: "720px",
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        overflow: "auto",
-                        maxHeight: "90vh",
-                        boxShadow: "0px 10px 15px -3px rgb(0 0 0 / 20%), 0px 4px 6px -2px rgb(0 0 0 / 15%)",
-                        display: "flex",
-                        flexDirection: "column",
-                    }}
-                >
-                    <Typography
-                        id="modal-modal-title"
-                        variant="h6"
-                        component="h2"
-                        sx={{padding: "24px"}}
+    if (isLoadingGetCompanyType || isLoadingGetCity) {
+        content = (
+            <Backdrop
+                sx={(theme) => ({color: '#fff', zIndex: theme.zIndex.drawer + 1})}
+                open={true}
+                onClick={dispatch(setIsQuickEditCompanyOpen(false))}
+            >
+                <CircularProgress color="inherit"/>
+            </Backdrop>
+        )
+    }
+
+    if (isSuccessGetCompanyType && isSuccessGetCity) {
+        content = (
+            <Modal
+                open={isQuickEditCompanyOpen}
+                onClose={() => dispatch(setIsQuickEditCompanyOpen(false))}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+                closeAfterTransition
+            >
+                <Box>
+                    <Box
+                        sx={{
+                            backgroundColor: "background.paper",
+                            borderRadius: "16px",
+                            width: "95%",
+                            maxWidth: "720px",
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            overflow: "auto",
+                            maxHeight: "90vh",
+                            boxShadow: "0px 10px 15px -3px rgb(0 0 0 / 20%), 0px 4px 6px -2px rgb(0 0 0 / 15%)",
+                            display: "flex",
+                            flexDirection: "column",
+                        }}
                     >
-                        {t('quickUpdate')}
-                    </Typography>
-                    <Box>
-                        <Formik
-                            initialValues={{
-                                companyName: company.companyName,
-                                companyAddress: company.companyAddress,
-                                companyTypeUuid: company.companyType.uuid,
-                                cityUuid: company.city.uuid,
-                                establishedDate: dayjs(company.establishedDate),
-                                image: company.image
-                            }}
-                            validationSchema={validationSchema}
-                            onSubmit={handleSubmit}
+                        <Typography
+                            id="modal-modal-title"
+                            variant="h6"
+                            component="h2"
+                            sx={{padding: "24px"}}
                         >
-                            {({
-                                  values, touched, errors, handleChange, handleBlur, setFieldValue,
-                              }) => {
+                            {t('quickUpdate')}
+                        </Typography>
+                        <Box>
+                            <Formik
+                                initialValues={{
+                                    companyName: company?.companyName,
+                                    companyAddress: company?.companyAddress,
+                                    companyTypeUuid: company?.companyType?.uuid,
+                                    cityUuid: company?.city?.uuid,
+                                    establishedDate: dayjs(company?.establishedDate),
+                                    image: company?.image
+                                }}
+                                validationSchema={validationSchema}
+                                onSubmit={handleSubmit}
+                            >
+                                {({
+                                      values, touched, errors, handleChange, handleBlur, setFieldValue,
+                                  }) => {
 
-                                const errorDateOfBirth = errors.dateOfBirth && touched.dateOfBirth;
+                                    const errorDateOfBirth = errors.dateOfBirth && touched.dateOfBirth;
 
-                                const handleCityChange = (value) => {
-                                    setFieldValue("cityUuid", value);
-                                };
+                                    const handleCityChange = (value) => {
+                                        setFieldValue("cityUuid", value);
+                                    };
 
-                                const handleCompanyTypeChange = (value) => {
-                                    setFieldValue("companyTypeUuid", value);
-                                };
+                                    const handleCompanyTypeChange = (value) => {
+                                        setFieldValue("companyTypeUuid", value);
+                                    };
 
-                                return (<Form>
+                                    return (<Form>
 
-                                    <Box className="grid grid-cols-1 sm:grid-cols-2 gap-5 px-[24px]">
-                                        <TextField
-                                            label={t("companyName")}
-                                            variant="outlined"
-                                            sx={{
-                                                "& .MuiInputBase-input": {
-                                                    boxShadow: "none",
-                                                },
-                                                borderRadius: "6px",
-                                            }}
-                                            type="text"
-                                            id="companyName"
-                                            name="companyName"
-                                            value={values.companyName}
-                                            onChange={handleChange}
-                                            error={errors.companyName && touched.companyName}
-                                            helperText={errors.companyName && touched.companyName ? errors.companyName : null}
-                                            size="medium"
-                                        />
-
-                                        <TextField
-                                            label={t("address")}
-                                            variant="outlined"
-                                            sx={{
-                                                "& .MuiInputBase-input": {
-                                                    boxShadow: "none",
-                                                },
-                                                borderRadius: "6px",
-                                            }}
-                                            type="text"
-                                            id="companyAddress"
-                                            name="companyAddress"
-                                            fullWidth
-                                            value={values.companyAddress}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            autoComplete="off"
-                                            error={
-                                                errors.companyAddress && touched.companyAddress
-                                            }
-                                            helperText={
-                                                errors.companyAddress && touched.companyAddress
-                                                    ? errors.companyAddress
-                                                    : null
-                                            }
-                                            size="medium"
-                                        />
-
-                                        <SelectSingleComponent
-                                            label={t("companyType")}
-                                            options={companyTypeData}
-                                            onChange={handleCompanyTypeChange}
-                                            fullWidth={true}
-                                            error={errors.companyTypeUuid}
-                                            touched={touched.companyTypeUuid}
-                                            optionLabelKey={"name"}
-                                            selectFistValue={company.companyType.uuid}
-                                        />
-
-                                        <SelectSingleComponent
-                                            label={t("city")}
-                                            options={cityName}
-                                            onChange={handleCityChange}
-                                            fullWidth={true}
-                                            error={errors.cityUuid}
-                                            touched={touched.cityUuid}
-                                            optionLabelKey="name"
-                                            selectFistValue={company.city.uuid}
-                                        />
-
-                                        <FormControl
-                                            sx={{ width: "100%" }}
-                                            variant="outlined"
-                                            size="medium"
-                                        >
-                                            <DatePicker
+                                        <Box className="grid grid-cols-1 sm:grid-cols-2 gap-5 px-[24px]">
+                                            <TextField
+                                                label={t("companyName")}
+                                                variant="outlined"
                                                 sx={{
                                                     "& .MuiInputBase-input": {
                                                         boxShadow: "none",
                                                     },
-                                                    ...(errorDateOfBirth && {
-                                                        "& .MuiOutlinedInput-notchedOutline": {
-                                                            borderColor: "#f44336",
-                                                            color: "white",
-                                                        },
-                                                    }),
-                                                    "& .MuiInputLabel-root ": {
-                                                        ...(errorDateOfBirth && {color: "#f44336"}),
-                                                    },
+                                                    borderRadius: "6px",
                                                 }}
-                                                label={t("establishedDate")}
-                                                value={values.establishedDate}
-                                                id="establishedDate"
-                                                name="establishedDate"
-                                                onChange={(value) => {
-                                                    setFieldValue("establishedDate", value);
-                                                }}
-                                                format="DD-MM-YYYY"
+                                                type="text"
+                                                id="companyName"
+                                                name="companyName"
+                                                value={values.companyName}
+                                                onChange={handleChange}
+                                                error={errors.companyName && touched.companyName}
+                                                helperText={errors.companyName && touched.companyName ? errors.companyName : null}
+                                                size="medium"
                                             />
-                                        </FormControl>
 
-                                    </Box>
-                                    <Box
-                                        sx={{
-                                            padding: "24px", display: "flex", justifyContent: "end",
-                                        }}
-                                    >
-                                        <Button
-                                            onClick={() => dispatch(setIsQuickEditCompanyOpen(false))}
+                                            <TextField
+                                                label={t("address")}
+                                                variant="outlined"
+                                                sx={{
+                                                    "& .MuiInputBase-input": {
+                                                        boxShadow: "none",
+                                                    },
+                                                    borderRadius: "6px",
+                                                }}
+                                                type="text"
+                                                id="companyAddress"
+                                                name="companyAddress"
+                                                fullWidth
+                                                value={values.companyAddress}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                autoComplete="off"
+                                                error={
+                                                    errors.companyAddress && touched.companyAddress
+                                                }
+                                                helperText={
+                                                    errors.companyAddress && touched.companyAddress
+                                                        ? errors.companyAddress
+                                                        : null
+                                                }
+                                                size="medium"
+                                            />
+
+                                            <SelectSingleComponent
+                                                label={t("companyType")}
+                                                options={companyTypeData}
+                                                onChange={handleCompanyTypeChange}
+                                                fullWidth={true}
+                                                error={errors.companyTypeUuid}
+                                                touched={touched.companyTypeUuid}
+                                                optionLabelKey={"name"}
+                                                selectFistValue={company.companyType.uuid}
+                                            />
+
+                                            <SelectSingleComponent
+                                                label={t("city")}
+                                                options={cityName}
+                                                onChange={handleCityChange}
+                                                fullWidth={true}
+                                                error={errors.cityUuid}
+                                                touched={touched.cityUuid}
+                                                optionLabelKey="name"
+                                                selectFistValue={company.city.uuid}
+                                            />
+
+                                            <FormControl
+                                                sx={{ width: "100%" }}
+                                                variant="outlined"
+                                                size="medium"
+                                            >
+                                                <DatePicker
+                                                    sx={{
+                                                        "& .MuiInputBase-input": {
+                                                            boxShadow: "none",
+                                                        },
+                                                        ...(errorDateOfBirth && {
+                                                            "& .MuiOutlinedInput-notchedOutline": {
+                                                                borderColor: "#f44336",
+                                                                color: "white",
+                                                            },
+                                                        }),
+                                                        "& .MuiInputLabel-root ": {
+                                                            ...(errorDateOfBirth && {color: "#f44336"}),
+                                                        },
+                                                    }}
+                                                    label={t("establishedDate")}
+                                                    value={values.establishedDate}
+                                                    id="establishedDate"
+                                                    name="establishedDate"
+                                                    onChange={(value) => {
+                                                        setFieldValue("establishedDate", value);
+                                                    }}
+                                                    format="DD-MM-YYYY"
+                                                />
+                                            </FormControl>
+
+                                        </Box>
+                                        <Box
                                             sx={{
-                                                ...buttonStyleOutlined,
+                                                padding: "24px", display: "flex", justifyContent: "end",
                                             }}
                                         >
-                                            {t('cancel')}
-                                        </Button>
-                                        <LoadingButton
-                                            loading={isLoadingUpdateCompany}
-                                            variant="contained"
-                                            sx={{...buttonStyleContained, ml: 1}}
-                                            type="submit"
-                                        >
-                                            {t('update')}
-                                        </LoadingButton>
-                                    </Box>
-                                </Form>);
-                            }}
-                        </Formik>
+                                            <Button
+                                                onClick={() => dispatch(setIsQuickEditCompanyOpen(false))}
+                                                sx={{
+                                                    ...buttonStyleOutlined,
+                                                }}
+                                            >
+                                                {t('cancel')}
+                                            </Button>
+                                            <LoadingButton
+                                                loading={isLoadingUpdateCompany}
+                                                variant="contained"
+                                                sx={{...buttonStyleContained, ml: 1}}
+                                                type="submit"
+                                            >
+                                                {t('update')}
+                                            </LoadingButton>
+                                        </Box>
+                                    </Form>);
+                                }}
+                            </Formik>
+                        </Box>
                     </Box>
                 </Box>
-            </Box>
-        </Modal>
-    )
+            </Modal>
+        )
+    }
+
 
     return content;
 }

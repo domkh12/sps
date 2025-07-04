@@ -16,17 +16,31 @@ import { setIdSiteToDelete } from "../redux/feature/site/siteSlice";
 import {setIdCompanyToDelete} from "../redux/feature/company/companySlice.js";
 import {useDeleteCompanyMutation} from "../redux/feature/company/companyApiSlice.js";
 import useTranslate from "../hook/useTranslate.jsx";
+import {useDeleteSlotMutation} from "../redux/feature/slot/slotApiSlice.js";
+import useAuth from "../hook/useAuth.jsx";
 
 function DeleteConfirmComponent() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { t } = useTranslate();
+  const { isAdmin, isManager } = useAuth();
   const open = useSelector((state) => state.action.isOpenConfirmDelete);
   const userId = useSelector((state) => state.users.idUserToDelete);
   const vehicleId = useSelector((state) => state.vehicles.idVehicleToDelete);
   const parkingSpaceId = useSelector((state) => state.parking.idParkingSpaceToDelete);
   const siteId = useSelector((state) => state.sites.isSiteToDelete);
   const companyId = useSelector((state) => state.companies.idCompanyToDelete);
+  const slotId = useSelector((state) => state.slot.idParkingSlotToDelete);
+
+  const [
+    deleteParkingSlot,
+    {
+        isSuccess: isSuccessDeleteParkingSlot,
+        isLoading: isLoadingDeleteParkingSlot,
+        isError: isErrorDeleteParkingSlot,
+        error: errorDeleteParkingSlot,
+    }
+  ] = useDeleteSlotMutation();
 
   const [
       deleteCompany,
@@ -101,40 +115,47 @@ function DeleteConfirmComponent() {
       await deleteSite({ uuid: siteId });
     }else if (companyId){
         await deleteCompany({ uuid: companyId });
+    }else if (slotId){
+        await deleteParkingSlot({ uuid: slotId });
     }
   };
 
   useEffect(() => {
     if (isUserDeleteSuccess) {
-      navigate("/dash/users");
+      navigate(`/${isAdmin ? "admin" : "dash"}/users`);
       dispatch(setIdUserToDelete(""));
       handleClose();
     }
     if (isVehicleDeleteSuccess) {
-      navigate("/dash/vehicles");
+      navigate(`/${isAdmin ? "admin" : "dash"}/vehicles`);
       dispatch(setIdVehicleToDelete(""));
       handleClose();
     }
     if (isParkingSpaceDeleteSuccess) {
-      navigate("/dash/parking-spaces");
+      navigate("/admin/parking-spaces");
       dispatch(setIdParkingSpaceToDelete(""));
       handleClose();
     }
     if(isSuccessDeleteSite){
-      navigate("/dash/branches");
+      navigate("/admin/branches");
       dispatch(setIdSiteToDelete(""));
       handleClose();
     }
     if (isCompanyDeleteSuccess){
-        navigate("/dash/companies");
+        navigate("/admin/companies");
         dispatch(setIdCompanyToDelete(""));
         handleClose();
     }
-  }, [isUserDeleteSuccess, isVehicleDeleteSuccess, isParkingSpaceDeleteSuccess, isSuccessDeleteSite, isCompanyDeleteSuccess]);
+    if (isSuccessDeleteParkingSlot) {
+        navigate("/admin/parking-slots");
+        dispatch(setIdParkingSpaceToDelete(""));
+        handleClose();
+    }
+  }, [isUserDeleteSuccess, isVehicleDeleteSuccess, isParkingSpaceDeleteSuccess, isSuccessDeleteSite, isCompanyDeleteSuccess, isSuccessDeleteParkingSlot]);
 
   let loading = false;
 
-  if (isUserDeleteLoading || isVehicleDeleteLoading || isParkingSpaceDeleteLoading || isLoadingDeleteSite || isCompanyDeleteLoading) {
+  if (isUserDeleteLoading || isVehicleDeleteLoading || isParkingSpaceDeleteLoading || isLoadingDeleteSite || isCompanyDeleteLoading || isLoadingDeleteParkingSlot) {
     loading = true;
   }
 

@@ -31,7 +31,6 @@ function QuickEditParkingSpaceComponent() {
   const slotUpdateLocalData = useSelector((state) => state.slot.slotUpdateLocalData);
   const slotsLoadedRef = useRef(false);
   const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
-  const handleClose = () => {dispatch(setIsOpenQuickEditParkingSpace(false));};
 
   useEffect(() => {
       if (open) {
@@ -39,14 +38,6 @@ function QuickEditParkingSpaceComponent() {
           slotsLoadedRef.current = true;
       }
   }, [open]);
-
-  const style = {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    height: "100vh",
-  };
 
     const [addMultipleSlot,{
         isSuccess: isAddMultipleSlotSuccess,
@@ -126,7 +117,7 @@ function QuickEditParkingSpaceComponent() {
       <Backdrop
           sx={(theme) => ({color: '#fff', zIndex: theme.zIndex.drawer + 1})}
           open={open}
-          onClick={handleClose}>
+          onClick={() => dispatch(setIsOpenQuickEditParkingSpace(false))}>
         <CircularProgress color="inherit"/>
       </Backdrop>
   );
@@ -245,9 +236,7 @@ function QuickEditParkingSpaceComponent() {
                   }}
                 >
                   <Button
-                    onClick={() => {
-                      dispatch(setIsOpenQuickEditParkingSpace(false));
-                    }}
+                    onClick={() => {dispatch(setIsOpenQuickEditParkingSpace(false))}}
                     sx={{
                       ...buttonStyleOutlined,
                     }}
@@ -273,11 +262,12 @@ function QuickEditParkingSpaceComponent() {
   return (<>
     <Modal
       open={open}
+      onClose={() => dispatch(setIsOpenQuickEditParkingSpace(false))}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
       closeAfterTransition
     >
-      <Box sx={style}>
+      <Box>
         <Box
             sx={{
                 backgroundColor: "background.paper",

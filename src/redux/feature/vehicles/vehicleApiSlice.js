@@ -45,12 +45,12 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
     filterVehicles: builder.query({
       query: ({
         pageNo = 1,
-        pageSize = 20,
+        pageSize = 5,
         keywords = "",
         branchId = "",
-        vehiceTypeId = "",
+        vehicleTypeId = "",
       }) => ({
-        url: `/vehicles/filters?pageNo=${pageNo}&pageSize=${pageSize}&keywords=${keywords}&branchId=${branchId}&vehicleTypeId=${vehiceTypeId}`,
+        url: `/vehicles/filters?pageNo=${pageNo}&pageSize=${pageSize}&keywords=${keywords}&branchId=${branchId}&vehicleTypeId=${vehicleTypeId}`,
         validateStatus: (response, result) => {
           return response.status === 200 && !result.isError;
         },
@@ -113,57 +113,59 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: "Vehicle", id: "LIST" }],
     }),
 
-    getAllLicensePlateProvinces: builder.mutation({
+    getAllLicensePlateProvinces: builder.query({
       query: () => ({
         url: "/license-plate-provinces",
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setLicensePlateProvincesFetched({ data }));
-        } catch (error) {
-          console.error("Failed to fetch:", error);
-        }
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "LicensePlateProvinces", id: "LIST"}, ...result.ids.map((id) => ({type: "LicensePlateProvinces", id})),];
+        } else return [{type: "LicensePlateProvinces", id: "LIST"}];
       },
     }),
 
-    getAllVehicleTypes: builder.mutation({
+    getAllVehicleTypes: builder.query({
       query: () => ({
         url: "/vehicle-types",
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setVehicleTypeFetched({ data }));
-        } catch (error) {
-          console.error("Failed to fetch:", error);
-        }
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "VehicleType", id: "LIST"}, ...result.ids.map((id) => ({type: "VehicleType", id})),];
+        } else return [{type: "VehicleType", id: "LIST"}];
       },
     }),
 
-    getAllLicensePlateTypes: builder.mutation({
+    getAllLicensePlateTypes: builder.query({
       query: () => ({
         url: "/license-plate-types",
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setLicensePlateTypesFetched({ data }));
-        } catch (error) {
-          console.error("Failed to fetch:", error);
-        }
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "LicensePlateTypes", id: "LIST"}, ...result.ids.map((id) => ({type: "LicensePlateTypes", id})),];
+        } else return [{type: "LicensePlateTypes", id: "LIST"}];
       },
     }),
+
+    getVehicleByUuid: builder.query({
+      query: (uuid) => `vehicles/uuid/${uuid}`,
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "VehicleByUuid", id: "LIST"}, ...result.ids.map((id) => ({type: "VehicleByUuid", id})),];
+        } else return [{type: "VehicleByUuid", id: "LIST"}];
+      },
+    })
+
   }),
 });
 
 export const {
+  useGetVehicleByUuidQuery,
   useGetVehiclesQuery,
   useAddNewVehicleMutation,
   useUpdateVehicleMutation,
-  useGetAllLicensePlateProvincesMutation,
-  useGetAllVehicleTypesMutation,
-  useGetAllLicensePlateTypesMutation,
+  useGetAllLicensePlateProvincesQuery,
+  useGetAllVehicleTypesQuery,
+  useGetAllLicensePlateTypesQuery,
   useDeleteVehicleMutation,
   useFilterVehiclesQuery,
 } = vehicleApiSlice;

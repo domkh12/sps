@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import KeyboardArrowRightRoundedIcon from "@mui/icons-material/KeyboardArrowRightRounded";
 import SpaceDashboardTwoToneIcon from "@mui/icons-material/SpaceDashboardTwoTone";
 import FmdGoodTwoToneIcon from "@mui/icons-material/FmdGoodTwoTone";
 import KeyboardArrowLeftRoundedIcon from "@mui/icons-material/KeyboardArrowLeftRounded";
 import ApartmentTwoToneIcon from "@mui/icons-material/ApartmentTwoTone";
-import SplitscreenIcon from '@mui/icons-material/Splitscreen';
 import EmojiTransportationIcon from '@mui/icons-material/EmojiTransportation';
 import CarRepairIcon from '@mui/icons-material/CarRepair';
 import {
@@ -18,7 +17,6 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
-  Popover,
   Typography,
 } from "@mui/material";
 import { IoIosArrowDown, IoIosArrowForward } from "react-icons/io";
@@ -53,22 +51,22 @@ function SideBar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const isVehiclesListPage = location.pathname === "/dash/vehicles";
-  const isVehiclesCreatePage = location.pathname === "/dash/vehicles/new";
-  const isParkingListPage = location.pathname === "/dash/parking-spaces";
-  const isParkingCreatePage = location.pathname === "/dash/parking-spaces/new";
-  const isUserListPage = location.pathname === "/dash/users";
-  const isUserCreatePage = location.pathname === "/dash/users/new";
-  const isReportListPage = location.pathname === "/dash/reports";
-  const isReportCreatePage = location.pathname === "/dash/reports/new";
-  const isHistoryPage = location.pathname === "/dash/history";
-  const isBranchListPage = location.pathname === "/dash/branches";
-  const isBranchCreatePage = location.pathname === "/dash/branches/new";
-  const isCompanyCreatePage=location.pathname === "/dash/companies";
-  const isCompanyListPage=location.pathname === "/dash/companies/new";
+  const isVehiclesListPage = location.pathname === "/admin/vehicles";
+  const isVehiclesCreatePage = location.pathname === "/admin/vehicles/new";
+  const isParkingListPage = location.pathname === "/admin/parking-spaces";
+  const isParkingCreatePage = location.pathname === "/admin/parking-spaces/new";
+  const isUserListPage = location.pathname === "/admin/users";
+  const isUserCreatePage = location.pathname === "/admin/users/new";
+  const isReportListPage = location.pathname === "/admin/reports";
+  const isReportCreatePage = location.pathname === "/admin/reports/new";
+  const isHistoryPage = location.pathname === "/admin/history";
+  const isBranchListPage = location.pathname === "/admin/branches";
+  const isBranchCreatePage = location.pathname === "/admin/branches/new";
+  const isCompanyCreatePage=location.pathname === "/admin/companies";
+  const isCompanyListPage=location.pathname === "/admin/companies/new";
 
-  const isSlotCreatePage = location.pathname === "/dash/parking-slots";
-  const isSlotListPage = location.pathname === "/dash/parking-slots/new";
+  const isSlotCreatePage = location.pathname === "/admin/parking-slots";
+  const isSlotListPage = location.pathname === "/admin/parking-slots/new";
 
 
 
@@ -176,7 +174,7 @@ function SideBar() {
                 timeout="auto"
                 unmountOnExit
               >
-                {(isManager || isAdmin) && (
+               
                   <ListItemButton
                     sx={{
                       borderRadius: "10px",
@@ -187,8 +185,8 @@ function SideBar() {
                       }),
                       ...listItemButtonStyle,
                     }}
-                    onClick={() => navigate("/dash")}
-                    selected={location.pathname === "/dash"}
+                    onClick={() => navigate("/admin")}
+                    selected={location.pathname === "/admin"}
                   >
                     <ListItemIcon
                       sx={{
@@ -238,7 +236,7 @@ function SideBar() {
                       />
                     )}
                   </ListItemButton>
-                )}
+                
                 <ListItemButton
                   sx={{
                     borderRadius: "10px",
@@ -246,8 +244,8 @@ function SideBar() {
                     mb: "5px",
                     ...listItemButtonStyle,
                   }}
-                  onClick={() => navigate("/dash/map-views")}
-                  selected={location.pathname === "/dash/map-views"}
+                  onClick={() => navigate("/admin/map-views")}
+                  selected={location.pathname === "/admin/map-views"}
                 >
                   <ListItemIcon
                     sx={{
@@ -305,8 +303,8 @@ function SideBar() {
                     color: "#424242",
                     ...listItemButtonStyle,
                   }}
-                  onClick={() => navigate("/dash/history")}
-                  selected={location.pathname === "/dash/history"}
+                  onClick={() => navigate("/admin/history")}
+                  selected={location.pathname === "/admin/history"}
                 >
                   <ListItemIcon
                     sx={{
@@ -355,7 +353,7 @@ function SideBar() {
                 </ListItemButton>
               </Collapse>
             </List>
-            {(isManager || isAdmin) && (
+            
               <>
                 <List
                   component="div"
@@ -401,7 +399,7 @@ function SideBar() {
                   >
 
              {/* Company  */}
-                   {isManager && (
+                   
                       <>
                         {isCollapsed ? (
                           <>
@@ -496,14 +494,14 @@ function SideBar() {
                                         onClick={() => {
                                           if (
                                             location.pathname !==
-                                            "/dash/companies"
+                                            "/admin/companies"
                                           ) {
                                             popupState.close();
                                           }
-                                          navigate("/dash/companies");
+                                          navigate("/admin/companies");
                                         }}
                                         selected={
-                                          location.pathname === "/dash/companies"
+                                          location.pathname === "/admin/companies"
                                         }
                                       >
                                         <ListItemText
@@ -530,15 +528,15 @@ function SideBar() {
                                         onClick={() => {
                                           if (
                                             location.pathname !==
-                                            "/dash/companies/new"
+                                            "/admin/companies/new"
                                           ) {
                                             popupState.close();
                                           }
-                                          navigate("/dash/companies/new");
+                                          navigate("/admin/companies/new");
                                         }}
                                         selected={
                                           location.pathname ===
-                                          "/dash/companies/new"
+                                          "/admin/companies/new"
                                         }
                                       >
                                         <ListItemText
@@ -640,9 +638,9 @@ function SideBar() {
                                     color: "#424242",
                                     mb: "5px",
                                   }}
-                                  onClick={() => navigate("/dash/companies")}
+                                  onClick={() => navigate("/admin/companies")}
                                   selected={
-                                    location.pathname === "/dash/companies"
+                                    location.pathname === "/admin/companies"
                                   }
                                 >
                                   <ListItemText
@@ -673,9 +671,9 @@ function SideBar() {
                                     color: "#424242",
                                     mb: "5px",
                                   }}
-                                  onClick={() => navigate("/dash/companies/new")}
+                                  onClick={() => navigate("/admin/companies/new")}
                                   selected={
-                                    location.pathname === "/dash/companies/new"
+                                    location.pathname === "/admin/companies/new"
                                   }
                                 >
                                   <ListItemText
@@ -698,13 +696,9 @@ function SideBar() {
                           </List>
                         </Collapse>
                       </>
-                    )}
-
-
-
-            
+                      
                 {/* Branch Menu */}
-                    {isManager && (
+                  
                       <>
                         {isCollapsed ? (
                           <>
@@ -799,14 +793,14 @@ function SideBar() {
                                         onClick={() => {
                                           if (
                                             location.pathname !==
-                                            "/dash/branches"
+                                            "/admin/branches"
                                           ) {
                                             popupState.close();
                                           }
-                                          navigate("/dash/branches");
+                                          navigate("/admin/branches");
                                         }}
                                         selected={
-                                          location.pathname === "/dash/branches"
+                                          location.pathname === "/admin/branches"
                                         }
                                       >
                                         <ListItemText
@@ -833,15 +827,15 @@ function SideBar() {
                                         onClick={() => {
                                           if (
                                             location.pathname !==
-                                            "/dash/branch/new"
+                                            "/admin/branch/new"
                                           ) {
                                             popupState.close();
                                           }
-                                          navigate("/dash/branches/new");
+                                          navigate("/admin/branches/new");
                                         }}
                                         selected={
                                           location.pathname ===
-                                          "/dash/branches/new"
+                                          "/admin/branches/new"
                                         }
                                       >
                                         <ListItemText
@@ -944,9 +938,9 @@ function SideBar() {
                                     color: "#424242",
                                     mb: "5px",
                                   }}
-                                  onClick={() => navigate("/dash/branches")}
+                                  onClick={() => navigate("/admin/branches")}
                                   selected={
-                                    location.pathname === "/dash/branches"
+                                    location.pathname === "/admin/branches"
                                   }
                                 >
                                   <ListItemText
@@ -977,9 +971,9 @@ function SideBar() {
                                     color: "#424242",
                                     mb: "5px",
                                   }}
-                                  onClick={() => navigate("/dash/branches/new")}
+                                  onClick={() => navigate("/admin/branches/new")}
                                   selected={
-                                    location.pathname === "/dash/branches/new"
+                                    location.pathname === "/admin/branches/new"
                                   }
                                 >
                                   <ListItemText
@@ -1002,10 +996,10 @@ function SideBar() {
                           </List>
                         </Collapse>
                       </>
-                    )}
+                    
 
                     {/* Parking Menu */}
-                    {(isManager || isAdmin) && (
+                   
                       <>
                         {isCollapsed ? (
                           <>
@@ -1101,14 +1095,14 @@ function SideBar() {
                                         onClick={() => {
                                           if (
                                             location.pathname !==
-                                            "/dash/parking-spaces"
+                                            "/admin/parking-spaces"
                                           ) {
                                             popupState.close();
                                           }
-                                          navigate("/dash/parking-spaces");
+                                          navigate("/admin/parking-spaces");
                                         }}
                                         selected={
-                                          location.pathname === "/dash/parking-spaces"
+                                          location.pathname === "/admin/parking-spaces"
                                         }
                                       >
                                         <ListItemText
@@ -1135,15 +1129,15 @@ function SideBar() {
                                           onClick={() => {
                                             if (
                                               location.pathname !==
-                                              "/dash/parking-spaces/new"
+                                              "/admin/parking-spaces/new"
                                             ) {
                                               popupState.close();
                                             }
-                                            navigate("/dash/parking-spaces/new");
+                                            navigate("/admin/parking-spaces/new");
                                           }}
                                           selected={
                                             location.pathname ===
-                                            "/dash/parking-spaces/new"
+                                            "/admin/parking-spaces/new"
                                           }
                                         >
                                           <ListItemText
@@ -1221,7 +1215,7 @@ function SideBar() {
                           </>
                         )}
                       </>
-                    )}
+                    
 
                     <Collapse in={isCollapsed ? !isCollapsed : isParkingOpen}>
                       <List
@@ -1244,8 +1238,8 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/dash/parking-spaces")}
-                              selected={location.pathname === "/dash/parking-spaces"}
+                              onClick={() => navigate("/admin/parking-spaces")}
+                              selected={location.pathname === "/admin/parking-spaces"}
                             >
                               <ListItemText
                                 primary={
@@ -1261,7 +1255,7 @@ function SideBar() {
                             </ListItemButton>
                           </li>
 
-                          {isManager && (
+                          
                             <li>
                               <img
                                 src="/images/nav_sublist.svg"
@@ -1274,9 +1268,9 @@ function SideBar() {
                                   color: "#424242",
                                   mb: "5px",
                                 }}
-                                onClick={() => navigate("/dash/parking-spaces/new")}
+                                onClick={() => navigate("/admin/parking-spaces/new")}
                                 selected={
-                                  location.pathname === "/dash/parking-spaces/new"
+                                  location.pathname === "/admin/parking-spaces/new"
                                 }
                               >
                                 <ListItemText
@@ -1295,7 +1289,7 @@ function SideBar() {
                                 />
                               </ListItemButton>
                             </li>
-                          )}
+                          
                         </ul>
                       </List>
                     </Collapse>
@@ -1385,14 +1379,14 @@ function SideBar() {
                                     }}
                                     onClick={() => {
                                       if (
-                                        location.pathname !== "/dash/parking-slots"
+                                        location.pathname !== "/admin/parking-slots"
                                       ) {
                                         popupState.close();
                                       }
-                                      navigate("/dash/parking-slots");
+                                      navigate("/admin/parking-slots");
                                     }}
                                     selected={
-                                      location.pathname === "/dash/parking-slots"
+                                      location.pathname === "/admin/parking-slots"
                                     }
                                   >
                                     <ListItemText
@@ -1419,14 +1413,14 @@ function SideBar() {
                                     onClick={() => {
                                       if (
                                         location.pathname !==
-                                        "/dash/parking-slots/new"
+                                        "/admin/parking-slots/new"
                                       ) {
                                         popupState.close();
                                       }
-                                      navigate("/dash/parking-slots/new");
+                                      navigate("/admin/parking-slots/new");
                                     }}
                                     selected={
-                                      location.pathname === "/dash/parking-slots/new"
+                                      location.pathname === "/admin/parking-slots/new"
                                     }
                                   >
                                     <ListItemText
@@ -1514,8 +1508,8 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/dash/parking-slots")}
-                              selected={location.pathname === "/dash/parking-slots"}
+                              onClick={() => navigate("/admin/parking-slots")}
+                              selected={location.pathname === "/admin/parking-slots"}
                             >
                               <ListItemText
                                 primary={
@@ -1542,8 +1536,8 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/dash/parking-slots/new")}
-                              selected={location.pathname === "/dash/parking-slots/new"}
+                              onClick={() => navigate("/admin/parking-slots/new")}
+                              selected={location.pathname === "/admin/parking-slots/new"}
                             >
                               <ListItemText
                                 primary={
@@ -1655,14 +1649,14 @@ function SideBar() {
                                     }}
                                     onClick={() => {
                                       if (
-                                        location.pathname !== "/dash/vehicles"
+                                        location.pathname !== "/admin/vehicles"
                                       ) {
                                         popupState.close();
                                       }
-                                      navigate("/dash/vehicles");
+                                      navigate("/admin/vehicles");
                                     }}
                                     selected={
-                                      location.pathname === "/dash/vehicles"
+                                      location.pathname === "/admin/vehicles"
                                     }
                                   >
                                     <ListItemText
@@ -1689,14 +1683,14 @@ function SideBar() {
                                     onClick={() => {
                                       if (
                                         location.pathname !==
-                                        "/dash/vehicles/new"
+                                        "/admin/vehicles/new"
                                       ) {
                                         popupState.close();
                                       }
-                                      navigate("/dash/vehicles/new");
+                                      navigate("/admin/vehicles/new");
                                     }}
                                     selected={
-                                      location.pathname === "/dash/vehicles/new"
+                                      location.pathname === "/admin/vehicles/new"
                                     }
                                   >
                                     <ListItemText
@@ -1788,8 +1782,8 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/dash/vehicles")}
-                              selected={location.pathname === "/dash/vehicles"}
+                              onClick={() => navigate("/admin/vehicles")}
+                              selected={location.pathname === "/admin/vehicles"}
                             >
                               <ListItemText
                                 primary={
@@ -1816,9 +1810,9 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/dash/vehicles/new")}
+                              onClick={() => navigate("/admin/vehicles/new")}
                               selected={
-                                location.pathname === "/dash/vehicles/new"
+                                location.pathname === "/admin/vehicles/new"
                               }
                             >
                               <ListItemText
@@ -1929,13 +1923,13 @@ function SideBar() {
                                       mb: "5px",
                                     }}
                                     onClick={() => {
-                                      if (location.pathname !== "/dash/users") {
+                                      if (location.pathname !== "/admin/users") {
                                         popupState.close();
                                       }
-                                      navigate("/dash/users");
+                                      navigate("/admin/users");
                                     }}
                                     selected={
-                                      location.pathname === "/dash/users"
+                                      location.pathname === "/admin/users"
                                     }
                                   >
                                     <ListItemText
@@ -1961,14 +1955,14 @@ function SideBar() {
                                     }}
                                     onClick={() => {
                                       if (
-                                        location.pathname !== "/dash/users/new"
+                                        location.pathname !== "/admin/users/new"
                                       ) {
                                         popupState.close();
                                       }
-                                      navigate("/dash/users/new");
+                                      navigate("/admin/users/new");
                                     }}
                                     selected={
-                                      location.pathname === "/dash/users/new"
+                                      location.pathname === "/admin/users/new"
                                     }
                                   >
                                     <ListItemText
@@ -2060,8 +2054,8 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/dash/users")}
-                              selected={location.pathname === "/dash/users"}
+                              onClick={() => navigate("/admin/users")}
+                              selected={location.pathname === "/admin/users"}
                             >
                               <ListItemText
                                 primary={
@@ -2088,8 +2082,8 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/dash/users/new")}
-                              selected={location.pathname === "/dash/users/new"}
+                              onClick={() => navigate("/admin/users/new")}
+                              selected={location.pathname === "/admin/users/new"}
                             >
                               <ListItemText
                                 primary={
@@ -2201,14 +2195,14 @@ function SideBar() {
                                     }}
                                     onClick={() => {
                                       if (
-                                        location.pathname !== "/dash/reports"
+                                        location.pathname !== "/admin/reports"
                                       ) {
                                         popupState.close();
                                       }
-                                      navigate("/dash/reports");
+                                      navigate("/admin/reports");
                                     }}
                                     selected={
-                                      location.pathname === "/dash/reports"
+                                      location.pathname === "/admin/reports"
                                     }
                                   >
                                     <ListItemText
@@ -2235,14 +2229,14 @@ function SideBar() {
                                     onClick={() => {
                                       if (
                                         location.pathname !==
-                                        "/dash/reports/new"
+                                        "/admin/reports/new"
                                       ) {
                                         popupState.close();
                                       }
-                                      navigate("/dash/reports/new");
+                                      navigate("/admin/reports/new");
                                     }}
                                     selected={
-                                      location.pathname === "/dash/reports/new"
+                                      location.pathname === "/admin/reports/new"
                                     }
                                   >
                                     <ListItemText
@@ -2334,8 +2328,8 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/dash/reports")}
-                              selected={location.pathname === "/dash/reports"}
+                              onClick={() => navigate("/admin/reports")}
+                              selected={location.pathname === "/admin/reports"}
                             >
                               <ListItemText
                                 primary={
@@ -2362,9 +2356,9 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/dash/reports/new")}
+                              onClick={() => navigate("/admin/reports/new")}
                               selected={
-                                location.pathname === "/dash/reports/new"
+                                location.pathname === "/admin/reports/new"
                               }
                             >
                               <ListItemText
@@ -2386,7 +2380,7 @@ function SideBar() {
                   </Collapse>
                 </List>
               </>
-            )}
+            
           </div>
         </nav>
       </Box>

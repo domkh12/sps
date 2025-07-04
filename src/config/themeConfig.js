@@ -1,15 +1,15 @@
 import {createTheme} from '@mui/material/styles';
-import {deepPurple, deepOrange} from '@mui/material/colors';
+import {deepPurple, deepOrange, indigo} from '@mui/material/colors';
 
 export const getTheme = (mode) =>
     createTheme({
         palette: {
             mode: mode,
             primary: {
-                main: deepPurple[600],
+                main: indigo[600],
             },
             secondary: {
-                main: deepOrange[900],
+                main: indigo[900],
             },
             ...(mode === 'dark'
                 ? {

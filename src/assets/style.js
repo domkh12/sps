@@ -95,7 +95,6 @@ export const buttonStyleContained = {
   textTransform: "none",
   borderRadius: "10px",
   boxShadow: "none",
-  ":hover": { boxShadow: "none", backgroundColor: "#333333" },
 };
 
 export const buttonStyleOutlined = {

@@ -40,7 +40,7 @@ function EditCompanyForm({company}){
 
     useEffect(() => {
         if (isSuccessUpdateCompany) {
-            navigate("/dash/companies")
+            navigate("/admin/companies")
             toast.success(t("updateSuccess"), {
                 position: "top-right",
                 autoClose: 2000,
@@ -79,7 +79,7 @@ function EditCompanyForm({company}){
     const breadcrumbs = [
         <button
             className="text-black hover:underline"
-            onClick={() => navigate("/dash")}
+            onClick={() => navigate("/admin")}
             key={1}
         >
             {t("dashboard")}
@@ -88,7 +88,7 @@ function EditCompanyForm({company}){
             {t("company")}
         </Typography>,
         <Typography color="inherit" key={3}>
-            {t("newcompany")}
+            {company?.companyName || "N/A"}
         </Typography>,
     ];
 
@@ -132,8 +132,8 @@ function EditCompanyForm({company}){
                     <SeoComponent title={"Create a new company"} />
                     <MainHeaderComponent
                         breadcrumbs={breadcrumbs}
-                        title={t("newcompany")}
-                        handleBackClick={() => navigate("/dash/branches")}
+                        title={company?.companyName || "N/A"}
+                        handleBackClick={() => navigate("/admin/companies")}
                     />
                     <Formik
                         initialValues={{

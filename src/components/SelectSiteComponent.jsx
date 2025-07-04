@@ -32,7 +32,6 @@ function SelectSiteComponent({
       },
     },
   };
-  console.log("options", options);
   const hasError = error && touched;
 
   const handleChange = (event) => {

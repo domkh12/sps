@@ -1,6 +1,6 @@
-import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import {Backdrop, Box, Button, CircularProgress, Modal, TextField, Typography} from "@mui/material";
 import { Form, Formik } from "formik";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import SelectSingleComponent from "./SelectSingleComponent";
 import * as Yup from "yup";
@@ -11,12 +11,6 @@ import {useGetAllSiteTypesQuery} from "../redux/feature/siteType/siteTypeApiSlic
 import { useUpdateSiteMutation } from "../redux/feature/site/siteApiSlice";
 import { buttonStyleContained, buttonStyleOutlined } from "../assets/style";
 import { setIsQuickEditBranchOpen } from "../redux/feature/site/siteSlice";
-import LoadingFetchingDataComponent from "./LoadingFetchingDataComponent";
-import {
-  setCaptionSnackBar,
-  setIsOpenSnackBar,
-} from "../redux/feature/actions/actionSlice";
-import AlertMessageComponent from "./AlertMessageComponent";
 import {useGetAllCitiesQuery} from "../redux/feature/city/cityApiSlice.js";
 import {Slide, toast} from "react-toastify";
 
@@ -102,7 +96,15 @@ function QuickEditBranchComponent() {
   };
   let content;
 
-  if (isLoadingGetCity || isLoadingGetCompanyName || isLoadingGetAllSiteTypes) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetCity || isLoadingGetCompanyName || isLoadingGetAllSiteTypes) content = (
+      <Backdrop
+          sx={(theme) => ({color: '#fff', zIndex: theme.zIndex.drawer + 1})}
+          open={true}
+          onClick={dispatch(setIsQuickEditBranchOpen(false))}
+      >
+        <CircularProgress color="inherit"/>
+      </Backdrop>
+  )
 
   if (isSuccessGetCity && isSuccessGetCompanyName && isSuccessGetAllSiteTypes) {
     content = (
@@ -127,17 +129,14 @@ function QuickEditBranchComponent() {
             setFieldValue,
           }) => {
             const handleCompanyChange = (value) => {
-              console.log("value", value);
               setFieldValue("companyId", value);
             };
 
             const handleCityChange = (value) => {
-              console.log("value", value);
               setFieldValue("cityId", value);
             };
 
             const handleSiteTypeChange = (value) => {
-              console.log("value", value);
               setFieldValue("siteTypeId", value);
             };
 
@@ -248,6 +247,7 @@ function QuickEditBranchComponent() {
                     {t('cancel')}
                   </Button>
                   <Button
+                    loading={isLoadingUpdateSite}
                     variant="contained"
                     sx={{ ...buttonStyleContained, ml: 1 }}
                     type="submit"

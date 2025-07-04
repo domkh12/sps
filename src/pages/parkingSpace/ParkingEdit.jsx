@@ -18,7 +18,7 @@ function ParkingEdit() {
 
   else if (isSuccess && parkingSpace) content = <ParkingEditForm parkingSpace={parkingSpace}/>;
   else if (isError) {
-    content = <div>Error: {error.message}</div>;
+    content = <div>Error: {error?.data?.error?.description}</div>;
   } else {
     content = <div>Unexpected state: No parking space data found.</div>;
   }

@@ -96,17 +96,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    getUserProfile: builder.mutation({
+    getUserProfile: builder.query({
       query: () => ({
         url: `/auth/profiles`,
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setUserProfile(data));
-        } catch (error) {
-          console.error("Failed to fetch user:", error);
-        }
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [{type: "Profile", id: "LIST"}, ...result.ids.map((id) => ({type: "Profile", id})),];
+        } else return [{type: "Profile", id: "LIST"}];
       },
     }),
 
@@ -116,15 +113,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
         method: "PUT",
         body: { ...initialUserData },
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          console.log("data", data);
-          dispatch(setUserProfile(data));
-        } catch (error) {
-          console.error("Failed to fetch user:", error);
-        }
-      },
+      invalidatesTags: (result, error, arg) => [{ type: "Profile", id: "LIST" }],
     }),
 
     changePassword: builder.mutation({
@@ -165,5 +154,5 @@ export const {
   useDisableTwoFaMutation,
   useVerify2FALoginMutation,
   useVerifySitesMutation,
-  useGetUserProfileMutation,
+  useGetUserProfileQuery,
 } = authApiSlice;

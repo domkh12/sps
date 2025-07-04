@@ -53,7 +53,6 @@ export default function AddNewParking() {
     },
   ] = useAddNewParkingMutation();
 
-  console.log("localSlotData", localSlotData)
   const [uploadImage] = useUploadImageMutation();
 
   const validationSchema = Yup.object().shape({
@@ -63,7 +62,7 @@ export default function AddNewParking() {
 
   useEffect(() => {
     if (isAddNewParkingSuccess) {
-      navigate("/dash/parking-spaces");
+      navigate("/admin/parking-spaces");
       toast.success(t("createSuccess"), {
         position: "top-right",
         autoClose: 2000,
@@ -110,7 +109,6 @@ export default function AddNewParking() {
       const updatedSlotLocalData = localSlotData.map(slot => {
         return { ...slot, parkingSpaceUuid: parkingSpaceUuid };
       });
-      console.log("updatedSlotLocalData", updatedSlotLocalData);
       // dispatch()
       await addMultipleSlot({slots: updatedSlotLocalData});
 
@@ -123,7 +121,7 @@ export default function AddNewParking() {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate("/admin")}
       key={1}
     >
       {t("dashboard")}
@@ -147,7 +145,7 @@ export default function AddNewParking() {
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
           title={t("createAParkingSpace")}
-          handleBackClick={() => navigate("/dash/parking-spaces")}
+          handleBackClick={() => navigate(`/admin/parking-spaces`)}
         />
         <div>
           <Formik

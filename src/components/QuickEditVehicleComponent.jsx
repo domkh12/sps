@@ -1,15 +1,11 @@
-import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import {Backdrop, Box, Button, CircularProgress, Modal, TextField, Typography} from "@mui/material";
 import { Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
-import LoadingFetchingDataComponent from "./LoadingFetchingDataComponent";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  useGetAllLicensePlateProvincesMutation,
-  useGetAllLicensePlateTypesMutation,
-  useGetAllVehicleTypesMutation,
-  useUpdateVehicleMutation,
+    useGetAllLicensePlateProvincesQuery, useGetAllLicensePlateTypesQuery, useGetAllVehicleTypesQuery,
+    useUpdateVehicleMutation,
 } from "../redux/feature/vehicles/vehicleApiSlice";
-import { useGetAllFullNameUsersMutation } from "../redux/feature/users/userApiSlice";
 import * as Yup from "yup";
 import useAuth from "../hook/useAuth";
 import useTranslate from "../hook/useTranslate";
@@ -17,36 +13,75 @@ import SelectSingleComponent from "./SelectSingleComponent";
 import ColorPickerComponent from "./ColorPickerComponent";
 import { buttonStyleContained, buttonStyleOutlined } from "../assets/style";
 import { setIsOpenQuickEditVehicle } from "../redux/feature/vehicles/vehicleSlice";
+import {useGetAllFullNameUsersQuery} from "../redux/feature/users/userApiSlice.js";
+import {Slide, toast} from "react-toastify";
+import {useGetAllCompaniesQuery} from "../redux/feature/company/companyApiSlice.js";
 
 function QuickEditVehicleComponent() {
   const open = useSelector((state) => state.vehicles.isOpenQuickEditVehicle);
   const handleClose = () => dispatch(setIsOpenQuickEditVehicle(false));
   const vehicle = useSelector((state) => state.vehicles.vehicleForQuickEdit);
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { isAdmin, isManager } = useAuth();
-  const licensePlateProvincesFetched = useSelector(
-    (state) => state.vehicles.licensePlateProvincesFetched
-  );
-  const vehicleTypeFetched = useSelector(
-    (state) => state.vehicles.vehicleTypeFetched
-  );
-  const licensePlateTypesFetched = useSelector(
-    (state) => state.vehicles.licensePlateTypesFetched
-  );
-  const allFullNameUsersFetched = useSelector(
-    (state) => state.users.allFullNameUsersFetched
-  );
+  const { isAdmin, isManager, sites } = useAuth();
+  const {data:companyData, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList", {skip: !isAdmin});
+
+    const {data: licensePlateProvincesFetched,
+        isSuccess:isSuccessGetAllLicensePlateProvinces,
+        isLoading:isLoadingGetAllLicensePlateProvinces,
+    } = useGetAllLicensePlateProvincesQuery("licensePlateProvinceList")
+
+    const {data:vehicleTypeFetched,
+        isSuccess:isSuccessGetAllVehicleType,
+        isLoading:isLoadingGetAllVehicleType,
+    } = useGetAllVehicleTypesQuery("vehicleTypeList");
+
+    const {data:licensePlateTypesFetched,
+        isSuccess: isSuccessGetAllLicensePlateTypes,
+        isLoading: isLoadingGetAllLicensePlateTypes,
+    } = useGetAllLicensePlateTypesQuery("licensePlateTypeList");
+
+    const {data: allFullNameUsersFetched,
+        isSuccess: isSuccessGetAllFullNameUsers,
+        isLoading: isLoadingGetAllFullNameUsers,
+    } = useGetAllFullNameUsersQuery("fullNameUsersList");
+
   const { t } = useTranslate();
 
   const validationSchema = Yup.object().shape({
-    // plateNumber: Yup.string()
-    //   .min(2, "Plate Number must be at least 2 characters")
-    //   .max(20, "Plate Number cannot exceed 20 characters")
-    //   .required("License Plate Number is required"),
-    // type: Yup.string().required("Vehicle Type is required"),
-    // owner: Yup.string().required("Owner is required"),
+      plateNumber: Yup.string()
+          .matches(/^[A-Za-z0-9-]+$/, t("onlyAlphanumericAndDash"))
+          .min(1, t("plateNumberMin"))
+          .max(20, t("plateNumberMax"))
+          .required(t("plateNumberRequired")),
+
+      make: Yup.string()
+          .max(50, t("vehicleMakeTooLong"))
+          .required(t("vehicleMakeRequired")),
+
+      model: Yup.string()
+          .max(50, t("vehicleModelTooLong"))
+          .required(t("vehicleModelRequired")),
+
+      color: Yup.string()
+          .required(t("colorRequired")),
+
+      vehicleTypeId: Yup.string()
+          .required(t("vehicleTypeRequired")),
+
+      userId: Yup.string()
+          .required(t("driverRequired")),
+
+      lppId: Yup.string()
+          .required(t("provinceRequired")),
+
+      licensePlateTypeId: Yup.string()
+          .required(t("licensePlateTypeRequired")),
+
+      ...(isAdmin ? {
+          branchUuid: Yup.string()
+              .required(t("branchRequired")),
+      }: {})
   });
 
   const [
@@ -59,81 +94,34 @@ function QuickEditVehicleComponent() {
     },
   ] = useUpdateVehicleMutation();
 
-  const [
-    getAllVehicleTypes,
-    {
-      isSuccess: isSuccessGetAllVehicleType,
-      isLoading: isLoadingGetAllVehicleType,
-      isError: isErrorGetAllVehicleType,
-      error: errorGetAllVehicleType,
-    },
-  ] = useGetAllVehicleTypesMutation();
-
-  const [
-    getAllFullNameUsers,
-    {
-      isSuccess: isSuccessGetAllFullNameUsers,
-      isLoading: isLoadingGetAllFullNameUsers,
-      isError: isErrorGetAllFullNameUsers,
-      error: errorGetAllFullNameUsers,
-    },
-  ] = useGetAllFullNameUsersMutation();
-
-  const [
-    getAllLicensePlateProvinces,
-    {
-      isSuccess: isSuccessGetAllLicensePlateProvinces,
-      isLoading: isLoadingGetAllLicensePlateProvinces,
-      isError: isErrorGetAllLicensePlateProvinces,
-      error: errorGetAllLicensePlateProvinces,
-    },
-  ] = useGetAllLicensePlateProvincesMutation();
-
-  const [
-    getAllLicensePlateTypes,
-    {
-      isSuccess: isSuccessGetAllLicensePlateTypes,
-      isLoading: isLoadingGetAllLicensePlateTypes,
-      isError: isErrorGetAllLicensePlateTypes,
-      error: errorGetAllLicensePlateTypes,
-    },
-  ] = useGetAllLicensePlateTypesMutation();
-
-  const style = {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    height: "100vh",
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const promises = [];
-        if (isAdmin || isManager) {
-          promises.push(getAllLicensePlateProvinces());
-          promises.push(getAllVehicleTypes());
-          promises.push(getAllLicensePlateTypes());
-          promises.push(getAllFullNameUsers());
+    useEffect(() => {
+        if (isSuccessUpdateVehicle) {
+            toast.success(t("createSuccess"), {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                transition: Slide,
+            });
+            handleClose();
         }
+    }, [isSuccessUpdateVehicle]);
 
-        await Promise.all(promises);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    if (isSuccessUpdateVehicle) {
-      handleClose();
-    }
-  }, [isSuccessUpdateVehicle]);
+    useEffect(() => {
+        if (isErrorUpdateVehicle) {
+            toast.error(`${errorUpdateVehicle?.data?.error?.description}`, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                transition: Slide,
+            });
+        }
+    }, [isErrorUpdateVehicle]);
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -147,6 +135,7 @@ function QuickEditVehicleComponent() {
         vehicleTypeId: values.vehicleTypeId,
         licensePlateTypeId: values.licensePlateTypeId,
         licensePlateProvinceId: values.lppId,
+        branchUuid: isAdmin ? values.branchUuid : sites[0]
       });
     } catch (error) {
       console.log(error);
@@ -157,20 +146,20 @@ function QuickEditVehicleComponent() {
 
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetAllVehicleType || isLoadingGetAllLicensePlateTypes || isLoadingGetAllFullNameUsers || isLoadingGetAllLicensePlateProvinces) content = (
+      <Backdrop
+          sx={(theme) => ({color: '#fff', zIndex: theme.zIndex.drawer + 1})}
+          open={true}
+          onClick={handleClose}
+      >
+        <CircularProgress color="inherit"/>
+      </Backdrop>
+  );
 
   if (error) {
     content = "Error";
   }
-  if (
-    !isLoading &&
-    !error
-    // (isManager
-    //   ? isFindAllGenderSuccess &&
-    //     isGetAllRolesSuccess &&
-    //     isGetAllCompaniesSuccess
-    //   : isFindAllGenderSuccess)
-  )
+  if (isSuccessGetAllFullNameUsers && isSuccessGetAllVehicleType && isSuccessGetAllLicensePlateTypes && isSuccessGetAllLicensePlateProvinces)
     content = (
       <Box>
         <Formik
@@ -183,6 +172,7 @@ function QuickEditVehicleComponent() {
             userId: vehicle?.user?.uuid,
             lppId: vehicle?.licensePlateProvince?.uuid,
             licensePlateTypeId: vehicle?.licensePlateType?.uuid,
+            branchUuid: vehicle?.sites?.length > 0 ? vehicle?.sites[0]?.uuid : []
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -195,16 +185,12 @@ function QuickEditVehicleComponent() {
             handleBlur,
             setFieldValue,
           }) => {
-            const handleColorChange = (value) => {
-              setFieldValue("color", value);
+            const handleBranchChange = (value) => {
+                setFieldValue("branchUuid", value);
             };
 
             const handleDriverChange = (value) => {
               setFieldValue("userId", value);
-            };
-
-            const handlelicensePlateProvincesChange = (value) => {
-              setFieldValue("lppId", value);
             };
 
             const handleVehicleTypeChange = (value) => {
@@ -215,7 +201,6 @@ function QuickEditVehicleComponent() {
               setFieldValue("licensePlateTypeId", value);
             };
 
-            const errorDateOfBirth = errors.dateOfBirth && touched.dateOfBirth;
             return (
               <Form>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 px-[24px]">
@@ -247,7 +232,7 @@ function QuickEditVehicleComponent() {
 
                   <SelectSingleComponent
                     label={`${t("province")}`}
-                    options={licensePlateProvincesFetched.data}
+                    options={licensePlateProvincesFetched}
                     fullWidth={true}
                     optionLabelKey="provinceNameEn"
                     selectFistValue={values.lppId}
@@ -255,7 +240,7 @@ function QuickEditVehicleComponent() {
 
                   <SelectSingleComponent
                     label={t("licensePlateType")}
-                    options={licensePlateTypesFetched.data}
+                    options={licensePlateTypesFetched}
                     onChange={handleLicesePlateTypesChange}
                     fullWidth={true}
                     optionLabelKey="name"
@@ -264,7 +249,7 @@ function QuickEditVehicleComponent() {
 
                   <SelectSingleComponent
                     label={t("vehicleType")}
-                    options={vehicleTypeFetched.data}
+                    options={vehicleTypeFetched}
                     onChange={handleVehicleTypeChange}
                     fullWidth={true}
                     optionLabelKey="name"
@@ -273,12 +258,29 @@ function QuickEditVehicleComponent() {
 
                   <SelectSingleComponent
                     label={t("driver")}
-                    options={allFullNameUsersFetched.data}
+                    options={allFullNameUsersFetched}
                     onChange={handleDriverChange}
                     fullWidth={true}
                     optionLabelKey="fullName"
                     selectFistValue={values.userId}
                   />
+
+                  {
+                      isAdmin && (
+                          <SelectSingleComponent
+                              label={t("branch")}
+                              options={companyData}
+                              onChange={handleBranchChange}
+                              fullWidth={true}
+                              error={errors.branchId}
+                              touched={touched.branchId}
+                              itemsLabelKey="sites"
+                              optionLabelKey="siteName"
+                              groupLabelKey="companyName"
+                              selectFistValue={values.branchUuid}
+                          />
+                      )
+                    }
 
                   <TextField
                     label={t("vehicleMake")}
@@ -348,14 +350,15 @@ function QuickEditVehicleComponent() {
                       ...buttonStyleOutlined,
                     }}
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                   <Button
                     variant="contained"
                     sx={{ ...buttonStyleContained, ml: 1 }}
                     type="submit"
+                    loading={isLoadingUpdateVehicle}
                   >
-                    Update
+                    {t('update')}
                   </Button>
                 </Box>
               </Form>
@@ -371,16 +374,25 @@ function QuickEditVehicleComponent() {
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
       closeAfterTransition
+      onClose={handleClose}
     >
-      <Box sx={style}>
+      <Box>
         <Box
-          sx={{
-            backgroundColor: "background.paper",
-            borderRadius: "16px",
-            width: "100%",
-            mx: 5,
-            maxWidth: "720px",
-          }}
+            sx={{
+              backgroundColor: "background.paper",
+              borderRadius: "16px",
+              width: "95%",
+              maxWidth: "720px",
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              overflow: "auto",
+              maxHeight: "90vh",
+              boxShadow: "0px 10px 15px -3px rgb(0 0 0 / 20%), 0px 4px 6px -2px rgb(0 0 0 / 15%)",
+              display: "flex",
+              flexDirection: "column",
+            }}
         >
           <Typography
             id="modal-modal-title"
@@ -388,14 +400,8 @@ function QuickEditVehicleComponent() {
             component="h2"
             sx={{ padding: "24px" }}
           >
-            Quick update
+            {t('quickEdit')}
           </Typography>
-          {/* {isErrorUpdateUser && (
-            <Box sx={{ px: "24px" }}>
-              <AlertMessageComponent />
-            </Box>
-          )} */}
-
           {content}
         </Box>
       </Box>

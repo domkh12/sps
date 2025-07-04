@@ -84,7 +84,7 @@ function ParkingEditForm({parkingSpace}) {
 
     useEffect(() => {
         if (isSuccessUpdateParking) {
-            navigate("/dash/parking-spaces");
+            navigate("/admin/parking-spaces");
             toast.success(t("updateSuccess"), {
                 position: "top-right",
                 autoClose: 2000,
@@ -144,7 +144,7 @@ function ParkingEditForm({parkingSpace}) {
     const breadcrumbs = [
         <button
             className="text-black hover:underline"
-            onClick={() => navigate("/dash")}
+            onClick={() => navigate("/admin")}
             key={1}
         >
             {t("dashboard")}
@@ -168,16 +168,16 @@ function ParkingEditForm({parkingSpace}) {
                 <MainHeaderComponent
                     breadcrumbs={breadcrumbs}
                     title={parkingSpace.label}
-                    handleBackClick={() => navigate("/dash/parking-spaces")}
+                    handleBackClick={() => navigate("/admin/parking-spaces")}
                 />
                 <div>
                     <Formik
                         enableReinitialize
                         initialValues={{
-                            parkingSpaceName: parkingSpace.label,
+                            parkingSpaceName: parkingSpace?.label,
                             slots: slotUpdateLocalData,
-                            siteUuid: parkingSpace.site.uuid,
-                            image: parkingSpace.image
+                            siteUuid: parkingSpace?.site?.uuid,
+                            image: parkingSpace?.image
                         }}
                         validationSchema={validationSchema}
                         onSubmit={handleSubmit}
@@ -294,7 +294,7 @@ function ParkingEditForm({parkingSpace}) {
                                                     <ButtonComponent
                                                         btnTitle={t("createParkingSpace")}
                                                         type={"submit"}
-                                                        // isLoading={isLoading}
+                                                        isLoading={isLoadingUpdateParking}
                                                     />
                                                 </div>
                                             </Card>

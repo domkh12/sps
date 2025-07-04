@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  useFindAllGenderMutation,
-  useGetAllRolesMutation,
+  useFindAllGenderQuery,
+  useGetAllRolesQuery,
   useUpdateUserMutation,
 } from "../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
@@ -29,29 +29,28 @@ import { cardStyle } from "../../assets/style";
 import ProfileUploadComponent from "../../components/ProfileUploadComponent";
 import SelectSingleComponent from "../../components/SelectSingleComponent";
 import { DatePicker } from "@mui/x-date-pickers";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import SelectComponent from "../../components/SelectComponent";
 import ButtonComponent from "../../components/ButtonComponent";
 import dayjs from "dayjs";
 import {
-  setCaptionSnackBar,
-  setErrorSnackbar,
   setIsOpenConfirmDelete,
-  setIsOpenSnackBar,
 } from "../../redux/feature/actions/actionSlice";
 import { setIdUserToDelete } from "../../redux/feature/users/userSlice";
+import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
+import {toast, Slide} from "react-toastify";
 
 function EditUserForm({ user }) {
   const navigate = useNavigate();
-  const [profileImageFile, setProfileImageFile] = useState(null);
-  const { t } = useTranslate();
-  const { isManager, isAdmin } = useAuth();
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const genderFetched = useSelector((state) => state.users.genders);
-  const rolesFetched = useSelector((state) => state.users.roles);
-  const companyData = useSelector((state) => state.companies.companiesData);
   const dispatch = useDispatch();
+  const { t } = useTranslate();
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const { isManager, isAdmin, sites } = useAuth();
+  const [error, setError] = useState(null);
+  const {data:companyData, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList", {skip: !isAdmin});
+  const {data: role, isSuccess: isSuccessGetRole, isLoading: isLoadingGetRole} = useGetAllRolesQuery("roleList");
+  const {data: gender, isSuccess: isSuccessGetGender, isLoading: isLoadingGetGender} = useFindAllGenderQuery("genderList");
+
   const [
     updateUser,
     {
@@ -64,108 +63,55 @@ function EditUserForm({ user }) {
   
   const [uploadImage] = useUploadImageMutation();
 
-  const [
-    findAllGender,
-    {
-      isSuccess: isFindAllGenderSuccess,
-      isLoading: isFindAllGenderLoading,
-      isError: isFindAllGenderError,
-      error: findAllGenderError,
-    },
-  ] = useFindAllGenderMutation();
-
-  const [
-    getAllCompanies,
-    {
-      isSuccess: isGetAllCompaniesSuccess,
-      isLoading: isGetAllCompaniesLoading,
-      isError: isGetAllCompaniesError,
-      error: getAllCompaniesError,
-    },
-  ] = useGetAllCompaniesMutation();
-
-  const [
-    getAllRoles,
-    {
-      isSuccess: isGetAllRolesSuccess,
-      isLoading: isGetAllRolesLoading,
-      isError: isGetAllRolesError,
-      error: getAllRolesError,
-    },
-  ] = useGetAllRolesMutation();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const promises = [];
-        if (isManager) {
-          promises.push(getAllRoles());
-          promises.push(getAllCompanies());
-        }
-        promises.push(findAllGender());
-
-        await Promise.all(promises);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, [isManager, getAllRoles, getAllCompanies, findAllGender]);
-
   const validationSchema = Yup.object().shape({
     fullName: Yup.string()
-      .matches(
-        /^[\u1780-\u17FF\sA-Za-z]+$/,
-        "Full name must contain only Khmer and English letters and spaces"
-      )
-      .required("Full name is required"),
+        .matches(
+            /^[\u1780-\u17FF\sA-Za-z]+$/,
+            t("fullNameMustContainOnlyKhmerOrEnglishCharacters")
+        )
+        .min(2, t("fullNameMustBeAtLeast2Characters"))
+        .max(100, t("fullNameMustNotExceed100Characters"))
+        .required(t("fullNameRequired")),
     dateOfBirth: Yup.date()
-      .required("Date of birth is required")
-      .test(
-        "is-valid-age",
-        "Must be between 10 and 120 years old",
-        function (value) {
-          if (!value) {
-            return false;
-          }
-          const today = dayjs();
-          const birthDate = dayjs(value);
-          const age = today.diff(birthDate, "year");
-          return age >= 10 && age <= 120;
-        }
-      ),
+        .required(t("dateOfBirthRequired"))
+        .test(
+            "is-valid-age",
+            t("ageMustBeBetween10And100"),
+            function (value) {
+              if (!value) {
+                return false;
+              }
+              const today = dayjs();
+              const birthDate = dayjs(value);
+              const age = today.diff(birthDate, "year");
+              return age >= 10 && age <= 100;
+            }
+        ),
     email: Yup.string()
-      .email("Invalid email format")
-      .required("Email is required"),
+        .email(t("invalidEmail"))
+        .required(t("emailRequired")),
     phoneNumber: Yup.string()
-      .matches(/^\+?\d+$/, "Phone number must be numbers with an optional '+'")
-      .test("len", "Must be between 7 and 15 digits", (val) => {
-        if (val) {
-          const digitsOnly = val.replace(/\D/g, "");
-          return digitsOnly.length >= 7 && digitsOnly.length <= 15;
-        }
-        return true;
-      })
-      .required("Phone number is required"),
-    genderId: Yup.string().required("Gender is required"),
+        .matches(/^\+?\d+$/, t("phoneNumberMustContainOnlyNumbers"))
+        .test("len", t("lengthMustBeBetween7And15Digits"), (val) => {
+          if (val) {
+            const digitsOnly = val.replace(/\D/g, "");
+            return digitsOnly.length >= 7 && digitsOnly.length <= 15;
+          }
+          return true;
+        })
+        .required(t("phoneNumberRequired")),
+    genderId: Yup.string().required(t("genderRequired")),
 
-    ...(isManager
-      ? {
-          roleId: Yup.array()
-            .test("len", "Role must not be empty", (val) => {
-              return val ? val.length !== 0 : false;
-            })
-            .required("Role is required"),
+    ...(isAdmin
+        ? {
+          roleId: Yup.string().required(t("roleRequired")),
           branchId: Yup.array()
-            .test("len", "Branch must not be empty", (val) => {
-              return val ? val.length !== 0 : false;
-            })
-            .required("Branch is required"),
+              .test("len", "Branch must not be empty", (val) => {
+                return val ? val.length !== 0 : false;
+              })
+              .required(t("branchRequired")),
         }
-      : {}),
+        : {}),
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -188,10 +134,10 @@ function EditUserForm({ user }) {
         fullName: values.fullName,
         genderId: values.genderId,
         address: values.address,
-        branchId: values.branchId,
+        branchId: isAdmin ? values.branchId : [sites[0]],
         email: values.email,
         phoneNumber: values.phoneNumber,
-        roleId: values.roleId,
+        roleId: [values.roleId],
         profileImage: profileImageUri,
         isVerified: values.isVerified,
         isDeleted: values.isDeleted,
@@ -205,30 +151,30 @@ function EditUserForm({ user }) {
 
   useEffect(() => {
     if (isSuccessUpdateUser) {
-      navigate("/dash/users");
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setCaptionSnackBar(t("createSuccess")));
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
+      navigate(`/${isAdmin ? "admin" : "dash"}/users`);
+      toast.success(t("updateSuccess"), {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
   }, [isSuccessUpdateUser]);
 
   useEffect(() => {
-    console.log("error", errorUpdateUser);
     if (isErrorUpdateUser) {
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setErrorSnackbar(true));
-      dispatch(
-        setCaptionSnackBar(`${errorUpdateUser?.data?.error?.description}`)
-      );
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
-
-      setTimeout(() => {
-        dispatch(setErrorSnackbar(false));
-      }, 3500);
+      toast.error(`${errorUpdateUser?.data?.error?.description}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
   }, [isErrorUpdateUser, dispatch]);
 
@@ -286,25 +232,17 @@ function EditUserForm({ user }) {
 
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetCompanyName || isLoadingGetGender || isLoadingGetRole) content = <LoadingFetchingDataComponent />;
 
   if (error) {
     content = "Error";
   }
 
-  if (
-    !isLoading &&
-    !error &&
-    (isManager
-      ? isFindAllGenderSuccess &&
-        isGetAllRolesSuccess &&
-        isGetAllCompaniesSuccess
-      : isFindAllGenderSuccess)
-  ) {
+  if (isSuccessGetGender && isSuccessGetRole && (isAdmin ? isSuccessGetCompanyName : true)) {
     const breadcrumbs = [
       <button
         className="text-black hover:underline"
-        onClick={() => navigate("/dash")}
+        onClick={() => navigate(`/${isAdmin ? "admin" : "dash"}`)}
         key={1}
       >
         {t("dashboard")}
@@ -319,10 +257,10 @@ function EditUserForm({ user }) {
     content = (
       <div data-aos="fade-left">
         <SeoComponent title={"Create a new user"} />
-        <MainHeaderCo mponent
+        <MainHeaderComponent
           breadcrumbs={breadcrumbs}
-          title={t("edit")}
-          handleBackClick={() => navigate("/dash/users")}
+          title={user?.fullName}
+          handleBackClick={() => navigate(`/${isAdmin ? "admin" : "dash"}/users`)}
         />
         <Formik
           initialValues={{
@@ -333,7 +271,7 @@ function EditUserForm({ user }) {
             phoneNumber: user?.phoneNumber,
             profileImage: user?.profileImage,
             dateOfBirth: dayjs(user?.dateOfBirth),
-            roleId: user?.roles.map((role) => role.uuid),
+            roleId: user?.roles[0]?.uuid,
             branchId: user?.sites.map((site) => site.uuid),
             isVerified: user?.isVerified,
             isDeleted: user?.isDeleted,
@@ -349,6 +287,7 @@ function EditUserForm({ user }) {
             handleBlur,
             setFieldValue,
           }) => {
+            console.log({values})
             const errorDateOfBirth = errors.dateOfBirth && touched.dateOfBirth;
 
             const handleRoleChange = (value) => {
@@ -472,7 +411,7 @@ function EditUserForm({ user }) {
                           }}
                           onClick={handleDelete}
                         >
-                          Delete user
+                          {t("deleteUser")}
                         </Button>
                       </div>
                     </Card>
@@ -539,7 +478,7 @@ function EditUserForm({ user }) {
 
                         <SelectSingleComponent
                           label={t("gender")}
-                          options={genderFetched.data}
+                          options={gender}
                           onChange={handleGenderChange}
                           fullWidth={true}
                           error={errors.genderId}
@@ -637,23 +576,23 @@ function EditUserForm({ user }) {
                           </FormHelperText>
                         </FormControl>
 
-                        {isManager && (
-                          <SelectComponent
-                            label={t("role")}
-                            options={rolesFetched.data}
-                            onChange={handleRoleChange}
-                            fullWidth={true}
-                            error={errors.roleId}
-                            touched={touched.roleId}
-                            optionLabelKey="name"
-                            selectFistValue={values.roleId}
-                          />
+                        {isAdmin && (
+                            <SelectSingleComponent
+                                label={t("role")}
+                                options={role}
+                                onChange={handleRoleChange}
+                                fullWidth={true}
+                                error={errors.roleId}
+                                touched={touched.roleId}
+                                optionLabelKey="name"
+                                selectFistValue={values.roleId}
+                            />
                         )}
 
-                        {isManager && (
+                        {isAdmin && (
                           <SelectComponent
                             label={t("branch")}
-                            options={companyData.data}
+                            options={companyData}
                             onChange={handleBranchChange}
                             fullWidth={true}
                             error={errors.branchId}

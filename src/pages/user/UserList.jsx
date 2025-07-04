@@ -4,14 +4,13 @@ import MainHeaderComponent from "../../components/MainHeaderComponent";
 import { cardStyle } from "../../assets/style";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  useGetAllRolesMutation,
-  useGetAllSignUpMethodsMutation,
+  useGetAllRolesQuery,
+  useGetAllSignUpMethodsQuery,
   useGetUsersQuery,
   useSearchUserQuery,
 } from "../../redux/feature/users/userApiSlice";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import SeoComponent from "../../components/SeoComponent";
-import { useEffect, useState } from "react";
 import useTranslate from "../../hook/useTranslate";
 import useAuth from "../../hook/useAuth";
 import {
@@ -25,38 +24,35 @@ import {
   setSignUpMethodFilter,
   setStatusFilter,
 } from "../../redux/feature/users/userSlice";
-import { useGetSitesListMutation } from "../../redux/feature/site/siteApiSlice";
 import FilterBarComponent from "../../components/FilterBarComponent";
 import FilterChipsComponent from "../../components/FilterChipsComponent";
 import UserTableComponent from "../../components/UserTableComponent";
 import QuickEditUserComponent from "../../components/QuickEditUserComponent";
+import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
+import {useDebounce} from "use-debounce";
+import {useGetListBranchQuery} from "../../redux/feature/site/siteApiSlice.js";
 
 function UserList() {
-  const statusFilter = useSelector((state) => state.users.statusFilter);
+  const { t } = useTranslate();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { isAdmin } = useAuth();
+  const statusFilter = useSelector((state) => state.users.statusFilter);
   const pageNo = useSelector((state) => state.users.pageNo);
   const pageSize = useSelector((state) => state.users.pageSize);
-  const { t } = useTranslate();
-  const roleFetched = useSelector((state) => state.users.roles);
   const searchQuery = useSelector((state) => state.users.searchQuery);
-  const signUpMethodsFetched = useSelector(
-    (state) => state.users.signUpMethods
-  );
   const roleFilter = useSelector((state) => state.users.roleFilter);
-  const signUpMethodFilter = useSelector(
-    (state) => state.users.signUpMethodFilter
-  );
-  const branchFetched = useSelector((state) => state.sites.sites);
+  const signUpMethodFilter = useSelector((state) => state.users.signUpMethodFilter);
   const branchFilter = useSelector((state) => state.users.branchFilter);
-  const { isManager } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  // const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
+  const {data:branchList, isSuccess: isSuccessGetBranchList, isLoading: isLoadingGetBranchList}= useGetListBranchQuery("branchList", {skip: !isAdmin});
+  const {data: role, isSuccess: isSuccessGetRole, isLoading: isLoadingGetRole} = useGetAllRolesQuery("roleList");
+  const {data: signUpMethods, isSuccess: isSuccessGetSignUpMethods, isLoading: isLoadingGetSignUpMethods} = useGetAllSignUpMethodsQuery("signUpMethodList");
+  const [debounceInputSearch] = useDebounce(searchQuery, 1000);
 
   const {
     data: users,
     isLoading: isLoadingGetAllUsers,
-    isSuccess,
+    isSuccess: isSuccessGetAllUsers,
     isError,
     error,
   } = useGetUsersQuery(
@@ -70,82 +66,23 @@ function UserList() {
 
   const {
     data: searchData,
-    isSuccess: isSuccessSearch,
-    isLoading: isLoadingSearch,
-    isError: isErrorSearch,
-    error: errorSearch,
+    isFetching: isFetchingGetUserFilter
   } = useSearchUserQuery(
     {
       pageNo,
       pageSize,
-      searchQuery,
+      searchQuery: debounceInputSearch,
       roleFilter,
       signUpMethodFilter,
       statusFilter,
       branchFilter,
-    },
-    {
-      skip:
-        searchQuery === "" &&
-        statusFilter === "" &&
-        roleFilter.length === 0 &&
-        signUpMethodFilter.length === 0 &&
-        branchFilter.length === 0,
     }
   );
-
-  const [
-    getSitesList,
-    {
-      isSuccess: isGetSitesListSuccess,
-      isLoading: isGetSitesListLoading,
-      isError: isGetSitesListError,
-      error: errorGetSitesList,
-    },
-  ] = useGetSitesListMutation();
-
-  const [
-    getAllSignUpMethods,
-    {
-      isSuccess: isGetAllSignUpMethodsSuccess,
-      isLoading: isGetAllSignUpMethodsLoading,
-      isError: isGetAllSignUpMethodsError,
-      error: errorGetAllSignUpMethod,
-    },
-  ] = useGetAllSignUpMethodsMutation();
-
-  const [
-    getAllRoles,
-    {
-      isSuccess: isGetAllRolesSuccess,
-      isLoading: isGetAllRolesLoading,
-      isError: isGetAllRolesError,
-      error: getAllRolesError,
-    },
-  ] = useGetAllRolesMutation();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        await Promise.all([
-          getAllRoles(),
-          getAllSignUpMethods(),
-          getSitesList(),
-        ]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate(`/${isAdmin ? "admin" : "dash"}`)}
       key={1}
     >
       {t("dashboard")}
@@ -159,7 +96,7 @@ function UserList() {
   ];
 
   const columns = [
-    { id: "name", label: "Name", minWidth: 170, align: "left" },
+    { id: "name", label: t('name'), minWidth: 170, align: "left" },
     {
       id: "phoneNumber",
       label: "Phone\u00a0Number",
@@ -172,7 +109,7 @@ function UserList() {
       minWidth: 120,
       align: "left",
     },
-    isManager
+    isAdmin
       ? {
           id: "branch",
           label: "Branch",
@@ -205,7 +142,7 @@ function UserList() {
   };
 
   const handleAddNewClick = () => {
-    navigate("/dash/users/new");
+    navigate(`/${isAdmin ? "admin" : "dash"}/users/new`);
   };
 
   const handleRoleChange = (role) => {
@@ -235,13 +172,15 @@ function UserList() {
 
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetAllUsers || isLoadingGetBranchList) content = <LoadingFetchingDataComponent />;
 
   if (isError) {
     content = <p>Error: {error?.message}</p>;
   }
 
-  if (isSuccess) {
+  if (isSuccessGetAllUsers &&
+     (isAdmin ? isSuccessGetBranchList : true)
+  ) {
     const {
       totalElements,
       pageSize,
@@ -252,6 +191,7 @@ function UserList() {
       bannedCount,
     } = users;
     const {
+      ids: idsDataFilter,
       totalElements: totalElementsSearch,
       pageSize: pageSizeSearch,
       pageNo: pageNoSearch,
@@ -272,9 +212,9 @@ function UserList() {
         <Card sx={{ ...cardStyle }}>
           <FilterBarComponent
             statusFilter={statusFilter}
-            roleFetched={roleFetched}
-            signUpMethodsFetched={signUpMethodsFetched}
-            branchFetched={branchFetched}
+            roleFetched={role}
+            signUpMethodsFetched={signUpMethods}
+            branchFetched={branchList}
             branchFilter={branchFilter}
             handleRoleChange={handleRoleChange}
             handleMethodChange={handleMethodChange}
@@ -294,9 +234,9 @@ function UserList() {
             roleFilter={roleFilter}
             branchFilter={branchFilter}
             signUpMethodFilter={signUpMethodFilter}
-            roleFetched={roleFetched}
-            branchFetched={branchFetched}
-            signUpMethodsFetched={signUpMethodsFetched}
+            roleFetched={role}
+            branchFetched={branchList}
+            signUpMethodsFetched={signUpMethods}
             dispatch={dispatch}
             handleRoleChange={handleRoleChange}
             handleBranchChange={handleBranchChange}
@@ -313,6 +253,8 @@ function UserList() {
             }
           />
           <UserTableComponent
+            idsDataFilter={idsDataFilter}
+            isFetchingGetUserFilter={isFetchingGetUserFilter}
             columns={columns}
             users={users}
             searchData={searchData}
@@ -324,8 +266,8 @@ function UserList() {
             pageSize={pageSize}
             pageNo={pageNo}
             totalElements={totalElements}
-            pageSizeSearch={pageSizeSearch}
-            pageNoSearch={pageNoSearch}
+            pageSizeFilter={pageSizeSearch}
+            pageNoFilter={pageNoSearch}
             totalElementsSearch={totalElementsSearch}
             dispatch={dispatch}
             handleChangePage={handleChangePage}

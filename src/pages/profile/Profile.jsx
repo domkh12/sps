@@ -5,12 +5,22 @@ import useTranslate from "../../hook/useTranslate";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
 import { FaAddressCard } from "react-icons/fa6";
 import { IoMdKey } from "react-icons/io";
+import useAuth from "../../hook/useAuth.jsx";
 
 export default function Profile() {
   const [value, setValue] = useState(0);
   const { t } = useTranslate();
   const location = useLocation();
   const navigate = useNavigate();
+  const { isManager, isAdmin } = useAuth();
+
+  const handleBackClick = () => {
+    if (isManager) {
+      navigate("/dash");
+    } else if (isAdmin) {
+      navigate("/admin");
+    }
+  }
 
   useEffect(() => {
     // Determine the initial tab based on the current URL
@@ -45,7 +55,10 @@ export default function Profile() {
 
   return (
     <>
-      <MainHeaderComponent breadcrumbs={breadcrumbs} title={t("account")} />
+      <MainHeaderComponent breadcrumbs={breadcrumbs}
+                           title={t("account")}
+                           handleBackClick={handleBackClick}
+      />
       <Tabs value={value} onChange={handleChange} aria-label="tabs">
         <Tab
           icon={<FaAddressCard className="w-5 h-5" />}

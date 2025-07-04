@@ -1,22 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
 import {
   useFilterVehiclesQuery,
-  useGetAllVehicleTypesMutation,
+  useGetAllVehicleTypesQuery,
   useGetVehiclesQuery,
 } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setIsFiltered,
-  setIsLoadingBar,
-  setIsPaginationSuccess,
-} from "../../redux/feature/actions/actionSlice";
-import {
-  setTotalPages,
   setBranchFilter,
   setVehicleTypeFilter,
   setSearchKeywords,
-  setClearVehicleFilter,
   setPageSize,
   setPageNo,
 } from "../../redux/feature/vehicles/vehicleSlice";
@@ -34,46 +26,39 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { cardStyle, listStyle } from "../../assets/style";
-import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
-import { BsFillPrinterFill, BsThreeDotsVertical } from "react-icons/bs";
+import { cardStyle } from "../../assets/style";
 import useTranslate from "../../hook/useTranslate";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import VehicleRowComponent from "../../components/VehicleRowComponent";
-import useAuth from "../../hook/useAuth";
 import QuickEditVehicleComponent from "../../components/QuickEditVehicleComponent";
-import { useGetSitesListMutation } from "../../redux/feature/site/siteApiSlice";
+import {useGetBranchListQuery, useGetListBranchQuery} from "../../redux/feature/site/siteApiSlice";
 import DataNotFound from "../../components/DataNotFound";
 import FilterChipsComponent from "../../components/FilterChipsComponent";
 import FilterBarComponent from "../../components/FilterBarComponent";
+import SkeletonTableRowComponent from "../../components/SkeletonTableRowComponent.jsx";
+import {useDebounce} from "use-debounce";
+import useAuth from "../../hook/useAuth.jsx";
 
 function VehicleList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const {isManager, isAdmin} = useAuth();
+  const { t } = useTranslate();
   const pageNo = useSelector((state) => state.vehicles.pageNo);
   const pageSize = useSelector((state) => state.vehicles.pageSize);
-  const totalPages = useSelector((state) => state.vehicles.totalPages);
-  const [isPageSizeOpen, setIsPageSizeOpen] = useState(false);
-  const pageSizeRef = useRef(null);
-  const { t } = useTranslate();
-  const [isLoading, setIsLoading] = useState(true);
-  const branchFetched = useSelector((state) => state.sites.sites);
   const branchFilter = useSelector((state) => state.vehicles.branchFilter);
-  const vehicleTypeFetched = useSelector(
-    (state) => state.vehicles.vehicleTypeFetched
-  );
-  const vehicleTypeFilter = useSelector(
-    (state) => state.vehicles.vehicleTypeFilter
-  );
+  const vehicleTypeFilter = useSelector((state) => state.vehicles.vehicleTypeFilter);
   const searchKeywords = useSelector((state) => state.vehicles.searchKeywords);
+  const [debounceInputSearch] = useDebounce(searchKeywords, 1000);
+
+  const {data:vehicleTypeFetched, isSuccess: isSuccessGetAllVehicleType, isLoading: isLoadingGetAllVehicleType,} = useGetAllVehicleTypesQuery("vehicleTypeList");
+  const {data: branchFetched, isSuccess: isSuccessGetBranchData, isLoading: isLoadingGetBranchData} = useGetListBranchQuery("branchNameList");
 
   const {
     data: vehicles,
     isLoading: isLoadingGetVehicles,
-    isSuccess,
-    isError,
-    refetch,
-    isFetching,
+    isSuccess : isSuccessGetVehicles,
+    isError: isErrorGetVehicles,
     error,
   } = useGetVehiclesQuery(
     { pageNo, pageSize },
@@ -86,95 +71,20 @@ function VehicleList() {
 
   const {
     data: vehicleFilterData,
-    isLoading: isLoadingGetVehicleFilter,
-    isSuccess: isSuccessGetVehicleFilter,
-    isError: isErrorGetVehicleFilter,
-    error: errorGetVehicleFilter,
+    isFetching: isFetchingGetParkingSpaceFilter,
   } = useFilterVehiclesQuery(
     {
-      keywords: searchKeywords,
-      vehiceTypeId: vehicleTypeFilter,
+      pageNo, pageSize,
+      keywords: debounceInputSearch,
+      vehicleTypeId: vehicleTypeFilter,
       branchId: branchFilter,
     },
-    {
-      skip:
-        searchKeywords === "" &&
-        vehicleTypeFilter.length === 0 &&
-        branchFilter.length === 0,
-    }
   );
-
-  const [
-    getSitesList,
-    {
-      isSuccess: isGetSitesListSuccess,
-      isLoading: isGetSitesListLoading,
-      isError: isGetSitesListError,
-      error: errorGetSitesList,
-    },
-  ] = useGetSitesListMutation();
-
-  const [
-    getAllVehicleTypes,
-    {
-      isSuccess: isGetAllVehicleTypesSuccess,
-      isLoading: isGetAllVehicleTypesLoading,
-      isError: isGetAllVehicleTypesError,
-      error: errorGetAllVehicleTypes,
-    },
-  ] = useGetAllVehicleTypesMutation();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        await Promise.all([getSitesList(), getAllVehicleTypes()]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    if (isFetching) {
-      dispatch(setIsLoadingBar(true));
-    } else {
-      dispatch(setIsLoadingBar(false));
-    }
-  }, [isFetching]);
-
-  useEffect(() => {
-    refetch();
-    setIsPageSizeOpen(false);
-    dispatch(setIsPaginationSuccess(true));
-  }, [pageNo, pageSize, refetch]);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (pageSizeRef.current && !pageSizeRef.current.contains(event.target)) {
-        setIsPageSizeOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isSuccess) {
-      dispatch(setTotalPages(vehicles.totalPages));
-    }
-  }, [vehicles, totalPages, pageNo]);
 
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate(`${isAdmin ? "/admin" : "/dash"}`)}
       key={1}
     >
       {t("dashboard")}
@@ -188,30 +98,30 @@ function VehicleList() {
   ];
 
   const columns = [
-    { id: "model", label: "Model", minWidth: 170, align: "left" },
+    { id: "model", label: t('model'), minWidth: 170, align: "left" },
     {
       id: "licensePlateNumber",
-      label: "License\u00a0Plate\u00a0Number",
+      label: t("licensePlate"),
       minWidth: 120,
       align: "left",
     },
     {
       id: "type",
-      label: "Type",
+      label: t("vehicleType"),
       minWidth: 120,
       align: "left",
       format: (value) => value.toLocaleString("en-US"),
     },
     {
       id: "color",
-      label: "Color",
+      label: t('color'),
       minWidth: 120,
       align: "left",
       format: (value) => value.toLocaleString("en-US"),
     },
     {
       id: "createdAt",
-      label: "Created\u00a0At",
+      label: t("createdAt"),
       minWidth: 120,
       align: "left",
       format: (value) => value.toFixed(2),
@@ -248,32 +158,32 @@ function VehicleList() {
 
   let content;
 
-  if (isLoading) content = <LoadingFetchingDataComponent />;
+  if (isLoadingGetAllVehicleType || isLoadingGetBranchData || isLoadingGetVehicles) content = <LoadingFetchingDataComponent />;
 
-  if (isError) {
+  if (isErrorGetVehicles) {
     content = <p>Error: {error?.message}</p>;
   }
 
-  if (!isLoading && isSuccess) {
+  if (isSuccessGetVehicles && isSuccessGetAllVehicleType && isSuccessGetBranchData) {
     const { ids, entities, totalElements, pageSize, pageNo } = vehicles;
 
     const {
       entities: searchEntities,
       ids: idsFilteredVehicles,
       totalElements: totalElementsSearch,
-      pageSize: pageSizeSearch,
-      pageNo: pageNoSearch,
+      pageSize: pageSizeFilter,
+      pageNo: pageNoFilter,
     } = vehicleFilterData || {};
 
     const displayTotalElements =
-      searchKeywords !== "" ||
+      debounceInputSearch !== "" ||
       vehicleTypeFilter.length > 0 ||
       branchFilter.length > 0
         ? totalElementsSearch
         : totalElements;
 
     const tableContent =
-      searchKeywords !== "" ||
+      debounceInputSearch !== "" ||
       vehicleTypeFilter.length > 0 ||
       branchFilter.length > 0 ? (
         <>
@@ -320,7 +230,7 @@ function VehicleList() {
           breadcrumbs={breadcrumbs}
           title={t('list')}
           btnTitle={t("newVehicle")}
-          onClick={() => navigate("/dash/vehicles/new")}
+          onClick={() => navigate(`/${isAdmin ? "admin" : "dash"}/vehicles/new`)}
         />
         <div>
           <Card sx={{ ...cardStyle }}>
@@ -329,7 +239,7 @@ function VehicleList() {
               searchQuery={searchKeywords}
               branchFilter={branchFilter}
               vehicleTypeFilter={vehicleTypeFilter}
-              branchFetched={branchFetched}
+              branchFetched={isAdmin ? branchFetched : undefined}
               vehicleTypeFetched={vehicleTypeFetched}
               handleVehicleTypeChange={handleVehicleTypeChange}
               handleBranchChange={handleBranchChange}
@@ -341,11 +251,15 @@ function VehicleList() {
               branchFilter={branchFilter}
               branchFetched={branchFetched}
               vehicleTypeFilter={vehicleTypeFilter}
-              vehicleTypeFetched={vehicleTypeFetched.data}
+              vehicleTypeFetched={vehicleTypeFetched}
               handleVehicleTypeChange={handleVehicleTypeChange}
               handleSearchChange={handleSearchChange}
               handleBranchChange={handleBranchChange}
-              clearFilter={() => dispatch(setClearVehicleFilter())}
+              clearFilter={() => {
+                dispatch(setSearchKeywords(""));
+                dispatch(setBranchFilter([]));
+                dispatch(setVehicleTypeFilter([]));
+              }}
               clearSearch={() => dispatch(setSearchKeywords(""))}
               resultFound={
                 vehicleFilterData ? totalElementsSearch : totalElements
@@ -384,17 +298,22 @@ function VehicleList() {
                     ))}
                   </TableRow>
                 </TableHead>
-                <TableBody sx={{ border: "none" }}>{tableContent}</TableBody>
+                <TableBody sx={{ border: "none" }}>
+                  {isFetchingGetParkingSpaceFilter && idsFilteredVehicles?.length === 0 ? (Array.from({length: pageSize}).map((_, index) => (
+                      <SkeletonTableRowComponent key={index} cellCount={4}/>
+                  ))) : (<>{tableContent}</>)}
+                </TableBody>
               </Table>
             </TableContainer>
             <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={displayTotalElements || 0}
-              rowsPerPage={pageSize || pageSizeSearch}
-              page={pageNoSearch || pageNo}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={displayTotalElements || 0}
+                rowsPerPage={pageSizeFilter != null && pageSizeFilter !== 0 ? pageSizeFilter : pageSize}
+                labelRowsPerPage={t('rowPerPage')}
+                page={pageNoFilter != null && pageNoFilter !== 0 ? pageNoFilter : pageNo}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </Card>
         </div>

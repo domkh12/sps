@@ -1,12 +1,12 @@
 import {memo} from "react";
 import {FaEye, FaPen, FaTrashCan} from "react-icons/fa6";
 import {
-    Checkbox,
+    Checkbox, IconButton,
     List,
     ListItem,
     ListItemText,
     TableCell,
-    TableRow,
+    TableRow, Tooltip,
     Typography,
 } from "@mui/material";
 import {Link, useNavigate} from "react-router-dom";
@@ -21,11 +21,13 @@ import {
     setParkingSpaceToEdit,
 } from "../redux/feature/parking/parkingSlice";
 import useTranslate from "../hook/useTranslate.jsx";
+import useAuth from "../hook/useAuth.jsx";
 
 function ParkingSpaceRowComponent({parkingId, parkingSpace}) {
     const dispatch = useDispatch();
     const {t} = useTranslate();
     const navigate = useNavigate();
+    const {isAdmin} = useAuth();
 
     const handleQuickEdit = () => {
         dispatch(setIsOpenQuickEditParkingSpace(true));
@@ -33,8 +35,8 @@ function ParkingSpaceRowComponent({parkingId, parkingSpace}) {
     };
 
     if (parkingSpace) {
-        var handleEdit = () => navigate(`/dash/parking-spaces/${parkingId}`);
-        var handleView = () => navigate(`/dash/parking-spaces/${parkingId}/view`);
+        var handleEdit = () => navigate(`/${isAdmin ? "admin" : "dash"}/parking-spaces/${parkingId}`);
+        var handleView = () => navigate(`/${isAdmin ? "admin" : "dash"}/parking-spaces/${parkingId}/view`);
         const handleDelete = () => {
             dispatch(setIsOpenConfirmDelete(true));
             dispatch(setIdParkingSpaceToDelete(parkingSpace.uuid));
@@ -82,7 +84,7 @@ function ParkingSpaceRowComponent({parkingId, parkingSpace}) {
                                     (
                                         <Link
                                             className="hover:underline"
-                                            to={`/dash/parking-spaces/${parkingId}/view`}
+                                            to={`/${!isAdmin ? "admin" : "dash"}/parking-spaces/${parkingId}/view`}
                                         >
                                             {parkingSpace?.label || "N/A"}
                                         </Link>
@@ -98,14 +100,14 @@ function ParkingSpaceRowComponent({parkingId, parkingSpace}) {
                 </TableCell>
 
                 <TableCell sx={{borderBottomStyle: "dashed"}}>
-                    <Typography variant="body1">{parkingSpace.lotQty}</Typography>
+                    <Typography variant="body1">{parkingSpace?.lotQty}</Typography>
                 </TableCell>
 
                 <TableCell sx={{borderBottomStyle: "dashed"}}>
                     <div>
-                        <CustomizedProgressBarsComponent value={100}/>
+                        <CustomizedProgressBarsComponent value={(parkingSpace?.filled * 100)/parkingSpace.lotQty}/>
                         <Typography variant="body1" className="text-center" color="gray">
-                            {`${parkingSpace?.filled} Free`}
+                            {`${parkingSpace?.empty} Free`}
                         </Typography>
                     </div>
                 </TableCell>
@@ -131,10 +133,30 @@ function ParkingSpaceRowComponent({parkingId, parkingSpace}) {
                         pr: 3,
                     }}
                 >
-                    <div className="flex justify-center items-center">
-                        <EditButtonComponent handleQuickEdit={handleQuickEdit}/>
-                        <MoreActionComponent menuItems={menuActions}/>
-                    </div>
+                    {
+                        isAdmin ?
+                        <div className="flex justify-center items-center">
+                            <EditButtonComponent handleQuickEdit={handleQuickEdit}/>
+                            <MoreActionComponent menuItems={menuActions}/>
+                        </div>
+                            :
+                        <Tooltip
+                            sx={{
+                                color: "",
+                            }}
+                            title={t('view')}
+                            placement="top"
+                            arrow
+                        >
+                            <IconButton size="large" onClick={handleView} sx={{
+                                backgroundColor: "transparent",
+                                "&:hover": {backgroundColor: "transparent"}
+                            }}>
+                                <FaEye className="w-6 h-6"/>
+                            </IconButton>
+                        </Tooltip>
+                    }
+
                 </TableCell>
             </TableRow>
         );

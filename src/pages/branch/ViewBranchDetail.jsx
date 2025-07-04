@@ -7,14 +7,13 @@ import ImageDetailComponent from "../../components/ImageDetailComponent.jsx";
 
 function ViewBranchDetail({branch}){
     const navigate = useNavigate();
-    console.log("branch", branch);
     const { t } = useTranslate();
     const breadcrumbs = [
         <Paper
             elevation={0}
             component="button"
             className="text-black hover:underline"
-            onClick={() => navigate("/dash")}
+            onClick={() => navigate("/admin")}
             key={1}
         >
             {t("dashboard")}
@@ -31,7 +30,7 @@ function ViewBranchDetail({branch}){
             <MainHeaderComponent
                 breadcrumbs={breadcrumbs}
                 title={branch.siteName}
-                handleBackClick={() => navigate("/dash/branches")}
+                handleBackClick={() => navigate("/admin/branches")}
             />
             <Card sx={{...cardStyle, p: "16px"}}>
                 <Typography variant="h6" sx={{pb: 1}}>{t('branchInfo')}</Typography>
@@ -57,7 +56,7 @@ function ViewBranchDetail({branch}){
                         <span >{t('city')} </span>
                         {`${"\u00a0"}:${"\u00a0"}${branch?.city.name || "N/A"}`}
                     </Typography>
-                    <Link to={`/dash/companies/${branch?.company?.uuid}/view`}>
+                    <Link to={`/admin/companies/${branch?.company?.uuid}/view`}>
                         <Typography variant="body1">
                             <span>{t('company')} </span>
                             <span>{`${"\u00a0"}:${"\u00a0"}`}</span>

@@ -1,12 +1,12 @@
 import {memo} from "react";
 import {FaEye, FaPen, FaTrashCan} from "react-icons/fa6";
 import {
-    Checkbox, Chip,
+    Checkbox, Chip, IconButton,
     List,
     ListItem,
     ListItemText,
     TableCell,
-    TableRow,
+    TableRow, Tooltip,
     Typography,
 } from "@mui/material";
 import {Link, useNavigate} from "react-router-dom";
@@ -15,24 +15,30 @@ import MoreActionComponent from "./MoreActionComponent";
 import {setIsOpenConfirmDelete} from "../redux/feature/actions/actionSlice";
 import {useDispatch} from "react-redux";
 import useTranslate from "../hook/useTranslate.jsx";
+import {
+    setIdParkingSlotToDelete,
+    setIsOpenQuickEditSlot,
+    setParkingSlotToEdit
+} from "../redux/feature/slot/slotSlice.js";
+import useAuth from "../hook/useAuth.jsx";
 
 function ParkingSlotRowComponent({parkingSlotId, parkingSlot}) {
-
+    const {isAdmin} = useAuth();
     const dispatch = useDispatch();
     const {t} = useTranslate();
     const navigate = useNavigate();
 
     const handleQuickEdit = () => {
-        // dispatch(setIsOpenQuickEditParkingSlot(true));
-        // dispatch(setParkingSlotToEdit(parkingSlot));
+        dispatch(setIsOpenQuickEditSlot(true));
+        dispatch(setParkingSlotToEdit(parkingSlot));
     };
 
     if (parkingSlot) {
-        var handleEdit = () => navigate(`/dash/parking-slots/${parkingSlotId}`);
-        var handleView = () => navigate(`/dash/parking-slots/${parkingSlotId}/view`);
+        var handleEdit = () => navigate(`/${isAdmin ? "admin" : "dash"}/parking-slots/${parkingSlotId}`);
+        var handleView = () => navigate(`/${isAdmin ? "admin" : "dash"}/parking-slots/${parkingSlotId}/view`);
         const handleDelete = () => {
-            // dispatch(setIsOpenConfirmDelete(true));
-            // dispatch(setIdParkingSlotToDelete(parkingSlot.uuid));
+            dispatch(setIsOpenConfirmDelete(true));
+            dispatch(setIdParkingSlotToDelete(parkingSlot?.uuid));
         };
 
         var menuActions = [
@@ -77,7 +83,7 @@ function ParkingSlotRowComponent({parkingSlotId, parkingSlot}) {
                                     (
                                         <Link
                                             className="hover:underline"
-                                            to={`/dash/parking-slots/${parkingSlotId}/view`}
+                                            to={`/${isAdmin ? "admin" : "dash"}/parking-slots/${parkingSlotId}/view`}
                                         >
                                             {parkingSlot?.lotName || "N/A"}
                                         </Link>
@@ -93,7 +99,10 @@ function ParkingSlotRowComponent({parkingSlotId, parkingSlot}) {
                 </TableCell>
 
                 <TableCell sx={{borderBottomStyle: "dashed"}}>
-                    <Chip color="success" label={`${parkingSlot?.isAvailable ? "Available" : "Occupied"}`}/>
+                    <Chip
+                        color={parkingSlot?.isAvailable ? "success" : "error"}
+                        label={`${parkingSlot?.isAvailable ? "Available" : "Occupied"}`}
+                    />
                 </TableCell>
 
                 <TableCell sx={{borderBottomStyle: "dashed"}}>
@@ -117,10 +126,30 @@ function ParkingSlotRowComponent({parkingSlotId, parkingSlot}) {
                         pr: 3,
                     }}
                 >
-                    <div className="flex justify-center items-center">
-                        <EditButtonComponent handleQuickEdit={handleQuickEdit}/>
-                        <MoreActionComponent menuItems={menuActions}/>
-                    </div>
+
+                    {
+                        isAdmin ?
+                            <div className="flex justify-center items-center">
+                                <EditButtonComponent handleQuickEdit={handleQuickEdit}/>
+                                <MoreActionComponent menuItems={menuActions}/>
+                            </div>
+                            :
+                            <Tooltip
+                                sx={{
+                                    color: "",
+                                }}
+                                title={t('view')}
+                                placement="top"
+                                arrow
+                            >
+                                <IconButton size="large" onClick={handleView} sx={{
+                                    backgroundColor: "transparent",
+                                    "&:hover": {backgroundColor: "transparent"}
+                                }}>
+                                    <FaEye className="w-6 h-6"/>
+                                </IconButton>
+                            </Tooltip>
+                    }
                 </TableCell>
             </TableRow>
         );

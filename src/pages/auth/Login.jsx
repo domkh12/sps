@@ -22,7 +22,7 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
-  OutlinedInput,
+  OutlinedInput, Paper, Stack,
   TextField,
   Typography,
 } from "@mui/material";
@@ -39,6 +39,7 @@ import SeoComponent from "../../components/SeoComponent";
 import { useGetSitesListMutation } from "../../redux/feature/site/siteApiSlice";
 import { setCredentials } from "../../redux/feature/auth/authSlice";
 import OTPInput from "../../components/OTPInput";
+import useLocalStorage from "../../hook/useLocalStorage.jsx";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -90,11 +91,34 @@ export default function Login() {
     },
   ] = useVerifySitesMutation();
 
+  const [authData, setAuthData] = useLocalStorage('authData', {
+    isRemember: false,
+    userRoles: "",
+    uuid: null,
+    siteUuid: null
+  });
+
+  const saveLoginInfo = (roles, uuid, siteUuid = null) => {
+    setAuthData({
+      isRemember: true,
+      userRoles: roles[0],
+      uuid,
+      siteUuid
+    });
+  };
+
   useEffect(() => {
-    if (rememberMe) {
-      navigate("/dash");
-    }
-  }, [rememberMe]);
+    const checkRememberedLogin = () => {
+      if (authData.isRemember && authData.userRoles !== "") {
+        if (authData.userRoles === "ROLE_ADMIN") {
+          navigate("/admin");
+        } else if (authData.userRoles === "ROLE_MANAGER") {
+          navigate("/dash");
+        }
+      }
+    };
+    checkRememberedLogin();
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -194,44 +218,30 @@ export default function Login() {
         password: values.password,
       }).unwrap();
 
-      if (!accessToken && required2FA) {
+      if (required2FA) {
         setStep(2);
-        resetForm({ values: { code: "" } });
-        return;
-      }
-
-      const decoded = jwtDecode(accessToken);
-      const { jti: email, scope, uuid, sites } = decoded;
-      console.log("sites", sites)
-      const roles = scope ? scope.split(" ") : [];
-
-      if (sites && sites?.length > 1) {
-        if (roles.includes(ROLES.ROLE_ADMIN)) {
-          try {
-            const response = await getSitesList().unwrap();
-            setBranchCount(response.length);
-            setSitesUuid(response);
-            setStep(3);
-            setToken(accessToken);
-            resetForm({ values: { uuid: "" } });
-          } catch (err) {
-            console.log(err);
-          }
-        }
+        setEmail(values.email);
+        resetForm({values: {code: ""}});
+        localStorage.setItem("isRemember", "true");
       } else {
-        if (!roles.includes(ROLES.ROLE_MANAGER) && sites.length == 1) {
+        const decoded = jwtDecode(accessToken);
+        const {jti: email, scope, uuid, siteUuid} = decoded;
+
+        const roles = scope ? scope.split(" ") : [];
+        if (roles.includes(ROLES.ROLE_MANAGER)) {
           try {
-            await verifySites({ uuid: sites });
-            dispatch(setUuid(uuid));
-            localStorage.setItem("isRemember", "true");
+            saveLoginInfo(roles, uuid);
             navigate("/dash");
           } catch (err) {
             console.log(err);
           }
-        } else {
-          dispatch(setUuid(uuid));
-          localStorage.setItem("isRemember", "true");
-          navigate("/dash");
+        } else if (roles.includes(ROLES.ROLE_ADMIN)) {
+          try {
+            navigate("/admin");
+            saveLoginInfo(roles, uuid, siteUuid);
+          } catch (err) {
+            console.log(err);
+          }
         }
       }
     } catch (error) {
@@ -272,13 +282,14 @@ export default function Login() {
           </div>
         </nav>
 
-        <Box
-          component="div"
-          sx={{
-            bgcolor: "background.default",
-            color: "text.primary",
-            height: "100%",
-          }}
+        <Paper
+            elevation={0}
+            component="div"
+            sx={{
+              color: "text.primary",
+              height: "100%",
+
+            }}
         >
           <Formik
             initialValues={{ email: "", password: "" }}
@@ -287,25 +298,36 @@ export default function Login() {
           >
             {({ values, touched, errors, handleChange, handleBlur }) => (
               <Form>
-                <section className="flex h-screen">
-                  <div className="h-screen shrink-0 w-[480px] hidden lg:block bg-[#f5f5f5]">
-                    <div className="px-[20px] h-full text-center flex justify-center items-center flex-col">
-                      <img
-                        src="/images/login_image.png"
-                        alt="login_image"
-                        className="w-full h-auto"
-                      />
-                    </div>
-                  </div>
-                  <Box
-                    sx={{
-                      width: "100%",
-                      px: "24px",
-                      py: 15,
-                    }}
-                    className="flex flex-col justify-center items-center lg:justify-center"
-                  >
-                    <div className="xs:min-w-[500px] max-w-[450px]">
+                <section className="h-screen">
+                  <Stack direction="row" sx={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                    maxWidth: "1280px",
+                    margin: "0 auto"
+                  }}>
+                    <Paper
+                        className="h-screen shrink-0 w-[480px] hidden lg:flex bg-[#f5f5f5] justify-center items-center">
+                      <Paper
+                          className="px-[20px] h-full text-center flex justify-center items-center flex-col">
+                        <img
+                            src="/images/login_image.png"
+                            alt="login_image"
+                            className="w-full h-auto"
+                        />
+                      </Paper>
+                    </Paper>
+                    <Paper
+                        sx={{
+                          width: "100%",
+                          px: "20px",
+                          py: 15,
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center"
+                        }}
+                    >
+                      <Paper sx={{maxWidth: "500px", width: "100%"}}>
                       <Typography variant="h6" sx={{ mb: "40px" }}>
                         {t("login-to-your-account")}
                       </Typography>
@@ -347,7 +369,7 @@ export default function Login() {
                           to={"/forgot-password"}
                           className="text-sm hover:underline text-right"
                         >
-                          Forgot password?
+                          {t('forgotPassword')}
                         </Link>
                       </div>
                       <FormControl
@@ -370,7 +392,7 @@ export default function Login() {
                           name="password"
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          autoComplete="off"
+                          autoComplete="new-password"
                           value={values.password}
                           type={showPassword ? "text" : "password"}
                           endAdornment={
@@ -414,7 +436,7 @@ export default function Login() {
                         {t("login")}
                       </LoadingButton>{" "}
                       <Divider>OR</Divider>
-                      <div className="flex justify-center">
+                      <Box sx={{display: "flex", justifyContent: "center", width: "100%"}}>
                         <IconButton
                           size="small"
                           onClick={() =>
@@ -437,14 +459,15 @@ export default function Login() {
                             <path fill="#FFBA08" d="M8.5 8.5H15V15H8.5V8.5z" />
                           </svg>
                         </IconButton>
-                      </div>
-                    </div>
-                  </Box>
+                      </Box>
+                      </Paper>
+                    </Paper>
+                  </Stack>
                 </section>
               </Form>
             )}
           </Formik>
-        </Box>
+        </Paper>
       </>
     );
   } else if (step === 2) {

@@ -8,7 +8,6 @@ import {
   Typography,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import { useGetVehiclesQuery } from "../redux/feature/vehicles/vehicleApiSlice";
 import { FaEye, FaPen, FaTrashCan } from "react-icons/fa6";
 import EditButtonComponent from "./EditButtonComponent";
 import MoreActionComponent from "./MoreActionComponent";
@@ -20,10 +19,12 @@ import {
   setIsOpenQuickEditVehicle,
   setVehicleForQuickEdit,
 } from "../redux/feature/vehicles/vehicleSlice";
-import useDateFormatter from "../hook/useDateFormatter";
+import useTranslate from "../hook/useTranslate.jsx";
+import useAuth from "../hook/useAuth.jsx";
 
 function VehicleRowComponent({ vehicleId, vehicle }) {
-  console.log("VehicleRowComponent rendered", vehicle);
+  const {t} = useTranslate();
+  const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -38,38 +39,28 @@ function VehicleRowComponent({ vehicleId, vehicle }) {
   };
 
   if (vehicle) {
-    var handleEdit = () => navigate(`/dash/vehicles/${vehicleId}`);
-    var handleView = () => navigate(`/dash/vehicles/${vehicleId}/view`);
+    var handleEdit = () => navigate(`/${isAdmin ? "admin" : "dash"}/vehicles/${vehicleId}`);
+    var handleView = () => navigate(`/${isAdmin ? "admin" : "dash"}/vehicles/${vehicleId}/view`);
 
     var menuActions = [
       {
-        label: "Edit",
+        label: t('edit'),
         icon: <FaPen className="w-5 h-5" />,
         onClick: handleEdit,
       },
       {
-        label: "View",
+        label: t("view"),
         icon: <FaEye className="w-5 h-5" />,
         onClick: handleView,
       },
       {
-        label: "Delete",
+        label: t('delete'),
         icon: <FaTrashCan className="w-5 h-5" />,
         onClick: handleDelete,
         textColor: "red",
         buttonColor: "red",
       },
     ];
-
-    const dateObj = new Date(vehicle.createdAt);
-    var { formattedDateDDMMYYYYNoZeros } = useDateFormatter(
-      new Date(vehicle.createdAt)
-    );
-    var formattedTime = dateObj.toLocaleTimeString("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
 
     return (
       <TableRow hover>
@@ -91,7 +82,7 @@ function VehicleRowComponent({ vehicleId, vehicle }) {
                   (
                     <Link
                       className="hover:underline"
-                      to={`/dash/vehicles/${vehicleId}/view`}
+                      to={`/${isAdmin ? "admin" : "dash"}/vehicles/${vehicleId}/view`}
                     >
                       {vehicle?.vehicleMake || "N/A"}
                     </Link>
@@ -143,14 +134,21 @@ function VehicleRowComponent({ vehicleId, vehicle }) {
           </div>
         </TableCell>
 
-        <TableCell sx={{ borderBottomStyle: "dashed" }}>
+        <TableCell sx={{borderBottomStyle: "dashed"}}>
           <Typography variant="body1">
-            {formattedDateDDMMYYYYNoZeros}
+            {vehicle.createdAt.substring(
+                0,
+                vehicle.createdAt.lastIndexOf(" ")
+            )}
           </Typography>
           <Typography variant="body2" color="gray">
-            {formattedTime}
+            {vehicle.createdAt.substring(
+                vehicle.createdAt.lastIndexOf(" "),
+                vehicle.createdAt.length
+            )}
           </Typography>
         </TableCell>
+
         <TableCell
           sx={{
             borderBottomStyle: "dashed",
@@ -158,8 +156,8 @@ function VehicleRowComponent({ vehicleId, vehicle }) {
           }}
         >
           <div className="flex justify-center items-center">
-            <EditButtonComponent handleQuickEdit={handleQuickEdit} />
-            <MoreActionComponent menuItems={menuActions} />
+             <EditButtonComponent handleQuickEdit={handleQuickEdit} />
+             <MoreActionComponent menuItems={menuActions} />
           </div>
         </TableCell>
       </TableRow>

@@ -12,29 +12,43 @@ import { cityApiSlice } from "../../redux/feature/city/cityApiSlice";
 import {companyTypeApiSlice} from "../../redux/feature/companyType/CompanyTypeApiSlice.js";
 import {siteTypeApiSlice} from "../../redux/feature/siteType/siteTypeApiSlice.js";
 import {slotApiSlice} from "../../redux/feature/slot/slotApiSlice.js";
+import {authApiSlice} from "../../redux/feature/auth/authApiSlice.js";
 
 
 function Prefetch() {
   const { isManager, isAdmin } = useAuth();
 
   useEffect(() => {
+
+    if (isManager || isAdmin) {
+      store.dispatch(authApiSlice.util.prefetch("getUserProfile", "userProfile", { force: true }));
+    }
+
     if (isManager) {
+      store.dispatch(parkingDetailApiSlice.util.prefetch("getAllParkingDetail", "parkingDetailList", { force: true }));
+      store.dispatch(parkingApiSlice.util.prefetch("getParkingSpaces", "parkingSpacesList", {force: true,}));
+      store.dispatch(userApiSlice.util.prefetch("getUsers", "usersList", { force: true }));
+      store.dispatch(vehicleApiSlice.util.prefetch("getVehicles", "vehiclesList", { force: true }));
+      store.dispatch(sitesApiSlice.util.prefetch("getSites", "sitesList", { force: true }));
+      store.dispatch(sitesApiSlice.util.prefetch("getListBranch", "branchList", { force: true }));
+    }
+
+    if (isAdmin) {
       store.dispatch(sitesApiSlice.util.prefetch("getSites", "sitesList", { force: true }));
       store.dispatch(companiesApiSlice.util.prefetch("getCompany","companiesList", {force: true}));
       store.dispatch(cityApiSlice.util.prefetch("getAllCities", "citiesList", {force: true }));
       store.dispatch(companyTypeApiSlice.util.prefetch("getCompanyType", "companyTypeList", {force: true }));
       store.dispatch(companiesApiSlice.util.prefetch("getAllCompanies", "companyNameList", {force: true}));
       store.dispatch(siteTypeApiSlice.util.prefetch("getAllSiteTypes", "siteTypeList", {force: true}));
-      store.dispatch(sitesApiSlice.util.prefetch("getBranchList", "branchNameList", { force: true }));
       store.dispatch(slotApiSlice.util.prefetch("getSlots", "slotsList", { force: true }));
       store.dispatch(sitesApiSlice.util.prefetch("getListBranch", "branchList", { force: true }));
-    }
-
-    if (isManager || isAdmin) {
-      store.dispatch(parkingDetailApiSlice.util.prefetch("getAllParkingDetail", "parkingDetailList", { force: true }));
-      store.dispatch(parkingApiSlice.util.prefetch("getParkingSpaces", "parkingSpacesList", {force: true,}));
-      store.dispatch(userApiSlice.util.prefetch("getUsers", "usersList", { force: true }));
-      store.dispatch(vehicleApiSlice.util.prefetch("getVehicles", "vehiclesList", {force: true,}));
+      store.dispatch(vehicleApiSlice.util.prefetch("getAllVehicleTypes", "vehicleTypeList", { force: true }));
+      store.dispatch(vehicleApiSlice.util.prefetch("getAllLicensePlateProvinces", "licensePlateProvinceList", { force: true }));
+      store.dispatch(vehicleApiSlice.util.prefetch("getAllLicensePlateTypes", "licensePlateTypeList", { force: true }));
+      store.dispatch(userApiSlice.util.prefetch("getAllFullNameUsers", "fullNameUsersList", { force: true }));
+      store.dispatch(userApiSlice.util.prefetch("getAllRoles", "roleList", { force: true }));
+      store.dispatch(userApiSlice.util.prefetch("findAllGender", "genderList", { force: true }));
+      store.dispatch(userApiSlice.util.prefetch("getAllSignUpMethods", "signUpMethodList", { force: true }));
     }
   }, []);
 

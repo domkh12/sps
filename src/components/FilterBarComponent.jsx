@@ -188,7 +188,7 @@ function FilterBarComponent({
             label={t("role")}
             labelId="role_label"
             id="role"
-            options={roleFetched?.data}
+            options={roleFetched}
             onChange={handleRoleChange}
             optionLabelKey="name"
             width60={true}
@@ -240,7 +240,7 @@ function FilterBarComponent({
             label={t("signUpMethod")}
             labelId="signUpMehod_label"
             id="sighUpMethod"
-            options={signUpMethodsFetched?.data}
+            options={signUpMethodsFetched}
             onChange={handleMethodChange}
             optionLabelKey="name"
             width60={true}
@@ -253,7 +253,7 @@ function FilterBarComponent({
             label={t("vehicleType")}
             labelId="vehicleType_label"
             id="vehicleType"
-            options={vehicleTypeFetched?.data}
+            options={vehicleTypeFetched}
             onChange={handleVehicleTypeChange}
             optionLabelKey="name"
             width60={true}

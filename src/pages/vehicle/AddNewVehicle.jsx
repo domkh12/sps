@@ -1,16 +1,16 @@
 import { Form, Formik } from "formik";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
-  useGetAllFullNameUsersMutation,
+  useGetAllFullNameUsersQuery,
 } from "../../redux/feature/users/userApiSlice";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAddNewVehicleMutation,
-  useGetAllLicensePlateProvincesMutation,
-  useGetAllLicensePlateTypesMutation,
-  useGetAllVehicleTypesMutation,
+  useGetAllLicensePlateProvincesQuery,
+  useGetAllLicensePlateTypesQuery,
+  useGetAllVehicleTypesQuery,
 } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import SeoComponent from "../../components/SeoComponent";
@@ -22,128 +22,113 @@ import useAuth from "../../hook/useAuth";
 import MainHeaderComponent from "./../../components/MainHeaderComponent";
 import ColorPickerComponent from "../../components/ColorPickerComponent";
 import ButtonComponent from "../../components/ButtonComponent";
-import { setCaptionSnackBar, setIsOpenSnackBar } from "../../redux/feature/actions/actionSlice";
 import ImageUploadComponent from "../../components/ImageUploadComponent";
+import {Slide, toast} from "react-toastify";
+import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent.jsx";
+import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
 
 function AddNewVehicle() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslate();
-  const [isLoading, setIsLoading] = useState(true);
   const [profileImageFile, setProfileImageFile] = useState(null);  
-  const { isManager, isAdmin } = useAuth();
-  const licensePlateProvincesFetched = useSelector(
-    (state) => state.vehicles.licensePlateProvincesFetched
-  );
-  const vehicleTypeFetched = useSelector(
-    (state) => state.vehicles.vehicleTypeFetched
-  );
-  const licensePlateTypesFetched = useSelector(
-    (state) => state.vehicles.licensePlateTypesFetched
-  );
-  const allFullNameUsersFetched = useSelector(
-    (state) => state.users.allFullNameUsersFetched
-  );
+  const { isAdmin, sites } = useAuth();
+  const {data:companyData, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList", {skip: !isAdmin});
 
-  const [addNewVehicle, { isSuccess: isSuccessAddNewVehicle, isLoading:isLoadingAddNewVehicle, isError, error }] =
-    useAddNewVehicleMutation();
+  const {data: licensePlateProvincesFetched,
+      isSuccess:isSuccessGetAllLicensePlateProvinces,
+      isLoading:isLoadingGetAllLicensePlateProvinces,
+  } = useGetAllLicensePlateProvincesQuery("licensePlateProvinceList")
 
-  const [
-    getAllVehicleTypes,
-    {
-      isSuccess: isSuccessGetAllVehicleType,
-      isLoading: isLoadingGetAllVehicleType,
-      isError: isErrorGetAllVehicleType,
-      error: errorGetAllVehicleType,
-    },
-  ] = useGetAllVehicleTypesMutation();
+  const {data:vehicleTypeFetched,
+      isSuccess:isSuccessGetAllVehicleType,
+      isLoading:isLoadingGetAllVehicleType,
+  } = useGetAllVehicleTypesQuery("vehicleTypeList");
 
-  const [
-    getAllFullNameUsers,
-    {
-      isSuccess: isSuccessGetAllFullNameUsers,
-      isLoading: isLoadingGetAllFullNameUsers,
-      isError: isErrorGetAllFullNameUsers,
-      error: errorGetAllFullNameUsers,
-    },
-  ] = useGetAllFullNameUsersMutation();
-
-  const [
-    getAllLicensePlateProvinces,
-    {
-      isSuccess: isSuccessGetAllLicensePlateProvinces,
-      isLoading: isLoadingGetAllLicensePlateProvinces,
-      isError: isErrorGetAllLicensePlateProvinces,
-      error: errorGetAllLicensePlateProvinces,
-    },
-  ] = useGetAllLicensePlateProvincesMutation();
-
-  const [
-    getAllLicensePlateTypes,
-    {
+  const {data:licensePlateTypesFetched,
       isSuccess: isSuccessGetAllLicensePlateTypes,
       isLoading: isLoadingGetAllLicensePlateTypes,
-      isError: isErrorGetAllLicensePlateTypes,
-      error: errorGetAllLicensePlateTypes,
-    },
-  ] = useGetAllLicensePlateTypesMutation();
+  } = useGetAllLicensePlateTypesQuery("licensePlateTypeList");
 
+  const {data: allFullNameUsersFetched,
+      isSuccess: isSuccessGetAllFullNameUsers,
+        isLoading: isLoadingGetAllFullNameUsers,
+  } = useGetAllFullNameUsersQuery("fullNameUsersList");
+
+  const [addNewVehicle,
+    {
+      isSuccess: isSuccessAddNewVehicle,
+      isLoading:isLoadingAddNewVehicle,
+      isError: isErrorAddNewVehicle,
+      error: errorAddNewVehicle,
+    }] = useAddNewVehicleMutation();
 
   const [uploadImage] = useUploadImageMutation();
 
   const validationSchema = Yup.object().shape({
-    // plateNameKh: Yup.string()
-    //   .matches(/^[\u1780-\u17FF\s]+$/, "Only Khmer characters are allowed")
-    //   .required("License Plate Kh Name is required"),
-    // plateNameEng: Yup.string()
-    //   .matches(/^[A-Za-z\s]+$/, "Only English characters are allowed")
-    //   .required("License Plate Eng Name is required"),
-    // plateNumber: Yup.string()
-    //   .matches(
-    //     /^[A-Za-z0-9-]+$/,
-    //     "Only letters, numbers, and hyphens are allowed"
-    //   )
-    //   .min(2, "Plate Number must be at least 2 characters")
-    //   .max(20, "Plate Number cannot exceed 20 characters")
-    //   .required("License Plate Number is required"),
-    // type: Yup.string().required("Vehicle Type is required"),
-    // userId: Yup.string().required("Owner is required"),
+    plateNumber: Yup.string()
+        .matches(/^[A-Za-z0-9-]+$/, t("onlyAlphanumericAndDash"))
+        .min(1, t("plateNumberMin"))
+        .max(20, t("plateNumberMax"))
+        .required(t("plateNumberRequired")),
+
+    make: Yup.string()
+        .max(50, t("vehicleMakeTooLong"))
+        .required(t("vehicleMakeRequired")),
+
+    model: Yup.string()
+        .max(50, t("vehicleModelTooLong"))
+        .required(t("vehicleModelRequired")),
+
+    color: Yup.string()
+        .required(t("colorRequired")),
+
+    vehicleTypeId: Yup.string()
+        .required(t("vehicleTypeRequired")),
+
+    userId: Yup.string()
+        .required(t("driverRequired")),
+
+    lppId: Yup.string()
+        .required(t("provinceRequired")),
+
+    licensePlateTypeId: Yup.string()
+        .required(t("licensePlateTypeRequired")),
+
+    ...(isAdmin ? {
+      branchUuid: Yup.string()
+          .required(t("branchRequired")),
+    }: {})
+
   });
 
   useEffect(()=>{
-   
        if (isSuccessAddNewVehicle) {
-         navigate("/dash/vehicles");
-         dispatch(setIsOpenSnackBar(true));
-         dispatch(setCaptionSnackBar(t("createSuccess")));
-         setTimeout(() => {
-           dispatch(setIsOpenSnackBar(false));
-         }, 3000);
+         navigate(`/${isAdmin ? "admin" : "dash"}/vehicles`);
+         toast.success(t("createSuccess"), {
+           position: "top-right",
+           autoClose: 2000,
+           hideProgressBar: false,
+           closeOnClick: true,
+           pauseOnHover: true,
+           draggable: false,
+           transition: Slide,
+         });
        }
-    
   }, [isSuccessAddNewVehicle])
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const promises = [];
-        if (isAdmin || isManager) {
-          promises.push(getAllLicensePlateProvinces());
-          promises.push(getAllVehicleTypes());
-          promises.push(getAllLicensePlateTypes());
-          promises.push(getAllFullNameUsers());
-        }
-
-        await Promise.all(promises);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+    if (isErrorAddNewVehicle){
+      toast.error(`${errorAddNewVehicle?.data?.error?.description}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
+    }
+  }, [isErrorAddNewVehicle]);
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -164,7 +149,8 @@ function AddNewVehicle() {
         vehicleTypeId: values.vehicleTypeId,
         image: profileImageUri,
         licensePlateTypeId: values.licensePlateTypeId,
-        licensePlateProvinceId: values.lppId
+        licensePlateProvinceId: values.lppId,
+        branchUuid: isAdmin ? values.branchUuid : sites[0]
       });
     } catch (error) {
       console.log(error);
@@ -176,7 +162,7 @@ function AddNewVehicle() {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate(`${isAdmin ? "admin" : "dash"}`)}
       key={1}
     >
       {t("dashboard")}
@@ -191,245 +177,278 @@ function AddNewVehicle() {
 
   let content;
 
-  content = (
-    <div>
-      <SeoComponent title={"Create a new user"} />
-      <MainHeaderComponent
-        breadcrumbs={breadcrumbs}
-        title={t("createNewVehicle")}
-        handleBackClick={() => navigate("/dash/vehicles")}
-      />
-      <div>
-        <Formik
-          initialValues={{
-            plateNumber: "",
-            color: "",
-            make: "",
-            model: "",
-            vehicleTypeId: "",
-            userId: "",
-            lppId: "",
-            licensePlateTypeId: "",
-          }}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({
-            values,
-            touched,
-            errors,
-            handleChange,
-            handleBlur,
-            setFieldValue,
-          }) => {
+  if (isLoadingGetAllVehicleType || isLoadingGetAllLicensePlateTypes || isLoadingGetAllFullNameUsers || isLoadingGetAllLicensePlateProvinces) content = <LoadingFetchingDataComponent/>
 
-            const handleDriverChange = (value) => {
-              setFieldValue("userId", value);
-            }
+  if (isSuccessGetAllVehicleType && isSuccessGetAllLicensePlateTypes && isSuccessGetAllFullNameUsers && isSuccessGetAllLicensePlateProvinces) {
+    content = (
+        <div>
+          <SeoComponent title={"Create a new user"}/>
+          <MainHeaderComponent
+              breadcrumbs={breadcrumbs}
+              title={t("createNewVehicle")}
+              handleBackClick={() => navigate(`/${isAdmin ? "admin" : "dash"}/vehicles`)}
+          />
+          <div>
+            <Formik
+                initialValues={{
+                  plateNumber: "",
+                  color: "",
+                  make: "",
+                  model: "",
+                  vehicleTypeId: "",
+                  userId: "",
+                  lppId: "",
+                  licensePlateTypeId: "",
+                  branchUuid: ""
+                }}
+                validationSchema={validationSchema}
+                onSubmit={handleSubmit}
+            >
+              {({
+                  values,
+                  touched,
+                  errors,
+                  handleChange,
+                  handleBlur,
+                  setFieldValue,
+                }) => {
 
-            const handlelicensePlateProvincesChange = (value) => {
-              setFieldValue("lppId", value);
-            };
+                const handleBranchChange = (value) => {
+                  setFieldValue("branchUuid", value);
+                };
 
-            const handleVehicleTypeChange = (value) => {
-              setFieldValue("vehicleTypeId", value);
-            };
+                const handleDriverChange = (value) => {
+                  setFieldValue("userId", value);
+                }
 
-            const handleLicesePlateTypesChange = (value) => {
-              setFieldValue("licensePlateTypeId", value);
-            };
+                const handlelicensePlateProvincesChange = (value) => {
+                  setFieldValue("lppId", value);
+                };
 
-            const selectedProvince = licensePlateProvincesFetched?.data?.find(
-              (lpp) => lpp?.uuid === values?.lppId
-            );
+                const handleVehicleTypeChange = (value) => {
+                  setFieldValue("vehicleTypeId", value);
+                };
 
-            const plateNumberShow = values.plateNumber
-              ? values.plateNumber
-              : "XXXXXX";
+                const handleLicesePlateTypesChange = (value) => {
+                  setFieldValue("licensePlateTypeId", value);
+                };
 
-            const provinceNameEn = selectedProvince
-              ? selectedProvince?.provinceNameEn
-              : "Not Selected";
+                const selectedProvince = licensePlateProvincesFetched?.data?.find(
+                    (lpp) => lpp?.uuid === values?.lppId
+                );
 
-            const provinceNameKh = selectedProvince
-              ? selectedProvince?.provinceNameKh
-              : "Not Selected";
+                const plateNumberShow = values.plateNumber
+                    ? values.plateNumber
+                    : "XXXXXX";
 
-            return (
-              <Form className="pb-8">
-                <Grid2 container spacing={3}>
-                  <Grid2 size={{ xs: 12, md: 4 }}>
-                    <Card
-                      sx={{
-                        ...cardStyle,
-                      }}
-                      className=" gap-5 pt-[40px] px-[24px] pb-[40px] "
-                    >
-                      <div className="w-auto rounded-[12px] mb-[16px] border-blue-600 border-[3px] px-[24px] py-2 flex items-center justify-between">
-                        <div className="flex flex-col">
-                          <Typography variant="h6" className="text-blue-600">
-                            {provinceNameEn}
-                          </Typography>
-                          <Typography variant="h6" className="text-red-600">
-                            {provinceNameKh}
-                          </Typography>
-                        </div>
-                        <Typography
-                          variant="h4"
-                          className="underline text-blue-600 uppercase"
-                        >
-                          {plateNumberShow}
-                        </Typography>
-                      </div>
+                const provinceNameEn = selectedProvince
+                    ? selectedProvince?.provinceNameEn
+                    : "Not Selected";
 
-                      <ImageUploadComponent
-                        setProfileImageFile={setProfileImageFile}
-                        profileImageFile={profileImageFile}
-                      />
+                const provinceNameKh = selectedProvince
+                    ? selectedProvince?.provinceNameKh
+                    : "Not Selected";
 
-                    </Card>
-                  </Grid2>
+                return (
+                    <Form className="pb-8">
+                      <Grid2 container spacing={3}>
+                        <Grid2 size={{xs: 12, md: 4}}>
+                          <Card
+                              sx={{
+                                ...cardStyle,
+                              }}
+                              className=" gap-5 pt-[40px] px-[24px] pb-[40px]"
+                          >
+                            <div
+                                className="w-auto rounded-[12px] mb-[16px] border-blue-600 border-[3px] px-[24px] py-2 flex items-center justify-between">
+                              <div className="flex flex-col">
+                                <Typography variant="h6" className="text-blue-600">
+                                  {provinceNameEn}
+                                </Typography>
+                                <Typography variant="h6" className="text-red-600">
+                                  {provinceNameKh}
+                                </Typography>
+                              </div>
+                              <Typography
+                                  variant="h4"
+                                  className="underline text-blue-600 uppercase"
+                              >
+                                {plateNumberShow}
+                              </Typography>
+                            </div>
 
-                  <Grid2 size={{ xs: 12, md: 8 }}>
-                    <Card
-                      sx={{
-                        ...cardStyle,
-                        padding: "24px",
-                      }}
-                      className="flex-auto w-full"
-                    >
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <TextField
-                          label={t("plateNumber")}
-                          variant="outlined"
-                          sx={{
-                            "& .MuiInputBase-input": {
-                              boxShadow: "none",
-                            },
-                            borderRadius: "6px",
-                          }}
-                          type="text"
-                          id="plateNumber"
-                          name="plateNumber"
-                          fullWidth
-                          value={values.plateNumber}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          autoComplete="off"
-                          error={errors.plateNumber && touched.plateNumber}
-                          helperText={
-                            errors.plateNumber && touched.plateNumber
-                              ? errors.plateNumber
-                              : null
-                          }
-                          size="medium"
-                        />
+                            <ImageUploadComponent
+                                setProfileImageFile={setProfileImageFile}
+                                profileImageFile={profileImageFile}
+                            />
 
-                        <SelectSingleComponent
-                          label={`${t("province")}`}
-                          options={licensePlateProvincesFetched.data}
-                          onChange={handlelicensePlateProvincesChange}
-                          fullWidth={true}
-                          optionLabelKey="provinceNameEn"
-                        />
+                          </Card>
+                        </Grid2>
 
-                        <SelectSingleComponent
-                          label={t("licensePlateType")}
-                          options={licensePlateTypesFetched.data}
-                          onChange={handleLicesePlateTypesChange}
-                          fullWidth={true}
-                          optionLabelKey="name"
-                        />
+                        <Grid2 size={{xs: 12, md: 8}}>
+                          <Card
+                              sx={{
+                                ...cardStyle,
+                                padding: "24px",
+                              }}
+                              className="flex-auto w-full"
+                          >
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                              <TextField
+                                  label={t("plateNumber")}
+                                  variant="outlined"
+                                  sx={{
+                                    "& .MuiInputBase-input": {
+                                      boxShadow: "none",
+                                    },
+                                    borderRadius: "6px",
+                                  }}
+                                  type="text"
+                                  id="plateNumber"
+                                  name="plateNumber"
+                                  fullWidth
+                                  value={values.plateNumber}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  autoComplete="off"
+                                  error={errors.plateNumber && touched.plateNumber}
+                                  helperText={
+                                    errors.plateNumber && touched.plateNumber
+                                        ? errors.plateNumber
+                                        : null
+                                  }
+                                  size="medium"
+                              />
 
-                        <SelectSingleComponent
-                          label={t("vehicleType")}
-                          options={vehicleTypeFetched.data}
-                          onChange={handleVehicleTypeChange}
-                          fullWidth={true}
-                          optionLabelKey="name"
-                        />
+                              <SelectSingleComponent
+                                  label={`${t("province")}`}
+                                  options={licensePlateProvincesFetched}
+                                  onChange={handlelicensePlateProvincesChange}
+                                  fullWidth={true}
+                                  optionLabelKey="provinceNameEn"
+                                  error={errors.lppId}
+                                  touched={touched.lppId}
+                              />
 
-                        <SelectSingleComponent
-                          label={t("driver")}
-                          options={allFullNameUsersFetched.data}
-                          onChange={handleDriverChange}
-                          fullWidth={true}
-                          optionLabelKey="fullName"
-                        />
+                              <SelectSingleComponent
+                                  label={t("licensePlateType")}
+                                  options={licensePlateTypesFetched}
+                                  onChange={handleLicesePlateTypesChange}
+                                  fullWidth={true}
+                                  optionLabelKey="name"
+                                  error={errors.licensePlateTypeId}
+                                  touched={touched.licensePlateTypeId}
+                              />
 
-                        <TextField
-                          label={t("vehicleMake")}
-                          variant="outlined"
-                          sx={{
-                            "& .MuiInputBase-input": {
-                              boxShadow: "none",
-                            },
-                            borderRadius: "6px",
-                          }}
-                          type="text"
-                          id="make"
-                          name="make"
-                          fullWidth
-                          value={values.make}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          autoComplete="off"
-                          error={errors.make && touched.make}
-                          helperText={
-                            errors.make && touched.make ? errors.make : null
-                          }
-                          size="medium"
-                        />
+                              <SelectSingleComponent
+                                  label={t("vehicleType")}
+                                  options={vehicleTypeFetched}
+                                  onChange={handleVehicleTypeChange}
+                                  fullWidth={true}
+                                  optionLabelKey="name"
+                                  error={errors.vehicleTypeId}
+                                  touched={touched.vehicleTypeId}
+                              />
 
-                        <TextField
-                          label={t("vehicleModel")}
-                          variant="outlined"
-                          sx={{
-                            "& .MuiInputBase-input": {
-                              boxShadow: "none",
-                            },
-                            borderRadius: "6px",
-                          }}
-                          type="text"
-                          id="model"
-                          name="model"
-                          fullWidth
-                          value={values.model}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          autoComplete="off"
-                          error={errors.model && touched.model}
-                          helperText={
-                            errors.model && touched.model ? errors.model : null
-                          }
-                          size="medium"
-                        />
+                              <SelectSingleComponent
+                                  label={t("driver")}
+                                  options={allFullNameUsersFetched}
+                                  onChange={handleDriverChange}
+                                  fullWidth={true}
+                                  optionLabelKey="fullName"
+                                  error={errors.userId}
+                                  touched={touched.userId}
+                              />
 
-                        <ColorPickerComponent
-                          label="Color"
-                          value={values.color}
-                          onChange={(color) => setFieldValue("color", color)}
-                        />
-                      </div>
+                              {
+                                isAdmin && (
+                                      <SelectSingleComponent
+                                          label={t("branch")}
+                                          options={companyData}
+                                          onChange={handleBranchChange}
+                                          fullWidth={true}
+                                          error={errors.branchId}
+                                          touched={touched.branchId}
+                                          itemsLabelKey="sites"
+                                          optionLabelKey="siteName"
+                                          groupLabelKey="companyName"
+                                      />
+                                  )
+                              }
 
-                      <div className="col-span-2 flex justify-end mt-[20px]">
-                        <ButtonComponent
-                          btnTitle={t("createVehicle")}
-                          type={"submit"}
-                          loadingCaption={t("creating")}
-                          // isLoading={isLoading}
-                        />
-                      </div>
-                    </Card>
-                  </Grid2>
-                </Grid2>
-              </Form>
-            );
-          }}
-        </Formik>
-      </div>
-    </div>
-  );
+                              <TextField
+                                  label={t("vehicleMake")}
+                                  variant="outlined"
+                                  sx={{
+                                    "& .MuiInputBase-input": {
+                                      boxShadow: "none",
+                                    },
+                                    borderRadius: "6px",
+                                  }}
+                                  type="text"
+                                  id="make"
+                                  name="make"
+                                  fullWidth
+                                  value={values.make}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  autoComplete="off"
+                                  error={errors.make && touched.make}
+                                  helperText={
+                                    errors.make && touched.make ? errors.make : null
+                                  }
+                                  size="medium"
+                              />
+
+                              <TextField
+                                  label={t("vehicleModel")}
+                                  variant="outlined"
+                                  sx={{
+                                    "& .MuiInputBase-input": {
+                                      boxShadow: "none",
+                                    },
+                                    borderRadius: "6px",
+                                  }}
+                                  type="text"
+                                  id="model"
+                                  name="model"
+                                  fullWidth
+                                  value={values.model}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  autoComplete="off"
+                                  error={errors.model && touched.model}
+                                  helperText={
+                                    errors.model && touched.model ? errors.model : null
+                                  }
+                                  size="medium"
+                              />
+
+                              <ColorPickerComponent
+                                  label="Color"
+                                  value={values.color}
+                                  onChange={(color) => setFieldValue("color", color)}
+                              />
+                            </div>
+
+                            <div className="col-span-2 flex justify-end mt-[20px]">
+                              <ButtonComponent
+                                  btnTitle={t("createVehicle")}
+                                  type={"submit"}
+                                  isLoading={isLoadingAddNewVehicle}
+                              />
+                            </div>
+                          </Card>
+                        </Grid2>
+                      </Grid2>
+                    </Form>
+                );
+              }}
+            </Formik>
+          </div>
+        </div>
+    );
+  }
 
   return content;
 }

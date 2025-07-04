@@ -40,7 +40,6 @@ import SkeletonTableRowComponent from "../../components/SkeletonTableRowComponen
 
 function ListCompany() {
   const navigate = useNavigate();
-  const openQuickEdit = useSelector((state) => state.companies.isQuickEditCompanyOpen);
   const pageSize = useSelector((state) => state.companies.pageSize);
   const pageNo = useSelector((state) => state.companies.pageNo);
   const { t } = useTranslate();
@@ -51,6 +50,7 @@ function ListCompany() {
   const searchKeywords = useSelector((state) => state.companies.companySearchKeywords);
   const [debounceInputSearch] = useDebounce(searchKeywords, 1000);
   const dispatch = useDispatch();
+
   const {
     data: companies,
     isSuccess,
@@ -78,7 +78,7 @@ function ListCompany() {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate("/admin")}
       key={1}
     >
       {t("dashboard")}
@@ -190,7 +190,7 @@ function ListCompany() {
           breadcrumbs={breadcrumbs}
           title={t("list")}
           btnTitle={t("newCompany")}
-          onClick={() => navigate("/dash/companies/new")}
+          onClick={() => navigate("/admin/companies/new")}
         />
 
         <div>
@@ -275,7 +275,7 @@ function ListCompany() {
             />
           </Card>
         </div>
-        {openQuickEdit && <QuickEditCompanyComponent />}
+        <QuickEditCompanyComponent />
       </div>
     );
   }

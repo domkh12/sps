@@ -1,28 +1,28 @@
-import React from 'react'
+import {useEffect} from 'react'
 import { useParams } from 'react-router-dom'
-import { useGetUsersQuery } from '../../redux/feature/users/userApiSlice';
+import {useFindUserByUuidQuery} from '../../redux/feature/users/userApiSlice';
 import LoadingFetchingDataComponent from '../../components/LoadingFetchingDataComponent';
 import ViewDetailUser from './ViewDetailUser';
 
 function ViewUser() {
-  const { id }= useParams() 
+    const {id} = useParams();
 
-   const { user } = useGetUsersQuery("usersList", {
-     selectFromResult: ({ data }) => ({
-       user: data?.entities[id],
-     }),
-   });   
+    const {data: user, isFetching, isSuccess, isError, error, refetch} = useFindUserByUuidQuery(id);
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
-   let content;
- 
-  
-   if (!user) {
-    content = <LoadingFetchingDataComponent />;
-  }
+    let content;
 
-  content = <ViewDetailUser user={user} />;
+    if (isFetching) content = <LoadingFetchingDataComponent/>;
 
-  return content;
+    else if (isSuccess && user) content = <ViewDetailUser user={user} />;
+    else if (isError) {
+        content = <div>Error: {error.message}</div>;
+    } else {
+        content = <div>Unexpected state: No user data found.</div>;
+    }
+    return content;
 }
 
 export default ViewUser

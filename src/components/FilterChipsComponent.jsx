@@ -194,7 +194,7 @@ function FilterChipsComponent({
                 <span className="font-medium mr-2">Role:</span>
                 <div className="flex gap-3">
                   {roleFilter.map((role) => {
-                    const matchedRole = roleFetched.data?.find(
+                    const matchedRole = roleFetched?.find(
                       (fetchedRole) => fetchedRole.uuid === role
                     );
                     const roleName = matchedRole ? matchedRole.name : role; // Use fetched name if match found
@@ -280,7 +280,7 @@ function FilterChipsComponent({
                 <span className="font-medium mr-2">{`Sign\u00a0up\u00a0method:`}</span>
                 <div className="flex gap-3">
                   {signUpMethodFilter.map((signUpMethod) => {
-                    const matchedSignUpMethod = signUpMethodsFetched.data?.find(
+                    const matchedSignUpMethod = signUpMethodsFetched?.find(
                       (fetchedSignUpMethod) =>
                         fetchedSignUpMethod.uuid === signUpMethod
                     );

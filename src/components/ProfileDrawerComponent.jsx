@@ -24,6 +24,7 @@ import { listItemButtonStyle } from "../assets/style";
 import { useConnectedUserMutation } from "../redux/feature/users/userApiSlice";
 import PortraitTwoToneIcon from "@mui/icons-material/PortraitTwoTone";
 import useTranslate from "../hook/useTranslate";
+import useLocalStorage from "../hook/useLocalStorage.jsx";
 
 function ProfileDrawerComponent({ open: initialOpen, onClose }) {
   const { username, status } = useAuth();
@@ -33,6 +34,13 @@ function ProfileDrawerComponent({ open: initialOpen, onClose }) {
   const navigate = useNavigate();
   const [sendLogout, { isLoading, isSucess, isError, error }] =
     useSendLogoutMutation();
+
+  const [authData, setAuthData] = useLocalStorage('authData', {
+     isRemember: false,
+     userRoles: "",
+     uuid: null,
+     siteUuid: null
+ });
 
   const handleDrawerClose = () => {
     onClose();
@@ -49,6 +57,12 @@ function ProfileDrawerComponent({ open: initialOpen, onClose }) {
 
   const handleSendLogout = async () => {
     try {
+        setAuthData({
+            isRemember: false,
+            userRoles: "",
+            uuid: null,
+            siteUuid: null
+        });
       await connectedUser({ uuid: user?.uuid, isOnline: false });
       await sendLogout().unwrap();
       navigate("/login");

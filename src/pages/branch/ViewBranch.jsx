@@ -19,7 +19,7 @@ function ViewBranch() {
 
     else if (isSuccess && branch) content = <ViewBranchDetail branch={branch}/>;
     else if (isError) {
-        content = <div>Error: {error.message}</div>;
+        content = <div>Error: {error?.data?.error?.description}</div>;
     } else {
         content = <div>Unexpected state: No branch data found.</div>;
     }

@@ -1,8 +1,3 @@
-import React, { useEffect, useState } from "react";
-import {
-  useFilterParkingSpacesQuery,
-  useGetParkingSpacesQuery,
-} from "../../redux/feature/parking/parkingApiSlice";
 import LoadingFetchingDataComponent from "./../../components/LoadingFetchingDataComponent";
 import SeoComponent from "../../components/SeoComponent";
 import {
@@ -22,40 +17,34 @@ import useTranslate from "../../hook/useTranslate";
 import { useNavigate } from "react-router-dom";
 import { cardStyle } from "../../assets/style";
 import FilterBarComponent from "../../components/FilterBarComponent";
-import ParkingSpaceRowComponent from "../../components/ParkingSpaceRowComponent";
 import useAuth from "./../../hook/useAuth";
 import QuickEditParkingSpaceComponent from "../../components/QuickEditParkingSpaceComponent";
 import { useDispatch, useSelector } from "react-redux";
-import { useGetSitesListMutation } from "../../redux/feature/site/siteApiSlice";
-import { setBranchFilter } from "../../redux/feature/users/userSlice";
+import {useGetBranchListQuery, useGetListBranchQuery} from "../../redux/feature/site/siteApiSlice";
 import {
-  setBranchFilterParking,
-  setClearParkingFilter,
   setPageNoParking,
   setPageSizeParking,
-  setSearchParkingSpace,
 } from "../../redux/feature/parking/parkingSlice";
 import DataNotFound from "../../components/DataNotFound";
 import FilterChipsComponent from "../../components/FilterChipsComponent";
 import {useFilterSlotsQuery, useGetSlotsQuery} from "../../redux/feature/slot/slotApiSlice.js";
 import ParkingSlotRowComponent from "../../components/ParkingSlotRowComponent.jsx";
+import SkeletonTableRowComponent from "../../components/SkeletonTableRowComponent.jsx";
+import {useDebounce} from "use-debounce";
+import {setBranchFilterForSlot, setSearchParkingSlot} from "../../redux/feature/slot/slotSlice.js";
+import QuickEditParkingSlotComponent from "../../components/QuickEditParkingSlotComponent.jsx";
 
 function ListParkingSlot() {
   const navigate = useNavigate();
   const { t } = useTranslate();
-  const { isManager } = useAuth();
-  const isOpenQuickEditParkingSpace = useSelector(
-    (state) => state.parking.isOpenQuickEditParkingSpace
-  );
-  const branchFetched = useSelector((state) => state.sites.sites);
-  const [isLoading, setIsLoading] = useState(true);
-  const branchFilter = useSelector((state) => state.parking.branchFilter);
-  const searchKeywords = useSelector(
-    (state) => state.parking.searchParkingSpace
-  );
+  const { isAdmin } = useAuth();
+  const {data: branchData, isSuccess: isSuccessGetBranchData, isLoading: isLoadingGetBranchData} = useGetListBranchQuery("branchNameList");
+  const branchFilter = useSelector((state) => state.slot.branchFilter);
+  const searchKeywords = useSelector((state) => state.slot.searchParkingSlot);
   const dispatch = useDispatch();
   const pageNo = useSelector((state) => state.parking.pageNo);
   const pageSize = useSelector((state) => state.parking.pageSize);
+  const [debounceInputSearch] = useDebounce(searchKeywords, 1000);
 
   const {
     data: getParkingSpacesData,
@@ -77,50 +66,20 @@ function ListParkingSlot() {
 
   const {
     data: filterParkingSpacesData,
-    isSuccess: isSuccessFilterParkingSpaces,
-    isLoading: isLoadingFilterParkingSpaces,
-    isError: isErrorFilterParkingSpaces,
-    error: errorFilterParkingSpaces,
+    isFetching: isFetchingGetParkingSpaceFilter
   } = useFilterSlotsQuery(
     {
       pageNo,
       pageSize,
-      keywords: searchKeywords,
+      keywords: debounceInputSearch,
       branchUuid: branchFilter,
-    },
-    {
-      skip: branchFilter.length === 0 && searchKeywords === "",
     }
   );
-
-  const [
-    getSitesList,
-    {
-      isSuccess: isGetSitesListSuccess,
-      isLoading: isGetSitesListLoading,
-      isError: isGetSitesListError,
-      error: errorGetSitesList,
-    },
-  ] = useGetSitesListMutation();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        await Promise.all([getSitesList()]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate(`/${isAdmin ? "admin" : "dash"}`)}
       key={1}
     >
       {t("dashboard")}
@@ -163,11 +122,11 @@ function ListParkingSlot() {
   ];
 
   const handleBranchChange = (branch) => {
-    dispatch(setBranchFilterParking(branch));
+    dispatch(setBranchFilterForSlot(branch));
   };
 
   const handleSearchChange = (keywords) => {
-    dispatch(setSearchParkingSpace(keywords));
+    dispatch(setSearchParkingSlot(keywords));
   };
 
   const handleChangePage = (event, newPage) => {
@@ -181,7 +140,7 @@ function ListParkingSlot() {
 
   let content;
 
-  if (isLoadingGetParkingSpaces) {
+  if (isLoadingGetParkingSpaces || isLoadingGetBranchData) {
     content = <LoadingFetchingDataComponent />;
   }
 
@@ -189,7 +148,7 @@ function ListParkingSlot() {
     content = <p>Error: {errorGetParkingSpaces?.message}</p>;
   }
 
-  if (isSuccessGetParkingSpaces) {
+  if (isSuccessGetParkingSpaces && isSuccessGetBranchData) {
     const { ids, entities, totalElements, pageSize, pageNo } =
       getParkingSpacesData;
 
@@ -197,8 +156,8 @@ function ListParkingSlot() {
       ids: idsFilter,
       entities: searchEntities,
       totalElements: totalElementsSearch,
-      pageSize: pageSizeSearch,
-      pageNo: pageNoSearch,
+      pageSize: pageSizeFilter,
+      pageNo: pageNoFilter,
     } = filterParkingSpacesData || {};
 
     const resultFound = filterParkingSpacesData
@@ -206,12 +165,12 @@ function ListParkingSlot() {
       : totalElements;
 
     const displayTotalElements =
-      searchKeywords !== "" || branchFilter.length > 0
+        debounceInputSearch !== "" || branchFilter.length > 0
         ? totalElementsSearch
         : totalElements;
 
     const tableContent =
-      searchKeywords !== "" || branchFilter.length > 0 ? (
+        debounceInputSearch !== "" || branchFilter.length > 0 ? (
         <>
           {idsFilter?.length ? (
             idsFilter.map((parkingSlotId) => (
@@ -255,14 +214,14 @@ function ListParkingSlot() {
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
           title={t("list")}
-          {...(isManager && { btnTitle: t("newslot") })}
-          {...(isManager && { onClick: () => navigate("new") })}
+          {...(isAdmin && { btnTitle: t("newslot") })}
+          {...(isAdmin && { onClick: () => navigate("new") })}
         />
 
         <Card sx={{ ...cardStyle }}>
           <FilterBarComponent
             showTabs={false}
-            branchFetched={branchFetched}
+            branchFetched={isAdmin ? branchData : undefined}
             branchFilter={branchFilter}
             searchQuery={searchKeywords}
             handleBranchChange={handleBranchChange}
@@ -271,12 +230,15 @@ function ListParkingSlot() {
 
           <FilterChipsComponent
             branchFilter={branchFilter}
-            branchFetched={branchFetched}
+            branchFetched={branchData}
             searchQuery={searchKeywords}
             handleSearchChange={handleSearchChange}
             handleBranchChange={handleBranchChange}
-            clearFilter={() => dispatch(setClearParkingFilter())}
-            clearSearch={() => dispatch(setSearchParkingSpace(""))}
+            clearFilter={() => {
+              dispatch(setBranchFilterForSlot([]));
+                dispatch(setSearchParkingSlot(""));
+            }}
+            clearSearch={() => dispatch(setSearchParkingSlot(""))}
             isFiltered={searchKeywords !== "" || branchFilter.length > 0}
             resultFound={resultFound}
           />
@@ -308,20 +270,25 @@ function ListParkingSlot() {
                   ))}
                 </TableRow>
               </TableHead>
-              <TableBody sx={{ border: "none" }}>{tableContent}</TableBody>
+              <TableBody sx={{ border: "none" }}>
+                {isFetchingGetParkingSpaceFilter && idsFilter?.length === 0 ? (Array.from({length: pageSize}).map((_, index) => (
+                    <SkeletonTableRowComponent key={index} cellCount={4}/>
+                ))) : (<>{tableContent}</>)}
+              </TableBody>
             </Table>
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
             count={displayTotalElements || 0}
-            rowsPerPage={pageSize || pageSizeSearch}
-            page={pageNoSearch || pageNo}
+            rowsPerPage={pageSizeFilter != null && pageSizeFilter !== 0 ? pageSizeFilter : pageSize}
+            labelRowsPerPage={t('rowPerPage')}
+            page={pageNoFilter != null && pageNoFilter !== 0 ? pageNoFilter : pageNo}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Card>
-        {isOpenQuickEditParkingSpace && <QuickEditParkingSpaceComponent />}
+        <QuickEditParkingSlotComponent/>
       </div>
     );
   }

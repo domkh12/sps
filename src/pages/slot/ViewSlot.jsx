@@ -19,7 +19,7 @@ function ViewSlot(){
 
     else if (isSuccess && parkingSlot) content = <ViewSlotDetail parkingSlot={parkingSlot}/>;
     else if (isError) {
-        content = <div>Error: {error.message}</div>;
+        content = <div>Error: {error?.data?.error?.description}</div>;
     } else {
         content = <div>Unexpected state: No parkingSlot data found.</div>;
     }

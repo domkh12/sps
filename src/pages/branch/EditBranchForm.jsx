@@ -52,11 +52,9 @@ function EditBranchForm({ branch }) {
     siteTypeId: Yup.string().required(t("branchTypeIsRequired")),
   });
 
-
-
   useEffect(() => {
     if (isSuccessUpdateSite) {
-      navigate("/dash/branches");
+      navigate("/admin/branches");
       toast.success(t("updateSuccess"), {
         position: "top-right",
         autoClose: 2000,
@@ -86,7 +84,7 @@ function EditBranchForm({ branch }) {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate("/admin")}
       key={1}
     >
       {t("dashboard")}
@@ -101,7 +99,6 @@ function EditBranchForm({ branch }) {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      console.log("values", values);
       const formData = new FormData();
       let profileImageUri = null;
       if (profileImageFile) {
@@ -137,8 +134,8 @@ function EditBranchForm({ branch }) {
 
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
-          title={t("edit")}
-          handleBackClick={() => navigate("/dash/branches")}
+          title={branch?.siteName || "N/A"}
+          handleBackClick={() => navigate("/admin/branches")}
         />
 
         <Formik

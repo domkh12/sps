@@ -27,6 +27,7 @@ import { useGetUsersQuery } from "../redux/feature/users/userApiSlice";
 import { setIsOpenConfirmDelete } from "../redux/feature/actions/actionSlice";
 import useAuth from "../hook/useAuth";
 import useDateFormatter from "../hook/useDateFormatter";
+import useTranslate from "../hook/useTranslate.jsx";
 
 function stringToColor(string) {
   let hash = 0;
@@ -77,7 +78,8 @@ function stringAvatar(name) {
 function UserRowComponent({ userId, user }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isManager } = useAuth();
+  const { isAdmin } = useAuth();
+  const {t} = useTranslate();
 
   const quickEditUserResponse = useSelector(
     (state) => state.users?.quickEditUserReponse
@@ -140,38 +142,28 @@ function UserRowComponent({ userId, user }) {
   }));
 
   if (user) {
-    var handleEdit = () => navigate(`/dash/users/${userId}`);
-    var handleView = () => navigate(`/dash/users/${userId}/view`);
+    var handleEdit = () => navigate(`/${isAdmin ? "admin" : "dash"}/users/${userId}`);
+    var handleView = () => navigate(`/${isAdmin ? "admin" : "dash"}/users/${userId}/view`);
 
     var menuActions = [
       {
-        label: "Edit",
+        label: t('edit'),
         icon: <FaPen className="w-5 h-5" />,
         onClick: handleEdit,
       },
       {
-        label: "View",
+        label: t('view'),
         icon: <FaEye className="w-5 h-5" />,
         onClick: handleView,
       },
       {
-        label: "Delete",
+        label: t('delete'),
         icon: <FaTrashCan className="w-5 h-5" />,
         onClick: handleDelete,
         textColor: "red",
         buttonColor: "red",
       },
     ];
-
-    const dateObj = new Date(loadedUser.createdAt);
-    var { formattedDateDDMMYYYYNoZeros } = useDateFormatter(
-      new Date(loadedUser.createdAt)
-    );
-    var formattedTime = dateObj.toLocaleTimeString("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
 
     var roles = loadedUser.roles.map((role) => (
       <p key={role.uuid}>{role.name}</p>
@@ -229,7 +221,7 @@ function UserRowComponent({ userId, user }) {
                 <ListItemText
                   primary={
                     (
-                      <Link className="hover:underline" to={"/dash"}>
+                      <Link className="hover:underline" to={`/${isAdmin ? "admin" : "dash"}/users/${userId}/view`}>
                         {loadedUser.fullName}
                       </Link>
                     ) || "N/A"
@@ -257,27 +249,31 @@ function UserRowComponent({ userId, user }) {
           >
             <div className="flex gap-5 items-center">{roles}</div>
           </TableCell>
-          {isManager && (
+          {isAdmin && (
             <TableCell
               sx={{ borderTopStyle: "dashed", borderBottomStyle: "dashed" }}
             >
               <Stack direction="column" spacing={1}>
-                {loadedUser.sites.map((site) => (
-                  <div key={site.uuid}>
-                    <Chip
-                      avatar={
-                        <Avatar
-                          alt="Branch_Img"
-                          src={site.image}
-                          {...stringAvatar(site.siteName)}
-                        />
-                      }
-                      className="w-fit"
-                      label={site.siteName}
-                      variant="outlined"
-                    />
-                  </div>
-                ))}
+                {loadedUser?.sites?.length > 0 ? (
+                    loadedUser?.sites?.map((site) => (
+                        <div key={site?.uuid}>
+                          <Chip
+                              avatar={
+                                <Avatar
+                                    alt="Branch_Img"
+                                    src={site?.image || ""}
+                                    {...stringAvatar(site?.siteName || "N/A")}
+                                />
+                              }
+                              className="w-fit"
+                              label={site?.siteName || "N/A"}
+                              variant="outlined"
+                          />
+                        </div>
+                    ))
+                ):(
+                    <Typography variant="body2" color="gray">N/A</Typography>
+                )}
               </Stack>
             </TableCell>
           )}
@@ -287,14 +283,18 @@ function UserRowComponent({ userId, user }) {
           >
             <Chip sx={getChipStyles()} size="small" label={loadedUser.status} />
           </TableCell>
-          <TableCell
-            sx={{ borderTopStyle: "dashed", borderBottomStyle: "dashed" }}
-          >
+          <TableCell sx={{borderBottomStyle: "dashed"}}>
             <Typography variant="body1">
-              {formattedDateDDMMYYYYNoZeros}
+              {loadedUser.createdAt.substring(
+                  0,
+                  loadedUser.createdAt.lastIndexOf(" ")
+              )}
             </Typography>
             <Typography variant="body2" color="gray">
-              {formattedTime}
+              {loadedUser.createdAt.substring(
+                  loadedUser.createdAt.lastIndexOf(" "),
+                  loadedUser.createdAt.length
+              )}
             </Typography>
           </TableCell>
           <TableCell

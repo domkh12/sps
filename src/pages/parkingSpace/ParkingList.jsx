@@ -26,7 +26,9 @@ import ParkingSpaceRowComponent from "../../components/ParkingSpaceRowComponent"
 import useAuth from "./../../hook/useAuth";
 import QuickEditParkingSpaceComponent from "../../components/QuickEditParkingSpaceComponent";
 import { useDispatch, useSelector } from "react-redux";
-import {useGetBranchListQuery, useGetSitesListMutation} from "../../redux/feature/site/siteApiSlice";
+import {
+  useGetListBranchQuery,
+} from "../../redux/feature/site/siteApiSlice";
 import {
   setBranchFilterParking,
   setClearParkingFilter,
@@ -42,14 +44,14 @@ import SkeletonTableRowComponent from "../../components/SkeletonTableRowComponen
 function ParkingList() {
   const navigate = useNavigate();
   const { t } = useTranslate();
-  const { isManager } = useAuth();
-  const {data: branchData, isSuccess: isSuccessGetBranchData, isLoading: isLoadingGetBranchData} = useGetBranchListQuery("branchNameList");
+  const dispatch = useDispatch();
+  const { isAdmin } = useAuth();
   const branchFilter = useSelector((state) => state.parking.branchFilter);
   const searchKeywords = useSelector((state) => state.parking.searchParkingSpace);
-  const dispatch = useDispatch();
   const pageNo = useSelector((state) => state.parking.pageNo);
   const pageSize = useSelector((state) => state.parking.pageSize);
   const [debounceInputSearch] = useDebounce(searchKeywords, 1000);
+  const {data: branchData, isSuccess: isSuccessGetBranchData, isLoading: isLoadingGetBranchData} = useGetListBranchQuery("branchNameList");
 
   const {
     data: getParkingSpacesData,
@@ -84,7 +86,7 @@ function ParkingList() {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate(`${isAdmin ? "/admin" : "/dash"}`)}
       key={1}
     >
       {t("dashboard")}
@@ -215,26 +217,26 @@ function ParkingList() {
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
           title={t("list")}
-          {...(isManager && { btnTitle: t("newParkingSpace") })}
-          {...(isManager && { onClick: () => navigate("new") })}
+          {...(isAdmin && { btnTitle: t("newParkingSpace") })}
+          {...(isAdmin && { onClick: () => navigate("new") })}
         />
 
         <Card sx={{ ...cardStyle }}>
           <FilterBarComponent
             showTabs={false}
-            branchFetched={branchData}
+            branchFetched={isAdmin ? branchData : undefined}
             branchFilter={branchFilter}
-            searchQuery={searchKeywords}
             handleBranchChange={handleBranchChange}
+            searchQuery={searchKeywords}
             handleSearchChange={handleSearchChange}
           />
 
           <FilterChipsComponent
-            branchFilter={branchFilter}
             branchFetched={branchData}
+            branchFilter={branchFilter}
+            handleBranchChange={handleBranchChange}
             searchQuery={searchKeywords}
             handleSearchChange={handleSearchChange}
-            handleBranchChange={handleBranchChange}
             clearFilter={() => dispatch(setClearParkingFilter())}
             clearSearch={() => dispatch(setSearchParkingSpace(""))}
             isFiltered={searchKeywords !== "" || branchFilter.length > 0}

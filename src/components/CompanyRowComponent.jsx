@@ -27,6 +27,7 @@ import {
   setIdCompanyToDelete,
   setIsQuickEditCompanyOpen
 } from "../redux/feature/company/companySlice.js";
+import useTranslate from "../hook/useTranslate.jsx";
 
 function stringToColor(string) {
   let hash = 0;
@@ -75,6 +76,7 @@ function stringAvatar(name) {
 }
 
 function CompanyRowComponent({companyId, company }) {
+  const { t } = useTranslate();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -84,22 +86,22 @@ function CompanyRowComponent({companyId, company }) {
       dispatch(setIsOpenConfirmDelete(true));
       dispatch(setIdCompanyToDelete(companyId));
     };
-    var handleEdit = () => navigate(`/dash/companies/${companyId}`);
-    var handleView = () => navigate(`/dash/companies/${companyId}/view`);
+    var handleEdit = () => navigate(`/admin/companies/${companyId}`);
+    var handleView = () => navigate(`/admin/companies/${companyId}/view`);
 
     var menuActions = [
       {
-        label: "Edit",
+        label: t('edit'),
         icon: <FaPen className="w-5 h-5" />,
         onClick: handleEdit,
       },
       {
-        label: "View",
+        label: t('view'),
         icon: <FaEye className="w-5 h-5" />,
         onClick: handleView,
       },
       {
-        label: "Delete",
+        label: t('delete'),
         icon: <FaTrashCan className="w-5 h-5" />,
         onClick: handleDelete,
         textColor: "red",
@@ -129,7 +131,7 @@ function CompanyRowComponent({companyId, company }) {
               <ListItemText
                 primary={
                   (
-                    <Link className="hover:underline" to={`/dash/companies/${companyId}/view`}>
+                    <Link className="hover:underline" to={`/admin/companies/${companyId}/view`}>
                       {company?.companyName}
                     </Link>
                   ) || "N/A"

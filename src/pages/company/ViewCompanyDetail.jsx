@@ -13,7 +13,7 @@ function ViewCompanyDetail({company}) {
             elevation={0}
             component="button"
             className="text-black hover:underline"
-            onClick={() => navigate("/dash")}
+            onClick={() => navigate("/admin")}
             key={1}
         >
             {t("dashboard")}
@@ -30,7 +30,7 @@ function ViewCompanyDetail({company}) {
             <MainHeaderComponent
                 breadcrumbs={breadcrumbs}
                 title={company.companyName || "N/A"}
-                handleBackClick={() => navigate("/dash/companies")}
+                handleBackClick={() => navigate("/admin/companies")}
             />
             <Card sx={{...cardStyle, p: "16px"}}>
                 <Typography variant="h6" sx={{pb: 1}}>{t('companyInfo')}</Typography>

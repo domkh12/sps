@@ -92,7 +92,7 @@ function BranchList() {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate("/admin")}
       key={1}
     >
       {t("dashboard")}
@@ -249,7 +249,7 @@ function BranchList() {
           breadcrumbs={breadcrumbs}
           title={t("list")}
           btnTitle={t("newBranch")}
-          onClick={() => navigate("/dash/branches/new")}
+          onClick={() => navigate("/admin/branches/new")}
         />
 
         <div>

@@ -1,5 +1,4 @@
 import {
-  Backdrop,
   Box,
   Collapse,
   Drawer,
@@ -10,8 +9,8 @@ import {
   ListSubheader,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
-
+import { useState } from "react";
+import EmojiTransportationIcon from '@mui/icons-material/EmojiTransportation';
 import { IoIosArrowDown, IoIosArrowForward } from "react-icons/io";
 import { listItemButtonStyle } from "../assets/style";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -27,6 +26,7 @@ import useTranslate from "../hook/useTranslate";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsOpenSidebarDrawer } from "../redux/feature/actions/actionSlice";
 import ApartmentTwoToneIcon from "@mui/icons-material/ApartmentTwoTone";
+import CarRepairIcon from '@mui/icons-material/CarRepair';
 import useAuth from "../hook/useAuth";
 
 function SidebarDrawerComponent() {
@@ -37,12 +37,18 @@ function SidebarDrawerComponent() {
   const [isUserOpen, setIsUserOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [isBranchOpen, setIsBranchOpen] = useState(false);
+  const [isCompanyOpen, setIsCompanyOpen] = useState(false);
+  const [isParkingSlotOpen, setIsParkingSlotOpen] = useState(false);
   const location = useLocation();
   const open = useSelector((state) => state.action.isOpenSidebarDrawer);
+  const isCompanyListPage = location.pathname === "/dash/companies";
+  const isCompanyCreatePage = location.pathname === "/dash/companies/new";
   const isVehiclesListPage = location.pathname === "/dash/vehicles";
   const isVehiclesCreatePage = location.pathname === "/dash/vehicles/new";
-  const isParkingListPage = location.pathname === "/dash/parkings";
-  const isParkingCreatePage = location.pathname === "/dash/parkings/new";
+  const isParkingListPage = location.pathname === "/dash/parking-spaces";
+  const isParkingCreatePage = location.pathname === "/dash/parking-spaces/new";
+  const isParkingSlotListPage = location.pathname === "/dash/parking-slots";
+    const isParkingSlotCreatePage = location.pathname === "/dash/parking-slots/new";
   const isUserListPage = location.pathname === "/dash/users";
   const isUserCreatePage = location.pathname === "/dash/users/new";
   const isReportListPage = location.pathname === "/dash/reports";
@@ -247,6 +253,131 @@ function SidebarDrawerComponent() {
                 }
               >
                 <Collapse in={isManagementOpen} timeout="auto" unmountOnExit>
+
+                  {/* Company Menu*/}
+
+                  {isManager && (
+                      <>
+                        <>
+                          <ListItemButton
+                              sx={{
+                                borderRadius: "10px",
+                                color: "#424242",
+                                ...((isCompanyListPage || isCompanyCreatePage) &&
+                                    listItemButtonStyle),
+                              }}
+                              selected={isCompanyOpen ? isCompanyOpen : isCompanyListPage || isCompanyCreatePage}
+                              onClick={() => setIsCompanyOpen(!isCompanyOpen)}
+                              className="group relative"
+                          >
+                            <ListItemIcon
+                                sx={{
+                                  minWidth: 0,
+                                  mr: 1,
+                                }}
+                            >
+                              <ApartmentTwoToneIcon className="w-6 h-6" />
+                            </ListItemIcon>
+
+                            <ListItemText
+                                primary={
+                                  <Typography
+                                      component="span"
+                                      variant="body1"
+                                      sx={{ color: "#424242", display: "inline" }}
+                                  >
+                                    {t("company")}
+                                  </Typography>
+                                }
+                            />
+
+                            {isCompanyOpen ? (
+                                <IoIosArrowDown />
+                            ) : (
+                                <IoIosArrowForward />
+                            )}
+                          </ListItemButton>
+                        </>
+
+                        <Collapse in={isCompanyOpen}>
+                          <List
+                              component="div"
+                              disablePadding
+                              sx={{ pt: 1 }}
+                              dense={true}
+                          >
+                            <ul className="ml-6 pl-[12px]">
+                              <div className="absolute h-[60px] border-l-[2px] bg-primary left-6 top-0"></div>
+                              <li>
+                                <img
+                                    src="/images/nav_sublist.svg"
+                                    alt="sub_list_img"
+                                    className="absolute top-[6px] left-6 h-[30px] w-[14px]"
+                                />
+                                <ListItemButton
+                                    sx={{
+                                      borderRadius: "10px",
+                                      color: "#424242",
+                                      mb: "5px",
+                                    }}
+                                    onClick={handleNavigate("/dash/companies")}
+                                    selected={location.pathname === "/dash/companies"}
+                                >
+                                  <ListItemText
+                                      primary={
+                                        <Typography
+                                            component="span"
+                                            variant="body1"
+                                            sx={{
+                                              color: "#424242",
+                                              display: "inline",
+                                            }}
+                                        >
+                                          {t("list")}
+                                        </Typography>
+                                      }
+                                  />
+                                </ListItemButton>
+                              </li>
+                              <li>
+                                <img
+                                    src="/images/nav_sublist.svg"
+                                    alt="sub_list_img"
+                                    className="absolute top-[55px] left-6 h-[14px] w-[14px]"
+                                />
+                                <ListItemButton
+                                    sx={{
+                                      borderRadius: "10px",
+                                      color: "#424242",
+                                      mb: "5px",
+                                    }}
+                                    onClick={handleNavigate("/dash/companies/new")}
+                                    selected={
+                                        location.pathname === "/dash/companies/new"
+                                    }
+                                >
+                                  <ListItemText
+                                      primary={
+                                        <Typography
+                                            component="span"
+                                            variant="body1"
+                                            sx={{
+                                              color: "#424242",
+                                              display: "inline",
+                                            }}
+                                        >
+                                          {t("create")}
+                                        </Typography>
+                                      }
+                                  />
+                                </ListItemButton>
+                              </li>
+                            </ul>
+                          </List>
+                        </Collapse>
+                      </>
+                  )}
+
                   {/* Branch Menu */}
 
                   {isManager && (
@@ -256,6 +387,7 @@ function SidebarDrawerComponent() {
                           sx={{
                             borderRadius: "10px",
                             color: "#424242",
+                            mt: "5px",
                             ...((isBranchListPage || isBranchCreatePage) &&
                               listItemButtonStyle),
                           }}
@@ -273,7 +405,7 @@ function SidebarDrawerComponent() {
                               mr: 1,
                             }}
                           >
-                            <ApartmentTwoToneIcon className="w-6 h-6" />
+                            <EmojiTransportationIcon className="w-6 h-6" />
                           </ListItemIcon>
 
                           <ListItemText
@@ -383,6 +515,7 @@ function SidebarDrawerComponent() {
                       sx={{
                         borderRadius: "10px",
                         color: "#424242",
+                        mt: "5px",
                         ...((isParkingListPage || isParkingCreatePage) &&
                           listItemButtonStyle),
                       }}
@@ -444,8 +577,8 @@ function SidebarDrawerComponent() {
                               color: "#424242",
                               mb: "5px",
                             }}
-                            onClick={handleNavigate("/dash/parkings")}
-                            selected={location.pathname === "/dash/parkings"}
+                            onClick={handleNavigate("/dash/parking-spaces")}
+                            selected={location.pathname === "/dash/parking-spaces"}
                           >
                             <ListItemText
                               primary={
@@ -472,9 +605,9 @@ function SidebarDrawerComponent() {
                               color: "#424242",
                               mb: "5px",
                             }}
-                            onClick={handleNavigate("/dash/parkings/new")}
+                            onClick={handleNavigate("/dash/parking-spaces/new")}
                             selected={
-                              location.pathname === "/dash/parkings/new"
+                              location.pathname === "/dash/parking-spaces/new"
                             }
                           >
                             <ListItemText
@@ -493,6 +626,126 @@ function SidebarDrawerComponent() {
                       </ul>
                     </List>
                   </Collapse>
+
+                  {/* Parking Slot Menu*/}
+
+                  <>
+                    <ListItemButton
+                        sx={{
+                          borderRadius: "10px",
+                          color: "#424242",
+                          mt: "5px",
+                          ...((isParkingSlotListPage || isParkingSlotCreatePage) &&
+                              listItemButtonStyle),
+                        }}
+                        selected={
+                          isParkingSlotOpen
+                              ? isParkingSlotOpen
+                              : isParkingSlotListPage || isParkingSlotCreatePage
+                        }
+                        onClick={() => setIsParkingSlotOpen(!isParkingSlotOpen)}
+                        className="group relative"
+                    >
+                      <ListItemIcon
+                          sx={{
+                            minWidth: 0,
+                            mr: 1,
+                          }}
+                      >
+                        <CarRepairIcon className="w-6 h-6" />
+                      </ListItemIcon>
+
+                      <ListItemText
+                          primary={
+                            <Typography
+                                component="span"
+                                variant="body1"
+                                sx={{ color: "#424242", display: "inline" }}
+                            >
+                              {t("parkingSlot")}
+                            </Typography>
+                          }
+                      />
+
+                      {isParkingSlotOpen ? (
+                          <IoIosArrowDown />
+                      ) : (
+                          <IoIosArrowForward />
+                      )}
+                    </ListItemButton>
+                  </>
+
+                  <Collapse in={isParkingSlotOpen}>
+                    <List
+                        component="div"
+                        disablePadding
+                        sx={{ pt: 1 }}
+                        dense={true}
+                    >
+                      <ul className="ml-6 pl-[12px]">
+                        <div className="absolute h-[60px] border-l-[2px] bg-primary left-6 top-0"></div>
+                        <li>
+                          <img
+                              src="/images/nav_sublist.svg"
+                              alt="sub_list_img"
+                              className="absolute top-[6px] left-6 h-[30px] w-[14px]"
+                          />
+                          <ListItemButton
+                              sx={{
+                                borderRadius: "10px",
+                                color: "#424242",
+                                mb: "5px",
+                              }}
+                              onClick={handleNavigate("/dash/parking-slots")}
+                              selected={location.pathname === "/dash/parking-slots"}
+                          >
+                            <ListItemText
+                                primary={
+                                  <Typography
+                                      component="span"
+                                      variant="body1"
+                                      sx={{ color: "#424242", display: "inline" }}
+                                  >
+                                    {t("list")}
+                                  </Typography>
+                                }
+                            />
+                          </ListItemButton>
+                        </li>
+                        <li>
+                          <img
+                              src="/images/nav_sublist.svg"
+                              alt="sub_list_img"
+                              className="absolute top-[55px] left-6 h-[14px] w-[14px]"
+                          />
+                          <ListItemButton
+                              sx={{
+                                borderRadius: "10px",
+                                color: "#424242",
+                                mb: "5px",
+                              }}
+                              onClick={handleNavigate("/dash/parking-slots/new")}
+                              selected={
+                                  location.pathname === "/dash/parking-slots/new"
+                              }
+                          >
+                            <ListItemText
+                                primary={
+                                  <Typography
+                                      component="span"
+                                      variant="body1"
+                                      sx={{ color: "#424242", display: "inline" }}
+                                  >
+                                    {t("create")}
+                                  </Typography>
+                                }
+                            />
+                          </ListItemButton>
+                        </li>
+                      </ul>
+                    </List>
+                  </Collapse>
+
                   {/* Vehicle Menu */}
                   <>
                     <ListItemButton

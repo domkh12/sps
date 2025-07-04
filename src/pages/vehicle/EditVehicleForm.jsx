@@ -1,27 +1,21 @@
 import { Form, Formik } from "formik";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
 import {
-  useGetAllLicensePlateProvincesMutation,
-  useGetAllLicensePlateTypesMutation,
-  useGetAllVehicleTypesMutation,
+  useGetAllLicensePlateProvincesQuery,
+  useGetAllLicensePlateTypesQuery,
+  useGetAllVehicleTypesQuery,
   useUpdateVehicleMutation,
 } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
-import {
-  setCaptionSnackBar,
-  setErrorSnackbar,
-  setIsLoadingBar,
-  setIsOpenConfirmDelete,
-  setIsOpenSnackBar,
-} from "../../redux/feature/actions/actionSlice";
+import {setIsOpenConfirmDelete} from "../../redux/feature/actions/actionSlice";
 import SeoComponent from "../../components/SeoComponent";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
 import { Button, Card, Grid2, TextField, Typography } from "@mui/material";
 import useTranslate from "../../hook/useTranslate";
-import { useGetAllFullNameUsersMutation } from "../../redux/feature/users/userApiSlice";
+import {useGetAllFullNameUsersQuery} from "../../redux/feature/users/userApiSlice";
 import { cardStyle } from "../../assets/style";
 import SelectSingleComponent from "../../components/SelectSingleComponent";
 import ButtonComponent from "../../components/ButtonComponent";
@@ -30,27 +24,36 @@ import useAuth from "../../hook/useAuth";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import { setIdVehicleToDelete } from "../../redux/feature/vehicles/vehicleSlice";
 import ImageUploadComponent from "../../components/ImageUploadComponent";
+import {Slide, toast} from "react-toastify";
+import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
 
 function EditUserForm({ vehicle }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
   const [profileImageFile, setProfileImageFile] = useState(null);
+  const {isAdmin, sites} = useAuth();
   const { t } = useTranslate();
-  const licensePlateProvincesFetched = useSelector(
-    (state) => state.vehicles.licensePlateProvincesFetched
-  );
-  const vehicleTypeFetched = useSelector(
-    (state) => state.vehicles.vehicleTypeFetched
-  );
-  const licensePlateTypesFetched = useSelector(
-    (state) => state.vehicles.licensePlateTypesFetched
-  );
-  const allFullNameUsersFetched = useSelector(
-    (state) => state.users.allFullNameUsersFetched
-  );
+  const {data:companyData, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList", {skip: !isAdmin});
 
-  const { isAdmin, isManager } = useAuth();
+  const {data: licensePlateProvincesFetched,
+    isSuccess:isSuccessGetAllLicensePlateProvinces,
+    isLoading:isLoadingGetAllLicensePlateProvinces,
+  } = useGetAllLicensePlateProvincesQuery("licensePlateProvinceList")
+
+  const {data:vehicleTypeFetched,
+    isSuccess:isSuccessGetAllVehicleType,
+    isLoading:isLoadingGetAllVehicleType,
+  } = useGetAllVehicleTypesQuery("vehicleTypeList");
+
+  const {data:licensePlateTypesFetched,
+    isSuccess: isSuccessGetAllLicensePlateTypes,
+    isLoading: isLoadingGetAllLicensePlateTypes,
+  } = useGetAllLicensePlateTypesQuery("licensePlateTypeList");
+
+  const {data: allFullNameUsersFetched,
+    isSuccess: isSuccessGetAllFullNameUsers,
+    isLoading: isLoadingGetAllFullNameUsers,
+  } = useGetAllFullNameUsersQuery("fullNameUsersList");
 
   const [
     updateVehicle,
@@ -62,55 +65,42 @@ function EditUserForm({ vehicle }) {
     },
   ] = useUpdateVehicleMutation();
 
-  const [
-    getAllVehicleTypes,
-    {
-      isSuccess: isSuccessGetAllVehicleType,
-      isLoading: isLoadingGetAllVehicleType,
-      isError: isErrorGetAllVehicleType,
-      error: errorGetAllVehicleType,
-    },
-  ] = useGetAllVehicleTypesMutation();
-
-  const [
-    getAllFullNameUsers,
-    {
-      isSuccess: isSuccessGetAllFullNameUsers,
-      isLoading: isLoadingGetAllFullNameUsers,
-      isError: isErrorGetAllFullNameUsers,
-      error: errorGetAllFullNameUsers,
-    },
-  ] = useGetAllFullNameUsersMutation();
-
-  const [
-    getAllLicensePlateProvinces,
-    {
-      isSuccess: isSuccessGetAllLicensePlateProvinces,
-      isLoading: isLoadingGetAllLicensePlateProvinces,
-      isError: isErrorGetAllLicensePlateProvinces,
-      error: errorGetAllLicensePlateProvinces,
-    },
-  ] = useGetAllLicensePlateProvincesMutation();
-
-  const [
-    getAllLicensePlateTypes,
-    {
-      isSuccess: isSuccessGetAllLicensePlateTypes,
-      isLoading: isLoadingGetAllLicensePlateTypes,
-      isError: isErrorGetAllLicensePlateTypes,
-      error: errorGetAllLicensePlateTypes,
-    },
-  ] = useGetAllLicensePlateTypesMutation();
-
   const [uploadImage] = useUploadImageMutation();
 
   const validationSchema = Yup.object().shape({
-    // plateNumber: Yup.string()
-    //   .min(2, "Plate Number must be at least 2 characters")
-    //   .max(20, "Plate Number cannot exceed 20 characters")
-    //   .required("License Plate Number is required"),
-    // type: Yup.string().required("Vehicle Type is required"),
-    // owner: Yup.string().required("Owner is required"),
+    plateNumber: Yup.string()
+        .matches(/^[A-Za-z0-9-]+$/, t("onlyAlphanumericAndDash"))
+        .min(1, t("plateNumberMin"))
+        .max(20, t("plateNumberMax"))
+        .required(t("plateNumberRequired")),
+
+    make: Yup.string()
+        .max(50, t("vehicleMakeTooLong"))
+        .required(t("vehicleMakeRequired")),
+
+    model: Yup.string()
+        .max(50, t("vehicleModelTooLong"))
+        .required(t("vehicleModelRequired")),
+
+    color: Yup.string()
+        .required(t("colorRequired")),
+
+    vehicleTypeId: Yup.string()
+        .required(t("vehicleTypeRequired")),
+
+    userId: Yup.string()
+        .required(t("driverRequired")),
+
+    lppId: Yup.string()
+        .required(t("provinceRequired")),
+
+    licensePlateTypeId: Yup.string()
+        .required(t("licensePlateTypeRequired")),
+
+    ...(isAdmin ? {
+      branchUuid: Yup.string()
+          .required(t("branchRequired")),
+    }: {})
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -134,6 +124,7 @@ function EditUserForm({ vehicle }) {
         image: profileImageUri,
         licensePlateTypeId: values.licensePlateTypeId,
         licensePlateProvinceId: values.lppId,
+        branchUuid: isAdmin ? values.branchUuid : sites[0]
       });
     } catch (error) {
       console.log(error);
@@ -144,53 +135,32 @@ function EditUserForm({ vehicle }) {
 
   useEffect(() => {
     if (isSuccessUpdateVehicle) {
-      navigate("/dash/vehicles");
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setCaptionSnackBar(t("createSuccess")));
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
+      navigate(`/${isAdmin ? "admin" : "dash"}/vehicles`);
+      toast.success(t("createSuccess"), {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
   }, [isSuccessUpdateVehicle]);
 
   useEffect(() => {
     if (isErrorUpdateVehicle) {
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setErrorSnackbar(true));
-      dispatch(
-        setCaptionSnackBar(`${errorUpdateVehicle?.data?.error?.description}`)
-      );
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
-
-      setTimeout(() => {
-        dispatch(setErrorSnackbar(false));
-      }, 3500);
+      toast.error(`${errorUpdateVehicle?.data?.error?.description}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
     }
   }, [isErrorUpdateVehicle]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const promises = [];
-        if (isAdmin || isManager) {
-          promises.push(getAllLicensePlateProvinces());
-          promises.push(getAllVehicleTypes());
-          promises.push(getAllLicensePlateTypes());
-          promises.push(getAllFullNameUsers());
-        }
-
-        await Promise.all(promises);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   const handleDelete = () => {
       dispatch(setIsOpenConfirmDelete(true));
@@ -200,7 +170,7 @@ function EditUserForm({ vehicle }) {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate(`/${isAdmin ? "admin" : "dash"}`)}
       key={1}
     >
       {t("dashboard")}
@@ -215,19 +185,20 @@ function EditUserForm({ vehicle }) {
 
   let content;
 
-  if (isLoading) <LoadingFetchingDataComponent />;
+  if (isLoadingGetAllVehicleType || isLoadingGetAllLicensePlateTypes || isLoadingGetAllFullNameUsers || isLoadingGetAllLicensePlateProvinces) content = <LoadingFetchingDataComponent />;
 
-  if (!isLoading) {
+  if (isSuccessGetAllFullNameUsers && isSuccessGetAllVehicleType && isSuccessGetAllLicensePlateTypes && isSuccessGetAllLicensePlateProvinces) {
     content = (
       <div>
         <SeoComponent title={"Create a new user"} />
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
           title={t("createNewVehicle")}
-          handleBackClick={() => navigate("/dash/vehicles")}
+          handleBackClick={() => navigate(`/${isAdmin ? "admin" : "dash"}/vehicles`)}
         />
         <div>
           <Formik
+            enableReinitialize
             initialValues={{
               plateNumber: vehicle.numberPlate,
               color: vehicle.color,
@@ -238,6 +209,7 @@ function EditUserForm({ vehicle }) {
               lppId: vehicle?.licensePlateProvince?.uuid,
               licensePlateTypeId: vehicle?.licensePlateType?.uuid,
               image: vehicle?.image,
+              branchUuid: vehicle?.sites?.length > 0 ? vehicle?.sites[0]?.uuid : []
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
@@ -250,6 +222,11 @@ function EditUserForm({ vehicle }) {
               handleBlur,
               setFieldValue,
             }) => {
+
+              const handleBranchChange = (value) => {
+                setFieldValue("branchUuid", value);
+              };
+
               const handleColorChange = (value) => {
                 setFieldValue("color", value);
               };
@@ -270,7 +247,7 @@ function EditUserForm({ vehicle }) {
                 setFieldValue("licensePlateTypeId", value);
               };
 
-              const selectedProvince = licensePlateProvincesFetched?.data?.find(
+              const selectedProvince = licensePlateProvincesFetched?.find(
                 (lpp) => lpp?.uuid === values?.lppId
               );
 
@@ -379,7 +356,7 @@ function EditUserForm({ vehicle }) {
 
                           <SelectSingleComponent
                             label={`${t("province")}`}
-                            options={licensePlateProvincesFetched.data}
+                            options={licensePlateProvincesFetched}
                             onChange={handlelicensePlateProvincesChange}
                             fullWidth={true}
                             optionLabelKey="provinceNameEn"
@@ -388,7 +365,7 @@ function EditUserForm({ vehicle }) {
 
                           <SelectSingleComponent
                             label={t("licensePlateType")}
-                            options={licensePlateTypesFetched.data}
+                            options={licensePlateTypesFetched}
                             onChange={handleLicesePlateTypesChange}
                             fullWidth={true}
                             optionLabelKey="name"
@@ -397,7 +374,7 @@ function EditUserForm({ vehicle }) {
 
                           <SelectSingleComponent
                             label={t("vehicleType")}
-                            options={vehicleTypeFetched.data}
+                            options={vehicleTypeFetched}
                             onChange={handleVehicleTypeChange}
                             fullWidth={true}
                             optionLabelKey="name"
@@ -406,12 +383,29 @@ function EditUserForm({ vehicle }) {
 
                           <SelectSingleComponent
                             label={t("driver")}
-                            options={allFullNameUsersFetched.data}
+                            options={allFullNameUsersFetched}
                             onChange={handleDriverChange}
                             fullWidth={true}
                             optionLabelKey="fullName"
                             selectFistValue={values.userId}
                           />
+
+                          {
+                            isAdmin && (
+                                  <SelectSingleComponent
+                                      label={t("branch")}
+                                      options={companyData}
+                                      onChange={handleBranchChange}
+                                      fullWidth={true}
+                                      error={errors.branchId}
+                                      touched={touched.branchId}
+                                      itemsLabelKey="sites"
+                                      optionLabelKey="siteName"
+                                      groupLabelKey="companyName"
+                                      selectFistValue={values.branchUuid}
+                                  />
+                              )
+                          }
 
                           <TextField
                             label={t("vehicleMake")}
@@ -474,8 +468,7 @@ function EditUserForm({ vehicle }) {
                           <ButtonComponent
                             btnTitle={t("saveChanges")}
                             type={"submit"}
-                            loadingCaption={t("creating")}
-                            // isLoading={isLoading}
+                            isLoading={isLoadingUpdateVehicle}
                           />
                         </div>
                       </Card>

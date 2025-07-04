@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MainHeaderComponent from "./../../components/MainHeaderComponent";
 import useTranslate from "./../../hook/useTranslate";
@@ -15,18 +15,8 @@ import {
   Typography,
 } from "@mui/material";
 import { cardStyle } from "../../assets/style";
-import EditButtonComponent from "../../components/EditButtonComponent";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setIsOpenQuickEdit,
-  setUserForQuickEdit,
-} from "../../redux/feature/users/userSlice";
-import {
-  setIsOpenQuickEditVehicle,
-  setVehicleForQuickEdit,
-} from "../../redux/feature/vehicles/vehicleSlice";
-import QuickEditVehicleComponent from "../../components/QuickEditVehicleComponent";
-import QuickEditUserComponent from "./../../components/QuickEditUserComponent";
+import useAuth from "../../hook/useAuth.jsx";
 
 function stringToColor(string) {
   let hash = 0;
@@ -76,16 +66,10 @@ function stringAvatar(name) {
 
 function ViewVehicleDetail({ vehicle }) {
   const userActive = useSelector((state) => state.users.isOnlineUser);
-  const isOpenQuickEdit = useSelector(
-    (state) => state.vehicles.isOpenQuickEditVehicle
-  );
-  const isOpenQuickEditUser = useSelector(
-    (state) => state.users.isOpenQuickEdit
-  );
   const navigate = useNavigate();
   const { t } = useTranslate();
-  const dispatch = useDispatch();
-  const [loadedUser, setLoadedUser] = useState(vehicle.user || {});
+  const [loadedUser, setLoadedUser] = useState(vehicle?.user || {});
+  const {isAdmin, isManager} = useAuth();
 
   useEffect(() => {
     if (userActive?.uuid === vehicle?.user?.uuid) {
@@ -126,7 +110,7 @@ function ViewVehicleDetail({ vehicle }) {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+        onClick={() => navigate(`${isAdmin ? "/admin" : "/dash"}`)}
       key={1}
     >
       {t("dashboard")}
@@ -135,7 +119,7 @@ function ViewVehicleDetail({ vehicle }) {
       {t("vehicle")}
     </Typography>,
     <Typography color="inherit" key={3}>
-      {vehicle.numberPlate}
+      {vehicle?.numberPlate}
     </Typography>,
   ];
   const getChipStyles = () => {
@@ -160,13 +144,13 @@ function ViewVehicleDetail({ vehicle }) {
       fontWeight: "500",
     };
   };
-  console.log("vehicle", vehicle);
+
   return (
     <div>
       <MainHeaderComponent
         breadcrumbs={breadcrumbs}
-        title={vehicle.numberPlate}
-        handleBackClick={() => navigate("/dash/vehicles")}
+        title={vehicle?.numberPlate}
+        handleBackClick={() => navigate(`/${isAdmin ? "admin" : "dash"}/vehicles`)}
       />
       <Grid2 container spacing={2}>
         <Grid2 size={{ xs: 12, md: 5 }}>
@@ -174,17 +158,17 @@ function ViewVehicleDetail({ vehicle }) {
             <div className="w-auto rounded-[12px] m-[16px] border-blue-600 border-[3px] px-[24px] py-2 flex items-center justify-between">
               <div className="flex flex-col">
                 <Typography variant="h6" className="text-blue-600">
-                  {vehicle.licensePlateProvince.provinceNameEn}
+                  {vehicle?.licensePlateProvince?.provinceNameEn}
                 </Typography>
                 <Typography variant="h6" className="text-red-600">
-                  {vehicle.licensePlateProvince.provinceNameKh}
+                  {vehicle?.licensePlateProvince?.provinceNameKh}
                 </Typography>
               </div>
               <Typography
                 variant="h4"
                 className="underline text-blue-600 uppercase"
               >
-                {vehicle.numberPlate}
+                {vehicle?.numberPlate || "N/A"}
               </Typography>
             </div>
           </Card>
@@ -192,13 +176,6 @@ function ViewVehicleDetail({ vehicle }) {
           <Card sx={{ ...cardStyle, p: "16px" }}>
             <div className="flex justify-between items-center mb-5">
               <Typography variant="h6">User info</Typography>
-
-              <EditButtonComponent
-                handleQuickEdit={() => {
-                  dispatch(setIsOpenQuickEdit(true));
-                  dispatch(setUserForQuickEdit(vehicle.user));
-                }}
-              />
             </div>
             <div className="flex justify-between">
               <List sx={{ padding: "0" }}>
@@ -210,13 +187,13 @@ function ViewVehicleDetail({ vehicle }) {
                     isonline={String(loadedUser?.isOnline)}
                   >
                     <Avatar
-                      alt={loadedUser.fullName}
-                      src={loadedUser.profileImage}
-                      {...stringAvatar(loadedUser.fullName)}
+                      alt={loadedUser?.fullName}
+                      src={loadedUser?.profileImage}
+                      {...stringAvatar(loadedUser?.fullName)}
                     />
                   </StyledBadge>
                   <ListItemText
-                    primary={<>{loadedUser.fullName}</> || "N/A"}
+                    primary={<>{loadedUser?.fullName}</> || "N/A"}
                     secondary={
                       <Typography
                         component="span"
@@ -233,30 +210,30 @@ function ViewVehicleDetail({ vehicle }) {
               <Chip
                 sx={getChipStyles()}
                 size="small"
-                label={loadedUser.status}
+                label={loadedUser?.status}
               />
             </div>
 
             <div className="flex flex-col gap-3 mt-5">
               <Typography variant="body1">
-                <span className="text-gray-cus">Gender</span>
-                {`${"\u00a0"}:${"\u00a0"}${vehicle.user.gender.gender}`}
+                <span className="text-gray-cus">{t('gender')}</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.user?.gender?.gender || "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">{`Date${"\u00a0"}of${"\u00a0"}birth`}</span>
-                {`${"\u00a0"}:${"\u00a0"}${vehicle.user.dateOfBirth}`}
+                <span className="text-gray-cus">{t('dateOfBirth')}</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.user?.dateOfBirth || "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">{`Phone`}</span>
-                {`${"\u00a0"}:${"\u00a0"}${vehicle.user.phoneNumber}`}
+                <span className="text-gray-cus">{t('phoneNumber')}</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.user?.phoneNumber || "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">{`Role`}</span>
-                {`${"\u00a0"}:${"\u00a0"}${vehicle.user.roles.map((role) => role.name)}`}
+                <span className="text-gray-cus">{t('role')}</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.user?.roles?.length ? vehicle?.user?.roles?.map((role) => role?.name) : "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">{`Branch`}</span>
-                {`${"\u00a0"}:${"\u00a0"}${vehicle.user.sites.map((site) => site.siteName)}`}
+                <span className="text-gray-cus">{t('branch')}</span>
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.user?.sites?.length > 0 ? vehicle?.user?.sites?.map((site) => site?.siteName) : "N/A"}`}
               </Typography>
             </div>
           </Card>
@@ -265,26 +242,19 @@ function ViewVehicleDetail({ vehicle }) {
           <Card sx={{ ...cardStyle, p: "16px" }}>
             <div className="flex justify-between items-center mb-5">
               <Typography variant="h6">User info</Typography>
-
-              <EditButtonComponent
-                handleQuickEdit={() => {
-                  dispatch(setIsOpenQuickEditVehicle(true));
-                  dispatch(setVehicleForQuickEdit(vehicle));
-                }}
-              />
             </div>
             <div className="flex items-center gap-5">
               <div className="p-1 border-dashed border rounded-[12px]">
                 <div className="w-48 h-28 rounded-[12px] overflow-hidden">
                   <img
-                    src={vehicle.image || "/images/car-img-placeholder.jpg"}
+                    src={vehicle?.image || "/images/car-img-placeholder.jpg"}
                     alt="vehicleImage"
                     className="w-full h-full object-cover"
                   />
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <Typography variant="body1">{vehicle?.vehicleMake}</Typography>
+                <Typography variant="body1">{vehicle?.vehicleMake || "N/A"}</Typography>
                 <Typography
                   variant="body2"
                   sx={{ color: "gray", display: "inline" }}
@@ -296,19 +266,19 @@ function ViewVehicleDetail({ vehicle }) {
             <div className="flex flex-col gap-3 mt-5">
               <Typography variant="body1">
                 <span className="text-gray-cus">{t("vehicleType")}</span>
-                {`${"\u00a0"}:${"\u00a0"}${vehicle.vehicleType.name}`}
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.vehicleType?.name}`}
               </Typography>
               <div className="flex gap-2">
                 <Typography variant="body1">{`${t("color")}${"\u00a0"}:`}</Typography>
                 <div
                   className="w-5 h-5 rounded-full border-[2px]"
-                  style={{ backgroundColor: vehicle.color }}
+                  style={{ backgroundColor: vehicle?.color }}
                 ></div>
-                <Typography variant="body1">{vehicle.color}</Typography>
+                <Typography variant="body1">{vehicle?.color}</Typography>
               </div>
               <Typography variant="body1">
                 <span className="text-gray-cus">{t("licensePlateType")}</span>
-                {`${"\u00a0"}:${"\u00a0"}${vehicle.licensePlateType.name}`}
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.licensePlateType?.name}`}
               </Typography>
               <Typography variant="body1">
                 <span className="text-gray-cus">Total parking hours</span>
@@ -320,18 +290,16 @@ function ViewVehicleDetail({ vehicle }) {
               </Typography>
               <Typography variant="body1">
                 <span className="text-gray-cus">Last parking lot</span>
-                {`${"\u00a0"}:${"\u00a0"}${vehicle.lastParkingLot || "N/A"}`}
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.lastParkingLot || "N/A"}`}
               </Typography>
               <Typography variant="body1">
                 <span className="text-gray-cus">Last parking-time</span>
-                {`${"\u00a0"}:${"\u00a0"}${vehicle.lastParkingTime || "N/A"}`}
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.lastParkingTime || "N/A"}`}
               </Typography>
             </div>
           </Card>
         </Grid2>
       </Grid2>
-      {isOpenQuickEditUser && <QuickEditUserComponent />}
-      {isOpenQuickEdit && <QuickEditVehicleComponent />}
     </div>
   );
 }

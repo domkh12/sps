@@ -74,8 +74,15 @@ export const apiSlice = createApi({
     "BranchName",
     "Slot",
     "BranchList",
-    "SlotByUuid"
-    // "slot"
+    "SlotByUuid",
+    "VehicleType",
+    "LicensePlateProvinces",
+    "LicensePlateTypes",
+    "FullNameUser",
+    "Gender",
+    "Role",
+    "SignupMethod",
+    "Profile"
   ],
   endpoints: (builder) => ({}),
 });

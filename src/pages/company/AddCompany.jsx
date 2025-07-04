@@ -40,7 +40,7 @@ function AddCompany() {
 
   useEffect(() => {
     if (isSuccessCreateCompany) {
-      navigate("/dash/companies")
+      navigate("/admin/companies")
       toast.success(t("createSuccess"), {
         position: "top-right",
         autoClose: 2000,
@@ -79,7 +79,7 @@ function AddCompany() {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate("/admin")}
       key={1}
     >
       {t("dashboard")}
@@ -132,7 +132,7 @@ function AddCompany() {
           <MainHeaderComponent
             breadcrumbs={breadcrumbs}
             title={t("newcompany")}
-            handleBackClick={() => navigate("/dash/companies")}
+            handleBackClick={() => navigate("/admin/companies")}
           />
           <Formik
             initialValues={{

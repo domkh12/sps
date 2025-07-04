@@ -1,10 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, IconButton } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import NotificationsNoneTwoToneIcon from "@mui/icons-material/NotificationsNoneTwoTone";
 import SearchTwoToneIcon from "@mui/icons-material/SearchTwoTone";
 import ToolTipButtonComponent from "../../components/ToolTipButtonComponent";
-import SidebarDrawerComponent from "../../components/SidebarDrawerComponent";
 import { IoSearch } from "react-icons/io5";
 import SettingComponent from "../../components/SettingComponent";
 import TranslateComponent from "../../components/TranslateComponent";
@@ -12,25 +11,26 @@ import ProfileDrawerComponent from "../../components/ProfileDrawerComponent";
 import SelectSiteComponent from "../../components/SelectSiteComponent";
 import useAuth from "../../hook/useAuth";
 import { selectCurrentToken } from "../../redux/feature/auth/authSlice";
-import { useVerifySitesMutation } from "../../redux/feature/auth/authApiSlice";
+import {useGetUserProfileQuery, useVerifySitesMutation} from "../../redux/feature/auth/authApiSlice";
 import { setChangedSite } from "../../redux/feature/site/siteSlice";
 import {
   setIsOpenDrawerProfiles,
   setIsOpenSidebarDrawer,
 } from "../../redux/feature/actions/actionSlice";
 import { CgMenuLeftAlt } from "react-icons/cg";
+import {useGetListBranchQuery} from "../../redux/feature/site/siteApiSlice.js";
 
 function NavBarDashboard() {
   const drawerOpen = useSelector((state) => state.action.isOpenDrawerProfiles);
   const sidebarDrawerOpen = useSelector(
     (state) => state.action.isOpenSidebarDrawer
   );
-  const user = useSelector((state) => state.auth.userProfile);
-  const sites = useSelector((state) => state.sites.sitesForChange);
   const { isAdmin, isManager, sites: currentSite } = useAuth();
   const dispatch = useDispatch();
   const token = useSelector(selectCurrentToken);
-
+  const {data: userProfile, isSuccess: isSuccessGetUserProfile, isLoading: isLoadingGetUserProfile} = useGetUserProfileQuery("userProfile");
+  const {data: sitesData, isSuccess: isSuccessGetSites, isLoading: isLoadingGetSites} = useGetListBranchQuery("siteList");
+  const { sites } = useAuth();
   const [
     verifySites,
     {
@@ -66,14 +66,12 @@ function NavBarDashboard() {
               onClick={() => dispatch(setIsOpenSidebarDrawer(true))}
             />
           </div>
-          {isAdmin && !isManager && (
-            <SelectSiteComponent
-              options={sites?.response}
-              optionLabelKey="siteName"
-              onChange={handleChange}
-              selectFistValue={currentSite}
-            />
-          )}
+          <SelectSiteComponent
+            options={sitesData}
+            optionLabelKey="siteName"
+            onChange={handleChange}
+            selectFistValue={sites[0]}
+          />
         </div>
 
         <div className="flex lg:gap-2 items-center flex-nowrap">
@@ -105,7 +103,7 @@ function NavBarDashboard() {
               className="w-auto h-auto  flex justify-center items-center"
               onClick={() => dispatch(setIsOpenDrawerProfiles(!drawerOpen))}
             >
-              <Avatar alt="Profile" src={user.profileImage} />
+              <Avatar alt="Profile" src={userProfile?.profileImage} />
             </IconButton>
           </div>
         </div>

@@ -22,6 +22,7 @@ import {
 } from "../redux/feature/site/siteSlice";
 import useDateFormatter from "../hook/useDateFormatter";
 import { setIsOpenConfirmDelete } from "../redux/feature/actions/actionSlice";
+import useTranslate from "../hook/useTranslate.jsx";
 
 function stringToColor(string) {
   let hash = 0;
@@ -72,6 +73,7 @@ function stringAvatar(name) {
 function BranchRowComponent({ siteId, site }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const {t} = useTranslate();
 
   if (site) {
     const dateObj = new Date(site.createdAt);
@@ -88,22 +90,22 @@ function BranchRowComponent({ siteId, site }) {
       dispatch(setIsOpenConfirmDelete(true));
       dispatch(setIdSiteToDelete(site.uuid));
     };
-    var handleEdit = () => navigate(`/dash/branches/${siteId}`);
-    var handleView = () => navigate(`/dash/branches/${siteId}/view`);
+    var handleEdit = () => navigate(`/admin/branches/${siteId}`);
+    var handleView = () => navigate(`/admin/branches/${siteId}/view`);
 
     var menuActions = [
       {
-        label: "Edit",
+        label: t('edit'),
         icon: <FaPen className="w-5 h-5" />,
         onClick: handleEdit,
       },
       {
-        label: "View",
+        label: t('view'),
         icon: <FaEye className="w-5 h-5" />,
         onClick: handleView,
       },
       {
-        label: "Delete",
+        label: t('delete'),
         icon: <FaTrashCan className="w-5 h-5" />,
         onClick: handleDelete,
         textColor: "red",
@@ -133,7 +135,7 @@ function BranchRowComponent({ siteId, site }) {
               <ListItemText
                 primary={
                   (
-                    <Link className="hover:underline" to={`/dash/branches/${siteId}/view`}>
+                    <Link className="hover:underline" to={`/admin/branches/${siteId}/view`}>
                       {site?.siteName || "N/A"}
                     </Link>
                   ) || "N/A"

@@ -11,14 +11,30 @@ const slotSlice= createSlice ({
         slot:{},
         idSlotToDelete:"",
         setIsOpenQuickEditSlot:false,
+        parkingSlotToEdit:{},
         slotToEdit:{},
         searchSlotToEdit:{},
         slotFilter:[],
         localSlotData:[],
         slotUpdateLocalData: [],
         isOpenAddNewSlot:false,
+        idParkingSlotToDelete:"",
+        searchParkingSlot: "",
+        branchFilter: [],
     },
     reducers :{
+        setParkingSlotToEdit:(state,action)=>{
+            state.parkingSlotToEdit = action.payload;
+        },
+        setBranchFilterForSlot:(state,action)=>{
+            state.branchFilter = action.payload;
+        },
+        setSearchParkingSlot:(state,action)=>{
+            state.searchParkingSlot = action.payload;
+        },
+        setIdParkingSlotToDelete:(state,action)=>{
+            state.idParkingSlotToDelete = action.payload;
+        },
         appendSlotLocalData(state, action) {
             state.slotUpdateLocalData = action.payload
         },
@@ -69,6 +85,10 @@ const slotSlice= createSlice ({
     }
 })  
 export const{
+    setParkingSlotToEdit,
+    setBranchFilterForSlot,
+    setSearchParkingSlot,
+    setIdParkingSlotToDelete,
     appendSlotLocalData,
     clearLocalSlotData,
     setNewLocalSlotData,

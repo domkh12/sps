@@ -7,7 +7,6 @@ import {
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
-import { useAddNewParkingMutation } from "../../redux/feature/parking/parkingApiSlice";
 import SeoComponent from "./../../components/SeoComponent";
 import MainHeaderComponent from "../../components/MainHeaderComponent";
 import useTranslate from "../../hook/useTranslate";
@@ -15,11 +14,6 @@ import { useNavigate } from "react-router-dom";
 import { cardStyle } from "../../assets/style";
 import ImageUploadComponent from "../../components/ImageUploadComponent";
 import ButtonComponent from "../../components/ButtonComponent";
-import {
-  setCaptionSnackBar,
-  setErrorSnackbar,
-  setIsOpenSnackBar,
-} from "../../redux/feature/actions/actionSlice";
 import { useDispatch } from "react-redux";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
@@ -32,7 +26,6 @@ export default function AddNewSlot() {
   const [profileImageFile, setProfileImageFile] = useState(null);
   const { t } = useTranslate();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { data: branchList, isSuccess: isSuccessGetBranchList, isLoading: isLoadingGetBranchList } = useGetListBranchQuery("branchList");
 
   const [
@@ -54,7 +47,7 @@ export default function AddNewSlot() {
 
   useEffect(() => {
     if (isSuccessAddNewParkingSlot) {
-      navigate("/dash/parking-slots");
+      navigate("/admin/parking-slots");
       toast.success(t("createSuccess"), {
         position: "top-right",
         autoClose: 2000,
@@ -106,7 +99,7 @@ export default function AddNewSlot() {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate("/admin")}
       key={1}
     >
       {t("dashboard")}
@@ -131,7 +124,7 @@ export default function AddNewSlot() {
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
           title={t("addSlot")}
-          handleBackClick={() => navigate("/dash/parking-slots")}
+          handleBackClick={() => navigate("/admin/parking-slots")}
         />
         <div>
           <Formik

@@ -95,7 +95,7 @@ export const companiesApiSlice = apiSlice.injectEndpoints({
 
     getAllCompanies: builder.query({
       query: () => ({
-        url: "/companies/names",
+        url: "/companies/list",
         method: "GET",
       }),
       providesTags: (result, error, arg) => {

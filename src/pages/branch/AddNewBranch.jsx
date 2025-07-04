@@ -44,7 +44,7 @@ function AddNewBranch() {
 
   useEffect(() => {
     if (isSuccessCreateNewSite) {
-      navigate("/dash/branches");
+      navigate("/admin/branches");
       toast.success(t("createSuccess"), {
         position: "top-right",
         autoClose: 2000,
@@ -82,7 +82,7 @@ function AddNewBranch() {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate("/admin")}
       key={1}
     >
       {t("dashboard")}
@@ -134,7 +134,7 @@ function AddNewBranch() {
           <MainHeaderComponent
             breadcrumbs={breadcrumbs}
             title={t("createNewBranch")}
-            handleBackClick={() => navigate("/dash/branches")}
+            handleBackClick={() => navigate("/admin/branches")}
           />
           <Formik
             initialValues={{

@@ -10,8 +10,12 @@ import {
 } from "@mui/material";
 import DataNotFound from "./DataNotFound";
 import UserRowComponent from "./UserRowComponent";
+import SkeletonTableRowComponent from "./SkeletonTableRowComponent.jsx";
+import useTranslate from "../hook/useTranslate.jsx";
 
 function UserTableComponent({
+  idsDataFilter,
+  isFetchingGetUserFilter,
   columns,
   users,
   searchData,
@@ -23,14 +27,15 @@ function UserTableComponent({
   pageSize,
   pageNo,
   totalElements,
-  pageSizeSearch,
-  pageNoSearch,
+  pageSizeFilter,
+  pageNoFilter,
   totalElementsSearch,
   handleChangePage,
   handleChangeRowsPerPage,
   entities,
   searchEntities,
 }) {
+  const {t} = useTranslate();
   const tableContent =
     searchQuery !== "" ||
     roleFilter.length > 0 ||
@@ -118,17 +123,22 @@ function UserTableComponent({
               ))}
             </TableRow>
           </TableHead>
-          <TableBody sx={{ border: "none" }}>{tableContent}</TableBody>
+          <TableBody sx={{ border: "none" }}>
+            {isFetchingGetUserFilter && idsDataFilter?.length === 0 ? (Array.from({length: pageSize}).map((_, index) => (
+                <SkeletonTableRowComponent key={index} cellCount={4}/>
+            ))) : (<>{tableContent}</>)}
+          </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={displayTotalElements || 0}
-        rowsPerPage={pageSize || pageSizeSearch}
-        page={pageNoSearch || pageNo}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={displayTotalElements || 0}
+          rowsPerPage={pageSizeFilter != null && pageSizeFilter !== 0 ? pageSizeFilter : pageSize}
+          labelRowsPerPage={t('rowPerPage')}
+          page={pageNoFilter != null && pageNoFilter !== 0 ? pageNoFilter : pageNo}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </>
   );

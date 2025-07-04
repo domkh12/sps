@@ -28,7 +28,7 @@ function HistoryList() {
   const { t } = useTranslate();
   const [isLoading, setIsLoading] = useState(true);
   const parkingSpaceFetched = useSelector(state => state.parking.labels)
-  console.log("parkingSpaceFetched", parkingSpaceFetched);
+
   const {
     data: parkingDetailData,
     isSuccess: isSuccessGetParkingDetail,
@@ -113,8 +113,10 @@ function HistoryList() {
   
   if (isLoading) content = <LoadingFetchingDataComponent />;
 
-  if (!isLoading) {
+  if (isSuccessGetParkingDetail) {
+
     const { ids } = parkingDetailData;
+
 
     const tableContent = ids.length ? (
       ids.map((historyId) => (

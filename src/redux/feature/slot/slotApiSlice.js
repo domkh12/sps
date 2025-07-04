@@ -108,11 +108,11 @@ export const slotApiSlice = apiSlice.injectEndpoints({
       query: ({ uuid }) => ({
         url: `/parking-lots/${uuid}`,
         method: "DELETE",
-        body: { uuid },
       }),
-      invalidatesTags: (result, error, arg) => [
-        { type: "Slot", id: arg.uuid },
-      ],
+      invalidatesTags: (result, error, arg) =>
+          [
+            { type: "Slot", id: arg.uuid },
+          ],
     }),
 
     findAllLabels: builder.mutation({
