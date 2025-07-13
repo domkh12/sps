@@ -18,6 +18,20 @@ import {useDeleteCompanyMutation} from "../redux/feature/company/companyApiSlice
 import useTranslate from "../hook/useTranslate.jsx";
 import {useDeleteSlotMutation} from "../redux/feature/slot/slotApiSlice.js";
 import useAuth from "../hook/useAuth.jsx";
+import { useDeleteCompanyTypeMutation } from "../redux/feature/companyType/CompanyTypeApiSlice.js";
+import { setIsOpenQuickEditCompanyType, setUuidForQuickEditCompanyTypeForDelete } from "../redux/feature/companyType/companyTypeSlice.js";
+import {setIsOpenQuickEditCity, setUuidCityForDelete, setUuidForQuickEditCity} from "../redux/feature/city/citySlice.js";
+import {useDeleteCityMutation} from "../redux/feature/city/cityApiSlice.js";
+import { setIsOpenQuickEditBranchType, setUuidForDeleteBranchType, setUuidForQuickEditBranchType } from "../redux/feature/siteType/siteTypeSlice.js";
+import { useDeleteBranchTypeMutation } from "../redux/feature/siteType/siteTypeApiSlice.js";
+import { useDeleteLicensePlateProvinceMutation } from "../redux/feature/licensePlateProvince/licensePlateProvinceApiSlice.js";
+import { setIsOpenQuickEditLicensePlateProvince, setUuidLicensePlateProvinceForDelete } from "../redux/feature/licensePlateProvince/licensePlateProvinceSlice.js";
+import { useDeleteLicensePlateTypeMutation } from "../redux/feature/licensePlateType/licensePlateTypeApiSlice.js";
+import { setIsOpenQuickEditLicensePlateType, setUuidLicensePlateTypeForDelete } from "../redux/feature/licensePlateType/licensePlateTypeSlice.js";
+import { useDeleteVehicleTypeMutation } from "../redux/feature/vehicleType/vehicleTypeApiSlice.js";
+import { setIsOpenQuickEditVehicleType, setUuidVehicleTypeForDelete } from "../redux/feature/vehicleType/vehicleTypeSlice.js";
+import { useDeleteGenderMutation } from "../redux/feature/gender/genderApiSlice.js";
+import { setIsOpenQuickEditGender, setUuidGenderForDelete } from "../redux/feature/gender/genderSlice.js";
 
 function DeleteConfirmComponent() {
   const navigate = useNavigate();
@@ -31,6 +45,83 @@ function DeleteConfirmComponent() {
   const siteId = useSelector((state) => state.sites.isSiteToDelete);
   const companyId = useSelector((state) => state.companies.idCompanyToDelete);
   const slotId = useSelector((state) => state.slot.idParkingSlotToDelete);
+  const companyTypeId = useSelector((state) => state.companyType.uuidForQuickEditCompanyTypeForDelete);
+  const cityId = useSelector((state) => state.city.uuidCityForDelete);
+  const branchTypeId = useSelector((state) => state.siteType.uuidForDeleteBranchType);
+  const licensePlateProvinceId = useSelector((state) => state.licensePlateProvince.uuidLicensePlateProvinceForDelete);
+  const licensePlateTypeId = useSelector((state) => state.licensePlateType.uuidLicensePlateTypeForDelete); 
+  const vehicleTypeId = useSelector((state) => state.vehicleType.uuidVehicleTypeForDelete);
+  const genderId = useSelector((state) => state.gender.uuidGenderForDelete);
+
+  const [
+    deleteGender,
+    {
+      isSuccess: isSuccessDeleteGender,
+      isLoading: isLoadingDeleteGender,
+      isError: isErrorDeleteGender,
+      error: errorDeleteGender,
+    },
+  ] = useDeleteGenderMutation();
+
+  const [
+    deleteVehicleType,
+    {
+      isSuccess: isSuccessDeleteVehicleType,
+      isLoading: isLoadingDeleteVehicleType,
+      isError: isErrorDeleteVehicleType,
+      error: errorDeleteVehicleType,
+    },
+  ] = useDeleteVehicleTypeMutation();
+
+  const [
+    deleteLicensePlateType,
+    {
+      isSuccess: isSuccessDeleteLicensePlateType,
+      isLoading: isLoadingDeleteLicensePlateType,
+      isError: isErrorDeleteLicensePlateType,
+      error: errorDeleteLicensePlateType,
+    },
+  ] = useDeleteLicensePlateTypeMutation();
+
+  const [
+    deleteLicensePlateProvince,
+    {
+      isSuccess: isSuccessDeleteLicensePlateProvince,
+      isLoading: isLoadingDeleteLicensePlateProvince,
+      isError: isErrorDeleteLicensePlateProvince,
+      error: errorDeleteLicensePlateProvince,
+    },
+  ] = useDeleteLicensePlateProvinceMutation();
+
+  const [
+    deleteBranchType,
+    {
+      isSuccess: isSuccessDeleteBranchType,
+      isLoading: isLoadingDeleteBranchType,
+      isError: isErrorDeleteBranchType,
+      error: errorDeleteBranchType,
+    },
+  ] = useDeleteBranchTypeMutation();
+
+  const [
+      deleteCity,
+      {
+            isSuccess: isSuccessDeleteCity,
+            isLoading: isLoadingDeleteCity,
+            isError: isErrorDeleteCity,
+            error: errorDeleteCity,
+      }
+  ] = useDeleteCityMutation();
+
+  const [
+    deleteCompanyType,
+    {
+        isSuccess: isSuccessDeleteCompanyType,
+        isLoading: isLoadingDeleteCompanyType,
+        isError: isErrorDeleteCompanyType,
+        error: errorDeleteCompanyType,
+    }
+  ] = useDeleteCompanyTypeMutation();
 
   const [
     deleteParkingSlot,
@@ -117,6 +208,20 @@ function DeleteConfirmComponent() {
         await deleteCompany({ uuid: companyId });
     }else if (slotId){
         await deleteParkingSlot({ uuid: slotId });
+    }else if (companyTypeId) {
+        await deleteCompanyType({ uuid: companyTypeId });
+    }else if (cityId){
+        await deleteCity({ uuid: cityId });
+    }else if (branchTypeId){
+        await deleteBranchType({ uuid: branchTypeId });
+    }else if (licensePlateProvinceId){
+        await deleteLicensePlateProvince({ uuid: licensePlateProvinceId });
+    }else if (licensePlateTypeId){
+        await deleteLicensePlateType({ uuid: licensePlateTypeId });
+    }else if (vehicleTypeId){
+        await deleteVehicleType({ uuid: vehicleTypeId });
+    }else if (genderId){
+        await deleteGender({ uuid: genderId });
     }
   };
 
@@ -151,11 +256,76 @@ function DeleteConfirmComponent() {
         dispatch(setIdParkingSpaceToDelete(""));
         handleClose();
     }
-  }, [isUserDeleteSuccess, isVehicleDeleteSuccess, isParkingSpaceDeleteSuccess, isSuccessDeleteSite, isCompanyDeleteSuccess, isSuccessDeleteParkingSlot]);
+
+    if (isSuccessDeleteCompanyType) {
+        dispatch(setUuidForQuickEditCompanyTypeForDelete(""));
+        dispatch(setIsOpenQuickEditCompanyType(false));
+        handleClose();
+    }
+
+    if (isSuccessDeleteCity) {
+        dispatch(setUuidCityForDelete(""));
+        dispatch(setIsOpenQuickEditCity(false));
+        handleClose();
+    }
+
+    if (isSuccessDeleteBranchType) {
+        dispatch(setUuidForDeleteBranchType(""));
+        dispatch(setIsOpenQuickEditBranchType(false));
+        handleClose();
+    }
+
+    if (isSuccessDeleteLicensePlateProvince) {
+        dispatch(setUuidLicensePlateProvinceForDelete(""));
+        dispatch(setIsOpenQuickEditLicensePlateProvince(false));
+        handleClose();
+    }
+
+    if (isSuccessDeleteLicensePlateType) {
+        dispatch(setUuidLicensePlateTypeForDelete(""));
+        dispatch(setIsOpenQuickEditLicensePlateType(false));
+        handleClose();
+    }
+
+    if (isSuccessDeleteVehicleType) {
+        dispatch(setUuidVehicleTypeForDelete(""));
+        dispatch(setIsOpenQuickEditVehicleType(false));
+        handleClose();
+    }
+
+    if (isSuccessDeleteGender) {
+        dispatch(setUuidGenderForDelete(""));
+        dispatch(setIsOpenQuickEditGender(false));
+        handleClose();
+    }
+
+  }, [
+      isUserDeleteSuccess,
+      isVehicleDeleteSuccess,
+      isParkingSpaceDeleteSuccess,
+      isSuccessDeleteSite,
+      isCompanyDeleteSuccess,
+      isSuccessDeleteParkingSlot,
+      isSuccessDeleteCompanyType,
+      isSuccessDeleteCity,
+      isSuccessDeleteBranchType,
+      isSuccessDeleteLicensePlateProvince,
+      isSuccessDeleteLicensePlateType,
+      isSuccessDeleteVehicleType,
+      isSuccessDeleteGender
+  ]);
 
   let loading = false;
 
-  if (isUserDeleteLoading || isVehicleDeleteLoading || isParkingSpaceDeleteLoading || isLoadingDeleteSite || isCompanyDeleteLoading || isLoadingDeleteParkingSlot) {
+  if (
+      isUserDeleteLoading || isVehicleDeleteLoading ||
+      isParkingSpaceDeleteLoading || isLoadingDeleteSite ||
+      isCompanyDeleteLoading || isLoadingDeleteParkingSlot ||
+      isLoadingDeleteCompanyType || isLoadingDeleteCity ||
+      isLoadingDeleteBranchType || isLoadingDeleteLicensePlateProvince ||
+      isLoadingDeleteLicensePlateType || isLoadingDeleteVehicleType ||
+      isLoadingDeleteGender
+  ) {
     loading = true;
   }
 
@@ -202,14 +372,9 @@ function DeleteConfirmComponent() {
           >
             <LoadingButton
               variant="contained"
-              sx={{
-                ...buttonStyleContained,
+              color="error"
+              sx={{              
                 mr: 1,
-                backgroundColor: "red",
-                ":hover": {
-                  backgroundColor: "#d32f2f",
-                  boxShadow: "none",
-                },
               }}
               loading={loading}
               onClick={handleDelete}
@@ -218,9 +383,7 @@ function DeleteConfirmComponent() {
             </LoadingButton>
             <Button
               onClick={handleClose}
-              sx={{
-                ...buttonStyleOutlined,
-              }}
+              variant="outlined"
             >
                 {t('cancel')}
             </Button>

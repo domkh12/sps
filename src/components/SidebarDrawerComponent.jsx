@@ -125,8 +125,8 @@ function SidebarDrawerComponent() {
                       mb: "5px",
                       ...listItemButtonStyle,
                     }}
-                    onClick={handleNavigate("/dash")}
-                    selected={location.pathname === "/dash"}
+                    onClick={handleNavigate("/admin")}
+                    selected={location.pathname === "/admin"}
                   >
                     <ListItemIcon
                       sx={{
@@ -159,8 +159,8 @@ function SidebarDrawerComponent() {
                       mb: "5px",
                       ...listItemButtonStyle,
                     }}
-                    onClick={handleNavigate("/dash/map-views")}
-                    selected={location.pathname === "/dash/map-views"}
+                    onClick={handleNavigate("/admin/map-views")}
+                    selected={location.pathname === "/admin/map-views"}
                   >
                     <ListItemIcon
                       sx={{
@@ -194,8 +194,8 @@ function SidebarDrawerComponent() {
                       color: "#424242",
                       ...listItemButtonStyle,
                     }}
-                    onClick={handleNavigate("/dash/history")}
-                    selected={location.pathname === "/dash/history"}
+                    onClick={handleNavigate("/admin/history")}
+                    selected={location.pathname === "/admin/history"}
                   >
                     <ListItemIcon
                       sx={{
@@ -256,7 +256,6 @@ function SidebarDrawerComponent() {
 
                   {/* Company Menu*/}
 
-                  {isManager && (
                       <>
                         <>
                           <ListItemButton
@@ -320,8 +319,8 @@ function SidebarDrawerComponent() {
                                       color: "#424242",
                                       mb: "5px",
                                     }}
-                                    onClick={handleNavigate("/dash/companies")}
-                                    selected={location.pathname === "/dash/companies"}
+                                    onClick={handleNavigate("/admin/companies")}
+                                    selected={location.pathname === "/admin/companies"}
                                 >
                                   <ListItemText
                                       primary={
@@ -351,9 +350,9 @@ function SidebarDrawerComponent() {
                                       color: "#424242",
                                       mb: "5px",
                                     }}
-                                    onClick={handleNavigate("/dash/companies/new")}
+                                    onClick={handleNavigate("/admin/companies/new")}
                                     selected={
-                                        location.pathname === "/dash/companies/new"
+                                        location.pathname === "/admin/companies/new"
                                     }
                                 >
                                   <ListItemText
@@ -376,11 +375,9 @@ function SidebarDrawerComponent() {
                           </List>
                         </Collapse>
                       </>
-                  )}
 
                   {/* Branch Menu */}
 
-                  {isManager && (
                     <>
                       <>
                         <ListItemButton
@@ -449,9 +446,9 @@ function SidebarDrawerComponent() {
                                   color: "#424242",
                                   mb: "5px",
                                 }}
-                                onClick={handleNavigate("/dash/branches")}
+                                onClick={handleNavigate("/admin/branches")}
                                 selected={
-                                  location.pathname === "/dash/branches"
+                                  location.pathname === "/admin/branches"
                                 }
                               >
                                 <ListItemText
@@ -482,9 +479,9 @@ function SidebarDrawerComponent() {
                                   color: "#424242",
                                   mb: "5px",
                                 }}
-                                onClick={handleNavigate("/dash/branches/new")}
+                                onClick={handleNavigate("/admin/branches/new")}
                                 selected={
-                                  location.pathname === "/dash/branches/new"
+                                  location.pathname === "/admin/branches/new"
                                 }
                               >
                                 <ListItemText
@@ -507,7 +504,7 @@ function SidebarDrawerComponent() {
                         </List>
                       </Collapse>
                     </>
-                  )}
+
 
                   {/* Parking Menu */}
                   <>
@@ -577,8 +574,8 @@ function SidebarDrawerComponent() {
                               color: "#424242",
                               mb: "5px",
                             }}
-                            onClick={handleNavigate("/dash/parking-spaces")}
-                            selected={location.pathname === "/dash/parking-spaces"}
+                            onClick={handleNavigate("/admin/parking-spaces")}
+                            selected={location.pathname === "/admin/parking-spaces"}
                           >
                             <ListItemText
                               primary={
@@ -605,9 +602,9 @@ function SidebarDrawerComponent() {
                               color: "#424242",
                               mb: "5px",
                             }}
-                            onClick={handleNavigate("/dash/parking-spaces/new")}
+                            onClick={handleNavigate("/admin/parking-spaces/new")}
                             selected={
-                              location.pathname === "/dash/parking-spaces/new"
+                              location.pathname === "/admin/parking-spaces/new"
                             }
                           >
                             <ListItemText
@@ -696,8 +693,8 @@ function SidebarDrawerComponent() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={handleNavigate("/dash/parking-slots")}
-                              selected={location.pathname === "/dash/parking-slots"}
+                              onClick={handleNavigate("/admin/parking-slots")}
+                              selected={location.pathname === "/admin/parking-slots"}
                           >
                             <ListItemText
                                 primary={
@@ -724,9 +721,9 @@ function SidebarDrawerComponent() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={handleNavigate("/dash/parking-slots/new")}
+                              onClick={handleNavigate("/admin/parking-slots/new")}
                               selected={
-                                  location.pathname === "/dash/parking-slots/new"
+                                  location.pathname === "/admin/parking-slots/new"
                               }
                           >
                             <ListItemText
@@ -813,8 +810,8 @@ function SidebarDrawerComponent() {
                               color: "#424242",
                               mb: "5px",
                             }}
-                            onClick={handleNavigate("/dash/vehicles")}
-                            selected={location.pathname === "/dash/vehicles"}
+                            onClick={handleNavigate("/admin/vehicles")}
+                            selected={location.pathname === "/admin/vehicles"}
                           >
                             <ListItemText
                               primary={
@@ -841,9 +838,9 @@ function SidebarDrawerComponent() {
                               color: "#424242",
                               mb: "5px",
                             }}
-                            onClick={handleNavigate("/dash/vehicles/new")}
+                            onClick={handleNavigate("/admin/vehicles/new")}
                             selected={
-                              location.pathname === "/dash/vehicles/new"
+                              location.pathname === "/admin/vehicles/new"
                             }
                           >
                             <ListItemText
@@ -924,8 +921,8 @@ function SidebarDrawerComponent() {
                               color: "#424242",
                               mb: "5px",
                             }}
-                            onClick={handleNavigate("/dash/users")}
-                            selected={location.pathname === "/dash/users"}
+                            onClick={handleNavigate("/admin/users")}
+                            selected={location.pathname === "/admin/users"}
                           >
                             <ListItemText
                               primary={
@@ -952,8 +949,8 @@ function SidebarDrawerComponent() {
                               color: "#424242",
                               mb: "5px",
                             }}
-                            onClick={handleNavigate("/dash/users/new")}
-                            selected={location.pathname === "/dash/users/new"}
+                            onClick={handleNavigate("/admin/users/new")}
+                            selected={location.pathname === "/admin/users/new"}
                           >
                             <ListItemText
                               primary={
@@ -1034,8 +1031,8 @@ function SidebarDrawerComponent() {
                               color: "#424242",
                               mb: "5px",
                             }}
-                            onClick={() => navigate("/dash/reports")}
-                            selected={location.pathname === "/dash/reports"}
+                            onClick={() => navigate("/admin/reports")}
+                            selected={location.pathname === "/admin/reports"}
                           >
                             <ListItemText
                               primary={
@@ -1062,8 +1059,8 @@ function SidebarDrawerComponent() {
                               color: "#424242",
                               mb: "5px",
                             }}
-                            onClick={() => navigate("/dash/reports/new")}
-                            selected={location.pathname === "/dash/reports/new"}
+                            onClick={() => navigate("/admin/reports/new")}
+                            selected={location.pathname === "/admin/reports/new"}
                           >
                             <ListItemText
                               primary={

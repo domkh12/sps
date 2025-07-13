@@ -113,39 +113,6 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: "Vehicle", id: "LIST" }],
     }),
 
-    getAllLicensePlateProvinces: builder.query({
-      query: () => ({
-        url: "/license-plate-provinces",
-      }),
-      providesTags: (result, error, arg) => {
-        if (result?.ids) {
-          return [{type: "LicensePlateProvinces", id: "LIST"}, ...result.ids.map((id) => ({type: "LicensePlateProvinces", id})),];
-        } else return [{type: "LicensePlateProvinces", id: "LIST"}];
-      },
-    }),
-
-    getAllVehicleTypes: builder.query({
-      query: () => ({
-        url: "/vehicle-types",
-      }),
-      providesTags: (result, error, arg) => {
-        if (result?.ids) {
-          return [{type: "VehicleType", id: "LIST"}, ...result.ids.map((id) => ({type: "VehicleType", id})),];
-        } else return [{type: "VehicleType", id: "LIST"}];
-      },
-    }),
-
-    getAllLicensePlateTypes: builder.query({
-      query: () => ({
-        url: "/license-plate-types",
-      }),
-      providesTags: (result, error, arg) => {
-        if (result?.ids) {
-          return [{type: "LicensePlateTypes", id: "LIST"}, ...result.ids.map((id) => ({type: "LicensePlateTypes", id})),];
-        } else return [{type: "LicensePlateTypes", id: "LIST"}];
-      },
-    }),
-
     getVehicleByUuid: builder.query({
       query: (uuid) => `vehicles/uuid/${uuid}`,
       providesTags: (result, error, arg) => {
@@ -163,9 +130,6 @@ export const {
   useGetVehiclesQuery,
   useAddNewVehicleMutation,
   useUpdateVehicleMutation,
-  useGetAllLicensePlateProvincesQuery,
-  useGetAllVehicleTypesQuery,
-  useGetAllLicensePlateTypesQuery,
   useDeleteVehicleMutation,
   useFilterVehiclesQuery,
 } = vehicleApiSlice;

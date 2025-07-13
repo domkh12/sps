@@ -6,19 +6,37 @@ import SelectSingleComponent from "./SelectSingleComponent";
 import * as Yup from "yup";
 import useTranslate from "../hook/useTranslate";
 import {useGetAllCompaniesQuery} from "../redux/feature/company/companyApiSlice";
-
 import {useGetAllSiteTypesQuery} from "../redux/feature/siteType/siteTypeApiSlice";
 import { useUpdateSiteMutation } from "../redux/feature/site/siteApiSlice";
 import { buttonStyleContained, buttonStyleOutlined } from "../assets/style";
 import { setIsQuickEditBranchOpen } from "../redux/feature/site/siteSlice";
 import {useGetAllCitiesQuery} from "../redux/feature/city/cityApiSlice.js";
 import {Slide, toast} from "react-toastify";
+import {
+  setIsOpenQuickCreateBranchType,
+  setIsOpenQuickEditBranchType,
+  setUuidForQuickEditBranchType
+} from "../redux/feature/siteType/siteTypeSlice.js";
+import {
+  setIsOpenQuickCreateCity,
+  setIsOpenQuickEditCity,
+  setUuidForQuickEditCity
+} from "../redux/feature/city/citySlice.js";
+import QuickEditCityComponent from "./QuickEditCityComponent.jsx";
+import QuickCreateCityComponent from "./QuickCreateCityComponent.jsx";
+import QuickEditBranchTypeComponent from "./QuickEditBranchTypeComponent.jsx";
+import QuickCreateBranchTypeComponent from "./QuickCreateBranchTypeComponent.jsx";
+import { LoadingButton } from "@mui/lab";
 
 function QuickEditBranchComponent() {
   const open = useSelector((state) => state.sites.isQuickEditBranchOpen);
   const branch = useSelector((state) => state.sites.branchForQuickEdit);
   const { t } = useTranslate();
   const dispatch = useDispatch();
+  const isOpenCreateCity = useSelector((state) => state.city.isOpenQuickCreateCity);
+  const isQuickEditCityOpen = useSelector((state) => state.city.isOpenQuickEditCity);
+  const isQuickEditBranchTypeOpen = useSelector((state) => state.siteType.isQuickEditBranchTypeOpen);
+  const isOpenQuickCreateBranchType = useSelector((state) => state.siteType.isOpenQuickCreateBranchType);
   const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
   const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
   const {data:getAllSiteTypes, isSuccess: isSuccessGetAllSiteTypes, isLoading: isLoadingGetAllSiteTypes} = useGetAllSiteTypesQuery("siteTypeList");
@@ -215,6 +233,15 @@ function QuickEditBranchComponent() {
                     touched={touched.cityId}
                     optionLabelKey="name"
                     selectFistValue={values.cityId}
+                    isEditable={true}
+                    onClickQuickEdit={(value) => {
+                      dispatch(setIsOpenQuickEditCity(true));
+                      dispatch(setUuidForQuickEditCity(value));
+                    }}
+                    isCreate={true}
+                    onClickCreate={() => {
+                      dispatch(setIsOpenQuickCreateCity(true));
+                    }}
                   />
 
                   <SelectSingleComponent
@@ -226,6 +253,15 @@ function QuickEditBranchComponent() {
                     touched={touched.siteTypeId}
                     optionLabelKey="name"
                     selectFistValue={values.siteTypeId}
+                    isEditable={true}
+                    onClickQuickEdit={(value) => {
+                      dispatch(setIsOpenQuickEditBranchType(true));
+                      dispatch(setUuidForQuickEditBranchType(value));
+                    }}
+                    isCreate={true}
+                    onClickCreate={() => {
+                      dispatch(setIsOpenQuickCreateBranchType(true));
+                    }}
                   />
                 </Box>
 
@@ -240,20 +276,18 @@ function QuickEditBranchComponent() {
                     onClick={() => {
                       dispatch(setIsQuickEditBranchOpen(false));
                     }}
-                    sx={{
-                      ...buttonStyleOutlined,
-                    }}
+                    variant="outlined"
                   >
                     {t('cancel')}
                   </Button>
-                  <Button
+                  <LoadingButton
                     loading={isLoadingUpdateSite}
                     variant="contained"
-                    sx={{ ...buttonStyleContained, ml: 1 }}
+                    sx={{ ml: 1 }}
                     type="submit"
                   >
                     {t('update')}
-                  </Button>
+                  </LoadingButton>
                 </Box>
               </Form>
             );
@@ -299,6 +333,10 @@ function QuickEditBranchComponent() {
           </Typography>
           {content}
         </Box>
+        {isQuickEditCityOpen && <QuickEditCityComponent/>}
+        {isOpenCreateCity && <QuickCreateCityComponent/>}
+        {isQuickEditBranchTypeOpen && <QuickEditBranchTypeComponent/>}
+        {isOpenQuickCreateBranchType && <QuickCreateBranchTypeComponent/>}
       </Box>
     </Modal>
   );

@@ -1,6 +1,5 @@
 import {
   useFilterVehiclesQuery,
-  useGetAllVehicleTypesQuery,
   useGetVehiclesQuery,
 } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { useNavigate } from "react-router-dom";
@@ -38,6 +37,7 @@ import FilterBarComponent from "../../components/FilterBarComponent";
 import SkeletonTableRowComponent from "../../components/SkeletonTableRowComponent.jsx";
 import {useDebounce} from "use-debounce";
 import useAuth from "../../hook/useAuth.jsx";
+import { useGetAllVehicleTypesQuery } from "../../redux/feature/vehicleType/vehicleTypeApiSlice.js";
 
 function VehicleList() {
   const dispatch = useDispatch();

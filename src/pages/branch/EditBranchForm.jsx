@@ -12,7 +12,7 @@ import SelectSingleComponent from "../../components/SelectSingleComponent";
 import ButtonComponent from "../../components/ButtonComponent";
 import * as Yup from "yup";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
-import { useDispatch } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import { useGetAllSiteTypesQuery} from "../../redux/feature/siteType/siteTypeApiSlice";
 import { useGetAllCitiesQuery } from "../../redux/feature/city/cityApiSlice";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
@@ -22,12 +22,30 @@ import {
 } from "../../redux/feature/actions/actionSlice";
 import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
 import {Slide, toast} from "react-toastify";
+import {
+  setIsOpenQuickCreateCity,
+  setIsOpenQuickEditCity,
+  setUuidForQuickEditCity
+} from "../../redux/feature/city/citySlice.js";
+import {
+  setIsOpenQuickCreateBranchType,
+  setIsOpenQuickEditBranchType,
+  setUuidForQuickEditBranchType
+} from "../../redux/feature/siteType/siteTypeSlice.js";
+import QuickEditCityComponent from "../../components/QuickEditCityComponent.jsx";
+import QuickCreateCityComponent from "../../components/QuickCreateCityComponent.jsx";
+import QuickEditBranchTypeComponent from "../../components/QuickEditBranchTypeComponent.jsx";
+import QuickCreateBranchTypeComponent from "../../components/QuickCreateBranchTypeComponent.jsx";
 
 function EditBranchForm({ branch }) {
   const { t } = useTranslate();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [profileImageFile, setProfileImageFile] = useState(null);
+  const isOpenCreateCity = useSelector((state) => state.city.isOpenQuickCreateCity);
+  const isQuickEditCityOpen = useSelector((state) => state.city.isOpenQuickEditCity);
+  const isQuickEditBranchTypeOpen = useSelector((state) => state.siteType.isQuickEditBranchTypeOpen);
+  const isOpenQuickCreateBranchType = useSelector((state) => state.siteType.isOpenQuickCreateBranchType);
   const {data:getAllSiteTypes, isSuccess: isSuccessGetAllSiteTypes, isLoading: isLoadingGetAllSiteTypes} = useGetAllSiteTypesQuery("siteTypeList");
   const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
   const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
@@ -130,7 +148,7 @@ function EditBranchForm({ branch }) {
   if (isSuccessGetCompanyName && isSuccessGetCity && isSuccessGetAllSiteTypes) {
     content = (
       <>
-        <SeoComponent title={t("edit")} />
+        <SeoComponent title={"Edit branch"} />
 
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
@@ -143,8 +161,8 @@ function EditBranchForm({ branch }) {
             siteName: branch?.siteName,
             branchAddress: branch?.siteAddress,
             companyId: branch?.company?.uuid,
-            cityId: branch?.city?.uuid,
-            siteTypeId: branch?.siteType?.uuid,
+            cityId: branch?.city?.uuid || "",
+            siteTypeId: branch?.siteType?.uuid || "",
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -269,6 +287,15 @@ function EditBranchForm({ branch }) {
                           touched={touched.cityId}
                           optionLabelKey="name"
                           selectFistValue={values.cityId}
+                          isEditable={true}
+                          onClickQuickEdit={(value) => {
+                            dispatch(setIsOpenQuickEditCity(true));
+                            dispatch(setUuidForQuickEditCity(value));
+                          }}
+                          isCreate={true}
+                          onClickCreate={() => {
+                            dispatch(setIsOpenQuickCreateCity(true));
+                          }}
                         />
 
                         <SelectSingleComponent
@@ -280,6 +307,15 @@ function EditBranchForm({ branch }) {
                           touched={touched.siteTypeId}
                           optionLabelKey="name"
                           selectFistValue={values.siteTypeId}
+                          isEditable={true}
+                          onClickQuickEdit={(value) => {
+                            dispatch(setIsOpenQuickEditBranchType(true));
+                            dispatch(setUuidForQuickEditBranchType(value));
+                          }}
+                          isCreate={true}
+                          onClickCreate={() => {
+                            dispatch(setIsOpenQuickCreateBranchType(true));
+                          }}
                         />
                       </div>
 
@@ -298,6 +334,10 @@ function EditBranchForm({ branch }) {
             );
           }}
         </Formik>
+        {isQuickEditCityOpen && <QuickEditCityComponent/>}
+        {isOpenCreateCity && <QuickCreateCityComponent/>}
+        {isQuickEditBranchTypeOpen && <QuickEditBranchTypeComponent/>}
+        {isOpenQuickCreateBranchType && <QuickCreateBranchTypeComponent/>}
       </>
     );
   }

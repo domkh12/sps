@@ -23,13 +23,14 @@ import SelectComponent from "./SelectComponent";
 import SelectSingleComponent from "./SelectSingleComponent";
 import dayjs from "dayjs";
 import {
-  useFindAllGenderQuery,
   useGetAllRolesQuery,
   useUpdateUserMutation,
 } from "../redux/feature/users/userApiSlice";
 import {useGetAllCompaniesQuery} from "../redux/feature/company/companyApiSlice";
 import { useEffect, useState } from "react";
 import {Slide, toast} from "react-toastify";
+import { useGetAllGendersQuery } from "../redux/feature/gender/genderApiSlice";
+import { LoadingButton } from "@mui/lab";
 
 function QuickEditUserComponent() {
   const open = useSelector((state) => state.users.isOpenQuickEdit);
@@ -41,7 +42,7 @@ function QuickEditUserComponent() {
   const { isManager, isAdmin } = useAuth();
   const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList", {skip: !isAdmin});
   const {data: role, isSuccess: isSuccessGetRole, isLoading: isLoadingGetRole} = useGetAllRolesQuery("roleList");
-  const {data: gender, isSuccess: isSuccessGetGender, isLoading: isLoadingGetGender} = useFindAllGenderQuery("genderList");
+  const {data: gender, isSuccess: isSuccessGetGender, isLoading: isLoadingGetGender} = useGetAllGendersQuery("genderList");
 
   const [
     updateUser,
@@ -445,14 +446,14 @@ function QuickEditUserComponent() {
                                               >
                                                   {t("cancel")}
                                               </Button>
-                                              <Button
+                                              <LoadingButton
                                                   variant="contained"
                                                   sx={{ ...buttonStyleContained, ml: 1 }}
                                                   type="submit"
-                                                  loading={isLoadingUpdateUser}
+                                                  loading={isLoadingUpdateUser}                                                  
                                               >
                                                   {t('update')}
-                                              </Button>
+                                              </LoadingButton>
                                           </Box>
                                       </Form>
                                   );

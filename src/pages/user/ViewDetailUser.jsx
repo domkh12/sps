@@ -74,14 +74,7 @@ function ViewDetailUser({ user }) {
   const userActive = useSelector((state) => state.users.isOnlineUser);
   const navigate = useNavigate();
   const { t } = useTranslate();
-  const [user, setUser] = useState(user?.user || {});
   const {isAdmin, isManager} = useAuth();
-  console.log({user})
-  useEffect(() => {
-    if (userActive?.uuid === user?.user?.uuid) {
-      setUser({ ...user?.user, isOnline: userActive.isOnline });
-    }
-  }, [userActive]);
 
   const StyledBadge = styled(Badge)(({ theme, isonline }) => ({
     "& .MuiBadge-badge": {
@@ -204,23 +197,23 @@ function ViewDetailUser({ user }) {
               <div className="flex flex-col gap-3 mt-5">
                 <Typography variant="body1">
                   <span className="text-gray-cus">{t('gender')}</span>
-                  {`${"\u00a0"}:${"\u00a0"}${user?.user?.gender?.gender || "N/A"}`}
+                  {`${"\u00a0"}:${"\u00a0"}${user?.gender?.gender || "N/A"}`}
                 </Typography>
                 <Typography variant="body1">
                   <span className="text-gray-cus">{t('dateOfBirth')}</span>
-                  {`${"\u00a0"}:${"\u00a0"}${user?.user?.dateOfBirth || "N/A"}`}
+                  {`${"\u00a0"}:${"\u00a0"}${user?.dateOfBirth || "N/A"}`}
                 </Typography>
                 <Typography variant="body1">
                   <span className="text-gray-cus">{t('phoneNumber')}</span>
-                  {`${"\u00a0"}:${"\u00a0"}${user?.user?.phoneNumber || "N/A"}`}
+                  {`${"\u00a0"}:${"\u00a0"}${user?.phoneNumber || "N/A"}`}
                 </Typography>
                 <Typography variant="body1">
                   <span className="text-gray-cus">{t('role')}</span>
-                  {`${"\u00a0"}:${"\u00a0"}${user?.user?.roles?.length ? user?.user?.roles?.map((role) => role?.name) : "N/A"}`}
+                  {`${"\u00a0"}:${"\u00a0"}${user?.roles?.length ? user?.roles?.map((role) => role?.name) : "N/A"}`}
                 </Typography>
                 <Typography variant="body1">
                   <span className="text-gray-cus">{t('branch')}</span>
-                  {`${"\u00a0"}:${"\u00a0"}${user?.user?.sites?.length > 0 ? user?.user?.sites?.map((site) => site?.siteName) : "N/A"}`}
+                  {`${"\u00a0"}:${"\u00a0"}${user?.sites?.length > 0 ? user?.sites?.map((site) => site?.siteName) : "N/A"}`}
                 </Typography>
               </div>
             </Card>

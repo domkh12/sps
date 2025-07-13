@@ -14,14 +14,13 @@ import SnackBarComponent from "../../components/SnackBarComponent";
 import { DESTINATION } from "../../config/destination";
 import {useGetUserProfileQuery, useVerifySitesMutation} from "../../redux/feature/auth/authApiSlice";
 import LoadingOneComponent from "./../../components/LoadingOneComponent";
-import { useGetSitesListMutation } from "../../redux/feature/site/siteApiSlice";
 import DeleteConfirmComponent from "../../components/DeleteConfirmComponent";
 import {
   selectIsInitialLoading,
 } from "../../redux/feature/app/appSlice";
-import SidebarDrawerComponent from "../../components/SidebarDrawerComponent";
 import useAuth from "../../hook/useAuth.jsx";
 import {setCredentials} from "../../redux/feature/auth/authSlice.js";
+import SideBarForManagerComponent from "../../components/SideBarForManagerComponent.jsx";
 
 function ManagerLayout() {
   const isPaginationSuccess = useSelector((state) => state.action.isPaginationSuccess);
@@ -180,7 +179,7 @@ function ManagerLayout() {
               isOpen={isOpenSnackBar}
           />
           <DeleteConfirmComponent />
-          <SidebarDrawerComponent />
+          <SideBarForManagerComponent />
         </div>
     )
   }

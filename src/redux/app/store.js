@@ -18,6 +18,11 @@ import appReducer from "../feature/app/appSlice.js";
 import companyTypeReducer from "../feature/companyType/companyTypeSlice.js";
 import themeReducer from "../feature/theme/themeSlice.js";
 import slotReducer from "../feature/slot/slotSlice.js"
+import licensePlateProvinceReducer from "../feature/licensePlateProvince/licensePlateProvinceSlice.js";
+import licensePlateTypeReducer from "../feature/licensePlateType/licensePlateTypeSlice.js";
+import vehicleTypeReducer from "../feature/vehicleType/vehicleTypeSlice.js";
+import genderReducer from "../feature/gender/genderSlice.js";
+
 const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,
@@ -37,8 +42,11 @@ const store = configureStore({
     analysis: analysisReducer,
     app: appReducer,
     companyType: companyTypeReducer,
-    slot: slotReducer
-    // slot:slotReducer,
+    slot: slotReducer,
+    licensePlateProvince: licensePlateProvinceReducer,
+    licensePlateType: licensePlateTypeReducer,
+    vehicleType: vehicleTypeReducer,
+    gender: genderReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

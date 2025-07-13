@@ -12,7 +12,7 @@ const companySlice = createSlice({
     companyDataForQuickEdit: {},
     pageNo: 1,
     pageSize: 5,
-    companySearchKeywords: "",
+    companySearchKeywords: ""
   },
   reducers: {
     setCompanySearchKeywords(state, action) {

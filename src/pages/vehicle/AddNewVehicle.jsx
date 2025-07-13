@@ -1,16 +1,12 @@
 import { Form, Formik } from "formik";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
 import {
   useGetAllFullNameUsersQuery,
 } from "../../redux/feature/users/userApiSlice";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useAddNewVehicleMutation,
-  useGetAllLicensePlateProvincesQuery,
-  useGetAllLicensePlateTypesQuery,
-  useGetAllVehicleTypesQuery,
 } from "../../redux/feature/vehicles/vehicleApiSlice";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
 import SeoComponent from "../../components/SeoComponent";
@@ -26,11 +22,32 @@ import ImageUploadComponent from "../../components/ImageUploadComponent";
 import {Slide, toast} from "react-toastify";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent.jsx";
 import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsOpenQuickCreateLicensePlateProvince, setIsOpenQuickEditLicensePlateProvince, setUuidForQuickEditLicensePlateProvince } from "../../redux/feature/licensePlateProvince/licensePlateProvinceSlice.js";
+import QuickEditLicensePlateProvinceComponent from "../../components/QuickEditLicensePlateProvinceComponent.jsx";
+import QuickCreateLicensePlateProvinceComponent from "../../components/QuickCreateLicensePlateProvinceComponent.jsx";
+import { useGetAllLicensePlateProvincesQuery } from "../../redux/feature/licensePlateProvince/licensePlateProvinceApiSlice.js";
+import { useGetAllLicensePlateTypesQuery } from "../../redux/feature/licensePlateType/licensePlateTypeApiSlice.js";
+import { setIsOpenQuickCreateLicensePlateType, setIsOpenQuickEditLicensePlateType, setUuidForQuickEditLicensePlateType } from "../../redux/feature/licensePlateType/licensePlateTypeSlice.js";
+import QuickEditLicensePlateTypeComponent from "../../components/QuickEditLicensePlateTypeComponent.jsx";
+import QuickCreateLicensePlateTypeComponent from "../../components/QuickCreateLicensePlateTypeComponent.jsx";
+import { useGetAllVehicleTypesQuery } from "../../redux/feature/vehicleType/vehicleTypeApiSlice.js";
+import { setIsOpenQuickCreateVehicleType, setIsOpenQuickEditVehicleType, setUuidForQuickEditVehicleType } from "../../redux/feature/vehicleType/vehicleTypeSlice.js";
+import QuickEditVehicleTypeComponent from "../../components/QuickEditVehicleTypeComponent.jsx";
+import QuickCreateVehicleTypeComponent from "../../components/QuickCreateVehicleTypeComponent.jsx";
 
 function AddNewVehicle() {
   const navigate = useNavigate();
   const { t } = useTranslate();
+  const dispatch = useDispatch();
   const [profileImageFile, setProfileImageFile] = useState(null);  
+  const isQuickEditLicensePlateProvinceOpen = useSelector((state) => state.licensePlateProvince.isOpenQuickEditLicensePlateProvince);
+  const isQuickCreateLicensePlateProvinceOpen = useSelector((state) => state.licensePlateProvince.isOpenQuickCreateLicensePlateProvince);
+  const isQuickEditLicensePlateTypeOpen = useSelector((state) => state.licensePlateType.isOpenQuickEditLicensePlateType);
+  const isQuickCreateLicensePlateTypeOpen = useSelector((state) => state.licensePlateType.isOpenQuickCreateLicensePlateType);
+  const isQuickEditVehicleTypeOpen = useSelector((state) => state.vehicleType.isOpenQuickEditVehicleType);  
+  const isQuickCreateVehicleTypeOpen = useSelector((state) => state.vehicleType.isOpenQuickCreateVehicleType);
+  const [nameProvince, setNameProvince] = useState("provinceNameKh");
   const { isAdmin, sites } = useAuth();
   const {data:companyData, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList", {skip: !isAdmin});
 
@@ -159,6 +176,17 @@ function AddNewVehicle() {
     }
   };
 
+  var menuActions = [
+    {
+      label: t('provinceNameEn'),
+      onClick: () => setNameProvince("provinceNameEn"),
+    },
+    {
+      label: t('provinceNameKh'),    
+      onClick: () => setNameProvince("provinceNameKh"),
+    },
+  ]
+
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
@@ -182,7 +210,7 @@ function AddNewVehicle() {
   if (isSuccessGetAllVehicleType && isSuccessGetAllLicensePlateTypes && isSuccessGetAllFullNameUsers && isSuccessGetAllLicensePlateProvinces) {
     content = (
         <div>
-          <SeoComponent title={"Create a new user"}/>
+          <SeoComponent title={"Create a new vehicle"}/>
           <MainHeaderComponent
               breadcrumbs={breadcrumbs}
               title={t("createNewVehicle")}
@@ -325,9 +353,19 @@ function AddNewVehicle() {
                                   options={licensePlateProvincesFetched}
                                   onChange={handlelicensePlateProvincesChange}
                                   fullWidth={true}
-                                  optionLabelKey="provinceNameEn"
+                                  optionLabelKey={nameProvince}
                                   error={errors.lppId}
                                   touched={touched.lppId}
+                                  isCreate={true}
+                                  onClickCreate={() => {
+                                    dispatch(setIsOpenQuickCreateLicensePlateProvince(true));
+                                  }}
+                                  isEditable={true}
+                                  onClickQuickEdit={(value) => {
+                                    dispatch(setIsOpenQuickEditLicensePlateProvince(true));
+                                    dispatch(setUuidForQuickEditLicensePlateProvince(value));
+                                  }}
+                                  menuActions={menuActions}
                               />
 
                               <SelectSingleComponent
@@ -338,6 +376,15 @@ function AddNewVehicle() {
                                   optionLabelKey="name"
                                   error={errors.licensePlateTypeId}
                                   touched={touched.licensePlateTypeId}
+                                  isCreate={true}
+                                  onClickCreate={() => {
+                                    dispatch(setIsOpenQuickCreateLicensePlateType(true));
+                                  }}
+                                  isEditable={true}
+                                  onClickQuickEdit={(value) => {
+                                    dispatch(setIsOpenQuickEditLicensePlateType(true));
+                                    dispatch(setUuidForQuickEditLicensePlateType(value));
+                                  }}
                               />
 
                               <SelectSingleComponent
@@ -348,6 +395,15 @@ function AddNewVehicle() {
                                   optionLabelKey="name"
                                   error={errors.vehicleTypeId}
                                   touched={touched.vehicleTypeId}
+                                  isCreate={true}
+                                  onClickCreate={() => {
+                                    dispatch(setIsOpenQuickCreateVehicleType(true));
+                                  }}
+                                  isEditable={true}
+                                  onClickQuickEdit={(value) => {
+                                    dispatch(setIsOpenQuickEditVehicleType(true));
+                                    dispatch(setUuidForQuickEditVehicleType(value));
+                                  }}
                               />
 
                               <SelectSingleComponent
@@ -446,6 +502,12 @@ function AddNewVehicle() {
               }}
             </Formik>
           </div>
+          {isQuickEditLicensePlateProvinceOpen && <QuickEditLicensePlateProvinceComponent/>}
+          {isQuickCreateLicensePlateProvinceOpen && <QuickCreateLicensePlateProvinceComponent/>}
+          {isQuickEditLicensePlateTypeOpen && <QuickEditLicensePlateTypeComponent/>}
+          {isQuickCreateLicensePlateTypeOpen && <QuickCreateLicensePlateTypeComponent/>}
+          {isQuickEditVehicleTypeOpen && <QuickEditVehicleTypeComponent/>}
+          {isQuickCreateVehicleTypeOpen && <QuickCreateVehicleTypeComponent/>}
         </div>
     );
   }

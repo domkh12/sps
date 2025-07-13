@@ -90,7 +90,10 @@ export const companiesApiSlice = apiSlice.injectEndpoints({
         url: `/companies/${uuid}`,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, arg) => [{ type: "Company", id: arg.uuid }],
+      invalidatesTags: (result, error, arg) => [
+          { type: "Company", id: arg.uuid },
+          {type: "CompanyName", id: "LIST"}
+      ],
     }),
 
     getAllCompanies: builder.query({

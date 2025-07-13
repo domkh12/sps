@@ -18,10 +18,30 @@ import ProfileUploadComponent from "../../components/ProfileUploadComponent.jsx"
 import SelectSingleComponent from "../../components/SelectSingleComponent.jsx";
 import {DatePicker} from "@mui/x-date-pickers";
 import ButtonComponent from "../../components/ButtonComponent.jsx";
+import QuickEditCompanyTypeComponent from "../../components/QuickEditCompanyTypeComponent.jsx";
+import QuickCreateCompanyTypeComponent from "../../components/QuickCreateCompanyTypeComponent.jsx";
+import QuickEditCityComponent from "../../components/QuickEditCityComponent.jsx";
+import QuickCreateCityComponent from "../../components/QuickCreateCityComponent.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {
+    setIsOpenQuickCreateCompanyType,
+    setIsOpenQuickEditCompanyType,
+    setUuidForQuickEditCompanyType
+} from "../../redux/feature/companyType/companyTypeSlice.js";
+import {
+    setIsOpenQuickCreateCity,
+    setIsOpenQuickEditCity,
+    setUuidForQuickEditCity
+} from "../../redux/feature/city/citySlice.js";
 
 function EditCompanyForm({company}){
     const navigate = useNavigate();
     const [profileImageFile, setProfileImageFile] = useState(null);
+    const dispatch = useDispatch();
+    const isQuickEditCompanyTypeOpen = useSelector((state) => state.companyType.isOpenQuickEditCompanyType);
+    const isOpenCreateCompanyType = useSelector((state) => state.companyType.isOpenQuickCreateCompanyType);
+    const isOpenCreateCity = useSelector((state) => state.city.isOpenQuickCreateCity);
+    const isQuickEditCityOpen = useSelector((state) => state.city.isOpenQuickEditCity);
     const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
     const {data:companyTypeData, isSuccess: isSuccessGetCompanyType, isLoading: isLoadingGetCompanyType} = useGetCompanyTypeQuery("companyTypeList");
     const { t } = useTranslate();
@@ -137,12 +157,12 @@ function EditCompanyForm({company}){
                     />
                     <Formik
                         initialValues={{
-                            companyName: company.companyName,
-                            companyAddress: company.companyAddress,
-                            companyTypeUuid: company.companyType.uuid,
-                            cityUuid: company.city.uuid,
-                            establishedDate: dayjs(company.establishedDate),
-                            image: company.image
+                            companyName: company?.companyName || "",
+                            companyAddress: company?.companyAddress || "",
+                            companyTypeUuid: company?.companyType?.uuid || "",
+                            cityUuid: company?.city?.uuid || "",
+                            establishedDate: dayjs(company?.establishedDate) || null,
+                            image: company?.image
                         }}
                         validationSchema={validationSchema}
                         onSubmit={handleSubmit}
@@ -249,7 +269,16 @@ function EditCompanyForm({company}){
                                                         error={errors.companyTypeUuid}
                                                         touched={touched.companyTypeUuid}
                                                         optionLabelKey={"name"}
-                                                        selectFistValue={company.companyType.uuid}
+                                                        selectFistValue={values.companyTypeUuid}
+                                                        isEditable={true}
+                                                        onClickQuickEdit={(value) => {
+                                                            dispatch(setUuidForQuickEditCompanyType(value));
+                                                            dispatch(setIsOpenQuickEditCompanyType(true));
+                                                        }}
+                                                        isCreate={true}
+                                                        onClickCreate={() => {
+                                                            dispatch(setIsOpenQuickCreateCompanyType(true));
+                                                        }}
                                                     />
 
                                                     <SelectSingleComponent
@@ -260,7 +289,16 @@ function EditCompanyForm({company}){
                                                         error={errors.cityUuid}
                                                         touched={touched.cityUuid}
                                                         optionLabelKey="name"
-                                                        selectFistValue={company.city.uuid}
+                                                        selectFistValue={values.cityUuid}
+                                                        isEditable={true}
+                                                        onClickQuickEdit={(value) => {
+                                                            dispatch(setIsOpenQuickEditCity(true));
+                                                            dispatch(setUuidForQuickEditCity(value));
+                                                        }}
+                                                        isCreate={true}
+                                                        onClickCreate={() => {
+                                                            dispatch(setIsOpenQuickCreateCity(true));
+                                                        }}
                                                     />
 
                                                     <FormControl
@@ -311,6 +349,10 @@ function EditCompanyForm({company}){
                         }}
                     </Formik>
                 </div>
+                {isQuickEditCompanyTypeOpen && <QuickEditCompanyTypeComponent/>}
+                {isOpenCreateCompanyType && <QuickCreateCompanyTypeComponent/>}
+                {isQuickEditCityOpen && <QuickEditCityComponent/>}
+                {isOpenCreateCity && <QuickCreateCityComponent/>}
             </>
         );
     }

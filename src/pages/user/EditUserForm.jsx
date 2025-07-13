@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  useFindAllGenderQuery,
   useGetAllRolesQuery,
   useUpdateUserMutation,
 } from "../../redux/feature/users/userApiSlice";
@@ -29,7 +28,7 @@ import { cardStyle } from "../../assets/style";
 import ProfileUploadComponent from "../../components/ProfileUploadComponent";
 import SelectSingleComponent from "../../components/SelectSingleComponent";
 import { DatePicker } from "@mui/x-date-pickers";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import SelectComponent from "../../components/SelectComponent";
 import ButtonComponent from "../../components/ButtonComponent";
 import dayjs from "dayjs";
@@ -39,6 +38,10 @@ import {
 import { setIdUserToDelete } from "../../redux/feature/users/userSlice";
 import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
 import {toast, Slide} from "react-toastify";
+import { useGetAllGendersQuery } from "../../redux/feature/gender/genderApiSlice.js";
+import { setIsOpenQuickCreateGender, setIsOpenQuickEditGender, setUuidForQuickEditGender } from "../../redux/feature/gender/genderSlice.js";
+import QuickCreateGenderComponent from "../../components/QuickCreateGenderComponent.jsx";
+import QuickEditGenderComponent from "../../components/QuickEditGenderComponent.jsx";
 
 function EditUserForm({ user }) {
   const navigate = useNavigate();
@@ -47,9 +50,11 @@ function EditUserForm({ user }) {
   const [profileImageFile, setProfileImageFile] = useState(null);
   const { isManager, isAdmin, sites } = useAuth();
   const [error, setError] = useState(null);
+  const isQuickEditGenderOpen = useSelector((state) => state.gender.isOpenQuickEditGender);
+  const isOpenQuickCreateGender = useSelector((state) => state.gender.isOpenQuickCreateGender);
   const {data:companyData, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList", {skip: !isAdmin});
   const {data: role, isSuccess: isSuccessGetRole, isLoading: isLoadingGetRole} = useGetAllRolesQuery("roleList");
-  const {data: gender, isSuccess: isSuccessGetGender, isLoading: isLoadingGetGender} = useFindAllGenderQuery("genderList");
+  const {data: gender, isSuccess: isSuccessGetGender, isLoading: isLoadingGetGender} = useGetAllGendersQuery("genderList");
 
   const [
     updateUser,
@@ -287,7 +292,7 @@ function EditUserForm({ user }) {
             handleBlur,
             setFieldValue,
           }) => {
-            console.log({values})
+            
             const errorDateOfBirth = errors.dateOfBirth && touched.dateOfBirth;
 
             const handleRoleChange = (value) => {
@@ -298,8 +303,7 @@ function EditUserForm({ user }) {
               setFieldValue("branchId", value);
             };
 
-            const handleGenderChange = (value) => {
-              console.log("value", value);
+            const handleGenderChange = (value) => {      
               setFieldValue("genderId", value);
             };
 
@@ -485,6 +489,15 @@ function EditUserForm({ user }) {
                           touched={touched.genderId}
                           optionLabelKey="gender"
                           selectFistValue={values.genderId}
+                          isEditable={true}
+                          onClickQuickEdit={(value) => {
+                            dispatch(setIsOpenQuickEditGender(true));
+                            dispatch(setUuidForQuickEditGender(value));
+                          }}
+                          isCreate={true}
+                          onClickCreate={() => {
+                            dispatch(setIsOpenQuickCreateGender(true));
+                          }}
                         />
 
                         <TextField
@@ -619,6 +632,8 @@ function EditUserForm({ user }) {
             );
           }}
         </Formik>
+        {isQuickEditGenderOpen && <QuickEditGenderComponent />}
+        {isOpenQuickCreateGender && <QuickCreateGenderComponent />}
       </div>
     );
   }

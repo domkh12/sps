@@ -10,12 +10,14 @@ import {
     IconButton,
     TextField,
     InputAdornment,
+    Button,
 } from "@mui/material";
 import DataNotFound from "./DataNotFound";
 import { useSelector } from "react-redux";
 import { FaPen } from "react-icons/fa6";
 import useTranslate from "../hook/useTranslate.jsx";
 import SearchTwoToneIcon from "@mui/icons-material/SearchTwoTone";
+import MoreActionComponent from "./MoreActionComponent.jsx";
 
 function SelectSingleComponent({
                                    label,
@@ -32,7 +34,10 @@ function SelectSingleComponent({
                                    companyLabel = "",
                                    selectFistValue,
                                    isEditable = false,
-                                   onClickQuickEdit
+                                   onClickQuickEdit,
+                                   isCreate=false,
+                                   onClickCreate,
+                                   menuActions
                                }) {
     const [valueSelect, setValueSelect] = useState("");
     const [searchText, setSearchText] = useState("");
@@ -44,22 +49,22 @@ function SelectSingleComponent({
     const MenuProps = {
         sx: {
             "& .MuiPaper-root": {
-                background: mode === "dark" ? "#141A21" : "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
+                background: mode === "dark" ? "#141A21" : "#fff",
                 borderRadius: "10px",
                 padding: "6px",
                 boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)",
-                marginTop: "0.5rem",
+                marginTop: "0.5rem",            
             },
             "& .MuiList-root": {
                 padding: "0",
                 display: "grid",
-                gap: "6px",
+                gap: "6px"
             },
         },
         PaperProps: {
             style: {
-                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-                width: "auto",
+                maxHeight: ITEM_HEIGHT * 7 + ITEM_PADDING_TOP,
+                width: "auto"
             },
         },
     };
@@ -210,15 +215,12 @@ function SelectSingleComponent({
             <InputLabel id={`${label}_label`} error={hasError}>
                 {label}
             </InputLabel>
-            <Select
+            <Select    
                 labelid={`${label}_label`}
                 id={label}
                 label={label}
                 MenuProps={{
-                    ...MenuProps,
-                    autoFocus: false,
-                    disableAutoFocus: true,
-                    disableEnforceFocus: true
+                     ...MenuProps
                 }}
                 value={selectFistValue ? selectFistValue : valueSelect}
                 onChange={handleChange}
@@ -242,34 +244,63 @@ function SelectSingleComponent({
                     }),
                 }}
             >
-                <div>
-                    <TextField
-                        size="small"
-                        variant="outlined"
-                        placeholder={t('search')}
-                        value={searchText}
-                        onChange={handleSearchChange}
-                        autoFocus
-                        onClick={(event) => {
-                            event.stopPropagation();
-                        }}
-                        onKeyDown={(event) => {
-                            event.stopPropagation();
-                        }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchTwoToneIcon />
-                                </InputAdornment>
-                            ),
-                        }}
-                        sx={{
-                            margin: "8px",
-                            width: "calc(100% - 16px)",
-                        }}
-                    />
+                <div className="h-14 sticky top-0 z-10 bg-white dark:bg-[#141A21] rounded-lg">
+                    <div className="flex justify-between items-center">
+                        <TextField
+                            size="small"
+                            variant="outlined"
+                            placeholder={t('search')}
+                            value={searchText}
+                            onChange={handleSearchChange}
+                            autoFocus
+                            onClick={(event) => {
+                                event.stopPropagation();
+                            }}
+                            onKeyDown={(event) => {
+                                event.stopPropagation();
+                            }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchTwoToneIcon />
+                                    </InputAdornment>
+                                ),
+                            }}
+                            sx={{
+                                margin: "8px",
+                                width: "calc(100% - 16px)"
+                            }}
+                        />
+                        {menuActions && (
+                            <div 
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                }}
+                                onMouseDown={(event) => {
+                                    event.stopPropagation();
+                                }}
+                            >
+                                <MoreActionComponent menuItems={menuActions} />
+                            </div>
+                        )}
+                    </div>
                 </div>
-                {renderMenuItems()}
+                    {renderMenuItems()}
+                {
+                    isCreate && (
+                        <div className="h-14 flex items-center justify-end px-2 sticky bottom-0 z-10 bg-white dark:bg-[#141A21] rounded-lg">
+                            <Button variant="contained" 
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                onClickCreate();
+                                }}
+                            >
+                                {t('create')}
+                            </Button>
+                        </div>        
+                    )
+                }
+                
             </Select>
             <FormHelperText error={hasError}>
                 {hasError ? error : null}
@@ -279,201 +310,3 @@ function SelectSingleComponent({
 }
 
 export default SelectSingleComponent;
-
-// import React, { useState, useEffect } from "react";
-// import {
-//   FormControl,
-//   InputLabel,
-//   MenuItem,
-//   Select,
-//   FormHelperText,
-//   ListSubheader,
-// } from "@mui/material";
-// import { selectMenuStyle, selectStyle } from "../assets/style";
-// import DataNotFound from "./DataNotFound";
-//
-// function SelectSingleComponent({
-//   label,
-//   options,
-//   onChange,
-//   className,
-//   fullWuuidth,
-//   error,
-//   touched,
-//   optionLabelKey = "label",
-//   groupLabelKey = "",
-//   itemsLabelKey = "items",
-//   selectFistValue,
-// }) {
-//   const [valueSelect, setValueSelect] = useState("");
-//   const ITEM_HEIGHT = 48;
-//   const ITEM_PADDING_TOP = 8;
-//   const MenuProps = {
-//     sx: {
-//       ...selectMenuStyle,
-//     },
-//     PaperProps: {
-//       style: {
-//         maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-//         wuuidth: "auto",
-//       },
-//     },
-//   };
-//
-//   const hasError = error && touched;
-//
-//   const [selectedUUUUID, setSelectedUUUUID] = useState("");
-//
-//   useEffect(() => {
-//     if (selectFistValue) {
-//       setSelectedUUUUID(selectFistValue);
-//       setValueSelect(
-//         findLabelByUuuuid(
-//           selectFistValue,
-//           options,
-//           optionLabelKey,
-//           groupLabelKey,
-//           itemsLabelKey
-//         )
-//       );
-//     }
-//   }, [selectFistValue, options]);
-//
-//   const findLabelByUuuuid = (
-//     uuuuid,
-//     options,
-//     optionLabelKey,
-//     groupLabelKey,
-//     itemsLabelKey
-//   ) => {
-//     if (!uuuuid || !options) return "";
-//     if (groupLabelKey) {
-//       for (const group of options) {
-//         const items = group[itemsLabelKey] || [];
-//         for (const item of items) {
-//           if (item.uuuuid === uuuuid) {
-//             return item[optionLabelKey];
-//           }
-//         }
-//       }
-//     } else {
-//       const foundOption = options.find((option) => option.uuuuid === uuuuid);
-//       return foundOption ? foundOption[optionLabelKey] : "";
-//     }
-//     return "";
-//   };
-//   const handleChange = (event) => {
-//     const newValue = event.target.value;
-//     setSelectedUUUUID(newValue);
-//     setValueSelect(
-//       findLabelByUuuuid(
-//         newValue,
-//         options,
-//         optionLabelKey,
-//         groupLabelKey,
-//         itemsLabelKey
-//       )
-//     );
-//
-//     onChange(newValue);
-//   };
-//
-//   const renderMenuItems = () => {
-//     if (!options || options.length === 0) {
-//       return (
-//         <div className="py-3">
-//           <DataNotFound />
-//         </div>
-//       );
-//     }
-//
-//     let menuItems = [];
-//     if (!groupLabelKey) {
-//       menuItems = options.map((option) => (
-//         <MenuItem
-//           key={option?.uuuuid}
-//           sx={{
-//             borderRadius: "5px",
-//             height: "40px",
-//             "& .MuiTypography-root": {
-//               fontSize: "15px",
-//             },
-//             paddingRight: "10px",
-//           }}
-//           value={option?.uuuuid}
-//         >
-//           {option[optionLabelKey]}
-//         </MenuItem>
-//       ));
-//     } else {
-//       options.forEach((group) => {
-//         menuItems.push(
-//           <ListSubheader
-//             key={group[groupLabelKey]}
-//             sx={{
-//               backgroundColor: "#D5D6E9",
-//               borderRadius: "5px",
-//               color: "#2C3092",
-//               pointerEvents: "none",
-//             }}
-//           >
-//             {group[groupLabelKey]}
-//           </ListSubheader>
-//         );
-//
-//         const items = group[itemsLabelKey] || [];
-//         items.forEach((option) => {
-//           menuItems.push(
-//             <MenuItem
-//               key={option.uuuuid}
-//               sx={{
-//                 borderRadius: "5px",
-//                 height: "40px",
-//                 "& .MuiTypography-root": {
-//                   fontSize: "15px",
-//                 },
-//                 paddingRight: "10px",
-//               }}
-//               value={option?.uuuuid}
-//             >
-//               {option[optionLabelKey]}
-//             </MenuItem>
-//           );
-//         });
-//       });
-//     }
-//
-//     return menuItems;
-//   };
-//
-//   return (
-//     <FormControl className={className} fullWuuidth={fullWuuidth} error={hasError}>
-//       <InputLabel uuid={`${label}_label`} error={hasError}>
-//         {label}
-//       </InputLabel>
-//       <Select
-//         labelUuid={`${label}_label`}
-//         uuid={label}
-//         label={label}
-//         MenuProps={MenuProps}
-//         value={selectedUUUUID}
-//         onChange={handleChange}
-//         sx={{
-//           ...selectStyle,
-//           ...(hasError && {
-//             "& .MuiOutlinedInput-notchedOutline": {
-//               borderColor: "#f44336",
-//             },
-//           }),
-//         }}
-//       >
-//         {renderMenuItems()}
-//       </Select>
-//       <FormHelperText error={hasError}>
-//         {hasError ? error : null}
-//       </FormHelperText>
-//     </FormControl>
-//   );
-// }
-//
-// export default SelectSingleComponent;

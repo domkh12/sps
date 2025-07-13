@@ -18,9 +18,25 @@ import {DatePicker} from "@mui/x-date-pickers";
 import {useCreateCompanyMutation} from "../../redux/feature/company/companyApiSlice.js";
 import dayjs from "dayjs";
 import {toast, Slide} from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsOpenQuickCreateCompanyType, setIsOpenQuickEditCompanyType, setUuidForQuickEditCompanyType } from "../../redux/feature/companyType/companyTypeSlice.js";
+import QuickEditCompanyTypeComponent from "../../components/QuickEditCompanyTypeComponent.jsx";
+import QuickCreateCompanyTypeComponent from "../../components/QuickCreateCompanyTypeComponent.jsx";
+import {
+  setIsOpenQuickCreateCity,
+  setIsOpenQuickEditCity,
+  setUuidForQuickEditCity
+} from "../../redux/feature/city/citySlice.js";
+import QuickEditCityComponent from "../../components/QuickEditCityComponent.jsx";
+import QuickCreateCityComponent from "../../components/QuickCreateCityComponent.jsx";
 
 function AddCompany() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isQuickEditCompanyTypeOpen = useSelector((state) => state.companyType.isOpenQuickEditCompanyType);
+  const isOpenCreateCompanyType = useSelector((state) => state.companyType.isOpenQuickCreateCompanyType);
+  const isOpenCreateCity = useSelector((state) => state.city.isOpenQuickCreateCity);
+  const isQuickEditCityOpen = useSelector((state) => state.city.isOpenQuickEditCity);
   const [profileImageFile, setProfileImageFile] = useState(null);
   const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
   const {data:companyTypeData, isSuccess: isSuccessGetCompanyType, isLoading: isLoadingGetCompanyType} = useGetCompanyTypeQuery("companyTypeList");
@@ -159,7 +175,8 @@ function AddCompany() {
                 setFieldValue("cityUuid", value);
               };
 
-              const handleCompanyTypeChange = (value) => {
+              const handleCompanyTypeChange = (value) => {     
+                console.log("Company Type UUID:", value);  
                 setFieldValue("companyTypeUuid", value);
               };
 
@@ -246,6 +263,15 @@ function AddCompany() {
                             error={errors.companyTypeUuid}
                             touched={touched.companyTypeUuid}
                             optionLabelKey={"name"}
+                            isEditable={true}
+                            onClickQuickEdit={(value) => {                             
+                              dispatch(setUuidForQuickEditCompanyType(value));
+                              dispatch(setIsOpenQuickEditCompanyType(true));
+                            }}
+                            isCreate={true}
+                            onClickCreate={() => {
+                              dispatch(setIsOpenQuickCreateCompanyType(true));
+                            }}
                           />
 
                           <SelectSingleComponent
@@ -256,6 +282,15 @@ function AddCompany() {
                             error={errors.cityUuid}
                             touched={touched.cityUuid}
                             optionLabelKey="name"
+                            isEditable={true}
+                            onClickQuickEdit={(value) => {
+                              dispatch(setIsOpenQuickEditCity(true));
+                              dispatch(setUuidForQuickEditCity(value));
+                            }}
+                            isCreate={true}
+                            onClickCreate={() => {
+                              dispatch(setIsOpenQuickCreateCity(true));
+                            }}
                           />
 
                           <FormControl
@@ -306,6 +341,10 @@ function AddCompany() {
             }}
           </Formik>
         </div>
+        {isQuickEditCompanyTypeOpen && <QuickEditCompanyTypeComponent/>}
+        {isOpenCreateCompanyType && <QuickCreateCompanyTypeComponent/>}
+        {isQuickEditCityOpen && <QuickEditCityComponent/>}
+        {isOpenCreateCity && <QuickCreateCityComponent/>}
       </>
     );
   }

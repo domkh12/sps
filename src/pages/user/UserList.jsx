@@ -109,14 +109,12 @@ function UserList() {
       minWidth: 120,
       align: "left",
     },
-    isAdmin
-      ? {
-          id: "branch",
-          label: "Branch",
-          minWidth: 120,
-          align: "left",
-        }
-      : null,
+    {
+      id: "branch",
+      label: "Branch",
+      minWidth: 120,
+      align: "left",
+    },
     {
       id: "status",
       label: "Status",

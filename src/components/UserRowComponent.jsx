@@ -249,34 +249,28 @@ function UserRowComponent({ userId, user }) {
           >
             <div className="flex gap-5 items-center">{roles}</div>
           </TableCell>
-          {isAdmin && (
-            <TableCell
-              sx={{ borderTopStyle: "dashed", borderBottomStyle: "dashed" }}
-            >
-              <Stack direction="column" spacing={1}>
-                {loadedUser?.sites?.length > 0 ? (
-                    loadedUser?.sites?.map((site) => (
-                        <div key={site?.uuid}>
-                          <Chip
-                              avatar={
-                                <Avatar
-                                    alt="Branch_Img"
-                                    src={site?.image || ""}
-                                    {...stringAvatar(site?.siteName || "N/A")}
-                                />
-                              }
-                              className="w-fit"
-                              label={site?.siteName || "N/A"}
-                              variant="outlined"
-                          />
-                        </div>
-                    ))
-                ):(
+          <TableCell sx={{ borderTopStyle: "dashed", borderBottomStyle: "dashed" }}>
+            <Stack direction="column" spacing={1}>
+              {loadedUser?.sites?.length > 0 ? (
+                loadedUser?.sites?.map((site) => (
+                  <div key={site?.uuid}>
+                    <Chip
+                      avatar={
+                        <Avatar
+                          alt="Branch_Img"
+                          src={site?.image || ""}
+                          {...stringAvatar(site?.siteName || "N/A")}/>
+                      }
+                        className="w-fit"
+                        label={site?.siteName || "N/A"}
+                        variant="outlined"
+                        />
+                  </div>
+                ))):(
                     <Typography variant="body2" color="gray">N/A</Typography>
                 )}
               </Stack>
-            </TableCell>
-          )}
+          </TableCell>
 
           <TableCell
             sx={{ borderTopStyle: "dashed", borderBottomStyle: "dashed" }}

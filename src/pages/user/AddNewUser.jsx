@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   useAddNewUserMutation,
-  useFindAllGenderQuery,
   useGetAllRolesQuery,
 } from "../../redux/feature/users/userApiSlice";
 import { useNavigate } from "react-router-dom";
@@ -38,6 +37,10 @@ import SeoComponent from "../../components/SeoComponent.jsx";
 import useAuth from "../../hook/useAuth.jsx";
 import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
 import {Slide, toast} from "react-toastify";
+import { useGetAllGendersQuery } from "../../redux/feature/gender/genderApiSlice.js";
+import { setIsOpenQuickCreateGender, setIsOpenQuickEditGender, setUuidForQuickEditGender } from "../../redux/feature/gender/genderSlice.js";
+import QuickEditGenderComponent from "../../components/QuickEditGenderComponent.jsx";
+import QuickCreateGenderComponent from "../../components/QuickCreateGenderComponent.jsx";
 
 function AddNewUser() {
   const navigate = useNavigate();
@@ -46,11 +49,13 @@ function AddNewUser() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState(null);
+  const isQuickEditGenderOpen = useSelector((state) => state.gender.isOpenQuickEditGender);
+  const isOpenQuickCreateGender = useSelector((state) => state.gender.isOpenQuickCreateGender);
   const { t } = useTranslate();
   const { isManager, isAdmin , sites} = useAuth();
   const {data:companyData, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList", {skip: !isAdmin});
   const {data: role, isSuccess: isSuccessGetRole, isLoading: isLoadingGetRole} = useGetAllRolesQuery("roleList");
-  const {data: gender, isSuccess: isSuccessGetGender, isLoading: isLoadingGetGender} = useFindAllGenderQuery("genderList");
+  const {data: gender, isSuccess: isSuccessGetGender, isLoading: isLoadingGetGender} = useGetAllGendersQuery("genderList");
   const [
     addNewUser,
     {
@@ -326,6 +331,7 @@ function AddNewUser() {
             };
 
             const handleGenderChange = (value) => {
+              
               setFieldValue("genderId", value);
             };
 
@@ -439,6 +445,15 @@ function AddNewUser() {
                           error={errors.genderId}
                           touched={touched.genderId}
                           optionLabelKey="gender"
+                          isEditable={true}
+                          onClickQuickEdit={(value) => {
+                            dispatch(setIsOpenQuickEditGender(true));
+                            dispatch(setUuidForQuickEditGender(value));
+                          }}
+                          isCreate={true}
+                          onClickCreate={() => {
+                            dispatch(setIsOpenQuickCreateGender(true));
+                          }}
                         />
 
                         <TextField
@@ -677,6 +692,8 @@ function AddNewUser() {
             );
           }}
         </Formik>
+        {isQuickEditGenderOpen && <QuickEditGenderComponent />}
+        {isOpenQuickCreateGender && <QuickCreateGenderComponent />}
       </div>
     );
   }

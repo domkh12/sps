@@ -8,6 +8,7 @@ function EditCompany() {
     const {id} = useParams();
 
     const {data: company, isFetching, isSuccess, isError, error, refetch} = useGetCompanyByUuidQuery(id);
+    
     useEffect(() => {
         refetch();
     }, [refetch]);

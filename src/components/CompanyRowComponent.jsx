@@ -142,7 +142,7 @@ function CompanyRowComponent({companyId, company }) {
         </TableCell>
 
           <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          {company?.companyType.name || "N/A"}
+          {company?.companyType?.name || "N/A"}
           </TableCell>
 
           <TableCell sx={{ borderBottomStyle: "dashed" }}>
@@ -154,7 +154,7 @@ function CompanyRowComponent({companyId, company }) {
         </TableCell>
 
           <TableCell sx={{ borderBottomStyle: "dashed" }}>
-          {company?.city.name || "N/A"}
+          {company?.city?.name || "N/A"}
           </TableCell>
 
           <TableCell sx={{ borderBottomStyle: "dashed" }}>
@@ -163,15 +163,15 @@ function CompanyRowComponent({companyId, company }) {
 
         <TableCell sx={{borderBottomStyle: "dashed"}}>
           <Typography variant="body1">
-            {company.createdAt.substring(
+            {company?.createdAt.substring(
                 0,
-                company.createdAt.lastIndexOf(" ")
+                company?.createdAt.lastIndexOf(" ")
             )}
           </Typography>
           <Typography variant="body2" color="gray">
-            {company.createdAt.substring(
-                company.createdAt.lastIndexOf(" "),
-                company.createdAt.length
+            {company?.createdAt.substring(
+                company?.createdAt.lastIndexOf(" "),
+                company?.createdAt.length
             )}
           </Typography>
         </TableCell>

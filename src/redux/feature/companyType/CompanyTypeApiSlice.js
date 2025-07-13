@@ -23,7 +23,52 @@ export const companyTypeApiSlice = apiSlice.injectEndpoints({
                 } else return [{ type: "CompanyType", id: "LIST" }];
             },
         }),
+
+        createCompanyType: builder.mutation({
+            query: (initialState) => ({
+                url: "/company-types",
+                method: "POST",
+                body: {
+                ...initialState,
+                },
+            }),
+            invalidatesTags: [{ type: "CompanyType", id: "LIST" }],
+        }),
+
+        updateCompanyType: builder.mutation({
+            query: ({uuid, ...initialCompanyTypeData}) => ({
+                url: `/company-types/${uuid}`,
+                method: "PUT",
+                body: {
+                ...initialCompanyTypeData,
+                },
+            }),
+            invalidatesTags: [{type: "CompanyType", id: "LIST"}],
+        }),
+
+        getCompanyTypeByUuid: builder.query({
+            query: ({uuid}) => `company-types/${uuid}`,
+            providesTags: (result, error, arg) => {
+                if (result?.ids) {
+                return [{type: "CompanyTypeByUuid", id: "LIST"}, ...result.ids.map((id) => ({type: "CompanyTypeByUuid", id})),];
+                } else return [{type: "CompanyTypeByUuid", id: "LIST"}];
+            },
+        }),
+
+        deleteCompanyType: builder.mutation({
+            query: ({ uuid }) => ({
+                url: `/company-types/${uuid}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: (result, error, arg) => [{ type: "CompanyType", id: "LIST" }],
+        }),
     }),
 });
 
-export const { useGetCompanyTypeQuery } = companyTypeApiSlice;
+export const { 
+    useCreateCompanyTypeMutation,
+    useDeleteCompanyTypeMutation,
+    useGetCompanyTypeByUuidQuery,
+    useUpdateCompanyTypeMutation, 
+    useGetCompanyTypeQuery
+} = companyTypeApiSlice;

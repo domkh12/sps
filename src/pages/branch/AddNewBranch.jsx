@@ -18,6 +18,16 @@ import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadIm
 import { useCreateNewSiteMutation } from "../../redux/feature/site/siteApiSlice";
 import {useGetAllCompaniesQuery} from "../../redux/feature/company/companyApiSlice.js";
 import {Slide, toast} from "react-toastify";
+import QuickEditCityComponent from "../../components/QuickEditCityComponent.jsx";
+import QuickCreateCityComponent from "../../components/QuickCreateCityComponent.jsx";
+import {
+  setIsOpenQuickCreateCity,
+  setIsOpenQuickEditCity,
+  setUuidForQuickEditCity
+} from "../../redux/feature/city/citySlice.js";
+import { setIsOpenQuickCreateBranchType, setIsOpenQuickEditBranchType, setUuidForQuickEditBranchType } from "../../redux/feature/siteType/siteTypeSlice.js";
+import QuickEditBranchTypeComponent from "../../components/QuickEditBranchTypeComponent.jsx";
+import QuickCreateBranchTypeComponent from "../../components/QuickCreateBranchTypeComponent.jsx";
 
 function AddNewBranch() {
   const navigate = useNavigate();
@@ -26,7 +36,10 @@ function AddNewBranch() {
   const { t } = useTranslate();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const isOpenCreateCity = useSelector((state) => state.city.isOpenQuickCreateCity);
+  const isQuickEditCityOpen = useSelector((state) => state.city.isOpenQuickEditCity);
+  const isQuickEditBranchTypeOpen = useSelector((state) => state.siteType.isQuickEditBranchTypeOpen);
+  const isOpenQuickCreateBranchType = useSelector((state) => state.siteType.isOpenQuickCreateBranchType);
   const [uploadImage] = useUploadImageMutation();
   const {data:companyName, isSuccess: isSuccessGetCompanyName, isLoading: isLoadingGetCompanyName}= useGetAllCompaniesQuery("companyNameList");
   const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
@@ -130,7 +143,7 @@ function AddNewBranch() {
     content = (
       <>
         <div data-aos="fade-left">
-          <SeoComponent title={"Create a new company"} />
+          <SeoComponent title={"Create a new branch"} />
           <MainHeaderComponent
             breadcrumbs={breadcrumbs}
             title={t("createNewBranch")}
@@ -267,6 +280,15 @@ function AddNewBranch() {
                             error={errors.cityId}
                             touched={touched.cityId}
                             optionLabelKey="name"
+                            isEditable={true}
+                            onClickQuickEdit={(value) => {
+                              dispatch(setIsOpenQuickEditCity(true));
+                              dispatch(setUuidForQuickEditCity(value));
+                            }}
+                            isCreate={true}
+                            onClickCreate={() => {
+                              dispatch(setIsOpenQuickCreateCity(true));
+                            }}
                           />
 
                           <SelectSingleComponent
@@ -277,6 +299,15 @@ function AddNewBranch() {
                             error={errors.siteTypeId}
                             touched={touched.siteTypeId}
                             optionLabelKey="name"
+                            isEditable={true}
+                            onClickQuickEdit={(value) => {
+                              dispatch(setIsOpenQuickEditBranchType(true));
+                              dispatch(setUuidForQuickEditBranchType(value));
+                            }}
+                            isCreate={true}
+                            onClickCreate={() => {
+                              dispatch(setIsOpenQuickCreateBranchType(true));
+                            }}
                           />
                         </div>
 
@@ -295,6 +326,10 @@ function AddNewBranch() {
             }}
           </Formik>
         </div>
+        {isQuickEditCityOpen && <QuickEditCityComponent/>}
+        {isOpenCreateCity && <QuickCreateCityComponent/>}
+        {isQuickEditBranchTypeOpen && <QuickEditBranchTypeComponent/>}
+        {isOpenQuickCreateBranchType && <QuickCreateBranchTypeComponent/>}
       </>
     );
   }

@@ -34,7 +34,7 @@ export default function Profile() {
   const breadcrumbs = [
     <button
       className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      onClick={() => navigate(`${isManager ? "/dash" : "/admin"}`)}
       key={1}
     >
       {t("dashboard")}
@@ -47,9 +47,9 @@ export default function Profile() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
     if (newValue === 0) {
-      navigate("/dash/accounts");
+      navigate(`${isManager ? "/dash/accounts" : "/admin/accounts"}`);
     } else if (newValue === 1) {
-      navigate("/dash/accounts/security");
+      navigate(`${isManager ? "/dash/accounts/security" : "/admin/accounts/security"}`);
     }
   };
 

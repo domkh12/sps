@@ -42,7 +42,7 @@ function ViewBranchDetail({branch}){
                     </Typography>
                     <Typography variant="body1">
                         <span >{t('branchType')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${branch?.siteType.name || "N/A"}`}
+                        {`${"\u00a0"}:${"\u00a0"}${branch?.siteType?.name || "N/A"}`}
                     </Typography>
                     <Typography variant="body1">
                         <span >{t('parkingSpaceQty')} </span>
@@ -54,7 +54,7 @@ function ViewBranchDetail({branch}){
                     </Typography>
                     <Typography variant="body1">
                         <span >{t('city')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${branch?.city.name || "N/A"}`}
+                        {`${"\u00a0"}:${"\u00a0"}${branch?.city?.name || "N/A"}`}
                     </Typography>
                     <Link to={`/admin/companies/${branch?.company?.uuid}/view`}>
                         <Typography variant="body1">

@@ -13,6 +13,10 @@ import {companyTypeApiSlice} from "../../redux/feature/companyType/CompanyTypeAp
 import {siteTypeApiSlice} from "../../redux/feature/siteType/siteTypeApiSlice.js";
 import {slotApiSlice} from "../../redux/feature/slot/slotApiSlice.js";
 import {authApiSlice} from "../../redux/feature/auth/authApiSlice.js";
+import {licensePlateProvinceApiSlice} from "../../redux/feature/licensePlateProvince/licensePlateProvinceApiSlice.js";
+import { licensePlateTypeApiSlice } from "../../redux/feature/licensePlateType/licensePlateTypeApiSlice.js";
+import { vehicleTypeApiSlice } from "../../redux/feature/vehicleType/vehicleTypeApiSlice.js";
+import { genderApiSlice } from "../../redux/feature/gender/genderApiSlice.js";
 
 
 function Prefetch() {
@@ -42,12 +46,12 @@ function Prefetch() {
       store.dispatch(siteTypeApiSlice.util.prefetch("getAllSiteTypes", "siteTypeList", {force: true}));
       store.dispatch(slotApiSlice.util.prefetch("getSlots", "slotsList", { force: true }));
       store.dispatch(sitesApiSlice.util.prefetch("getListBranch", "branchList", { force: true }));
-      store.dispatch(vehicleApiSlice.util.prefetch("getAllVehicleTypes", "vehicleTypeList", { force: true }));
-      store.dispatch(vehicleApiSlice.util.prefetch("getAllLicensePlateProvinces", "licensePlateProvinceList", { force: true }));
-      store.dispatch(vehicleApiSlice.util.prefetch("getAllLicensePlateTypes", "licensePlateTypeList", { force: true }));
+      store.dispatch(vehicleTypeApiSlice.util.prefetch("getAllVehicleTypes", "vehicleTypeList", { force: true }));
+      store.dispatch(licensePlateProvinceApiSlice.util.prefetch("getAllLicensePlateProvinces", "licensePlateProvinceList", { force: true }));
+      store.dispatch(licensePlateTypeApiSlice.util.prefetch("getAllLicensePlateTypes", "licensePlateTypeList", { force: true }));
       store.dispatch(userApiSlice.util.prefetch("getAllFullNameUsers", "fullNameUsersList", { force: true }));
       store.dispatch(userApiSlice.util.prefetch("getAllRoles", "roleList", { force: true }));
-      store.dispatch(userApiSlice.util.prefetch("findAllGender", "genderList", { force: true }));
+      store.dispatch(genderApiSlice.util.prefetch("getAllGenders", "genderList", { force: true }));
       store.dispatch(userApiSlice.util.prefetch("getAllSignUpMethods", "signUpMethodList", { force: true }));
     }
   }, []);

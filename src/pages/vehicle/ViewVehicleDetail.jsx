@@ -158,10 +158,10 @@ function ViewVehicleDetail({ vehicle }) {
             <div className="w-auto rounded-[12px] m-[16px] border-blue-600 border-[3px] px-[24px] py-2 flex items-center justify-between">
               <div className="flex flex-col">
                 <Typography variant="h6" className="text-blue-600">
-                  {vehicle?.licensePlateProvince?.provinceNameEn}
+                  {vehicle?.licensePlateProvince?.provinceNameEn || "N/A"}
                 </Typography>
                 <Typography variant="h6" className="text-red-600">
-                  {vehicle?.licensePlateProvince?.provinceNameKh}
+                  {vehicle?.licensePlateProvince?.provinceNameKh || "N/A"}
                 </Typography>
               </div>
               <Typography
@@ -175,7 +175,7 @@ function ViewVehicleDetail({ vehicle }) {
 
           <Card sx={{ ...cardStyle, p: "16px" }}>
             <div className="flex justify-between items-center mb-5">
-              <Typography variant="h6">User info</Typography>
+              <Typography variant="h6">{t("userInfo")}</Typography>
             </div>
             <div className="flex justify-between">
               <List sx={{ padding: "0" }}>
@@ -241,7 +241,7 @@ function ViewVehicleDetail({ vehicle }) {
         <Grid2 size={{ xs: 12, md: 7 }}>
           <Card sx={{ ...cardStyle, p: "16px" }}>
             <div className="flex justify-between items-center mb-5">
-              <Typography variant="h6">User info</Typography>
+              <Typography variant="h6">{t("vehicleInfo")}</Typography>
             </div>
             <div className="flex items-center gap-5">
               <div className="p-1 border-dashed border rounded-[12px]">
@@ -259,14 +259,14 @@ function ViewVehicleDetail({ vehicle }) {
                   variant="body2"
                   sx={{ color: "gray", display: "inline" }}
                 >
-                  {vehicle?.vehicleModel}
+                  {vehicle?.vehicleModel || "N/A"}
                 </Typography>
               </div>
             </div>
             <div className="flex flex-col gap-3 mt-5">
               <Typography variant="body1">
                 <span className="text-gray-cus">{t("vehicleType")}</span>
-                {`${"\u00a0"}:${"\u00a0"}${vehicle?.vehicleType?.name}`}
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.vehicleType?.name || "N/A"}`}
               </Typography>
               <div className="flex gap-2">
                 <Typography variant="body1">{`${t("color")}${"\u00a0"}:`}</Typography>
@@ -274,26 +274,26 @@ function ViewVehicleDetail({ vehicle }) {
                   className="w-5 h-5 rounded-full border-[2px]"
                   style={{ backgroundColor: vehicle?.color }}
                 ></div>
-                <Typography variant="body1">{vehicle?.color}</Typography>
+                <Typography variant="body1">{vehicle?.color || "N/A"}</Typography>
               </div>
               <Typography variant="body1">
                 <span className="text-gray-cus">{t("licensePlateType")}</span>
-                {`${"\u00a0"}:${"\u00a0"}${vehicle?.licensePlateType?.name}`}
+                {`${"\u00a0"}:${"\u00a0"}${vehicle?.licensePlateType?.name || "N/A" }`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">Total parking hours</span>
+                <span className="text-gray-cus">{t("totalParkingHours")}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.totalParkingHours || "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">Total parking fee</span>
+                <span className="text-gray-cus">{t("totalParkingFees")}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.totalParkingFees || "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">Last parking lot</span>
+                <span className="text-gray-cus">{t("lastParkingSlot")}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.lastParkingLot || "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">Last parking-time</span>
+                <span className="text-gray-cus">{t("lastParkingTime")}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.lastParkingTime || "N/A"}`}
               </Typography>
             </div>

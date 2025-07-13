@@ -244,7 +244,7 @@ function BranchList() {
 
     content = (
       <div data-aos="fade-left">
-        <SeoComponent title="Company List" />
+        <SeoComponent title="Branch list" />
         <MainHeaderComponent
           breadcrumbs={breadcrumbs}
           title={t("list")}

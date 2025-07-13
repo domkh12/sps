@@ -29,7 +29,7 @@ function ViewCompanyDetail({company}) {
         <>
             <MainHeaderComponent
                 breadcrumbs={breadcrumbs}
-                title={company.companyName || "N/A"}
+                title={company?.companyName || "N/A"}
                 handleBackClick={() => navigate("/admin/companies")}
             />
             <Card sx={{...cardStyle, p: "16px"}}>
@@ -50,11 +50,11 @@ function ViewCompanyDetail({company}) {
                     </Typography>
                     <Typography variant="body1">
                         <span >{t('city')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.city.name || "N/A"}`}
+                        {`${"\u00a0"}:${"\u00a0"}${company?.city?.name || "N/A"}`}
                     </Typography>
                     <Typography variant="body1">
                         <span >{t('companyType')} </span>
-                        {`${"\u00a0"}:${"\u00a0"}${company?.companyType.name || "N/A"}`}
+                        {`${"\u00a0"}:${"\u00a0"}${company?.companyType?.name || "N/A"}`}
                     </Typography>
                     <Typography variant="body1">
                         <span >{t('establishedDate')} </span>

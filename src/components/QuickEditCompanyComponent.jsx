@@ -14,12 +14,30 @@ import SelectSingleComponent from "./SelectSingleComponent.jsx";
 import {DatePicker} from "@mui/x-date-pickers";
 import {useGetAllCitiesQuery} from "../redux/feature/city/cityApiSlice.js";
 import {useGetCompanyTypeQuery} from "../redux/feature/companyType/CompanyTypeApiSlice.js";
+import QuickEditCompanyTypeComponent from "./QuickEditCompanyTypeComponent.jsx";
+import QuickCreateCompanyTypeComponent from "./QuickCreateCompanyTypeComponent.jsx";
+import QuickEditCityComponent from "./QuickEditCityComponent.jsx";
+import QuickCreateCityComponent from "./QuickCreateCityComponent.jsx";
+import {
+    setIsOpenQuickCreateCity,
+    setIsOpenQuickEditCity,
+    setUuidForQuickEditCity
+} from "../redux/feature/city/citySlice.js";
+import {
+    setIsOpenQuickCreateCompanyType,
+    setIsOpenQuickEditCompanyType,
+    setUuidForQuickEditCompanyType
+} from "../redux/feature/companyType/companyTypeSlice.js";
 
 function QuickEditCompanyComponent() {
     const isQuickEditCompanyOpen = useSelector((state) => state.companies.isQuickEditCompanyOpen);
     const company = useSelector((state) => state.companies.companyDataForQuickEdit);
     const { t } = useTranslate();
     const dispatch = useDispatch();
+    const isQuickEditCompanyTypeOpen = useSelector((state) => state.companyType.isOpenQuickEditCompanyType);
+    const isOpenCreateCompanyType = useSelector((state) => state.companyType.isOpenQuickCreateCompanyType);
+    const isOpenCreateCity = useSelector((state) => state.city.isOpenQuickCreateCity);
+    const isQuickEditCityOpen = useSelector((state) => state.city.isOpenQuickEditCity);
     const {data:cityName, isSuccess: isSuccessGetCity, isLoading: isLoadingGetCity}= useGetAllCitiesQuery("citiesList");
     const {data:companyTypeData, isSuccess: isSuccessGetCompanyType, isLoading: isLoadingGetCompanyType} = useGetCompanyTypeQuery("companyTypeList");
 
@@ -145,8 +163,8 @@ function QuickEditCompanyComponent() {
                                 initialValues={{
                                     companyName: company?.companyName,
                                     companyAddress: company?.companyAddress,
-                                    companyTypeUuid: company?.companyType?.uuid,
-                                    cityUuid: company?.city?.uuid,
+                                    companyTypeUuid: company?.companyType?.uuid || "",
+                                    cityUuid: company?.city?.uuid || "",
                                     establishedDate: dayjs(company?.establishedDate),
                                     image: company?.image
                                 }}
@@ -225,7 +243,16 @@ function QuickEditCompanyComponent() {
                                                 error={errors.companyTypeUuid}
                                                 touched={touched.companyTypeUuid}
                                                 optionLabelKey={"name"}
-                                                selectFistValue={company.companyType.uuid}
+                                                selectFistValue={values.companyTypeUuid}
+                                                isEditable={true}
+                                                onClickQuickEdit={(value) => {
+                                                    dispatch(setUuidForQuickEditCompanyType(value));
+                                                    dispatch(setIsOpenQuickEditCompanyType(true));
+                                                }}
+                                                isCreate={true}
+                                                onClickCreate={() => {
+                                                    dispatch(setIsOpenQuickCreateCompanyType(true));
+                                                }}
                                             />
 
                                             <SelectSingleComponent
@@ -236,7 +263,16 @@ function QuickEditCompanyComponent() {
                                                 error={errors.cityUuid}
                                                 touched={touched.cityUuid}
                                                 optionLabelKey="name"
-                                                selectFistValue={company.city.uuid}
+                                                selectFistValue={values.citiUuid}
+                                                isEditable={true}
+                                                onClickQuickEdit={(value) => {
+                                                    dispatch(setIsOpenQuickEditCity(true));
+                                                    dispatch(setUuidForQuickEditCity(value));
+                                                }}
+                                                isCreate={true}
+                                                onClickCreate={() => {
+                                                    dispatch(setIsOpenQuickCreateCity(true));
+                                                }}
                                             />
 
                                             <FormControl
@@ -298,6 +334,10 @@ function QuickEditCompanyComponent() {
                             </Formik>
                         </Box>
                     </Box>
+                    {isQuickEditCompanyTypeOpen && <QuickEditCompanyTypeComponent/>}
+                    {isOpenCreateCompanyType && <QuickCreateCompanyTypeComponent/>}
+                    {isQuickEditCityOpen && <QuickEditCityComponent/>}
+                    {isOpenCreateCity && <QuickCreateCityComponent/>}
                 </Box>
             </Modal>
         )

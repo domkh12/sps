@@ -195,19 +195,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
           console.log(error);
         }
       },
-    }),
-
-    findAllGender: builder.query({
-      query: () => ({
-        url: "/genders",
-        method: "GET",
-      }),
-      providesTags: (result, error, arg) => {
-        if (result?.ids) {
-          return [{type: "Gender", id: "LIST"}, ...result.ids.map((id) => ({type: "Gender", id})),];
-        } else return [{type: "Gender", id: "LIST"}];
-      },
-    }),
+    }),    
 
     getAllRoles: builder.query({
       query: () => ({
@@ -249,7 +237,6 @@ export const {
   useGet2faSecretCodeMutation,
   useGet2faStatusMutation,
   useDeleteUserMutation,
-  useFindAllGenderQuery,
 } = userApiSlice;
 
 // return the query result object
