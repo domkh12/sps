@@ -229,6 +229,7 @@ const SelectComponent = ({
                     sx={{
                       borderRadius: "5px",
                       height: "40px",
+                      my: "6px",
                       padding: "0",
                       "& .MuiTypography-root": {
                         fontSize: "15px",

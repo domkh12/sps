@@ -38,8 +38,13 @@ function FilterChipsComponent({
   companyTypeFetched,
   companyTypeFilter,
   handleCompanyTypeChange,
+  dateFrom = "",
+  dateTo = "",
+  onDateChange
 }) {
+
   const dispatch = useDispatch();
+
   return (
     <>
       {isFiltered && (
@@ -187,6 +192,20 @@ function FilterChipsComponent({
                   />
                 </div>
               </div>
+            ) : null}
+
+            {dateFrom !== "" && dateTo !== "" ? (
+                <div className="p-2 rounded-[7px] border-dashed border w-fit">
+                  <div>
+                    <span className="font-medium mr-2">Date Range:</span>
+                    <Chip
+                        size="small"
+                        sx={{ borderRadius: "8px" }}
+                        label={`${new Date(dateFrom).toLocaleDateString("en-GB", { timeZone: "Asia/Phnom_Penh" })} - ${new Date(dateTo).toLocaleDateString("en-GB", { timeZone: "Asia/Phnom_Penh" })}`}
+                        onDelete={() => onDateChange("", "")}
+                    />
+                  </div>
+                </div>
             ) : null}
 
             {roleFilter?.length > 0 ? (

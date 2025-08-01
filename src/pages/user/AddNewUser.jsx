@@ -429,7 +429,7 @@ function AddNewUser() {
                           value={values.email}
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          autoComplete="off"
+                          autoComplete="emailForCreate"
                           error={errors.email && touched.email}
                           helperText={
                             errors.email && touched.email ? errors.email : null
@@ -566,7 +566,7 @@ function AddNewUser() {
                             name="password"
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            autoComplete="off"
+                            autoComplete="passWordForCreate"
                             value={values.password}
                             type={showPassword ? "text" : "password"}
                             endAdornment={
@@ -617,7 +617,7 @@ function AddNewUser() {
                             name="confirmPassword"
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            autoComplete="off"
+                            autoComplete="confirmPasswordForCreate"
                             value={values.confirmPassword}
                             type={showConfirmPassword ? "text" : "password"}
                             endAdornment={

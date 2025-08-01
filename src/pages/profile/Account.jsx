@@ -10,10 +10,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {useFindAllGenderQuery} from "../../redux/feature/users/userApiSlice";
 import { useUploadImageMutation } from "../../redux/feature/uploadImage/uploadImageApiSlice";
-import { useNavigate } from "react-router-dom";
 import SeoComponent from "../../components/SeoComponent";
 import useTranslate from "../../hook/useTranslate";
 import ProfileUploadComponent from "../../components/ProfileUploadComponent";
@@ -24,10 +21,12 @@ import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataCo
 import ButtonComponent from "../../components/ButtonComponent";
 import {useGetUserProfileQuery, useUpdateUserProfileMutation} from "../../redux/feature/auth/authApiSlice";
 import {Slide, toast} from "react-toastify";
+import { useGetAllGendersQuery } from "../../redux/feature/gender/genderApiSlice";
+
 function Account() {
   const { t } = useTranslate();
   const [profileImageFile, setProfileImageFile] = useState(null);
-  const {data: gender, isSuccess: isSuccessGetGender, isLoading: isLoadingGetGender} = useFindAllGenderQuery("genderList");
+  const {data: gender, isSuccess: isSuccessGetGender, isLoading: isLoadingGetGender} = useGetAllGendersQuery("genderList");
   const {data: userProfile, isSuccess: isSuccessGetUserProfile, isLoading: isLoadingGetUserProfile} = useGetUserProfileQuery("userProfile");
 
   const [uploadImage] = useUploadImageMutation();

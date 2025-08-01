@@ -356,11 +356,11 @@ function AddNewVehicle() {
                                   optionLabelKey={nameProvince}
                                   error={errors.lppId}
                                   touched={touched.lppId}
-                                  isCreate={true}
+                                  isCreate={isAdmin}
                                   onClickCreate={() => {
                                     dispatch(setIsOpenQuickCreateLicensePlateProvince(true));
                                   }}
-                                  isEditable={true}
+                                  isEditable={isAdmin}
                                   onClickQuickEdit={(value) => {
                                     dispatch(setIsOpenQuickEditLicensePlateProvince(true));
                                     dispatch(setUuidForQuickEditLicensePlateProvince(value));
@@ -376,11 +376,11 @@ function AddNewVehicle() {
                                   optionLabelKey="name"
                                   error={errors.licensePlateTypeId}
                                   touched={touched.licensePlateTypeId}
-                                  isCreate={true}
+                                  isCreate={isAdmin}
                                   onClickCreate={() => {
                                     dispatch(setIsOpenQuickCreateLicensePlateType(true));
                                   }}
-                                  isEditable={true}
+                                  isEditable={isAdmin}
                                   onClickQuickEdit={(value) => {
                                     dispatch(setIsOpenQuickEditLicensePlateType(true));
                                     dispatch(setUuidForQuickEditLicensePlateType(value));
@@ -395,11 +395,11 @@ function AddNewVehicle() {
                                   optionLabelKey="name"
                                   error={errors.vehicleTypeId}
                                   touched={touched.vehicleTypeId}
-                                  isCreate={true}
+                                  isCreate={isAdmin}
                                   onClickCreate={() => {
                                     dispatch(setIsOpenQuickCreateVehicleType(true));
                                   }}
-                                  isEditable={true}
+                                  isEditable={isAdmin}
                                   onClickQuickEdit={(value) => {
                                     dispatch(setIsOpenQuickEditVehicleType(true));
                                     dispatch(setUuidForQuickEditVehicleType(value));
@@ -502,12 +502,12 @@ function AddNewVehicle() {
               }}
             </Formik>
           </div>
-          {isQuickEditLicensePlateProvinceOpen && <QuickEditLicensePlateProvinceComponent/>}
-          {isQuickCreateLicensePlateProvinceOpen && <QuickCreateLicensePlateProvinceComponent/>}
-          {isQuickEditLicensePlateTypeOpen && <QuickEditLicensePlateTypeComponent/>}
-          {isQuickCreateLicensePlateTypeOpen && <QuickCreateLicensePlateTypeComponent/>}
-          {isQuickEditVehicleTypeOpen && <QuickEditVehicleTypeComponent/>}
-          {isQuickCreateVehicleTypeOpen && <QuickCreateVehicleTypeComponent/>}
+          {isAdmin && isQuickEditLicensePlateProvinceOpen && <QuickEditLicensePlateProvinceComponent/>}
+          {isAdmin && isQuickCreateLicensePlateProvinceOpen && <QuickCreateLicensePlateProvinceComponent/>}
+          {isAdmin && isQuickEditLicensePlateTypeOpen && <QuickEditLicensePlateTypeComponent/>}
+          {isAdmin && isQuickCreateLicensePlateTypeOpen && <QuickCreateLicensePlateTypeComponent/>}
+          {isAdmin && isQuickEditVehicleTypeOpen && <QuickEditVehicleTypeComponent/>}
+          {isAdmin && isQuickCreateVehicleTypeOpen && <QuickCreateVehicleTypeComponent/>}          
         </div>
     );
   }

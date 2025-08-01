@@ -25,8 +25,16 @@ const userSlice = createSlice({
     quickEditUserReponse: {},
     idUserToDelete: "",
     allFullNameUsersFetched: [],
+    pageNoReportUser: 1,
+    pageSizeReportUser: 5,
   },
   reducers: {
+    setPageNoReportUser(state, action) {
+      state.pageNoReportUser = action.payload;
+    },
+    setPageSizeReportUser(state, action) {
+      state.pageSizeReportUser = action.payload;
+    },
     setIsLoadingUser(state, action) {
       state.isLoadingUser = action.payload;
     },
@@ -123,6 +131,8 @@ const userSlice = createSlice({
 });
 
 export const {
+  setPageNoReportUser,
+  setPageSizeReportUser,
   clearFilter,
   setIsLoadingUser,
   setUuid,

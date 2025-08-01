@@ -17,6 +17,9 @@ import {licensePlateProvinceApiSlice} from "../../redux/feature/licensePlateProv
 import { licensePlateTypeApiSlice } from "../../redux/feature/licensePlateType/licensePlateTypeApiSlice.js";
 import { vehicleTypeApiSlice } from "../../redux/feature/vehicleType/vehicleTypeApiSlice.js";
 import { genderApiSlice } from "../../redux/feature/gender/genderApiSlice.js";
+import {parkingSlotDetailApiSlice} from "../../redux/feature/parkingSlotDetail/parkingSlotDetailApiSlice.js";
+import { checkInApiSlice } from "../../redux/feature/checkIn/checkInApiSlice.js";
+import {checkOutApiSlice} from "../../redux/feature/checkOut/checkOutApiSlice.js";
 
 
 function Prefetch() {
@@ -29,7 +32,7 @@ function Prefetch() {
     }
 
     if (isManager) {
-      store.dispatch(parkingDetailApiSlice.util.prefetch("getAllParkingDetail", "parkingDetailList", { force: true }));
+      store.dispatch(parkingDetailApiSlice.util.prefetch("getAllParkingDetail", "parkingSlotDetailList", { force: true }));
       store.dispatch(parkingApiSlice.util.prefetch("getParkingSpaces", "parkingSpacesList", {force: true,}));
       store.dispatch(userApiSlice.util.prefetch("getUsers", "usersList", { force: true }));
       store.dispatch(vehicleApiSlice.util.prefetch("getVehicles", "vehiclesList", { force: true }));
@@ -38,6 +41,9 @@ function Prefetch() {
     }
 
     if (isAdmin) {
+      store.dispatch(checkOutApiSlice.util.prefetch("getCheckOut", "checkOutList", { force: true }));
+      store.dispatch(checkInApiSlice.util.prefetch("getCheckIn", "checkInList", { force: true }));
+      store.dispatch(parkingSlotDetailApiSlice.util.prefetch("getParkingSlotDetail", "parkingSlotDetailList", { force: true }));
       store.dispatch(sitesApiSlice.util.prefetch("getSites", "sitesList", { force: true }));
       store.dispatch(companiesApiSlice.util.prefetch("getCompany","companiesList", {force: true}));
       store.dispatch(cityApiSlice.util.prefetch("getAllCities", "citiesList", {force: true }));

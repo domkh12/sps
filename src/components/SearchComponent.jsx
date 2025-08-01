@@ -9,13 +9,14 @@ function SearchComponent({ onSearchChange, value }) {
   const handleInputChange = (event) => {
     let inputValue = event.target.value;
 
-    const regex = /^[a-zA-Z0-9\s]*$/;
+    // const regex = /^[a-zA-Z0-9\s]*$/;
 
-    if (regex.test(inputValue)) {
+    // if (regex.test(inputValue)) {
+    //   onSearchChange(inputValue);
+    // } else {
+    //   event.target.value = value;
+    // }
       onSearchChange(inputValue);
-    } else {
-      event.target.value = value;
-    }
   };
 
   return (

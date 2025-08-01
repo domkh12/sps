@@ -78,6 +78,41 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
+    filterReportVehicles: builder.query({
+      query: ({
+        pageNo = 1,
+        pageSize = 5,
+        dateFrom = "",
+        dateTo = "",
+      }) => ({
+        url: `/vehicles/report?pageNo=${pageNo}&pageSize=${pageSize}&dateFrom=${dateFrom}&dateTo=${dateTo}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError;
+        },
+      }),
+      transformResponse: (responseData) => {
+        const loadVehicles = responseData.content.map((vehicle) => {
+          vehicle.id = vehicle.uuid;
+          return vehicle;
+        });
+        return {
+          ...vehicleAdapter.setAll(initialState, loadVehicles),
+          totalPages: responseData.page.totalPages,
+          totalElements: responseData.page.totalElements,
+          pageNo: responseData.page.number,
+          pageSize: responseData.page.size,
+        };
+      },
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [
+            { type: "Vehicle", id: "LIST" },
+            ...result.ids.map((id) => ({ type: "Vehicle", id })),
+          ];
+        } else return [{ type: "Vehicle", id: "LIST" }];
+      },
+    }),
+
     addNewVehicle: builder.mutation({
       query: (initialState) => ({
         url: "/vehicles",
@@ -126,6 +161,7 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
+  useFilterReportVehiclesQuery,
   useGetVehicleByUuidQuery,
   useGetVehiclesQuery,
   useAddNewVehicleMutation,

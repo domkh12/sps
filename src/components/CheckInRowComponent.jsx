@@ -26,7 +26,6 @@ import {Link} from "react-router-dom";
 import useAuth from "../hook/useAuth";
 import useDateFormatter from "../hook/useDateFormatter";
 import useTranslate from "./../hook/useTranslate";
-import {useGetParkingSlotDetailQuery} from "../redux/feature/parkingSlotDetail/parkingSlotDetailApiSlice";
 import ImageComponent from "./ImageComponent.jsx";
 
 function formatDuration(seconds) {
@@ -92,7 +91,7 @@ function stringAvatar(name) {
     };
 }
 
-function HistoryRowComponent({parkingDetail}) {
+function CheckInRowComponent({parkingDetail}) {
     const [open, setOpen] = useState(false);
     const [durations, setDurations] = useState("");
     const {isManager, isAdmin} = useAuth();
@@ -140,16 +139,6 @@ function HistoryRowComponent({parkingDetail}) {
         parkingDetail?.timeOut,
     ]);
 
-    const dateObj = new Date(parkingDetail?.timeIn);
-    var {formattedDateDDMMYYYYNoZeros: timeInformatedDate} = useDateFormatter(
-        new Date(parkingDetail?.timeIn)
-    );
-    var timeInformattedTime = dateObj.toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-    });
-
     const getChipStyles = () => {
         let backgroundColor = "#D2E3D6";
         let color = "#207234";
@@ -184,29 +173,8 @@ function HistoryRowComponent({parkingDetail}) {
                     <List sx={{padding: "0"}}>
                         <ListItem sx={{padding: "0", gap: "10px"}}>
                             <div className="w-32 h-20 rounded-[12px] overflow-hidden">
-                                <ImageComponent imageUrl={parkingDetail?.image || "/images/car-img-placeholder.jpg"}/>
+                                <ImageComponent imageUrl={parkingDetail?.imageCheckIn || "/images/car-img-placeholder.jpg"}/>
                             </div>
-                            <ListItemText
-                                primary={
-                                    (
-                                        <Link
-                                            className="hover:underline"
-                                            to={`${isAdmin ? "/admin" : "/dash"}/vehicles/${parkingDetail.vehicle.uuid}/view`}
-                                        >
-                                            {parkingDetail?.vehicle?.vehicleMake || "N/A"}
-                                        </Link>
-                                    ) || "N/A"
-                                }
-                                secondary={
-                                    <Typography
-                                        component="span"
-                                        variant="body2"
-                                        sx={{color: "gray", display: "inline"}}
-                                    >
-                                        {parkingDetail?.vehicle?.vehicleModel || "N/A"}
-                                    </Typography>
-                                }
-                            />
                         </ListItem>
                     </List>
                 </TableCell>
@@ -228,48 +196,20 @@ function HistoryRowComponent({parkingDetail}) {
                     </div>
                 </TableCell>
 
-                <TableCell component="th" scope="row">
-                    <Tooltip title="Location - ( Lot )" placement="bottom-start" arrow>
-                        <p>
-                            {`${parkingDetail?.parkingSpace?.label} - ( ${parkingDetail?.parkingLot?.lotName || "N/A"} )`}
-                        </p>
-                    </Tooltip>
-                </TableCell>
-
                 <TableCell sx={{borderBottomStyle: "dashed"}}>
-                    <Box sx={{display: "flex", flexDirection: "row", alignItems: "center", gap: 2}}>
-                        <Box>
-                            <Typography variant="body1">
-                                {parkingDetail?.timeIn?.substring(
-                                    0,
-                                    parkingDetail?.timeIn?.lastIndexOf(" ")
-                                )}
-                            </Typography>
-                            <Typography variant="body2" color="gray">
-                                {parkingDetail?.timeIn?.substring(
-                                    parkingDetail?.timeIn?.lastIndexOf(" "),
-                                    parkingDetail?.timeIn?.length
-                                )}
-                            </Typography>
-                        </Box>
-                        <Typography variant="body2" sx={{mx: 1}}>-</Typography>
-                        <Box>
-                            <Typography variant="body1">
-                                {parkingDetail?.timeOut?.substring(
-                                    0,
-                                    parkingDetail?.timeOut?.lastIndexOf(" ")
-                                )}
-                            </Typography>
-                            <Typography variant="body2" color="gray">
-                                {parkingDetail?.timeOut?.substring(
-                                    parkingDetail?.timeOut?.lastIndexOf(" "),
-                                    parkingDetail?.timeOut?.length
-                                )}
-                            </Typography>
-                        </Box>
-                    </Box>
+                    <Typography variant="body1">
+                        {parkingDetail?.createdAt.substring(
+                            0,
+                            parkingDetail?.createdAt.lastIndexOf(" ")
+                        )}
+                    </Typography>
+                    <Typography variant="body2" color="gray">
+                        {parkingDetail?.createdAt.substring(
+                            parkingDetail?.createdAt.lastIndexOf(" "),
+                            parkingDetail?.createdAt.length
+                        )}
+                    </Typography>
                 </TableCell>
-
 
                 <TableCell
                     sx={{borderTopStyle: "none", borderBottomStyle: "none"}}
@@ -334,25 +274,25 @@ function HistoryRowComponent({parkingDetail}) {
                                 <TableHead sx={{backgroundColor: "transparent"}}>
                                     <TableRow>
                                         <TableCell
-                                            minWidth={120}
+                                            minwidth={120}
                                             align="left"
                                             sx={{pl: 3, py: 2}}
                                         >
                                             {t("driver")}
                                         </TableCell>
-                                        <TableCell minWidth={120} align="left">
+                                        <TableCell minwidth={120} align="left">
                                             {t("gender")}
                                         </TableCell>
-                                        <TableCell minWidth={120} align="left">
+                                        <TableCell minwidth={120} align="left">
                                             {t("phoneNumber")}
                                         </TableCell>
-                                        <TableCell minWidth={120} align="left">
+                                        <TableCell minwidth={120} align="left">
                                             {t("role")}
                                         </TableCell>
-                                        <TableCell minWidth={120} align="left">
+                                        <TableCell minwidth={120} align="left">
                                             {t("branch")}
                                         </TableCell>
-                                        <TableCell minWidth={120} align="left">
+                                        <TableCell minwidth={120} align="left">
                                             {t("status")}
                                         </TableCell>
                                     </TableRow>
@@ -489,7 +429,7 @@ function HistoryRowComponent({parkingDetail}) {
                                                 <Chip
                                                     sx={getChipStyles()}
                                                     size="small"
-                                                    label={parkingDetail?.vehicle?.user?.status}
+                                                    label={parkingDetail?.vehicle?.user?.status || "Inactive"}
                                                 />
                                             ) : (
                                                 <p>N/A</p>
@@ -506,6 +446,6 @@ function HistoryRowComponent({parkingDetail}) {
     );
 }
 
-const memoizedHistoryRow = memo(HistoryRowComponent);
+const memoizedCheckInRow = memo(CheckInRowComponent);
 
-export default memoizedHistoryRow;
+export default memoizedCheckInRow;

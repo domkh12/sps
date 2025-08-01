@@ -22,6 +22,9 @@ import licensePlateProvinceReducer from "../feature/licensePlateProvince/license
 import licensePlateTypeReducer from "../feature/licensePlateType/licensePlateTypeSlice.js";
 import vehicleTypeReducer from "../feature/vehicleType/vehicleTypeSlice.js";
 import genderReducer from "../feature/gender/genderSlice.js";
+import parkingSlotDetailReducer from "../feature/parkingSlotDetail/parkingSlotSlice.js";
+import checkInReducer from "../feature/checkIn/checkInSlice.js"
+import checkOutReducer from "../feature/checkOut/checkOutSlice.js"
 
 const store = configureStore({
   reducer: {
@@ -47,6 +50,9 @@ const store = configureStore({
     licensePlateType: licensePlateTypeReducer,
     vehicleType: vehicleTypeReducer,
     gender: genderReducer,
+    parkingSlotDetail: parkingSlotDetailReducer,
+    checkIn: checkInReducer,
+    checkOut: checkOutReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

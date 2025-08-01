@@ -28,6 +28,9 @@ import { setIsOpenSidebarDrawer } from "../redux/feature/actions/actionSlice";
 import ApartmentTwoToneIcon from "@mui/icons-material/ApartmentTwoTone";
 import CarRepairIcon from '@mui/icons-material/CarRepair';
 import useAuth from "../hook/useAuth";
+import GarageTwoToneIcon from "@mui/icons-material/GarageTwoTone";
+import ArrowCircleLeftTwoToneIcon from "@mui/icons-material/ArrowCircleLeftTwoTone";
+import ArrowCircleRightTwoToneIcon from "@mui/icons-material/ArrowCircleRightTwoTone";
 
 function SidebarDrawerComponent() {
   const [isOverviewOpen, setIsOverviewOpen] = useState(true);
@@ -189,13 +192,73 @@ function SidebarDrawerComponent() {
                     />
                   </ListItemButton>
                   <ListItemButton
+                      sx={{
+                        borderRadius: "10px",
+                        color: "#424242",
+                        ...listItemButtonStyle,
+                      }}
+                      onClick={handleNavigate("/admin/vehicle-entry")}
+                      selected={location.pathname === "/admin/vehicle-entry"}
+                  >
+                    <ListItemIcon
+                        sx={{
+                          minWidth: 0,
+                          mr: 1,
+                        }}
+                    >
+                      <ArrowCircleRightTwoToneIcon className="w-6 h-6" />
+                    </ListItemIcon>
+                    <ListItemText
+                        primary={
+                          <Typography
+                              component="span"
+                              variant="body1"
+                              sx={{ color: "#424242", display: "inline" }}
+                          >
+                            {t("vehicleEntry")}
+                          </Typography>
+                        }
+                    />
+                  </ListItemButton>
+                  <ListItemButton
+                      sx={{
+                        borderRadius: "10px",
+                        mt: "5px",
+                        color: "#424242",
+                        ...listItemButtonStyle,
+                      }}
+                      onClick={handleNavigate("/admin/vehicle-exit")}
+                      selected={location.pathname === "/admin/vehicle-exit"}
+                  >
+                    <ListItemIcon
+                        sx={{
+                          minWidth: 0,
+                          mr: 1,
+                        }}
+                    >
+                      <ArrowCircleLeftTwoToneIcon className="w-6 h-6" />
+                    </ListItemIcon>
+                    <ListItemText
+                        primary={
+                          <Typography
+                              component="span"
+                              variant="body1"
+                              sx={{ color: "#424242", display: "inline" }}
+                          >
+                            {t("vehicleExit")}
+                          </Typography>
+                        }
+                    />
+                  </ListItemButton>
+                  <ListItemButton
                     sx={{
                       borderRadius: "10px",
+                      mt: "5px",
                       color: "#424242",
                       ...listItemButtonStyle,
                     }}
-                    onClick={handleNavigate("/admin/history")}
-                    selected={location.pathname === "/admin/history"}
+                    onClick={handleNavigate("/admin/parking-detail")}
+                    selected={location.pathname === "/admin/parking-detail"}
                   >
                     <ListItemIcon
                       sx={{
@@ -203,7 +266,7 @@ function SidebarDrawerComponent() {
                         mr: 1,
                       }}
                     >
-                      <ScheduleTwoToneIcon className="w-6 h-6" />
+                      <GarageTwoToneIcon className="w-6 h-6" />
                     </ListItemIcon>
                     <ListItemText
                       primary={
@@ -212,7 +275,7 @@ function SidebarDrawerComponent() {
                           variant="body1"
                           sx={{ color: "#424242", display: "inline" }}
                         >
-                          {t("history")}
+                          {t("parkingDetail")}
                         </Typography>
                       }
                     />

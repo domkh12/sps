@@ -17,6 +17,7 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
+  Paper,
   Typography,
 } from "@mui/material";
 import { IoIosArrowDown, IoIosArrowForward } from "react-icons/io";
@@ -32,6 +33,9 @@ import PopupState, { bindHover, bindPopover } from "material-ui-popup-state";
 import HoverPopover from "material-ui-popup-state/HoverPopover";
 import useAuth from "./../../hook/useAuth";
 import useTranslate from "./../../hook/useTranslate";
+import ArrowCircleRightTwoToneIcon from '@mui/icons-material/ArrowCircleRightTwoTone';
+import ArrowCircleLeftTwoToneIcon from '@mui/icons-material/ArrowCircleLeftTwoTone';
+import GarageTwoToneIcon from '@mui/icons-material/GarageTwoTone';
 
 function SideBar() {
   const isCollapsed = useSelector((state) => state.action.isCollapsed);
@@ -92,14 +96,14 @@ function SideBar() {
 
   const content = (
     <>
-      <Box
-        sx={{
-          bgcolor: "background.default",
+      <Paper
+        elevation={0}
+        sx={{        
           color: "text.primary",
         }}
         className={`${
           isCollapsed
-            ? "w-[90px] transition-all duration-500"
+            ? "w-[95px] transition-all duration-500"
             : "w-[300px] transition-all duration-500"
         } h-full border-r-[1px] border-r-gray-200 w-[15rem] shrink-0 hidden xl:block`}
       >
@@ -297,14 +301,18 @@ function SideBar() {
                     />
                   )}
                 </ListItemButton>
+
+                {/* Vehicle Entry */}
+
                 <ListItemButton
                   sx={{
                     borderRadius: "10px",
+                    mt: "5px",
                     color: "#424242",
                     ...listItemButtonStyle,
                   }}
-                  onClick={() => navigate("/admin/history")}
-                  selected={location.pathname === "/admin/history"}
+                  onClick={() => navigate("/admin/vehicle-entry")}
+                  selected={location.pathname === "/admin/vehicle-entry"}
                 >
                   <ListItemIcon
                     sx={{
@@ -318,7 +326,7 @@ function SideBar() {
                       "flex flex-col justify-center items-center w-full"
                     }`}
                   >
-                    <ScheduleTwoToneIcon className="w-6 h-6" />
+                    <ArrowCircleRightTwoToneIcon className="w-6 h-6" />
                     {isCollapsed && (
                       <ListItemText
                         secondary={
@@ -331,7 +339,7 @@ function SideBar() {
                               textWrap: "nowrap",
                             }}
                           >
-                            {t("history")}
+                            {t("vehicleEntry")}
                           </Typography>
                         }
                       />
@@ -345,12 +353,128 @@ function SideBar() {
                           variant="body1"
                           sx={{ color: "#424242", display: "inline" }}
                         >
-                          {t("history")}
+                          {t("vehicleEntry")}
                         </Typography>
                       }
                     />
                   )}
                 </ListItemButton>
+
+                {/* Vehicle Exit */}
+
+                <ListItemButton
+                  sx={{
+                    borderRadius: "10px",
+                    mt: "5px",
+                    color: "#424242",
+                    ...listItemButtonStyle,
+                  }}
+                  onClick={() => navigate("/admin/vehicle-exit")}
+                  selected={location.pathname === "/admin/vehicle-exit"}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      ...(!isCollapsed && {
+                        mr: 1,
+                      }),
+                    }}
+                    className={`${
+                      isCollapsed &&
+                      "flex flex-col justify-center items-center w-full"
+                    }`}
+                  >
+                    <ArrowCircleLeftTwoToneIcon className="w-6 h-6" />
+                    {isCollapsed && (
+                      <ListItemText
+                        secondary={
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            sx={{
+                              color: "#424242",
+                              display: "inline",
+                              textWrap: "nowrap",
+                            }}
+                          >
+                            {t("vehicleExit")}
+                          </Typography>
+                        }
+                      />
+                    )}
+                  </ListItemIcon>
+                  {!isCollapsed && (
+                    <ListItemText
+                      primary={
+                        <Typography
+                          component="span"
+                          variant="body1"
+                          sx={{ color: "#424242", display: "inline" }}
+                        >
+                          {t("vehicleExit")}
+                        </Typography>
+                      }
+                    />
+                  )}
+                </ListItemButton>
+
+                {/* History */}
+                <ListItemButton
+                  sx={{
+                    borderRadius: "10px",
+                    color: "#424242",
+                    mt: "5px",
+                    ...listItemButtonStyle,
+                  }}
+                  onClick={() => navigate("/admin/parking-detail")}
+                  selected={location.pathname === "/admin/parking-detail"}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      ...(!isCollapsed && {
+                        mr: 1,
+                      }),
+                    }}
+                    className={`${
+                      isCollapsed &&
+                      "flex flex-col justify-center items-center w-full"
+                    }`}
+                  >
+                    <GarageTwoToneIcon className="w-6 h-6" />
+                    {isCollapsed && (
+                      <ListItemText
+                        secondary={
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            sx={{
+                              color: "#424242",
+                              display: "inline",
+                              textWrap: "nowrap",
+                            }}
+                          >
+                            {t("parkingDetail")}
+                          </Typography>
+                        }
+                      />
+                    )}
+                  </ListItemIcon>
+                  {!isCollapsed && (
+                    <ListItemText
+                      primary={
+                        <Typography
+                          component="span"
+                          variant="body1"
+                          sx={{ color: "#424242", display: "inline" }}
+                        >
+                          {t("parkingDetail")}
+                        </Typography>
+                      }
+                    />
+                  )}
+                </ListItemButton>
+                
               </Collapse>
             </List>
             
@@ -2195,14 +2319,14 @@ function SideBar() {
                                     }}
                                     onClick={() => {
                                       if (
-                                        location.pathname !== "/admin/reports"
+                                        location.pathname !== "/admin/reports/user-history"
                                       ) {
                                         popupState.close();
                                       }
-                                      navigate("/admin/reports");
+                                      navigate("/admin/reports/user-history");
                                     }}
                                     selected={
-                                      location.pathname === "/admin/reports"
+                                      location.pathname === "/admin/reports/user-history"
                                     }
                                   >
                                     <ListItemText
@@ -2215,7 +2339,7 @@ function SideBar() {
                                             display: "inline",
                                           }}
                                         >
-                                          {t("list")}
+                                          {t("userHistory")}
                                         </Typography>
                                       }
                                     />
@@ -2229,14 +2353,14 @@ function SideBar() {
                                     onClick={() => {
                                       if (
                                         location.pathname !==
-                                        "/admin/reports/new"
+                                        "/admin/reports/vehicle-history"
                                       ) {
                                         popupState.close();
                                       }
-                                      navigate("/admin/reports/new");
+                                      navigate("/admin/reports/vehicle-history");
                                     }}
                                     selected={
-                                      location.pathname === "/admin/reports/new"
+                                      location.pathname === "/admin/reports/vehicle-history"
                                     }
                                   >
                                     <ListItemText
@@ -2249,7 +2373,7 @@ function SideBar() {
                                             display: "inline",
                                           }}
                                         >
-                                          {t("create")}
+                                          {t("vehicleHistory")}
                                         </Typography>
                                       }
                                     />
@@ -2328,8 +2452,8 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/admin/reports")}
-                              selected={location.pathname === "/admin/reports"}
+                              onClick={() => navigate("/admin/reports/user-history")}
+                              selected={location.pathname === "/admin/reports/user-history"}
                             >
                               <ListItemText
                                 primary={
@@ -2338,7 +2462,7 @@ function SideBar() {
                                     variant="body1"
                                     sx={{ color: "#424242", display: "inline" }}
                                   >
-                                    {t("list")}
+                                    {t("userHistory")}
                                   </Typography>
                                 }
                               />
@@ -2356,9 +2480,9 @@ function SideBar() {
                                 color: "#424242",
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/admin/reports/new")}
+                              onClick={() => navigate("/admin/reports/vehicle-history")}
                               selected={
-                                location.pathname === "/admin/reports/new"
+                                location.pathname === "/admin/reports/vehicle-history"
                               }
                             >
                               <ListItemText
@@ -2368,12 +2492,12 @@ function SideBar() {
                                     variant="body1"
                                     sx={{ color: "#424242", display: "inline" }}
                                   >
-                                    {t("create")}
+                                    {t("vehicleHistory")}
                                   </Typography>
                                 }
                               />
                             </ListItemButton>
-                          </li>
+                          </li>                          
                         </ul>
                       </List>
                     </Collapse>
@@ -2383,7 +2507,7 @@ function SideBar() {
             
           </div>
         </nav>
-      </Box>
+      </Paper>
     </>
   );
 

@@ -7,6 +7,10 @@ import { ROLES } from "./config/roles.js";
 import RequireAuth from "./pages/auth/RequireAuth.jsx";
 import {useSelector} from "react-redux";
 import {getTheme} from "./config/themeConfig.js";
+const CheckOutList = lazy(() => import("./pages/checkOut/CheckOutList.jsx"));
+const CheckInList = lazy(() => import("./pages/checkIn/CheckInList.jsx"));
+const UserHistory = lazy(() => import("./pages/report/UserHistory.jsx"));
+const VehicleHistory = lazy(() => import("./pages/report/VehicleHistory.jsx"));
 const EditCompany = lazy(() => import("./pages/company/EditCompany.jsx"));
 const ViewCompany = lazy(() => import("./pages/company/ViewCompany.jsx"));
 const ManagerLayout = lazy(() => import("./pages/layoutManager/ManagerLayout"));
@@ -92,6 +96,26 @@ function App() {
                     {/* Dashboard Route*/}
                     <Route index element={<Dashboard />} />
 
+                    {/* Map View Route */}
+                    <Route path="map-views">
+                      <Route index element={<MapViews />} />
+                    </Route>
+
+                    {/* History Route */}
+                    <Route path="parking-detail">
+                      <Route index element={<HistoryList />} />
+                    </Route>
+
+                    {/* Check in */}
+                    <Route path="vehicle-entry">
+                      <Route index element={<CheckInList />}/>
+                    </Route>
+
+                    {/* Check out */}
+                    <Route path="vehicle-exit">
+                      <Route index element={<CheckOutList />}/>
+                    </Route>
+
                     {/* Account Route */}
                     <Route path="accounts" element={<Profile />}>
                       <Route index element={<Account />} />
@@ -125,12 +149,7 @@ function App() {
                     {/* Message Route */}
                     <Route path="messages">
                       <Route index element={<MessagesList />} />
-                    </Route>
-
-                    {/* Map View Route */}
-                    <Route path="map-views">
-                      <Route index element={<MapViews />} />
-                    </Route>
+                    </Route>                    
 
                     {/* Parking Space Route */}
                     <Route path="parking-spaces">
@@ -152,12 +171,9 @@ function App() {
                     <Route path="reports">
                       <Route index element={<ReportList />} />
                       <Route path="new" element={<CreateReport />} />
-                    </Route>
-
-                    {/* History Route */}
-                    <Route path="history">
-                      <Route index element={<HistoryList />} />
-                    </Route>
+                      <Route path="user-history" element={<UserHistory />} />
+                      <Route path="vehicle-history" element={<VehicleHistory />} />
+                    </Route>                    
 
                     {/* Branch Route */}
                     <Route path="branches">
@@ -207,8 +223,8 @@ function App() {
                      <Route path="security" element={<Security />} />
                    </Route>
 
-                   {/* History Route */}
-                   <Route path="history">
+                   {/* Parking Detail Route */}
+                   <Route path="parking-detail">
                      <Route index element={<HistoryList />} />
                    </Route>
 

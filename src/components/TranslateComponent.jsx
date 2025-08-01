@@ -16,6 +16,7 @@ import {
 } from "../redux/feature/translate/translationSlice";
 import SnackBarComponent from "./SnackBarComponent";
 import useTranslate from "./../hook/useTranslate";
+import { toast, Slide } from "react-toastify";
 
 function TranslateComponent() {
   const { language, loading, isSuccess } = useSelector(
@@ -29,22 +30,21 @@ function TranslateComponent() {
 
   useEffect(() => {
     if (initialFetchDone) {
-      dispatch(fetchTranslations(language));
-      setInitialFetchDone(false);
-      setOpenSnackBar(false);
-      return;
+        dispatch(fetchTranslations(language));
+        setInitialFetchDone(false);
+    } else {
+        toast.success(t("changeLanguage"), {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: false,
+            transition: Slide,
+        });
     }
+}, [language]);
 
-    if (loading) {
-      setOpenSnackBar(true);
-      setCaption(t("changingLanguage"));
-    } else if (isSuccess) {
-      setCaption(t("changeLanguage"));
-      setTimeout(() => {
-        setOpenSnackBar(false);
-      }, 3000);
-    }
-  }, [isSuccess, dispatch]);
   
   const handleLanguageChange = (lang) => {
     dispatch(setLanguage(lang));
