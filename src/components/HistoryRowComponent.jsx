@@ -1,7 +1,6 @@
-import React, {memo, useEffect, useState} from "react";
+import React, {memo, useState} from "react";
 import {
     Avatar,
-    Badge,
     Box,
     Checkbox,
     Chip,
@@ -11,7 +10,6 @@ import {
     ListItem,
     ListItemText,
     Stack,
-    styled,
     Table,
     TableBody,
     TableCell,
@@ -24,27 +22,9 @@ import {IoIosArrowUp} from "react-icons/io";
 import {IoIosArrowDown} from "react-icons/io";
 import {Link} from "react-router-dom";
 import useAuth from "../hook/useAuth";
-import useDateFormatter from "../hook/useDateFormatter";
 import useTranslate from "./../hook/useTranslate";
-import {useGetParkingSlotDetailQuery} from "../redux/feature/parkingSlotDetail/parkingSlotDetailApiSlice";
 import ImageComponent from "./ImageComponent.jsx";
-
-function formatDuration(seconds) {
-    const days = Math.floor(seconds / (3600 * 24));
-    seconds -= days * 3600 * 24; // Remaining seconds after removing days
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-    let result = "";
-    if (days > 0) {
-        result += `${days}d `;
-    }
-    result += `${String(h).padStart(2, "0")}h : ${String(m).padStart(
-        2,
-        "0"
-    )}m : ${String(s).padStart(2, "0")}s`;
-    return result;
-}
+import {formatMinutesToHoursMinutes} from "../redux/feature/utils/util.js";
 
 function stringToColor(string) {
     let hash = 0;
@@ -94,61 +74,8 @@ function stringAvatar(name) {
 
 function HistoryRowComponent({parkingDetail}) {
     const [open, setOpen] = useState(false);
-    const [durations, setDurations] = useState("");
     const {isManager, isAdmin} = useAuth();
     const {t} = useTranslate();
-
-    useEffect(() => {
-        let intervalId;
-
-        const calculateInitialDuration = () => {
-            let durationInSeconds = 0;
-            if (parkingDetail?.timeIn) {
-                //timeOut might be null
-                const startTime = new Date(parkingDetail?.timeIn);
-                const endTime = parkingDetail?.timeOut
-                    ? new Date(parkingDetail.timeOut)
-                    : new Date(); // Use current time if no timeOut
-                const duration = endTime - startTime;
-                durationInSeconds = Math.ceil(duration / 1000);
-            }
-            setDurations(durationInSeconds);
-            return durationInSeconds;
-        };
-
-        if (parkingDetail?.isParking && parkingDetail?.timeIn) {
-            // 1. Calculate initial duration and start the timer.
-            calculateInitialDuration(); // Important: Calculate *before* setting the interval
-
-            intervalId = setInterval(() => {
-                setDurations((prevDurations) => prevDurations + 1); // Increment seconds
-            }, 1000);
-        } else {
-            // 2.  Calculate duration (for cases where it's NOT parking).
-            calculateInitialDuration();
-        }
-
-        // Cleanup function: Clear the interval when unmounting or isParking changes
-        return () => {
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
-        };
-    }, [
-        parkingDetail?.isParking,
-        parkingDetail?.timeIn,
-        parkingDetail?.timeOut,
-    ]);
-
-    const dateObj = new Date(parkingDetail?.timeIn);
-    var {formattedDateDDMMYYYYNoZeros: timeInformatedDate} = useDateFormatter(
-        new Date(parkingDetail?.timeIn)
-    );
-    var timeInformattedTime = dateObj.toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-    });
 
     const getChipStyles = () => {
         let backgroundColor = "#D2E3D6";
@@ -274,7 +201,7 @@ function HistoryRowComponent({parkingDetail}) {
                 <TableCell
                     sx={{borderTopStyle: "none", borderBottomStyle: "none"}}
                 >
-                    <Typography variant="body1">{formatDuration(durations) || "N/A"}</Typography>
+                    <Typography variant="body1">{formatMinutesToHoursMinutes(parkingDetail?.durations) || "N/A"}</Typography>
                 </TableCell>
 
                 <TableCell

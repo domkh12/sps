@@ -252,5 +252,9 @@
   "vehicleEntry": "Vehicle entry",
   "vehicleExit": "Vehicle exit",
   "timeOut": "Time out",
-  "parkingDetail": "Parking detail"
+  "parkingDetail": "Parking detail",
+  "resetPasswordSuccess": "Reset password success",
+  "resetPasswordDescription": "Create new, secure and unique passwords",
+  "updatePassword": "Update password",
+  "createNewPassword": "Create new password"
 }

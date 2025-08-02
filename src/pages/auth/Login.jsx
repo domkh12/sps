@@ -328,7 +328,7 @@ export default function Login() {
                         }}
                     >
                       <Paper sx={{maxWidth: "500px", width: "100%"}}>
-                      <Typography variant="h6" sx={{ mb: "40px" }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, color: "text.primary", mb: "40px" }}>
                         {t("login-to-your-account")}
                       </Typography>
                       {open && (

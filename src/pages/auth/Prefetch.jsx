@@ -20,6 +20,7 @@ import { genderApiSlice } from "../../redux/feature/gender/genderApiSlice.js";
 import {parkingSlotDetailApiSlice} from "../../redux/feature/parkingSlotDetail/parkingSlotDetailApiSlice.js";
 import { checkInApiSlice } from "../../redux/feature/checkIn/checkInApiSlice.js";
 import {checkOutApiSlice} from "../../redux/feature/checkOut/checkOutApiSlice.js";
+import {analysisApiSlice} from "../../redux/feature/analysis/analysisApiSlice.js";
 
 
 function Prefetch() {
@@ -29,6 +30,7 @@ function Prefetch() {
 
     if (isManager || isAdmin) {
       store.dispatch(authApiSlice.util.prefetch("getUserProfile", "userProfile", { force: true }));
+      store.dispatch(analysisApiSlice.util.prefetch("getAnalysis", "analysisList", { force: true }));
     }
 
     if (isManager) {

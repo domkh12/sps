@@ -251,5 +251,9 @@
   "vehicleEntry": "រថយន្តចូល",
   "vehicleExit": "រថយន្តចេញ",
   "timeOut": "ពេលវេលាចេញ",
-  "parkingDetail": "ព័ត៌មានលម្អិត"
+  "parkingDetail": "ព័ត៌មានលម្អិត",
+  "resetPasswordSuccess": "កំណត់ពាក្យសម្ងាត់ឡើងវិញជោគជ័យ",
+  "resetPasswordDescription": "បង្កើតពាក្យសម្ងាត់ថ្មីដែលមានសុវត្ថិភាព និងប្លែកពីមុន",
+  "updatePassword": "ធ្វើបច្ចុប្បន្នភាពពាក្យសម្ងាត់",
+  "createNewPassword": "បង្កើតពាក្យសម្ងាត់ថ្មី"
 }

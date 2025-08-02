@@ -130,7 +130,7 @@ function ForgotPassword() {
                                                 alt="branch_image"
                                                 className="w-20 h-auto"
                                             />
-                                            <Typography variant="h6" className="text-center">
+                                            <Typography variant="h6" sx={{ fontWeight: 600, color: "text.primary" }}>
                                                 {t("forgotYourPassword")}
                                             </Typography>
                                             <Typography variant="body1" className="text-center">
