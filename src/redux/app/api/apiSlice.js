@@ -86,7 +86,8 @@ export const apiSlice = createApi({
     "ParkingSlotDetail",
     "CheckIn",
     "CheckOut",
-    "Analysis"
+    "Analysis",
+    "ClientInfo"
   ],
   endpoints: (builder) => ({}),
 });

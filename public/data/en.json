@@ -256,5 +256,11 @@
   "resetPasswordSuccess": "Reset password success",
   "resetPasswordDescription": "Create new, secure and unique passwords",
   "updatePassword": "Update password",
-  "createNewPassword": "Create new password"
+  "createNewPassword": "Create new password",
+  "currentPasswordIsRequired": "Current password is required",
+  "newPasswordIsRequired": "New password is required",
+  "confirmPasswordMustMatch": "Passwords must match",
+  "loginType": "Login type",
+  "ipAddress": "IP address",
+  "userAgent": "User agent"
 }

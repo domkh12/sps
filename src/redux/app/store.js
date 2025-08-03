@@ -25,6 +25,7 @@ import genderReducer from "../feature/gender/genderSlice.js";
 import parkingSlotDetailReducer from "../feature/parkingSlotDetail/parkingSlotSlice.js";
 import checkInReducer from "../feature/checkIn/checkInSlice.js"
 import checkOutReducer from "../feature/checkOut/checkOutSlice.js"
+import clientInfoReducer from "../feature/clientInfo/clientInfoSlice.js"
 
 const store = configureStore({
   reducer: {
@@ -52,7 +53,8 @@ const store = configureStore({
     gender: genderReducer,
     parkingSlotDetail: parkingSlotDetailReducer,
     checkIn: checkInReducer,
-    checkOut: checkOutReducer
+    checkOut: checkOutReducer,
+    clientInfo: clientInfoReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

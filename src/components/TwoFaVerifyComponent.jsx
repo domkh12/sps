@@ -283,21 +283,14 @@ function TwoFaVerifyComponent({ onVerificationSuccess }) {
             <Divider />
             <div className="flex justify-end items-center gap-2 p-4">
               <Button
-                variant="text"
+                variant="outlined"
                 onClick={() => dispatch(setIsOpenTwoFaPopOver(false))}
-                sx={{
-                  borderRadius: "20px",
-                  paddingX: "1rem",
-                }}
               >
                 Cancel
               </Button>
               <LoadingButton
                 loading={isVerifyTwoFaLoading}
                 variant="contained"
-                sx={{
-                  borderRadius: "20px",
-                }}
               >
                 Verify
               </LoadingButton>
