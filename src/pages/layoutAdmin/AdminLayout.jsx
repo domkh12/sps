@@ -55,6 +55,9 @@ function AdminLayout() {
                     }
                 }
             );
+            setTimeout(() => {
+                dispatch(setIsRefetchCheckIn(false));
+            }, 1000)
         }
     }, [messageCheckIn, dispatch]);
 
@@ -81,6 +84,9 @@ function AdminLayout() {
                     }
                 }
             );
+            setTimeout(() => {
+                dispatch(setIsRefetchCheckOut(false));
+            }, 1000)
         }
     }, [messageCheckOut, dispatch]);
 

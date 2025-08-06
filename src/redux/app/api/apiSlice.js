@@ -87,7 +87,8 @@ export const apiSlice = createApi({
     "CheckIn",
     "CheckOut",
     "Analysis",
-    "ClientInfo"
+    "ClientInfo",
+    "TwoFaStatus"
   ],
   endpoints: (builder) => ({}),
 });

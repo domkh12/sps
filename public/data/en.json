@@ -262,5 +262,8 @@
   "confirmPasswordMustMatch": "Passwords must match",
   "loginType": "Login type",
   "ipAddress": "IP address",
-  "userAgent": "User agent"
+  "userAgent": "User agent",
+  "changePasswordSuccess": "Change password success",
+  "verifySuccess": "Verify success",
+  "verifyCodeSuccess": "Verify code success"
 }

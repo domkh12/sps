@@ -83,8 +83,6 @@ function HistoryList() {
         if (isRefetchCheckIn || isRefetchCheckOut) {
             refetchParkingDetail();
             refetchParkingDetailFilter();
-            dispatch(setIsRefetchCheckIn(false));
-            dispatch(setIsRefetchCheckOut(false));
         }
     }, [isRefetchCheckIn, isRefetchCheckOut]);
 

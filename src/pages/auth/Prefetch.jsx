@@ -32,6 +32,7 @@ function Prefetch() {
     if (isManager || isAdmin) {
       store.dispatch(authApiSlice.util.prefetch("getUserProfile", "userProfile", { force: true }));
       store.dispatch(analysisApiSlice.util.prefetch("getAnalysis", "analysisList", { force: true }));
+      store.dispatch(userApiSlice.util.prefetch("get2faStatus", "get2faStatusList", { force: true }));
     }
 
     if (isManager) {

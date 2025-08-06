@@ -4,14 +4,14 @@ import {
   Box,
   Button,
   Divider,
-  IconButton,
+  IconButton, Modal,
   Paper,
   Popover,
   Skeleton,
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { PiCopyThin, PiXThin } from "react-icons/pi";
 import { Link } from "react-router-dom";
 import {
@@ -25,30 +25,25 @@ import {
   useGetQrCode2FaMutation,
   useVerifyTwoFaMutation,
 } from "../redux/feature/auth/authApiSlice";
-import {
-  setCaptionSnackBar,
-  setIsOpenSnackBar,
-} from "../redux/feature/actions/actionSlice";
 import useTranslate from "../hook/useTranslate";
-import OTPInput from "./OTPInput";
+import {Slide, toast} from "react-toastify";
+import OTPInput from "react-otp-input";
 
-function TwoFaVerifyComponent({ onVerificationSuccess }) {
+function TwoFaVerifyComponent() {
+  const [otp, setOtp] = useState('');
   const [copied, setCopied] = useState(false);
   const qrCodeUrl = useSelector(selectQrCodeUrl);
-  const [anchorEl, setAnchorEl] = useState(null);
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(true);
-  const [shortUrl, setShortUrl] = useState("");
   const twoFASecretCode = useSelector(selectTwoFASecretCode);
-  const isOpeningPoppOverForm = useSelector(
+  const isOpeningPopOverForm = useSelector(
     (state) => state.auth.isOpenTwoFaPopOver
   );
   const { t } = useTranslate();
   const [
     get2faSecretCode,
     {
-      isLoading: isget2faSecretCodeLoading,
-      isSuccess: isget2faSecretCodeSuccess,
+      isLoading: isGet2faSecretCodeLoading,
+      isSuccess: isGet2faSecretCodeSuccess,
     },
   ] = useGet2faSecretCodeMutation();
 
@@ -60,26 +55,41 @@ function TwoFaVerifyComponent({ onVerificationSuccess }) {
       isSuccess: isVerifyTwoFaSuccess,
       isLoading: isVerifyTwoFaLoading,
       isError: isVerifyTwoFaError,
+      error: verifyTwoFaError,
     },
   ] = useVerifyTwoFaMutation();
 
   useEffect(() => {
     if (isVerifyTwoFaSuccess) {
-      dispatch(setIsOpenSnackBar(true));
-      dispatch(setCaptionSnackBar(t("createSuccess")));
-      setTimeout(() => {
-        dispatch(setIsOpenSnackBar(false));
-      }, 3000);
+      toast.success(t("verifySuccess"), {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
       dispatch(setIsOpenTwoFaPopOver(false));
-       if (onVerificationSuccess) {
-         onVerificationSuccess();
-       }
     }
   }, [isVerifyTwoFaSuccess]);
 
   useEffect(() => {
+    if (isVerifyTwoFaError) {
+      toast.error(`${verifyTwoFaError?.data?.error?.description}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        transition: Slide,
+      });
+    }
+  }, [isVerifyTwoFaError]);
+
+  useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       try {
         const promises = [];
 
@@ -89,24 +99,28 @@ function TwoFaVerifyComponent({ onVerificationSuccess }) {
         await Promise.all(promises);
       } catch (error) {
         console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
-    if (isOpeningPoppOverForm) {
-      fetchData();
-    }
-  }, [isOpeningPoppOverForm]);
+    fetchData();
+
+  }, [setIsOpenTwoFaPopOver]);
 
   const handleClose = () => {
-    setAnchorEl(null);
+    dispatch(setIsOpenTwoFaPopOver(false));
+    setOtp('');
   };
-  const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+
+  useEffect(() => {
+    if (otp.length === 6) {
+      verifyTwoFa({
+        code: otp
+      })
+    }
+  }, [otp])
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(shortUrl);
+      await navigator.clipboard.writeText(twoFASecretCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -114,32 +128,28 @@ function TwoFaVerifyComponent({ onVerificationSuccess }) {
     }
   };
 
-  const handleActivateBtnClick = async (otp) => {
-    await verifyTwoFa(otp);
-  };
-
   return (
     <>
-      <Popover
-        open={isOpeningPoppOverForm}
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: "center",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "center",
-          horizontal: "center",
-        }}
-        sx={{
-          "& .MuiPopover-paper": {
-            width: "38rem",
-            height: "auto",
-            borderRadius: "20px",
-          },
-        }}
+      <Modal
+          open={isOpeningPopOverForm}
+          onClose={handleClose}
+          aria-labelledby="two-factor-authentication-modal"
+          aria-describedby="two-factor-authentication-description"
       >
-        <Box sx={{}}>
+        <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '38rem',
+              maxWidth: '90vw',
+              bgcolor: 'background.paper',
+              borderRadius: '20px',
+              boxShadow: 24,
+              outline: 'none',
+            }}
+        >
           <Typography variant="body2" component="div">
             <Typography
               sx={{
@@ -224,7 +234,7 @@ function TwoFaVerifyComponent({ onVerificationSuccess }) {
                   className="copy-box flex justify-between items-center col-span-11"
                 >
                   <Box sx={{ p: "20px" }}>
-                    {isget2faSecretCodeLoading ? (
+                    {isGet2faSecretCodeLoading ? (
                       <Skeleton
                         sx={{ bgcolor: "grey.500" }}
                         width={300}
@@ -259,16 +269,51 @@ function TwoFaVerifyComponent({ onVerificationSuccess }) {
                   Enter the 6 figure confirmation code shown on the app:
                 </p>
               </Typography>
-              <Typography
-                component="div"
-                className="grid grid-cols-12 w-full"
-                sx={{ mt: 2 }}
-              >
-                <div className="col-span-1"></div>
-                <div className="col-span-11">
-                  <OTPInput length={6} onComplete={handleActivateBtnClick} />
+                <div className="flex justify-center">
+                  {/*<OTPInput*/}
+                  {/*    value={otp}*/}
+                  {/*    onChange={setOtp}*/}
+                  {/*    numInputs={6}*/}
+                  {/*    renderSeparator={<span>-</span>}*/}
+                  {/*    // onPaste={handlePaste}*/}
+                  {/*    inputType="tel"*/}
+                  {/*    renderInput={(props) => <input {...props} />}*/}
+                  {/*    inputStyle={{*/}
+                  {/*      width: "2.5rem",*/}
+                  {/*      height: "2.5rem",*/}
+                  {/*      margin: "0 0.5rem",*/}
+                  {/*      fontSize: "1.5rem",*/}
+                  {/*      borderRadius: 4,*/}
+                  {/*      border: "1px solid #ccc",*/}
+                  {/*      // color: mode === "dark" ? "white" : "black",*/}
+                  {/*      // backgroundColor: mode === "dark" ? "black" : "white"*/}
+                  {/*    }}*/}
+                  {/*/>*/}
+                  <OTPInput
+                      value={otp}
+                      onChange={setOtp}
+                      numInputs={6}
+                      renderSeparator={<span className="hidden sm:inline mx-1 text-gray-400">-</span>} // Hide separators on mobile
+                      inputType="tel"
+                      renderInput={(props) => <input {...props} />}
+                      containerStyle={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '0.25rem',
+                        maxWidth: '100%',
+                        overflow: 'hidden'
+                      }}
+                      inputStyle={{
+                        width: 'min(12vw, 2.5rem)', // More aggressive responsive sizing
+                        height: 'min(12vw, 2.5rem)',
+                        fontSize: 'min(4vw, 1.5rem)',
+                        borderRadius: 4,
+                        border: "1px solid #ccc",
+                        textAlign: 'center',
+                        margin: 0
+                      }}
+                  />
                 </div>
-              </Typography>
               {/* code verify end */}
               {/* warning start */}
               <Typography component="div" sx={{ mt: 2 }} className="w-full">
@@ -297,7 +342,7 @@ function TwoFaVerifyComponent({ onVerificationSuccess }) {
             </div>
           </Typography>
         </Box>
-      </Popover>
+      </Modal>
     </>
   );
 }

@@ -261,5 +261,8 @@
   "confirmPasswordMustMatch": "ពាក្យសម្ងាត់ត្រូវតែដូចគ្នា",
   "loginType": "ប្រភេទចូល",
   "ipAddress": "IP address",
-  "userAgent": "ភ្នាក់ងារអ្នកប្រើប្រាស់"
+  "userAgent": "ភ្នាក់ងារអ្នកប្រើប្រាស់",
+  "changePasswordSuccess": "ផ្លាស់ប្ដូរលេខសម្ងាត់បានជោគជ័យ",
+  "verifySuccess": "ផ្ទៀងផ្ទាត់ជោគជ័យ",
+  "verifyCodeSuccess": "ផ្ទៀងផ្ទាត់កូដជោគជ័យ"
 }

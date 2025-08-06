@@ -48,6 +48,7 @@ export default function AddNewParking() {
     addNewParking,
     {
       isSuccess: isAddNewParkingSuccess,
+      isLoading: isLoadingAddNewParking,
       isError: isErrorAddNewParking,
       error: errorAddNewParking,
     },
@@ -264,7 +265,7 @@ export default function AddNewParking() {
                           <ButtonComponent
                             btnTitle={t("createParkingSpace")}
                             type={"submit"}
-                            // isLoading={isLoading}
+                            isLoading={isLoadingAddNewParking || isLoadingAddMultipleSlot}
                           />
                         </div>
                       </Card>

@@ -1,7 +1,6 @@
 import {useState, useEffect} from "react";
 import Chart from "react-apexcharts";
 import {
-    Filter,
     TrendingUp,
     TrendingDown,
     MapPin,
@@ -16,111 +15,7 @@ import {useGetAnalysisQuery} from "../../redux/feature/analysis/analysisApiSlice
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent.jsx";
 import SeoComponent from "../../components/SeoComponent.jsx";
 import {formatMinutesToHoursMinutes} from "../../redux/feature/utils/util.js";
-// Mock data for the smart parking system
-const mockData = {
-    totalStats: {
-        totalUserCount: 2847,
-        totalVehicleCount: 1923,
-        totalParkingAreasCount: 450,
-        totalParkingSlotsCount: 3600,
-        totalCompanies: 3,
-        totalBranches: 8,
-        occupancyRate: 78.5,
-        averageStayTime: 2.4,
-    },
-    companies: [
-        {
-            id: 1,
-            name: "Downtown Plaza",
-            branches: 3,
-            totalAreas: 18,
-            totalSlots: 1440,
-            occupiedSlots: 1127,
-            avgStayTime: 2.8,
-            color: "#3B82F6",
-        },
-        {
-            id: 2,
-            name: "Shopping Center",
-            branches: 3,
-            totalAreas: 15,
-            totalSlots: 1200,
-            occupiedSlots: 944,
-            avgStayTime: 3.2,
-            color: "#10B981",
-        },
-        {
-            id: 3,
-            name: "Business District",
-            branches: 2,
-            totalAreas: 12,
-            totalSlots: 960,
-            occupiedSlots: 745,
-            avgStayTime: 1.9,
-            color: "#F59E0B",
-        },
-    ],
-    hourlyData: [
-        {hour: "6AM", occupied: 200, total: 3600},
-        {hour: "8AM", occupied: 2240, total: 3600},
-        {hour: "10AM", occupied: 2800, total: 3600},
-        {hour: "12PM", occupied: 3360, total: 3600},
-        {hour: "2PM", occupied: 3120, total: 3600},
-        {hour: "4PM", occupied: 3040, total: 3600},
-        {hour: "6PM", occupied: 2560, total: 3600},
-        {hour: "8PM", occupied: 1440, total: 3600},
-        {hour: "10PM", occupied: 680, total: 3600},
-    ],
-    weeklyData: [
-        {day: "Mon", occupancy: 85, avgStayTime: 2.3},
-        {day: "Tue", occupancy: 82, avgStayTime: 2.1},
-        {day: "Wed", occupancy: 88, avgStayTime: 2.4},
-        {day: "Thu", occupancy: 90, avgStayTime: 2.6},
-        {day: "Fri", occupancy: 95, avgStayTime: 2.9},
-        {day: "Sat", occupancy: 78, avgStayTime: 3.2},
-        {day: "Sun", occupancy: 65, avgStayTime: 2.8},
-    ],
-    branchData: [
-        {
-            name: "Plaza North",
-            areas: 6,
-            slots: 480,
-            occupied: 384,
-            efficiency: 92,
-        },
-        {
-            name: "Plaza South",
-            areas: 6,
-            slots: 480,
-            occupied: 416,
-            efficiency: 88,
-        },
-        {name: "Plaza East", areas: 6, slots: 480, occupied: 336, efficiency: 85},
-        {
-            name: "Mall Center",
-            areas: 5,
-            slots: 400,
-            occupied: 328,
-            efficiency: 90,
-        },
-        {name: "Mall West", areas: 5, slots: 400, occupied: 312, efficiency: 87},
-        {name: "Mall North", areas: 5, slots: 400, occupied: 304, efficiency: 84},
-        {
-            name: "Business Hub",
-            areas: 6,
-            slots: 480,
-            occupied: 384,
-            efficiency: 89,
-        },
-        {
-            name: "Business Tower",
-            areas: 6,
-            slots: 480,
-            occupied: 360,
-            efficiency: 86,
-        },
-    ],
-};
+import {useSelector} from "react-redux";
 
 const StatCard = ({
                       icon: Icon,
@@ -204,8 +99,15 @@ const Dashboard = () => {
     const [timeFilter, setTimeFilter] = useState("today");
     const [selectedCompany, setSelectedCompany] = useState("all");
     const [isLoaded, setIsLoaded] = useState(false);
-    const {data: analysisData, isLoading, isSuccess} = useGetAnalysisQuery("analysisList");
-    console.log(analysisData);
+    const {data: analysisData, isLoading, isSuccess, refetch} = useGetAnalysisQuery("analysisList");
+    const isRefetchCheckIn = useSelector((state) => state.checkIn.isRefetchCheckIn);
+    const isRefetchCheckOut = useSelector((state) => state.checkOut.isRefetchCheckOut);
+
+    useEffect(() => {
+        if (isRefetchCheckIn || isRefetchCheckOut) {
+            refetch();
+        }
+    }, [isRefetchCheckOut, isRefetchCheckIn]);
     useEffect(() => {
         const timer = setTimeout(() => setIsLoaded(true), 300);
         return () => clearTimeout(timer);
@@ -231,35 +133,7 @@ const Dashboard = () => {
                         </div>
 
                         {/* Filters */}
-                        <div className="flex flex-wrap gap-3">
-                            <div className="flex items-center space-x-2 bg-white rounded-lg p-1 shadow-sm">
-                                <Filter size={18} className="text-gray-500 ml-2"/>
-                                <select
-                                    value={selectedCompany}
-                                    onChange={(e) => setSelectedCompany(e.target.value)}
-                                    className="border-none focus:ring-0 text-sm"
-                                >
-                                    <option value="all">All Companies</option>
-                                    {mockData.companies.map((company) => (
-                                        <option key={company.id} value={company.id}>
-                                            {company.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
 
-                            <div className="flex space-x-2">
-                                {["today", "week", "month"].map((filter) => (
-                                    <FilterButton
-                                        key={filter}
-                                        active={timeFilter === filter}
-                                        onClick={() => setTimeFilter(filter)}
-                                    >
-                                        {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                                    </FilterButton>
-                                ))}
-                            </div>
-                        </div>
                     </div>
 
                     {/* Main Stats Cards */}
@@ -394,7 +268,7 @@ const Dashboard = () => {
                                     },
                                     colors: ["#3B82F6"],
                                     xaxis: {
-                                        categories: mockData.hourlyData.map((item) => item.hour),
+                                        categories: analysisData.hourlyData.map((item) => item.hour),
                                         labels: {
                                             style: {colors: "#666"},
                                         },
@@ -417,7 +291,7 @@ const Dashboard = () => {
                                 series={[
                                     {
                                         name: "Occupied Slots",
-                                        data: mockData.hourlyData.map((item) => item.occupied),
+                                        data: analysisData.hourlyData.map((item) => item.occupied),
                                     },
                                 ]}
                                 type="area"
@@ -460,7 +334,7 @@ const Dashboard = () => {
                                     dataLabels: {enabled: false},
                                     colors: ["#10B981"],
                                     xaxis: {
-                                        categories: mockData.weeklyData.map((item) => item.day),
+                                        categories: analysisData.weeklyData.map((item) => item.day),
                                         labels: {
                                             style: {colors: "#666"},
                                         },
@@ -497,7 +371,7 @@ const Dashboard = () => {
                                 series={[
                                     {
                                         name: "Average Stay Time",
-                                        data: mockData.weeklyData.map((item) => item.avgStayTime),
+                                        data: analysisData.weeklyData.map((item) => item.avgStayTime),
                                     },
                                 ]}
                                 type="bar"

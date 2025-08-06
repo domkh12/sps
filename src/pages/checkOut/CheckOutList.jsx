@@ -77,7 +77,6 @@ function CheckOutList() {
     if (isRefetchCheckOut) {
       refetchCheckOut();
       refetchCheckOutFilter();
-      dispatch(setIsRefetchCheckOut(false));
     }
   }, [isRefetchCheckOut, dispatch, refetchCheckOut, refetchCheckOutFilter])
 

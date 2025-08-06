@@ -17,6 +17,7 @@ export const clientInfoApiSlice = apiSlice.injectEndpoints({
       }),
       transformResponse: (responseData) => {
         const loadedClientInfo = responseData.content.map((clientInfo) => {
+          clientInfo.id = clientInfo.id;
           return clientInfo;
         });
         return {

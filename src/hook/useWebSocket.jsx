@@ -3,7 +3,7 @@ import { Stomp } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentToken } from "../redux/feature/auth/authSlice";
-import {useGetUserProfileQuery} from "../redux/feature/auth/authApiSlice.js";
+import { useGetUserProfileQuery } from "../redux/feature/auth/authApiSlice.js";
 
 const useWebSocket = (destination) => {
   const socketClient = useRef(null);
@@ -16,9 +16,83 @@ const useWebSocket = (destination) => {
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
   const token = useSelector(selectCurrentToken);
-  const {data:user} = useGetUserProfileQuery("userProfile");
+  const { data: user, isLoading: isUserLoading, error: userError } = useGetUserProfileQuery("userProfile", {
+    skip: !token // Skip the query if no token is available
+  });
+  const dispatch = useDispatch();
+
   const MAX_RECONNECT_ATTEMPTS = 5;
   const RECONNECT_INTERVAL = 3000; // 3 seconds
+
+  // Function to check if error is related to token expiry/invalidity
+  const isTokenError = useCallback((error) => {
+    if (!error) return false;
+
+    // Handle FrameImpl objects (STOMP frame errors)
+    if (error.command === 'ERROR') {
+      console.log("STOMP ERROR frame detected:", error);
+
+      // Check headers for authentication-related messages
+      if (error.headers) {
+        const headerMessage = error.headers.message || error.headers.error || '';
+        const tokenErrorKeywords = [
+          'authentication failed',
+          'authentication required',
+          'unauthorized',
+          'invalid token',
+          'expired token',
+          'jwt',
+          'token',
+          '401',
+          'forbidden',
+          'access denied'
+        ];
+
+        if (tokenErrorKeywords.some(keyword =>
+            headerMessage.toLowerCase().includes(keyword))) {
+          return true;
+        }
+      }
+
+      // If it's an ERROR frame with no specific message, assume it's auth-related
+      // since our Spring Boot config throws auth errors for invalid tokens
+      return true;
+    }
+
+    // Handle regular error messages
+    const errorMessage = error.message || error.toString().toLowerCase();
+    const tokenErrorKeywords = [
+      'authentication failed',
+      'authentication required',
+      'unauthorized',
+      'invalid token',
+      'expired token',
+      'jwt',
+      'token',
+      '401',
+      'forbidden',
+      'access denied',
+      'failed to send message to executorsubscribablechannel'
+    ];
+
+    return tokenErrorKeywords.some(keyword =>
+        errorMessage.toLowerCase().includes(keyword)
+    );
+  }, []);
+
+  // Function to refresh the page
+  const refreshPage = useCallback(() => {
+    console.log("Token expired or invalid. Refreshing page...");
+    // Clear any stored authentication data before refresh
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    sessionStorage.clear();
+
+    // Add a small delay to ensure cleanup is complete
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  }, []);
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -74,7 +148,14 @@ const useWebSocket = (destination) => {
     setIsConnected(false);
     setError(err);
 
-    // Attempt to reconnect if we haven't exceeded max attempts
+    // Check if the error is token-related
+    if (isTokenError(err)) {
+      console.error("Authentication error detected. Token may be expired or invalid.");
+      refreshPage();
+      return; // Don't attempt reconnection for token errors
+    }
+
+    // For non-token errors, attempt to reconnect if we haven't exceeded max attempts
     if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
       console.log(`Attempting to reconnect... (${reconnectAttempts + 1}/${MAX_RECONNECT_ATTEMPTS})`);
       reconnectTimeoutRef.current = setTimeout(() => {
@@ -85,14 +166,39 @@ const useWebSocket = (destination) => {
       console.error("Max reconnection attempts reached");
       setError(new Error("Connection failed after multiple attempts"));
     }
-  }, [reconnectAttempts]);
+  }, [reconnectAttempts, isTokenError, refreshPage]);
 
   const connect = useCallback(async () => {
-    // Don't connect if we don't have required data
-    if (!token || !user?.uuid || !destination) {
-      console.warn("Missing required connection parameters");
+    // Check if we have all required parameters
+    if (!token) {
+      console.log("WebSocket: No token available, waiting...");
       return;
     }
+
+    if (!user?.uuid) {
+      if (isUserLoading) {
+        console.log("WebSocket: User profile is loading, waiting...");
+        return;
+      } else if (userError) {
+        console.error("WebSocket: Failed to load user profile:", userError);
+        return;
+      } else {
+        console.warn("WebSocket: User UUID not available");
+        return;
+      }
+    }
+
+    if (!destination) {
+      console.warn("WebSocket: No destination provided");
+      return;
+    }
+
+    console.log("WebSocket: All required parameters available, connecting...", {
+      hasToken: !!token,
+      userUuid: user?.uuid,
+      destination,
+      tokenPreview: token?.substring(0, 20) + '...'
+    });
 
     setIsLoading(true);
     setError(null);
@@ -120,20 +226,57 @@ const useWebSocket = (destination) => {
       // Set reconnect delay
       socketClient.current.reconnectDelay = RECONNECT_INTERVAL;
 
+      // Enhanced error handling for the connection
       socketClient.current.connect(
           {
             Authorization: `Bearer ${token}`,
             uuid: user?.uuid
           },
           () => onConnected(destination),
-          onError
+          (error) => {
+            console.error("Raw WebSocket error:", error);
+
+            // Enhanced error processing for different error types
+            let processedError = error;
+
+            // Handle FrameImpl objects (STOMP ERROR frames)
+            if (error && error.command === 'ERROR') {
+              const errorMessage = error.headers?.message ||
+                  error.headers?.error ||
+                  'Authentication failed';
+              processedError = new Error(errorMessage);
+              processedError.isStompError = true;
+              processedError.originalFrame = error;
+            }
+            // Handle frame errors with headers
+            else if (error && error.headers && error.headers.message) {
+              processedError = new Error(error.headers.message);
+            }
+            // Handle string errors
+            else if (typeof error === 'string') {
+              processedError = new Error(error);
+            }
+            // Handle cases where error might be undefined or null
+            else if (!error) {
+              processedError = new Error('Unknown WebSocket connection error');
+            }
+
+            onError(processedError);
+          }
       );
     } catch (connectionError) {
       console.error("Failed to initialize WebSocket connection:", connectionError);
+
+      // Check if initialization error is token-related
+      if (isTokenError(connectionError)) {
+        refreshPage();
+        return;
+      }
+
       setError(connectionError);
       setIsLoading(false);
     }
-  }, [token, user?.uuid, destination, onConnected, onError, disconnect]);
+  }, [token, user?.uuid, destination, isUserLoading, userError, onConnected, onError, disconnect, isTokenError, refreshPage]);
 
   // Manual reconnect function
   const reconnect = useCallback(() => {
@@ -149,6 +292,13 @@ const useWebSocket = (destination) => {
         return true;
       } catch (sendError) {
         console.error("Failed to send message:", sendError);
+
+        // Check if send error is token-related
+        if (isTokenError(sendError)) {
+          refreshPage();
+          return false;
+        }
+
         setError(sendError);
         return false;
       }
@@ -156,30 +306,72 @@ const useWebSocket = (destination) => {
       console.warn("WebSocket not connected. Cannot send message.");
       return false;
     }
-  }, [isConnected]);
+  }, [isConnected, isTokenError, refreshPage]);
 
+  // Monitor token changes and refresh if token becomes null/undefined
   useEffect(() => {
-    connect();
+    if (!token && isConnected) {
+      console.log("Token is no longer available. Refreshing page...");
+      refreshPage();
+    }
+  }, [token, isConnected, refreshPage]);
+
+  // Effect to handle connection when dependencies are ready
+  useEffect(() => {
+    // Only attempt to connect if we have token and destination
+    // The user loading will be handled inside connect()
+    if (token && destination) {
+      console.log("WebSocket: Dependencies ready, attempting connection...");
+      connect();
+    } else {
+      console.log("WebSocket: Waiting for dependencies...", {
+        hasToken: !!token,
+        hasDestination: !!destination,
+        hasUser: !!user?.uuid,
+        isUserLoading
+      });
+    }
 
     return () => {
       disconnect();
     };
-  }, [connect, disconnect]);
+  }, [token, destination, user?.uuid, isUserLoading, connect, disconnect]);
 
   // Reset reconnect attempts when user or token changes
   useEffect(() => {
     setReconnectAttempts(0);
   }, [user?.uuid, token]);
 
+  // Add cleanup on window beforeunload to prevent memory leaks
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      disconnect();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [disconnect]);
+
   return {
-    isLoading,
+    isLoading: isLoading || isUserLoading, // Include user loading state
     error,
     messages,
     isConnected,
     reconnectAttempts,
     reconnect,
     sendMessage,
-    disconnect: disconnect
+    disconnect: disconnect,
+    // Additional state information for debugging
+    connectionState: {
+      hasToken: !!token,
+      hasUser: !!user?.uuid,
+      hasDestination: !!destination,
+      isUserLoading,
+      userError
+    }
   };
 };
 

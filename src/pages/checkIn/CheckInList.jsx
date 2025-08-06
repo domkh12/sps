@@ -80,8 +80,6 @@ function CheckInList() {
     if (isRefetchCheckIn || isRefetchCheckOut) {
       refetchCheckIn();
       refetchCheckInFilter();
-      dispatch(setIsRefetchCheckIn(false));
-      dispatch(setIsRefetchCheckOut(false));
     }
   }, [isRefetchCheckIn, isRefetchCheckOut]);
 

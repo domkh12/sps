@@ -20,7 +20,7 @@ import SeoComponent from "../../components/SeoComponent";
 import {IoEye, IoEyeOff, IoLockClosed} from "react-icons/io5";
 import {LoadingButton} from "@mui/lab";
 import {MdKeyboardArrowLeft} from "react-icons/md";
-import {useResetPassswordMutation} from "../../redux/feature/auth/authApiSlice";
+import {useResetPasswordMutation} from "../../redux/feature/auth/authApiSlice";
 import LogoComponent from "../../components/LogoComponent";
 import * as Yup from "yup";
 import {Slide, toast} from "react-toastify";
@@ -37,7 +37,7 @@ function ResetPassword() {
         isLoading,
         isError,
         error
-    }] = useResetPassswordMutation();
+    }] = useResetPasswordMutation();
 
     const validationSchema = Yup.object().shape({
         newPassword: Yup.string()

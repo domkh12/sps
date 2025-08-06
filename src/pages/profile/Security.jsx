@@ -20,24 +20,20 @@ import {
     useDisableTwoFaMutation, useGetUserProfileQuery,
     useSendLogoutMutation,
 } from "../../redux/feature/auth/authApiSlice";
-import {
-    setCaptionSnackBar,
-    setErrorSnackbar,
-    setIsOpenSnackBar,
-} from "../../redux/feature/actions/actionSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import {
     selectIsTwoFAEnabled,
     setIsOpenTwoFaPopOver,
 } from "../../redux/feature/auth/authSlice";
-import {useGet2faStatusMutation} from "../../redux/feature/users/userApiSlice";
+import {useGet2faStatusQuery} from "../../redux/feature/users/userApiSlice";
 import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataComponent";
 import TwoFaVerifyComponent from "../../components/TwoFaVerifyComponent";
 import {useGetClientInfoQuery} from "../../redux/feature/clientInfo/clientInfoApiSlice.js";
 import DataNotFound from "../../components/DataNotFound.jsx";
 import ClientInfoRowComponent from "../../components/ClientInfoRowComponent.jsx";
 import {setPageNoClientInfo, setPageSizeClientInfo} from "../../redux/feature/clientInfo/clientInfoSlice.js";
+import {Slide, toast} from "react-toastify";
 
 function Security() {
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -54,39 +50,13 @@ function Security() {
         sendLogout,
         {isSuccess: isSuccessLogout, isError: isErrorLogout, error: errorLogout},
     ] = useSendLogoutMutation();
-    const isTwoFaEnabled = useSelector(selectIsTwoFAEnabled);
 
-    const [get2faStatus, {isLoading: isLoadingGet2faStatus}] =
-        useGet2faStatusMutation();
+    const {data: twoFaStatus, isSuccess: isTwoFaStatusSuccess, isLoading: isLoadingTwoFaStatus} =
+        useGet2faStatusQuery();
 
     const [disableTwoFa, {isSuccess: isDisableTwoFaSuccess}] =
         useDisableTwoFaMutation();
 
-    const fetch2FAStatus = async () => {
-        try {
-            await get2faStatus();
-        } catch (error) {
-            console.error("Error fetching 2FA status:", error);
-        }
-    };
-
-    useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            try {
-                const promises = [];
-
-                promises.push(get2faStatus());
-
-                await Promise.all(promises);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
 
     const navigate = useNavigate();
 
@@ -111,6 +81,7 @@ function Security() {
         pageNo,
         pageSize
     });
+
     console.log({clientInfoData})
     const handleChangePage = (event, newPage) => {
         dispatch(setPageNoClientInfo(newPage + 1));
@@ -150,38 +121,30 @@ function Security() {
     }, [isSuccessLogout, navigate]);
 
     useEffect(() => {
-        if (isDisableTwoFaSuccess) {
-            fetch2FAStatus();
-        }
-    }, [isDisableTwoFaSuccess]);
-
-    useEffect(() => {
         if (isSuccessChangePassword) {
-            dispatch(setIsOpenSnackBar(true));
-            dispatch(setCaptionSnackBar(t("createSuccess")));
-            setTimeout(() => {
-                dispatch(setIsOpenSnackBar(false));
-            }, 3000);
-            setTimeout(() => {
-                sendLogout();
-            }, 5000);
+            toast.success(t("changePasswordSuccess"), {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                transition: Slide,
+            });
         }
     }, [isSuccessChangePassword, dispatch, sendLogout, navigate]);
 
     useEffect(() => {
         if (isErrorChangePassword) {
-            dispatch(setIsOpenSnackBar(true));
-            dispatch(setErrorSnackbar(true));
-            dispatch(
-                setCaptionSnackBar(`${errorChangePassword?.data?.error?.description}`)
-            );
-            setTimeout(() => {
-                dispatch(setIsOpenSnackBar(false));
-            }, 3000);
-
-            setTimeout(() => {
-                dispatch(setErrorSnackbar(false));
-            }, 3500);
+            toast.error(`${errorChangePassword?.data?.error?.description}`, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                transition: Slide,
+            });
         }
     }, [isErrorChangePassword, dispatch]);
 
@@ -205,9 +168,9 @@ function Security() {
 
     let content;
 
-    if (isLoading) content = <LoadingFetchingDataComponent/>;
+    if (isLoadingTwoFaStatus || isLoadingClientInfo) content = <LoadingFetchingDataComponent/>;
 
-    if (!isLoading) {
+    if (isTwoFaStatusSuccess && isSuccessClientInfo) {
 
         const {ids, entities, totalElements, pageSize, pageNo} = clientInfoData;
 
@@ -446,7 +409,7 @@ function Security() {
                         {t("tfa")}
                     </Typography>
                     <div className="border p-5 rounded-[10px] gap-5 flex flex-col">
-                        {isTwoFaEnabled ? (
+                        {twoFaStatus?.is2faEnabled ? (
                             <div className="flex justify-start items-center text-green-500 gap-3">
                                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
                                 <p>On</p>
@@ -464,7 +427,7 @@ function Security() {
                                 Use an authenticator app to generate one time security codes.
                             </p>
                         </div>
-                        {isTwoFaEnabled ? (
+                        {twoFaStatus?.is2faEnabled ? (
                             <div className="flex justify-end mt-[20px]">
                                 <ButtonComponent
                                     btnTitle={t("disable")}
@@ -524,7 +487,7 @@ function Security() {
                         onRowsPerPageChange={handleChangeRowsPerPage}
                     />
                 </Card>
-                <TwoFaVerifyComponent onVerificationSuccess={fetch2FAStatus}/>
+                <TwoFaVerifyComponent />
             </div>
         );
     }

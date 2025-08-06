@@ -69,10 +69,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
 
     verifyTwoFa: builder.mutation({
-      query: (code) => ({
+      query: ({code}) => ({
         url: `/auth/verify-2fa?code=${code}`,
         method: "POST",
       }),
+      invalidatesTags: (result, error, arg) =>
+          [
+            { type: "TwoFaStatus", id: "LIST" }
+          ],
     }),
 
     disableTwoFa: builder.mutation({
@@ -80,6 +84,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
         url: `/auth/disable-2fa`,
         method: "POST",
       }),
+      invalidatesTags: (result, error, arg) =>
+          [
+              { type: "TwoFaStatus", id: "LIST" }
+          ],
     }),
 
     verify2FALogin: builder.mutation({
@@ -131,7 +139,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    resetPasssword: builder.mutation({
+    resetPassword: builder.mutation({
       query: ({ token, newPassword }) => ({
         url: `/auth/reset-password`,
         method: "POST",
@@ -142,7 +150,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
-  useResetPassswordMutation,
+  useResetPasswordMutation,
   useForgotPasswordMutation,
   useChangePasswordMutation,
   useUpdateUserProfileMutation,
