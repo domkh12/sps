@@ -152,8 +152,6 @@ const SelectComponent = ({
   const MenuProps = {
     sx: {
       "& .MuiPaper-root": {
-        // background: mode === "dark" ? "#141A21" : "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
-        background: "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
         borderRadius: "10px",
         padding: "6px",
         boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)",

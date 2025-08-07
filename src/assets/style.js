@@ -1,21 +1,6 @@
-import { tooltipClasses } from "@mui/material";
 
 export const listItemButtonStyle = {
-  "&.Mui-selected": {
-    backgroundColor: "#D5D6E9",
-    "& .MuiListItemIcon-root": {
-      color: "#2C3092",
-    },
-    "& .MuiListItemText-root > span": {
-      color: "#2C3092",
-    },
-    "&:hover": {
-      backgroundColor: "#C0C1DE",
-    },
-    "& .MuiTouchRipple-child": {
-      backgroundColor: "#5659A8",
-    },
-  },
+
 };
 
 export const cardStyle = {
@@ -69,26 +54,7 @@ export const listStyle = {
   width: "200px",
   padding: "5px",
   borderRadius: "10px",
-  background: "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
   boxShadow: "0px 0px 15px rgba(0, 0, 0, 0.15)",
-};
-
-export const toolTipStyle = {
-  slotProps: {
-    popper: {
-      sx: {
-        [`&.${tooltipClasses.popper}[data-popper-placement*="top"] .${tooltipClasses.tooltip}`]:
-          {
-            borderRadius: "8px",
-            backgroundColor: "#000000",
-          },
-        [`&.${tooltipClasses.popper}[data-popper-placement*="top"] .${tooltipClasses.arrow}`]:
-          {
-            color: "#000000",
-          },
-      },
-    },
-  },
 };
 
 export const buttonStyleContained = {

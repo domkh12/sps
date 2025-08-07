@@ -37,6 +37,7 @@ import useWebSocket from "../../hook/useWebSocket.jsx";
 import {useEffect} from "react";
 import FilterChipsComponent from "../../components/FilterChipsComponent.jsx";
 import {setIsRefetchCheckOut} from "../../redux/feature/checkOut/checkOutSlice.js";
+import useAuth from "../../hook/useAuth.jsx";
 
 function CheckInList() {
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ function CheckInList() {
   const dateToValue = dateTo ? dayjs(dateTo) : null;
   const isRefetchCheckIn = useSelector((state) => state.checkIn.isRefetchCheckIn);
   const isRefetchCheckOut = useSelector((state) => state.checkOut.isRefetchCheckOut);
+  const {isAdmin} = useAuth();
 
   const {
     data: checkInData,
@@ -85,8 +87,8 @@ function CheckInList() {
 
   const breadcrumbs = [
     <button
-      className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      className="hover:underline"
+      onClick={() => navigate(`${isAdmin ? "/admin" : "/dash"}`)}
       key={1}
     >
       {t("dashboard")}

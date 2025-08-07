@@ -91,7 +91,7 @@ function BranchList() {
 
   const breadcrumbs = [
     <button
-      className="text-black hover:underline"
+      className="hover:underline"
       onClick={() => navigate("/admin")}
       key={1}
     >
@@ -313,7 +313,7 @@ function BranchList() {
                       <TableCell
                         key={column.id}
                         align={column.align}
-                        style={{ minWidth: column.minWidth, color: "gray", whiteSpace: "nowrap" }}
+                        style={{ minWidth: column.minWidth,  whiteSpace: "nowrap", color: "gray"}}
                       >
                         {column.label}
                       </TableCell>

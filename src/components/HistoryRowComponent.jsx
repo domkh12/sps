@@ -128,7 +128,7 @@ function HistoryRowComponent({parkingDetail}) {
                                     <Typography
                                         component="span"
                                         variant="body2"
-                                        sx={{color: "gray", display: "inline"}}
+                                        sx={{ display: "inline"}}
                                     >
                                         {parkingDetail?.vehicle?.vehicleModel || "N/A"}
                                     </Typography>
@@ -245,7 +245,6 @@ function HistoryRowComponent({parkingDetail}) {
             <TableRow>
                 <TableCell
                     style={{paddingBottom: 0, paddingTop: 0}}
-                    sx={{backgroundColor: "#F4F6F8"}}
                     colSpan={8}
                 >
                     <Collapse in={open} timeout="auto" unmountOnExit>
@@ -255,7 +254,6 @@ function HistoryRowComponent({parkingDetail}) {
                                 minWidth: 0,
                                 borderRadius: 3,
                             }}
-                            className="bg-white"
                         >
                             <Table size="small" aria-label="driver-detail">
                                 <TableHead sx={{backgroundColor: "transparent"}}>
@@ -325,7 +323,7 @@ function HistoryRowComponent({parkingDetail}) {
                                                             <Typography
                                                                 component="span"
                                                                 variant="body2"
-                                                                sx={{color: "gray", display: "inline"}}
+                                                                sx={{ display: "inline"}}
                                                             >
                                                                 {parkingDetail?.vehicle?.user?.email || "N/A"}
                                                             </Typography>

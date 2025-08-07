@@ -1,4 +1,4 @@
-import { ThemeProvider } from "@mui/material";
+import {CssBaseline, ThemeProvider} from "@mui/material";
 import Aos from "aos";
 import "aos/dist/aos.css";
 import { lazy, Suspense, useEffect } from "react";
@@ -57,9 +57,7 @@ const AddNewSlot =lazy(()=>import("./pages/slot/AddNewSlot.jsx"));
 const AddCompany =lazy (()=>import ("./pages/company/AddCompany.jsx"));
 const ListCompany =lazy(()=>import("./pages/company/ListCompany.jsx"));
 function App() {
-
-  const mode = useSelector((state) => state.theme.mode);
-  const theme = getTheme(mode);
+  const theme = getTheme();
 
   window.addEventListener("vite:preloadError", (event) => {
     event.preventDefault();
@@ -73,7 +71,8 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme} disableTransitionOnChange>
+      <CssBaseline />
       <Suspense fallback={<LoadingOneComponent />}>
         <Routes>
           {/* Public routes */}

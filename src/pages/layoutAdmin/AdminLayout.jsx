@@ -17,6 +17,7 @@ import SidebarDrawerComponent from "../../components/SidebarDrawerComponent";
 import {toast, Slide} from "react-toastify";
 import {setIsRefetchCheckIn} from "../../redux/feature/checkIn/checkInSlice.js";
 import {setIsRefetchCheckOut} from "../../redux/feature/checkOut/checkOutSlice.js";
+import {Box, Paper} from "@mui/material";
 
 function AdminLayout() {
   const mainContentRef = useRef(null);
@@ -138,17 +139,17 @@ function AdminLayout() {
         <div className="fixed top-0 left-0 w-full h-screen dark:bg-[#282828]">
           <div className="flex h-full bg-white">
             <SideBar />
-            <div className="flex-grow h-full overflow-auto">
+            <Paper className="flex-grow h-full overflow-auto">
               <header className="sticky top-0 w-full z-20">
                 <NavBarDashboard />
               </header>
-              <main
+              <Paper component="main"
                   ref={mainContentRef}
-                  className="xl:px-[40px] px-[10px] sm:px-[20px] pt-[8px] pb-[64px] "
+                  className="xl:px-[40px] px-[10px] sm:px-[20px] pt-[8px] pb-[64px]"
               >
                 <Outlet />
-              </main>
-            </div>
+              </Paper>
+            </Paper>
           </div>
           <SnackBarComponent
               isError={isErrorSnackbar}

@@ -109,7 +109,7 @@ function ViewVehicleDetail({ vehicle }) {
 
   const breadcrumbs = [
     <button
-      className="text-black hover:underline"
+      className=" hover:underline"
         onClick={() => navigate(`${isAdmin ? "/admin" : "/dash"}`)}
       key={1}
     >
@@ -198,7 +198,7 @@ function ViewVehicleDetail({ vehicle }) {
                       <Typography
                         component="span"
                         variant="body2"
-                        sx={{ color: "gray", display: "inline" }}
+                        sx={{  display: "inline" }}
                       >
                         {loadedUser?.email || "N/A"}
                       </Typography>
@@ -216,23 +216,23 @@ function ViewVehicleDetail({ vehicle }) {
 
             <div className="flex flex-col gap-3 mt-5">
               <Typography variant="body1">
-                <span className="text-gray-cus">{t('gender')}</span>
+                <span >{t('gender')}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.user?.gender?.gender || "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">{t('dateOfBirth')}</span>
+                <span >{t('dateOfBirth')}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.user?.dateOfBirth || "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">{t('phoneNumber')}</span>
+                <span >{t('phoneNumber')}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.user?.phoneNumber || "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">{t('role')}</span>
+                <span >{t('role')}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.user?.roles?.length ? vehicle?.user?.roles?.map((role) => role?.name) : "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">{t('branch')}</span>
+                <span >{t('branch')}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.user?.sites?.length > 0 ? vehicle?.user?.sites?.map((site) => site?.siteName) : "N/A"}`}
               </Typography>
             </div>
@@ -257,7 +257,7 @@ function ViewVehicleDetail({ vehicle }) {
                 <Typography variant="body1">{vehicle?.vehicleMake || "N/A"}</Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: "gray", display: "inline" }}
+                  sx={{  display: "inline" }}
                 >
                   {vehicle?.vehicleModel || "N/A"}
                 </Typography>
@@ -265,7 +265,7 @@ function ViewVehicleDetail({ vehicle }) {
             </div>
             <div className="flex flex-col gap-3 mt-5">
               <Typography variant="body1">
-                <span className="text-gray-cus">{t("vehicleType")}</span>
+                <span >{t("vehicleType")}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.vehicleType?.name || "N/A"}`}
               </Typography>
               <div className="flex gap-2">
@@ -277,23 +277,23 @@ function ViewVehicleDetail({ vehicle }) {
                 <Typography variant="body1">{vehicle?.color || "N/A"}</Typography>
               </div>
               <Typography variant="body1">
-                <span className="text-gray-cus">{t("licensePlateType")}</span>
+                <span >{t("licensePlateType")}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.licensePlateType?.name || "N/A" }`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">{t("totalParkingHours")}</span>
+                <span >{t("totalParkingHours")}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.totalParkingHours || "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">{t("totalParkingFees")}</span>
+                <span >{t("totalParkingFees")}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.totalParkingFees || "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">{t("lastParkingSlot")}</span>
+                <span >{t("lastParkingSlot")}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.lastParkingLot || "N/A"}`}
               </Typography>
               <Typography variant="body1">
-                <span className="text-gray-cus">{t("lastParkingTime")}</span>
+                <span >{t("lastParkingTime")}</span>
                 {`${"\u00a0"}:${"\u00a0"}${vehicle?.lastParkingTime || "N/A"}`}
               </Typography>
             </div>

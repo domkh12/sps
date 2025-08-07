@@ -14,7 +14,7 @@ function ViewSlotDetail({parkingSlot}){
         <Paper
             elevation={0}
             component="button"
-            className="text-black hover:underline"
+            className=" hover:underline"
             onClick={() => navigate(`/${isAdmin ? "admin" : "dash"}`)}
             key={1}
         >

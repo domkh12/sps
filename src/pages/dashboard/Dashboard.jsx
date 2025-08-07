@@ -16,6 +16,7 @@ import LoadingFetchingDataComponent from "../../components/LoadingFetchingDataCo
 import SeoComponent from "../../components/SeoComponent.jsx";
 import {formatMinutesToHoursMinutes} from "../../redux/feature/utils/util.js";
 import {useSelector} from "react-redux";
+import {Box, Card, useTheme} from "@mui/material";
 
 const StatCard = ({
                       icon: Icon,
@@ -82,19 +83,6 @@ const StatCard = ({
     );
 };
 
-const FilterButton = ({active, children, onClick}) => (
-    <button
-        onClick={onClick}
-        className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-            active
-                ? "bg-blue-500 text-white shadow-lg transform scale-105"
-                : "bg-white text-gray-600 hover:bg-gray-50 hover:shadow-md"
-        }`}
-    >
-        {children}
-    </button>
-);
-
 const Dashboard = () => {
     const [timeFilter, setTimeFilter] = useState("today");
     const [selectedCompany, setSelectedCompany] = useState("all");
@@ -103,15 +91,52 @@ const Dashboard = () => {
     const isRefetchCheckIn = useSelector((state) => state.checkIn.isRefetchCheckIn);
     const isRefetchCheckOut = useSelector((state) => state.checkOut.isRefetchCheckOut);
 
+    // Get the current theme from Material-UI
+    const theme = useTheme();
+    const isDarkMode = theme.palette.mode === 'dark';
+
     useEffect(() => {
         if (isRefetchCheckIn || isRefetchCheckOut) {
             refetch();
         }
     }, [isRefetchCheckOut, isRefetchCheckIn]);
+
     useEffect(() => {
         const timer = setTimeout(() => setIsLoaded(true), 300);
         return () => clearTimeout(timer);
     }, []);
+
+    // Common chart options for dark mode support
+    const getBaseChartOptions = () => ({
+        tooltip: {
+            theme: isDarkMode ? "dark" : "light",
+            style: {
+                fontSize: "12px",
+            },
+        },
+        xaxis: {
+            labels: {
+                style: {
+                    colors: isDarkMode ? "#e5e7eb" : "#666",
+                },
+            },
+        },
+        yaxis: {
+            labels: {
+                style: {
+                    colors: isDarkMode ? "#e5e7eb" : "#666",
+                },
+            },
+        },
+        grid: {
+            borderColor: isDarkMode ? "#374151" : "#f0f0f0",
+        },
+        legend: {
+            labels: {
+                colors: isDarkMode ? "#e5e7eb" : "#374151",
+            },
+        },
+    });
 
     let content;
 
@@ -120,16 +145,16 @@ const Dashboard = () => {
     if (isSuccess) content = (
         <>
             <SeoComponent title={"Dashboard"}/>
-            <div className="min-h-screen">
+            <Box className="min-h-screen">
                 <div className="mx-auto space-y-6">
                     {/* Header */}
                     <div
                         className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                            <h1 className="text-3xl font-bold  mb-2">
                                 Smart Parking Dashboard
                             </h1>
-                            <p className="text-gray-600">Real-time analytics and monitoring</p>
+                            <p>Real-time analytics and monitoring</p>
                         </div>
 
                         {/* Filters */}
@@ -227,12 +252,12 @@ const Dashboard = () => {
                     {/* Charts Section */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Hourly Occupancy Chart */}
-                        <div
-                            className={`bg-white rounded-xl p-6 shadow-lg transition-all duration-1000 transform ${
+                        <Card
+                            className={`rounded-xl p-6 shadow-lg transition-all duration-1000 transform ${
                                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                             }`}
                         >
-                            <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                            <h3 className="text-xl font-semibold mb-4 flex items-center">
                                 <Clock className="mr-2" size={20}/>
                                 Hourly Slot Occupancy
                             </h3>
@@ -267,25 +292,10 @@ const Dashboard = () => {
                                         },
                                     },
                                     colors: ["#3B82F6"],
+                                    ...getBaseChartOptions(),
                                     xaxis: {
+                                        ...getBaseChartOptions().xaxis,
                                         categories: analysisData.hourlyData.map((item) => item.hour),
-                                        labels: {
-                                            style: {colors: "#666"},
-                                        },
-                                    },
-                                    yaxis: {
-                                        labels: {
-                                            style: {colors: "#666"},
-                                        },
-                                    },
-                                    grid: {
-                                        borderColor: "#f0f0f0",
-                                    },
-                                    tooltip: {
-                                        theme: "light",
-                                        style: {
-                                            fontSize: "12px",
-                                        },
                                     },
                                 }}
                                 series={[
@@ -297,15 +307,15 @@ const Dashboard = () => {
                                 type="area"
                                 height={300}
                             />
-                        </div>
+                        </Card>
 
                         {/* Weekly Stay Time Chart */}
-                        <div
-                            className={`bg-white rounded-xl p-6 shadow-lg transition-all duration-1000 delay-200 transform ${
+                        <Card
+                            className={`rounded-xl p-6 shadow-lg transition-all duration-1000 delay-200 transform ${
                                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                             }`}
                         >
-                            <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                            <h3 className="text-xl font-semibold  mb-4 flex items-center">
                                 <Clock className="mr-2" size={20}/>
                                 Weekly Average Stay Time
                             </h3>
@@ -333,23 +343,20 @@ const Dashboard = () => {
                                     },
                                     dataLabels: {enabled: false},
                                     colors: ["#10B981"],
+                                    ...getBaseChartOptions(),
                                     xaxis: {
+                                        ...getBaseChartOptions().xaxis,
                                         categories: analysisData.weeklyData.map((item) => item.day),
-                                        labels: {
-                                            style: {colors: "#666"},
-                                        },
                                     },
                                     yaxis: {
+                                        ...getBaseChartOptions().yaxis,
                                         labels: {
-                                            style: {colors: "#666"},
+                                            ...getBaseChartOptions().yaxis.labels,
                                             formatter: (value) => `${value}h`,
                                         },
                                     },
-                                    grid: {
-                                        borderColor: "#f0f0f0",
-                                    },
                                     tooltip: {
-                                        theme: "light",
+                                        ...getBaseChartOptions().tooltip,
                                         y: {
                                             formatter: (value) => `${value}h`,
                                         },
@@ -377,17 +384,17 @@ const Dashboard = () => {
                                 type="bar"
                                 height={300}
                             />
-                        </div>
+                        </Card>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Company Distribution */}
-                        <div
-                            className={`bg-white rounded-xl p-6 shadow-lg transition-all duration-1000 delay-400 transform ${
+                        <Card
+                            className={`rounded-xl p-6 shadow-lg transition-all duration-1000 delay-400 transform ${
                                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                             }`}
                         >
-                            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                            <h3 className="text-xl font-semibold  mb-4">
                                 Company Slot Distribution
                             </h3>
                             <Chart
@@ -411,6 +418,9 @@ const Dashboard = () => {
                                         position: "bottom",
                                         horizontalAlign: "center",
                                         fontSize: "12px",
+                                        labels: {
+                                            colors: isDarkMode ? "#e5e7eb" : "#374151",
+                                        },
                                     },
                                     plotOptions: {
                                         pie: {
@@ -423,7 +433,7 @@ const Dashboard = () => {
                                                         label: "Total Slots",
                                                         fontSize: "14px",
                                                         fontWeight: 600,
-                                                        color: "#374151",
+                                                        color: isDarkMode ? "#e5e7eb" : "#374151",
                                                         formatter: () => {
                                                             return analysisData.companies
                                                                 .reduce(
@@ -440,8 +450,12 @@ const Dashboard = () => {
                                     dataLabels: {
                                         enabled: true,
                                         formatter: (val) => `${val.toFixed(1)}%`,
+                                        style: {
+                                            colors: [isDarkMode ? "#1f2937" : "#ffffff"],
+                                        },
                                     },
                                     tooltip: {
+                                        theme: isDarkMode ? "dark" : "light",
                                         y: {
                                             formatter: (value) => `${value} slots`,
                                         },
@@ -451,29 +465,29 @@ const Dashboard = () => {
                                 type="donut"
                                 height={250}
                             />
-                        </div>
+                        </Card>
 
                         {/* Branch Performance */}
-                        <div
-                            className={`lg:col-span-2 bg-white rounded-xl p-6 shadow-lg transition-all duration-1000 delay-600 transform ${
+                        <Card
+                            className={`lg:col-span-2 rounded-xl p-6 shadow-lg transition-all duration-1000 delay-600 transform ${
                                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                             }`}
                         >
-                            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                            <h3 className="text-xl font-semibold mb-4">
                                 Branch Performance
                             </h3>
                             <div className="space-y-4 max-h-64 overflow-y-auto">
                                 {analysisData.branchData.map((branch, index) => (
                                     <div
                                         key={branch.name}
-                                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                        className="flex items-center justify-between p-3  rounded-lg"
                                     >
                                         <div className="flex items-center space-x-3">
                                             <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                                             <span className="font-medium">{branch.name}</span>
                                         </div>
                                         <div className="flex items-center space-x-4">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm ">
                       {branch.occupied}/{branch.slots} slots
                     </span>
                                             <div className="w-20 bg-gray-200 rounded-full h-2">
@@ -492,15 +506,15 @@ const Dashboard = () => {
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </Card>
                     </div>
 
                     {/* Company Details Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {analysisData.companies.map((company, index) => (
-                            <div
+                            <Card
                                 key={company.id}
-                                className={`bg-white rounded-xl p-6 shadow-lg transition-all duration-700 delay-${
+                                className={`rounded-xl p-6 shadow-lg transition-all duration-700 delay-${
                                     (index + 1) * 200
                                 } transform ${
                                     isLoaded
@@ -509,7 +523,7 @@ const Dashboard = () => {
                                 }`}
                             >
                                 <div className="flex items-center justify-between mb-4">
-                                    <h4 className="text-lg font-semibold text-gray-800">
+                                    <h4 className="text-lg font-semibold">
                                         {company.name}
                                     </h4>
                                     <div
@@ -520,25 +534,25 @@ const Dashboard = () => {
 
                                 <div className="space-y-3">
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Branches</span>
+                                        <span>Branches</span>
                                         <span className="font-medium">{company.branches}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Parking Areas</span>
+                                        <span>Parking Areas</span>
                                         <span className="font-medium">{company.totalAreas}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Total Slots</span>
+                                        <span>Total Slots</span>
                                         <span className="font-medium">{company.totalSlots}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Occupied Slots</span>
+                                        <span>Occupied Slots</span>
                                         <span className="font-medium text-blue-600">
                     {company.occupiedSlots}
                   </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Avg Stay Time</span>
+                                        <span>Avg Stay Time</span>
                                         <span className="font-medium text-green-600">
                     {formatMinutesToHoursMinutes(company.avgStayTime)}
                   </span>
@@ -554,7 +568,7 @@ const Dashboard = () => {
                            }%
                     </span>
                                         </div>
-                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div className="w-full rounded-full h-2">
                                             <div
                                                 className="h-2 rounded-full transition-all duration-1000"
                                                 style={{
@@ -568,11 +582,11 @@ const Dashboard = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </Card>
                         ))}
                     </div>
                 </div>
-            </div>
+            </Box>
         </>
     )
 

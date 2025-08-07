@@ -49,7 +49,6 @@ function SelectSingleComponent({
     const MenuProps = {
         sx: {
             "& .MuiPaper-root": {
-                background: mode === "dark" ? "#141A21" : "#fff",
                 borderRadius: "10px",
                 padding: "6px",
                 boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)",
@@ -236,7 +235,6 @@ function SelectSingleComponent({
                     return selectedOption ? getOptionDisplayText(selectedOption) : '';
                 }}
                 sx={{
-                    ...selectStyle,
                     ...(hasError && {
                         "& .MuiOutlinedInput-notchedOutline": {
                             borderColor: "#f44336",
@@ -244,7 +242,7 @@ function SelectSingleComponent({
                     }),
                 }}
             >
-                <div className="h-14 sticky top-0 z-10 bg-white dark:bg-[#141A21] rounded-lg">
+                <div className="h-14 sticky top-0 z-10 rounded-lg">
                     <div className="flex justify-between items-center">
                         <TextField
                             size="small"

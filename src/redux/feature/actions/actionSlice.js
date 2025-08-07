@@ -15,8 +15,12 @@ const actionSlice = createSlice({
     isFiltered: false,
     isOpenDrawerProfiles: false,
     isOpenSidebarDrawer: false,
+    isSettingDrawerOpen: false,
   },
   reducers: {
+    setIsSettingDrawerOpen(state, action) {
+      state.isSettingDrawerOpen = action.payload;
+    },
     toggleCollapsed(state, action) {
       state.isCollapsed = !state.isCollapsed;
     },
@@ -57,6 +61,7 @@ const actionSlice = createSlice({
 });
 
 export const {
+  setIsSettingDrawerOpen,
   setIsOpenSidebarDrawer,
   toggleCollapsed,
   setIsLoadingBar,

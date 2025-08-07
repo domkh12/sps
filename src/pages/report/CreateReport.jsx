@@ -17,7 +17,7 @@ function CreateReport() {
 
   const breadcrumbs = [
     <button
-      className="text-black hover:underline"
+      className=" hover:underline"
       onClick={() => navigate("/dash")}
       key={1}
     >

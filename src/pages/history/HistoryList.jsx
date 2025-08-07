@@ -41,6 +41,7 @@ import SearchComponent from "../../components/SearchComponent.jsx";
 import TableActionMenuComponent from "../../components/TableActionMenuComponent.jsx";
 import SkeletonTableRowComponent from "../../components/SkeletonTableRowComponent.jsx";
 import {setIsRefetchCheckOut} from "../../redux/feature/checkOut/checkOutSlice.js";
+import useAuth from "../../hook/useAuth.jsx";
 
 function HistoryList() {
     const navigate = useNavigate();
@@ -56,6 +57,7 @@ function HistoryList() {
     const dateToValue = dateTo ? dayjs(dateTo) : null;
     const isRefetchCheckIn = useSelector((state) => state.checkIn.isRefetchCheckIn);
     const isRefetchCheckOut = useSelector((state) => state.checkOut.isRefetchCheckOut);
+    const {isAdmin} = useAuth();
 
     const {
         data: parkingDetailData,
@@ -127,8 +129,8 @@ function HistoryList() {
     ];
     const breadcrumbs = [
         <button
-            className="text-black hover:underline"
-            onClick={() => navigate("/dash")}
+            className="hover:underline"
+            onClick={() => navigate(`${isAdmin ? "/admin" : "/dash"}`)}
             key={1}
         >
             {t("dashboard")}
@@ -182,7 +184,7 @@ function HistoryList() {
                             />
                         ))
                     ) : (
-                        <TableRow sx={{bgcolor: "#f9fafb"}}>
+                        <TableRow>
                             <TableCell align="center" colSpan={20}>
                                 <DataNotFound/>
                             </TableCell>
@@ -199,7 +201,7 @@ function HistoryList() {
                             />
                         ))
                     ) : (
-                        <TableRow sx={{bgcolor: "#f9fafb"}}>
+                        <TableRow >
                             <TableCell align="center" colSpan={20}>
                                 <DataNotFound/>
                             </TableCell>
@@ -273,18 +275,10 @@ function HistoryList() {
                     />
                     <TableContainer>
                         <Table>
-                            <TableHead sx={{backgroundColor: "#F4F6F8"}}>
+                            <TableHead>
                                 <TableRow>
                                     <TableCell padding="checkbox">
                                         <Checkbox
-                                            sx={{
-                                                "&.Mui-checked": {
-                                                    color: "#2C3092",
-                                                },
-                                                "&:hover": {
-                                                    color: "#2C3092",
-                                                },
-                                            }}
                                             color="primary"
                                         />
                                     </TableCell>

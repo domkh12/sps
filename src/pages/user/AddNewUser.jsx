@@ -261,7 +261,7 @@ function AddNewUser() {
 
   const breadcrumbs = [
     <button
-      className="text-black hover:underline"
+      className=" hover:underline"
       onClick={() => navigate(`${isAdmin ? "admin" : "dash"}`)}
       key={1}
     >

@@ -33,7 +33,7 @@ export default function Profile() {
   
   const breadcrumbs = [
     <button
-      className="text-black hover:underline"
+      className="hover:underline"
       onClick={() => navigate(`${isManager ? "/dash" : "/admin"}`)}
       key={1}
     >
@@ -54,7 +54,7 @@ export default function Profile() {
   };
 
   return (
-    <>
+    <div className="h-full">
       <MainHeaderComponent breadcrumbs={breadcrumbs}
                            title={t("account")}
                            handleBackClick={handleBackClick}
@@ -78,6 +78,6 @@ export default function Profile() {
       <div className="mt-10">
         <Outlet />
       </div>
-    </>
+    </div>
   );
 }

@@ -1,29 +1,18 @@
 import {createTheme} from '@mui/material/styles';
-import {deepPurple, deepOrange, indigo} from '@mui/material/colors';
+import {indigo} from '@mui/material/colors';
 
-export const getTheme = (mode) =>
+export const getTheme = () =>
     createTheme({
+        colorSchemes: {
+            dark: true,
+        },
         palette: {
-            mode: mode,
             primary: {
                 main: indigo[600],
             },
             secondary: {
                 main: indigo[900],
             },
-            ...(mode === 'dark'
-                ? {
-                    background: {
-                        default: '#121212',
-                        paper: '#141A21',
-                    },
-                }
-                : {
-                    background: {
-                        default: '#fafafa',
-                        paper: '#fff',
-                    },
-                }),
         },
 
         typography: {
@@ -31,6 +20,28 @@ export const getTheme = (mode) =>
         },
 
         components: {
+
+            MuiTableHead: {
+              styleOverrides: {
+                  root: ({ theme }) => ({
+                      backgroundColor: theme.palette.mode === 'dark'
+                          ? theme.palette.grey[800]
+                          : theme.palette.grey[100],
+                      '& .MuiTableCell-head': {
+                          backgroundColor: theme.palette.mode === 'dark'
+                              ? theme.palette.grey[800]
+                              : theme.palette.grey[100],
+                          color: theme.palette.mode === 'dark'
+                              ? theme.palette.common.white
+                              : theme.palette.text.primary,
+                          fontWeight: 600,
+                          borderBottom: theme.palette.mode === 'dark'
+                              ? `1px solid ${theme.palette.grey[700]}`
+                              : `1px solid ${theme.palette.grey[300]}`,
+                      }
+                  })
+              }
+            },
 
             MuiPopover: {
                 styleOverrides: {
@@ -50,21 +61,11 @@ export const getTheme = (mode) =>
                 }
             },
 
-            MuiCssBaseline: {
-                styleOverrides: {
-                    body: {
-                        background: mode === 'dark' ? '#141A21 !important' : '#fafafa',
-                    }
-                }
-            },
-
             MuiListSubheader: {
                 variants: [
                     {
                         props: {variant: 'cus1'},
                         style: {
-                            color: mode === 'dark' ? '#E0E0F6' : '#2C3092',
-                            backgroundColor: mode === 'dark' ? '#1C252E' : '#D5D6E9',
                             borderRadius: "5px",
                             pointerEvents: "none",
                             fontWeight: 600,
@@ -104,24 +105,11 @@ export const getTheme = (mode) =>
                 }
             },
 
-            MuiTabs: {
-                styleOverrides: {
-                    root: {
-                        "& .MuiTabs-indicator": {
-                            backgroundColor: mode === "dark" ? "#fff" : "#000",
-                        }
-                    }
-                }
-            },
-
             MuiTab: {
                 styleOverrides: {
                     root: {
                         textTransform: "none",
                         fontSize: "1rem",
-                        "&.Mui-selected": {
-                            color: mode === "dark" ? "#fff" : "#000",
-                        },
                     }
                 }
             },
@@ -132,11 +120,7 @@ export const getTheme = (mode) =>
                         borderRadius: '8px',
                     },
                     contained: {
-                        // backgroundColor: deepPurple[600],
                         borderRadius: '8px',
-                        // '&:hover': {
-                        //     backgroundColor: deepPurple[700],
-                        // },
                     },
                     root: {
                         textTransform: 'none',
@@ -146,20 +130,16 @@ export const getTheme = (mode) =>
 
             MuiCard: {
                 styleOverrides: {
-                    root: {
-                        variants: [
-                            {
-                                style: {
-                                    borderRadius: "14px",
-                                    boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
-                                    backgroundColor: mode === 'dark' ? '#1C252E' : '#fff',
-                                    color: mode === 'dark' ? '#fff' : '#000',
-                                    transition: 'all 0.3s ease',
-                                },
-                            },
-                        ],
-                    },
+                    root: ({ theme }) => ({
+                        backgroundColor: theme.palette.mode === 'dark'
+                            ? theme.palette.grey[900]
+                            : "",
+                        borderRadius: "14px",
+                        boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
+
+                    })
                 },
+
             },
 
             MuiIconButton: {
@@ -168,11 +148,7 @@ export const getTheme = (mode) =>
                         variants: [
                             {
                                 style: {
-                                    color: mode === 'dark' ? '#fff' : '#637381',
                                     transition: 'all 0.3s ease',
-                                    "&:hover": {
-                                        backgroundColor: mode === 'dark' ? '#1C252E' : '#f2f2f2',
-                                    }
                                 },
                             },
                         ],
@@ -188,7 +164,6 @@ export const getTheme = (mode) =>
                 },
                 defaultProps: {
                     elevation: 0,
-
                 },
 
             },
@@ -198,8 +173,6 @@ export const getTheme = (mode) =>
                     {
                         props: {variant: 'customStyled'},
                         style: {
-                            background: mode === 'dark' ? '#141A21' : "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
-                            color: mode === 'dark' ? '#fff' : '#637381',
                             borderRadius: "10px",
                             padding: "6px",
                             boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)",
@@ -220,13 +193,12 @@ export const getTheme = (mode) =>
                     {
                         props: {variant: 'description'},
                         style: {
-                            color: mode === "dark" ? "#fff" : "#000",
-                            opacity: mode === "dark" ? "80%" : "40%",
                             fontSize: "14px"
                         },
                     },
                 ],
             },
+
 
 
         },

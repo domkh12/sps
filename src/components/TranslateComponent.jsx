@@ -76,14 +76,6 @@ function TranslateComponent() {
                 vertical: "bottom",
                 horizontal: "center",
               }}
-              slotProps={{
-                paper: {
-                  style: {
-                    backgroundColor: "transparent",
-                    boxShadow: "none",
-                  },
-                },
-              }}
               transformOrigin={{
                 vertical: "top",
                 horizontal: "center",
@@ -104,7 +96,6 @@ function TranslateComponent() {
                   }}
                   sx={{
                     borderRadius: "6px",
-                    color: "#424242",
                   }}
                 >
                   <ListItemText
@@ -121,7 +112,6 @@ function TranslateComponent() {
                           component="span"
                           variant="body2"
                           sx={{
-                            color: "#424242",
                             display: "inline",
                           }}
                         >
@@ -139,7 +129,6 @@ function TranslateComponent() {
                   }}
                   sx={{
                     borderRadius: "6px",
-                    color: "#424242",
                   }}
                 >
                   <ListItemText
@@ -156,7 +145,6 @@ function TranslateComponent() {
                           component="span"
                           variant="body2"
                           sx={{
-                            color: "#424242",
                             display: "inline",
                           }}
                         >

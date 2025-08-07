@@ -271,7 +271,7 @@ function CheckOutRowComponent({ parkingDetail }) {
                               <Typography
                                 component="span"
                                 variant="body2"
-                                sx={{ color: "gray", display: "inline" }}
+                                sx={{  display: "inline" }}
                               >
                                 {parkingDetail?.vehicle?.user?.email || "N/A"}
                               </Typography>

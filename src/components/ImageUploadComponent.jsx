@@ -83,10 +83,10 @@ function ImageUploadComponent({
           >
             <div className="flex justify-center items-center flex-col gap-2">
               <BsCameraFill
-                className={`${isError ? "text-[#f44336] text-opacity-100" : "text-black text-opacity-30"} w-7 h-7 `}
+                className={`${isError ? "text-[#f44336] text-opacity-100" : " text-opacity-30"} w-7 h-7 `}
               />
               <span
-                className={`${isError ? "text-[#f44336] text-opacity-100" : "text-black text-opacity-40"}  text-sm`}
+                className={`${isError ? "text-[#f44336] text-opacity-100" : " text-opacity-40"}  text-sm`}
               >
                 Upload photo
               </span>
@@ -105,7 +105,7 @@ function ImageUploadComponent({
       <div className="flex justify-center items-center my-4">
         <Typography
           variant="caption"
-          className="text-black text-opacity-60 text-center w-[170px]"
+          className=" text-opacity-60 text-center w-[170px]"
         >
           {t("imageValidation")}
         </Typography>

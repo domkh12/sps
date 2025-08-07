@@ -1,4 +1,3 @@
-import React from "react";
 import { Typography } from "@mui/material";
 import useTranslate from "../hook/useTranslate";
 
@@ -10,7 +9,6 @@ function DataNotFound() {
         src="/images/ic-content.svg"
         alt="ic_content"
         className="w-[160px] h-fit"
-        
       />
       <Typography variant="body1" sx={{ color: "gray" }}>
         {t("noData")}

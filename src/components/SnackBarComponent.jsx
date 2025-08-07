@@ -52,7 +52,7 @@ function SnackBarComponent({
               }}
               aria-label="close"
             >
-              <IoClose className="text-[12px] text-black" />
+              <IoClose className="text-[12px] " />
             </IconButton>
           }
           icon={

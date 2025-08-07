@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar, IconButton } from "@mui/material";
+import {Avatar, IconButton, Paper, Typography} from "@mui/material";
 import NotificationsNoneTwoToneIcon from "@mui/icons-material/NotificationsNoneTwoTone";
 import SearchTwoToneIcon from "@mui/icons-material/SearchTwoTone";
 import ToolTipButtonComponent from "../../components/ToolTipButtonComponent";
@@ -18,9 +18,10 @@ function NavBarDashboard() {
   const user = useSelector((state) => state.auth.userProfile);
   const dispatch = useDispatch();
 
+
   return (
     <>
-      <div className="h-[70px] bg-white text-white bg-opacity-50 backdrop-blur-md flex justify-between flex-nowrap items-center xl:px-[40px] px-[10px] sm:px-[20px]">
+      <Paper className="h-[70px] backdrop-blur-md flex justify-between flex-nowrap items-center xl:px-[40px] px-[10px] sm:px-[20px]">
         <div className=" flex items-center gap-[10px]">
           <div className="xl:hidden">
             <ToolTipButtonComponent
@@ -33,10 +34,12 @@ function NavBarDashboard() {
 
         <div className="flex lg:gap-2 items-center flex-nowrap">
           <button className="hidden  bg-black bg-opacity-5 hover:bg-opacity-10 w-[100px] h-[40px] rounded-xl gap-2 xl:flex justify-evenly items-center px-[7px] mr-[8px] shadow-inner">
-            <SearchTwoToneIcon className="w-5 h-5 text-black text-opacity-50" />
-            <span className="text-black bg-white px-[7px] py-[2px] rounded-lg shadow-sm">
+            <SearchTwoToneIcon className="w-5 h-5  text-opacity-50" />
+            <div className="bg-white px-[7px] py-[2px] rounded-lg shadow-sm text-black">
+            <Typography variant="body1">
               ⌘ K
-            </span>
+            </Typography>
+            </div>
           </button>
           <div>
             <ToolTipButtonComponent title={"Search"} icon={IoSearch} />
@@ -64,13 +67,14 @@ function NavBarDashboard() {
             </IconButton>
           </div>
         </div>
-      </div>
+      </Paper>
       {drawerOpen && (
           <ProfileDrawerComponent
               open={drawerOpen}
               onClose={() => dispatch(setIsOpenDrawerProfiles(false))}
           />
       )}
+
     </>
   );
 }

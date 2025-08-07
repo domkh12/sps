@@ -124,13 +124,13 @@ function MapViews() {
 
   const breadcrumbs = [
     <button
-      className="text-black hover:underline"
+      className="hover:underline"
       onClick={() => navitage("/dash")}
       key={1}
     >
       {t("dashboard")}
     </button>,
-    <Typography color="inherit" key={2}>
+    <Typography key={2}>
       {t("mapView")}
     </Typography>,
   ];

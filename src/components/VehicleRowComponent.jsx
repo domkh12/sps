@@ -92,7 +92,7 @@ function VehicleRowComponent({ vehicleId, vehicle }) {
                   <Typography
                     component="span"
                     variant="body2"
-                    sx={{ color: "gray", display: "inline" }}
+                    sx={{  display: "inline" }}
                   >
                     {vehicle?.vehicleModel || "N/A"}
                   </Typography>

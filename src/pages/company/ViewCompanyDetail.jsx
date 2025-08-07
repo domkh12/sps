@@ -12,7 +12,7 @@ function ViewCompanyDetail({company}) {
         <Paper
             elevation={0}
             component="button"
-            className="text-black hover:underline"
+            className=" hover:underline"
             onClick={() => navigate("/admin")}
             key={1}
         >

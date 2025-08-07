@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import {Typography} from "@mui/material";
 
 function LogoComponent() {
   const isCollapsed = useSelector((state) => state.action.isCollapsed);
@@ -16,9 +17,9 @@ function LogoComponent() {
         <span className="text-[16px] xs:text-xl tracking-wide">
           ប្រព័ន្ធចតរថយន្តឆ្លាតវៃ
         </span>
-        <span className="text-[12px] xs:text-sm text-opacity-70 text-black tracking-wide">
+        <Typography className="text-[12px] xs:text-sm text-opacity-70 tracking-wide">
           Smart Parking System
-        </span>
+        </Typography>
       </div>
     </div>
   );

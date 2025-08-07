@@ -108,7 +108,7 @@ function ViewDetailUser({ user }) {
 
   const breadcrumbs = [
     <button
-        className="text-black hover:underline"
+        className=" hover:underline"
         onClick={() => navigate(`${isAdmin ? "/admin" : "/dash"}`)}
         key={1}
     >
@@ -178,7 +178,7 @@ function ViewDetailUser({ user }) {
                           <Typography
                               component="span"
                               variant="body2"
-                              sx={{ color: "gray", display: "inline" }}
+                              sx={{  display: "inline" }}
                           >
                             {user?.email || "N/A"}
                           </Typography>
@@ -196,23 +196,23 @@ function ViewDetailUser({ user }) {
 
               <div className="flex flex-col gap-3 mt-5">
                 <Typography variant="body1">
-                  <span className="text-gray-cus">{t('gender')}</span>
+                  <span >{t('gender')}</span>
                   {`${"\u00a0"}:${"\u00a0"}${user?.gender?.gender || "N/A"}`}
                 </Typography>
                 <Typography variant="body1">
-                  <span className="text-gray-cus">{t('dateOfBirth')}</span>
+                  <span >{t('dateOfBirth')}</span>
                   {`${"\u00a0"}:${"\u00a0"}${user?.dateOfBirth || "N/A"}`}
                 </Typography>
                 <Typography variant="body1">
-                  <span className="text-gray-cus">{t('phoneNumber')}</span>
+                  <span >{t('phoneNumber')}</span>
                   {`${"\u00a0"}:${"\u00a0"}${user?.phoneNumber || "N/A"}`}
                 </Typography>
                 <Typography variant="body1">
-                  <span className="text-gray-cus">{t('role')}</span>
+                  <span >{t('role')}</span>
                   {`${"\u00a0"}:${"\u00a0"}${user?.roles?.length ? user?.roles?.map((role) => role?.name) : "N/A"}`}
                 </Typography>
                 <Typography variant="body1">
-                  <span className="text-gray-cus">{t('branch')}</span>
+                  <span >{t('branch')}</span>
                   {`${"\u00a0"}:${"\u00a0"}${user?.sites?.length > 0 ? user?.sites?.map((site) => site?.siteName) : "N/A"}`}
                 </Typography>
               </div>

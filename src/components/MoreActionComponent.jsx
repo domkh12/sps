@@ -40,9 +40,7 @@ function MoreActionComponent({
               slotProps={{
                 paper: {
                   style: {
-                    padding: 10,
-                    backgroundColor: "transparent",
-                    boxShadow: "none",
+                    ...listStyle
                   },
                 },
               }}
@@ -55,9 +53,6 @@ function MoreActionComponent({
                 component="div"
                 disablePadding
                 dense={true}
-                sx={{
-                  ...listStyle,
-                }}
               >
                 {menuItems.map((item, index) => (
                   <ListItemButton

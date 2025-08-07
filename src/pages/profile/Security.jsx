@@ -82,7 +82,6 @@ function Security() {
         pageSize
     });
 
-    console.log({clientInfoData})
     const handleChangePage = (event, newPage) => {
         dispatch(setPageNoClientInfo(newPage + 1));
     };

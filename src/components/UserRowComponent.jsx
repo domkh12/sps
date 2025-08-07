@@ -230,7 +230,7 @@ function UserRowComponent({ userId, user }) {
                     <Typography
                       component="span"
                       variant="body2"
-                      sx={{ color: "gray", display: "inline" }}
+                      sx={{  display: "inline" }}
                     >
                       {loadedUser.email || "N/A"}
                     </Typography>

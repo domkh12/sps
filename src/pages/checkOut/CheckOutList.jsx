@@ -36,6 +36,7 @@ import {
 } from "../../redux/feature/checkOut/checkOutSlice.js";
 import {useEffect} from "react";
 import FilterChipsComponent from "../../components/FilterChipsComponent.jsx";
+import useAuth from "../../hook/useAuth.jsx";
 
 function CheckOutList() {
   const navigate = useNavigate();
@@ -50,6 +51,7 @@ function CheckOutList() {
   const dateFromValue = dateFrom ? dayjs(dateFrom) : null;
   const dateToValue = dateTo ? dayjs(dateTo) : null;
   const isRefetchCheckOut = useSelector((state) => state.checkOut.isRefetchCheckOut);
+  const {isAdmin} = useAuth();
 
   const {
     data: checkOutData,
@@ -110,8 +112,8 @@ function CheckOutList() {
 
   const breadcrumbs = [
     <button
-      className="text-black hover:underline"
-      onClick={() => navigate("/dash")}
+      className="hover:underline"
+      onClick={() => navigate(`${isAdmin ? "/admin" : "/dash"}`)}
       key={1}
     >
       {t("dashboard")}

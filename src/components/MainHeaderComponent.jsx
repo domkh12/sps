@@ -20,11 +20,10 @@ function MainHeaderComponent({
               size="small"
               disableRipple
               sx={{
-                backgroundColor: "transparent", "&:hover": {backgroundColor: "transparent"},
-                color: "#0A0A0A"
+                backgroundColor: "transparent", "&:hover": {backgroundColor: "transparent"}
               }}
           >
-            <IoIosArrowBack className="text-gray-700"/>
+            <IoIosArrowBack/>
             <Typography variant="h5" sx={{fontSize: "24px", fontWeight: "500"}}>
               {title}
             </Typography>

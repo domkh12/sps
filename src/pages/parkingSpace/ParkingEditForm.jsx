@@ -143,7 +143,7 @@ function ParkingEditForm({parkingSpace}) {
 
     const breadcrumbs = [
         <button
-            className="text-black hover:underline"
+            className=" hover:underline"
             onClick={() => navigate("/admin")}
             key={1}
         >
