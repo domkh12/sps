@@ -16,8 +16,12 @@ const actionSlice = createSlice({
     isOpenDrawerProfiles: false,
     isOpenSidebarDrawer: false,
     isSettingDrawerOpen: false,
+    isOpenUtilSearch: false,
   },
   reducers: {
+    setIsOpenUtilSearch(state, action) {
+      state.isOpenUtilSearch = action.payload;
+    },
     setIsSettingDrawerOpen(state, action) {
       state.isSettingDrawerOpen = action.payload;
     },
@@ -61,6 +65,7 @@ const actionSlice = createSlice({
 });
 
 export const {
+  setIsOpenUtilSearch,
   setIsSettingDrawerOpen,
   setIsOpenSidebarDrawer,
   toggleCollapsed,

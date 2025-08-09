@@ -1,7 +1,7 @@
 import {createTheme} from '@mui/material/styles';
 import {indigo} from '@mui/material/colors';
 
-export const getTheme = () =>
+export const getTheme = (mode) =>
     createTheme({
         colorSchemes: {
             dark: true,
@@ -20,6 +20,36 @@ export const getTheme = () =>
         },
 
         components: {
+
+            MuiCssBaseline: {
+                styleOverrides: (theme) => ({
+                    body: {
+                        // Webkit browsers (Chrome, Safari, Edge)
+                        '*::-webkit-scrollbar': {
+                            width: '8px',
+                            height: '8px',
+                        },
+                        '*::-webkit-scrollbar-track': {
+                            backgroundColor: theme.palette.mode === 'dark' ? '#2b2b2b' : '#f1f1f1',
+                        },
+                        '*::-webkit-scrollbar-thumb': {
+                            backgroundColor: theme.palette.mode === 'dark' ? '#6b6b6b' : '#c1c1c1',
+                            borderRadius: '4px',
+                            '&:hover': {
+                                backgroundColor: theme.palette.mode === 'dark' ? '#888' : '#a8a8a8',
+                            },
+                        },
+                        '*::-webkit-scrollbar-thumb:active': {
+                            backgroundColor: theme.palette.mode === 'dark' ? '#555' : '#999',
+                        },
+                        // Firefox
+                        scrollbarWidth: 'thin',
+                        scrollbarColor: theme.palette.mode === 'dark'
+                            ? '#6b6b6b #2b2b2b'
+                            : '#c1c1c1 #f1f1f1',
+                    },
+                }),
+            },
 
             MuiTableHead: {
               styleOverrides: {

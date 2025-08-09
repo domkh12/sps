@@ -1,12 +1,11 @@
 import {
-  Box,
   Collapse,
   Drawer,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  ListSubheader,
+  ListSubheader, Paper,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
@@ -16,7 +15,6 @@ import { listItemButtonStyle } from "../assets/style";
 import { useLocation, useNavigate } from "react-router-dom";
 import SpaceDashboardTwoToneIcon from "@mui/icons-material/SpaceDashboardTwoTone";
 import FmdGoodTwoToneIcon from "@mui/icons-material/FmdGoodTwoTone";
-import ScheduleTwoToneIcon from "@mui/icons-material/ScheduleTwoTone";
 import LogoComponent from "./LogoComponent";
 import LocalParkingTwoToneIcon from "@mui/icons-material/LocalParkingTwoTone";
 import DirectionsCarRoundedIcon from "@mui/icons-material/DirectionsCarRounded";
@@ -77,7 +75,7 @@ function SidebarDrawerComponent() {
   };
 
   return (
-    <>
+    <Paper>
       {open && (
         <Drawer
           anchor="left"
@@ -85,9 +83,9 @@ function SidebarDrawerComponent() {
           variant="temporary"
           onClose={() => dispatch(setIsOpenSidebarDrawer(false))}
         >
-          <Box sx={{ width: 280 }}>
+          <Paper sx={{ width: 280, height: "100%" }}>
             <LogoComponent />
-            <div className="px-[16px] overflow-auto">
+            <Paper className="px-[16px] overflow-auto">
               <List
                 component="div"
                 aria-labelledby="nested-list-subheader"
@@ -124,7 +122,7 @@ function SidebarDrawerComponent() {
                   <ListItemButton
                     sx={{
                       borderRadius: "10px",
-                      color: "#424242",
+                      
                       mb: "5px",
                       ...listItemButtonStyle,
                     }}
@@ -146,7 +144,7 @@ function SidebarDrawerComponent() {
                           component="span"
                           variant="body1"
                           sx={{
-                            color: "#424242",
+                            
                             display: "inline",
                           }}
                         >
@@ -158,7 +156,7 @@ function SidebarDrawerComponent() {
                   <ListItemButton
                     sx={{
                       borderRadius: "10px",
-                      color: "#424242",
+                      
                       mb: "5px",
                       ...listItemButtonStyle,
                     }}
@@ -181,7 +179,7 @@ function SidebarDrawerComponent() {
                           component="span"
                           variant="body1"
                           sx={{
-                            color: "#424242",
+                            
                             display: "inline",
                             textWrap: "nowrap",
                           }}
@@ -194,7 +192,7 @@ function SidebarDrawerComponent() {
                   <ListItemButton
                       sx={{
                         borderRadius: "10px",
-                        color: "#424242",
+                        
                         ...listItemButtonStyle,
                       }}
                       onClick={handleNavigate("/admin/vehicle-entry")}
@@ -213,7 +211,7 @@ function SidebarDrawerComponent() {
                           <Typography
                               component="span"
                               variant="body1"
-                              sx={{ color: "#424242", display: "inline" }}
+                              sx={{  display: "inline" }}
                           >
                             {t("vehicleEntry")}
                           </Typography>
@@ -224,7 +222,7 @@ function SidebarDrawerComponent() {
                       sx={{
                         borderRadius: "10px",
                         mt: "5px",
-                        color: "#424242",
+                        
                         ...listItemButtonStyle,
                       }}
                       onClick={handleNavigate("/admin/vehicle-exit")}
@@ -243,7 +241,7 @@ function SidebarDrawerComponent() {
                           <Typography
                               component="span"
                               variant="body1"
-                              sx={{ color: "#424242", display: "inline" }}
+                              sx={{  display: "inline" }}
                           >
                             {t("vehicleExit")}
                           </Typography>
@@ -254,7 +252,7 @@ function SidebarDrawerComponent() {
                     sx={{
                       borderRadius: "10px",
                       mt: "5px",
-                      color: "#424242",
+                      
                       ...listItemButtonStyle,
                     }}
                     onClick={handleNavigate("/admin/parking-detail")}
@@ -273,7 +271,7 @@ function SidebarDrawerComponent() {
                         <Typography
                           component="span"
                           variant="body1"
-                          sx={{ color: "#424242", display: "inline" }}
+                          sx={{  display: "inline" }}
                         >
                           {t("parkingDetail")}
                         </Typography>
@@ -324,7 +322,7 @@ function SidebarDrawerComponent() {
                           <ListItemButton
                               sx={{
                                 borderRadius: "10px",
-                                color: "#424242",
+                                
                                 ...((isCompanyListPage || isCompanyCreatePage) &&
                                     listItemButtonStyle),
                               }}
@@ -346,7 +344,7 @@ function SidebarDrawerComponent() {
                                   <Typography
                                       component="span"
                                       variant="body1"
-                                      sx={{ color: "#424242", display: "inline" }}
+                                      sx={{  display: "inline" }}
                                   >
                                     {t("company")}
                                   </Typography>
@@ -379,7 +377,7 @@ function SidebarDrawerComponent() {
                                 <ListItemButton
                                     sx={{
                                       borderRadius: "10px",
-                                      color: "#424242",
+                                      
                                       mb: "5px",
                                     }}
                                     onClick={handleNavigate("/admin/companies")}
@@ -391,7 +389,7 @@ function SidebarDrawerComponent() {
                                             component="span"
                                             variant="body1"
                                             sx={{
-                                              color: "#424242",
+                                              
                                               display: "inline",
                                             }}
                                         >
@@ -410,7 +408,7 @@ function SidebarDrawerComponent() {
                                 <ListItemButton
                                     sx={{
                                       borderRadius: "10px",
-                                      color: "#424242",
+                                      
                                       mb: "5px",
                                     }}
                                     onClick={handleNavigate("/admin/companies/new")}
@@ -424,7 +422,7 @@ function SidebarDrawerComponent() {
                                             component="span"
                                             variant="body1"
                                             sx={{
-                                              color: "#424242",
+                                              
                                               display: "inline",
                                             }}
                                         >
@@ -446,7 +444,7 @@ function SidebarDrawerComponent() {
                         <ListItemButton
                           sx={{
                             borderRadius: "10px",
-                            color: "#424242",
+                            
                             mt: "5px",
                             ...((isBranchListPage || isBranchCreatePage) &&
                               listItemButtonStyle),
@@ -473,7 +471,7 @@ function SidebarDrawerComponent() {
                               <Typography
                                 component="span"
                                 variant="body1"
-                                sx={{ color: "#424242", display: "inline" }}
+                                sx={{  display: "inline" }}
                               >
                                 {t("branch")}
                               </Typography>
@@ -506,7 +504,7 @@ function SidebarDrawerComponent() {
                               <ListItemButton
                                 sx={{
                                   borderRadius: "10px",
-                                  color: "#424242",
+                                  
                                   mb: "5px",
                                 }}
                                 onClick={handleNavigate("/admin/branches")}
@@ -520,7 +518,7 @@ function SidebarDrawerComponent() {
                                       component="span"
                                       variant="body1"
                                       sx={{
-                                        color: "#424242",
+                                        
                                         display: "inline",
                                       }}
                                     >
@@ -539,7 +537,7 @@ function SidebarDrawerComponent() {
                               <ListItemButton
                                 sx={{
                                   borderRadius: "10px",
-                                  color: "#424242",
+                                  
                                   mb: "5px",
                                 }}
                                 onClick={handleNavigate("/admin/branches/new")}
@@ -553,7 +551,7 @@ function SidebarDrawerComponent() {
                                       component="span"
                                       variant="body1"
                                       sx={{
-                                        color: "#424242",
+                                        
                                         display: "inline",
                                       }}
                                     >
@@ -574,7 +572,7 @@ function SidebarDrawerComponent() {
                     <ListItemButton
                       sx={{
                         borderRadius: "10px",
-                        color: "#424242",
+                        
                         mt: "5px",
                         ...((isParkingListPage || isParkingCreatePage) &&
                           listItemButtonStyle),
@@ -601,7 +599,7 @@ function SidebarDrawerComponent() {
                           <Typography
                             component="span"
                             variant="body1"
-                            sx={{ color: "#424242", display: "inline" }}
+                            sx={{  display: "inline" }}
                           >
                             {t("parkingSpace")}
                           </Typography>
@@ -634,7 +632,7 @@ function SidebarDrawerComponent() {
                           <ListItemButton
                             sx={{
                               borderRadius: "10px",
-                              color: "#424242",
+                              
                               mb: "5px",
                             }}
                             onClick={handleNavigate("/admin/parking-spaces")}
@@ -645,7 +643,7 @@ function SidebarDrawerComponent() {
                                 <Typography
                                   component="span"
                                   variant="body1"
-                                  sx={{ color: "#424242", display: "inline" }}
+                                  sx={{  display: "inline" }}
                                 >
                                   {t("list")}
                                 </Typography>
@@ -662,7 +660,7 @@ function SidebarDrawerComponent() {
                           <ListItemButton
                             sx={{
                               borderRadius: "10px",
-                              color: "#424242",
+                              
                               mb: "5px",
                             }}
                             onClick={handleNavigate("/admin/parking-spaces/new")}
@@ -675,7 +673,7 @@ function SidebarDrawerComponent() {
                                 <Typography
                                   component="span"
                                   variant="body1"
-                                  sx={{ color: "#424242", display: "inline" }}
+                                  sx={{  display: "inline" }}
                                 >
                                   {t("create")}
                                 </Typography>
@@ -693,7 +691,7 @@ function SidebarDrawerComponent() {
                     <ListItemButton
                         sx={{
                           borderRadius: "10px",
-                          color: "#424242",
+                          
                           mt: "5px",
                           ...((isParkingSlotListPage || isParkingSlotCreatePage) &&
                               listItemButtonStyle),
@@ -720,7 +718,7 @@ function SidebarDrawerComponent() {
                             <Typography
                                 component="span"
                                 variant="body1"
-                                sx={{ color: "#424242", display: "inline" }}
+                                sx={{  display: "inline" }}
                             >
                               {t("parkingSlot")}
                             </Typography>
@@ -753,7 +751,7 @@ function SidebarDrawerComponent() {
                           <ListItemButton
                               sx={{
                                 borderRadius: "10px",
-                                color: "#424242",
+                                
                                 mb: "5px",
                               }}
                               onClick={handleNavigate("/admin/parking-slots")}
@@ -764,7 +762,7 @@ function SidebarDrawerComponent() {
                                   <Typography
                                       component="span"
                                       variant="body1"
-                                      sx={{ color: "#424242", display: "inline" }}
+                                      sx={{  display: "inline" }}
                                   >
                                     {t("list")}
                                   </Typography>
@@ -781,7 +779,7 @@ function SidebarDrawerComponent() {
                           <ListItemButton
                               sx={{
                                 borderRadius: "10px",
-                                color: "#424242",
+                                
                                 mb: "5px",
                               }}
                               onClick={handleNavigate("/admin/parking-slots/new")}
@@ -794,7 +792,7 @@ function SidebarDrawerComponent() {
                                   <Typography
                                       component="span"
                                       variant="body1"
-                                      sx={{ color: "#424242", display: "inline" }}
+                                      sx={{  display: "inline" }}
                                   >
                                     {t("create")}
                                   </Typography>
@@ -811,7 +809,7 @@ function SidebarDrawerComponent() {
                     <ListItemButton
                       sx={{
                         borderRadius: "10px",
-                        color: "#424242",
+                        
                         ...((isVehiclesListPage || isVehiclesCreatePage) &&
                           listItemButtonStyle),
                         mt: "5px",
@@ -837,7 +835,7 @@ function SidebarDrawerComponent() {
                           <Typography
                             component="span"
                             variant="body1"
-                            sx={{ color: "#424242", display: "inline" }}
+                            sx={{  display: "inline" }}
                           >
                             {t("vehicle")}
                           </Typography>
@@ -870,7 +868,7 @@ function SidebarDrawerComponent() {
                           <ListItemButton
                             sx={{
                               borderRadius: "10px",
-                              color: "#424242",
+                              
                               mb: "5px",
                             }}
                             onClick={handleNavigate("/admin/vehicles")}
@@ -881,7 +879,7 @@ function SidebarDrawerComponent() {
                                 <Typography
                                   component="span"
                                   variant="body1"
-                                  sx={{ color: "#424242", display: "inline" }}
+                                  sx={{  display: "inline" }}
                                 >
                                   {t("list")}
                                 </Typography>
@@ -898,7 +896,7 @@ function SidebarDrawerComponent() {
                           <ListItemButton
                             sx={{
                               borderRadius: "10px",
-                              color: "#424242",
+                              
                               mb: "5px",
                             }}
                             onClick={handleNavigate("/admin/vehicles/new")}
@@ -911,7 +909,7 @@ function SidebarDrawerComponent() {
                                 <Typography
                                   component="span"
                                   variant="body1"
-                                  sx={{ color: "#424242", display: "inline" }}
+                                  sx={{  display: "inline" }}
                                 >
                                   {t("create")}
                                 </Typography>
@@ -927,7 +925,7 @@ function SidebarDrawerComponent() {
                   <ListItemButton
                     sx={{
                       borderRadius: "10px",
-                      color: "#424242",
+                      
                       ...((isUserListPage || isUserCreatePage) &&
                         listItemButtonStyle),
                       mt: "5px",
@@ -953,7 +951,7 @@ function SidebarDrawerComponent() {
                         <Typography
                           component="span"
                           variant="body1"
-                          sx={{ color: "#424242", display: "inline" }}
+                          sx={{  display: "inline" }}
                         >
                           {t("user")}
                         </Typography>
@@ -981,7 +979,7 @@ function SidebarDrawerComponent() {
                           <ListItemButton
                             sx={{
                               borderRadius: "10px",
-                              color: "#424242",
+                              
                               mb: "5px",
                             }}
                             onClick={handleNavigate("/admin/users")}
@@ -992,7 +990,7 @@ function SidebarDrawerComponent() {
                                 <Typography
                                   component="span"
                                   variant="body1"
-                                  sx={{ color: "#424242", display: "inline" }}
+                                  sx={{  display: "inline" }}
                                 >
                                   {t("list")}
                                 </Typography>
@@ -1009,7 +1007,7 @@ function SidebarDrawerComponent() {
                           <ListItemButton
                             sx={{
                               borderRadius: "10px",
-                              color: "#424242",
+                              
                               mb: "5px",
                             }}
                             onClick={handleNavigate("/admin/users/new")}
@@ -1020,7 +1018,7 @@ function SidebarDrawerComponent() {
                                 <Typography
                                   component="span"
                                   variant="body1"
-                                  sx={{ color: "#424242", display: "inline" }}
+                                  sx={{  display: "inline" }}
                                 >
                                   {t("create")}
                                 </Typography>
@@ -1037,7 +1035,7 @@ function SidebarDrawerComponent() {
                   <ListItemButton
                     sx={{
                       borderRadius: "10px",
-                      color: "#424242",
+                      
                       ...((isReportListPage || isReportCreatePage) &&
                         listItemButtonStyle),
                       mt: "5px",
@@ -1063,7 +1061,7 @@ function SidebarDrawerComponent() {
                         <Typography
                           component="span"
                           variant="body1"
-                          sx={{ color: "#424242", display: "inline" }}
+                          sx={{  display: "inline" }}
                         >
                           {t("report")}
                         </Typography>
@@ -1075,66 +1073,68 @@ function SidebarDrawerComponent() {
 
                   <Collapse in={isReportOpen}>
                     <List
-                      component="div"
-                      disablePadding
-                      sx={{ pt: 1 }}
-                      dense={true}
+                        component="div"
+                        disablePadding
+                        sx={{ pt: 1 }}
+                        dense={true}
                     >
                       <ul className="ml-6 pl-[12px]">
                         <div className="absolute h-[60px] border-l-[2px] bg-primary left-6 top-0"></div>
                         <li>
                           <img
-                            src="/images/nav_sublist.svg"
-                            alt="sub_list_img"
-                            className="absolute top-[6px] left-6 h-[30px] w-[14px]"
+                              src="/images/nav_sublist.svg"
+                              alt="sub_list_img"
+                              className="absolute top-[6px] left-6 h-[30px] w-[14px]"
                           />
                           <ListItemButton
-                            sx={{
-                              borderRadius: "10px",
-                              color: "#424242",
-                              mb: "5px",
-                            }}
-                            onClick={() => navigate("/admin/reports")}
-                            selected={location.pathname === "/admin/reports"}
+                              sx={{
+                                borderRadius: "10px",
+
+                                mb: "5px",
+                              }}
+                              onClick={() => navigate("/admin/reports/user-history")}
+                              selected={location.pathname === "/admin/reports/user-history"}
                           >
                             <ListItemText
-                              primary={
-                                <Typography
-                                  component="span"
-                                  variant="body1"
-                                  sx={{ color: "#424242", display: "inline" }}
-                                >
-                                  {t("list")}
-                                </Typography>
-                              }
+                                primary={
+                                  <Typography
+                                      component="span"
+                                      variant="body1"
+                                      sx={{ display: "inline" }}
+                                  >
+                                    {t("userHistory")}
+                                  </Typography>
+                                }
                             />
                           </ListItemButton>
                         </li>
                         <li>
                           <img
-                            src="/images/nav_sublist.svg"
-                            alt="sub_list_img"
-                            className="absolute top-[55px] left-6 h-[14px] w-[14px]"
+                              src="/images/nav_sublist.svg"
+                              alt="sub_list_img"
+                              className="absolute top-[55px] left-6 h-[14px] w-[14px]"
                           />
                           <ListItemButton
-                            sx={{
-                              borderRadius: "10px",
-                              color: "#424242",
-                              mb: "5px",
-                            }}
-                            onClick={() => navigate("/admin/reports/new")}
-                            selected={location.pathname === "/admin/reports/new"}
+                              sx={{
+                                borderRadius: "10px",
+
+                                mb: "5px",
+                              }}
+                              onClick={() => navigate("/admin/reports/vehicle-history")}
+                              selected={
+                                  location.pathname === "/admin/reports/vehicle-history"
+                              }
                           >
                             <ListItemText
-                              primary={
-                                <Typography
-                                  component="span"
-                                  variant="body1"
-                                  sx={{ color: "#424242", display: "inline" }}
-                                >
-                                  {t("create")}
-                                </Typography>
-                              }
+                                primary={
+                                  <Typography
+                                      component="span"
+                                      variant="body1"
+                                      sx={{ display: "inline" }}
+                                  >
+                                    {t("vehicleHistory")}
+                                  </Typography>
+                                }
                             />
                           </ListItemButton>
                         </li>
@@ -1143,11 +1143,11 @@ function SidebarDrawerComponent() {
                   </Collapse>
                 </Collapse>
               </List>
-            </div>
-          </Box>
+            </Paper>
+          </Paper>
         </Drawer>
       )}
-    </>
+    </Paper>
   );
 }
 

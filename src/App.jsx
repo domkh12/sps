@@ -1,12 +1,13 @@
-import {CssBaseline, ThemeProvider} from "@mui/material";
+import {CssBaseline, ThemeProvider, useColorScheme} from "@mui/material";
 import Aos from "aos";
 import "aos/dist/aos.css";
-import { lazy, Suspense, useEffect } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
-import { ROLES } from "./config/roles.js";
+import {lazy, Suspense, useEffect} from "react";
+import {Navigate, Route, Routes} from "react-router-dom";
+import {ROLES} from "./config/roles.js";
 import RequireAuth from "./pages/auth/RequireAuth.jsx";
-import {useSelector} from "react-redux";
 import {getTheme} from "./config/themeConfig.js";
+import {ToastContainer} from "react-toastify";
+
 const CheckOutList = lazy(() => import("./pages/checkOut/CheckOutList.jsx"));
 const CheckInList = lazy(() => import("./pages/checkIn/CheckInList.jsx"));
 const UserHistory = lazy(() => import("./pages/report/UserHistory.jsx"));
@@ -53,210 +54,235 @@ const ParkingList = lazy(() => import("./pages/parkingSpace/ParkingList.jsx"));
 const TestComponent = lazy(() => import("./components/TestComponent.jsx"));
 const ReportList = lazy(() => import("./pages/report/ReportList.jsx"));
 const CreateReport = lazy(() => import("./pages/report/CreateReport.jsx"));
-const AddNewSlot =lazy(()=>import("./pages/slot/AddNewSlot.jsx"));
-const AddCompany =lazy (()=>import ("./pages/company/AddCompany.jsx"));
-const ListCompany =lazy(()=>import("./pages/company/ListCompany.jsx"));
+const AddNewSlot = lazy(() => import("./pages/slot/AddNewSlot.jsx"));
+const AddCompany = lazy(() => import ("./pages/company/AddCompany.jsx"));
+const ListCompany = lazy(() => import("./pages/company/ListCompany.jsx"));
+
 function App() {
-  const theme = getTheme();
 
-  window.addEventListener("vite:preloadError", (event) => {
-    event.preventDefault();
-    window.location.reload();
-  });
+    const theme = getTheme();
 
-  useEffect(() => {
-    Aos.init({
-      duration: 500,
+    window.addEventListener("vite:preloadError", (event) => {
+        event.preventDefault();
+        window.location.reload();
     });
-  }, []);
 
-  return (
-    <ThemeProvider theme={theme} disableTransitionOnChange>
-      <CssBaseline />
-      <Suspense fallback={<LoadingOneComponent />}>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/test" element={<TestComponent />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/unauthorize" element={<Error403Component />} />
+    useEffect(() => {
+        Aos.init({
+            duration: 500,
+        });
+    }, []);
 
-          {/* Protected routes */}
-          <Route element={<PersistLogin />}>
-            <Route element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}>
-              <Route element={<Prefetch />}>
+    return (
+        <>
+            <ThemeProvider theme={theme} disableTransitionOnChange>
+                <CssBaseline/>
+                <Suspense fallback={<LoadingOneComponent/>}>
+                    <Routes>
+                        {/* Public routes */}
+                        <Route path="/" element={<Navigate to="/login" replace/>}/>
+                        <Route path="/test" element={<TestComponent/>}/>
+                        <Route path="/login" element={<Login/>}/>
+                        <Route path="/forgot-password" element={<ForgotPassword/>}/>
+                        <Route path="/reset-password" element={<ResetPassword/>}/>
+                        <Route path="/unauthorize" element={<Error403Component/>}/>
 
-                {/* Start dash */}
-                <Route element={<RequireAuth allowedRoles={[ROLES.ROLE_ADMIN]}/>}>
-                  <Route path="/admin" element={<AdminLayout />}>
+                        {/* Protected routes */}
+                        <Route element={<PersistLogin/>}>
+                            <Route element={<RequireAuth allowedRoles={[...Object.values(ROLES)]}/>}>
+                                <Route element={<Prefetch/>}>
 
-                    {/* Dashboard Route*/}
-                    <Route index element={<Dashboard />} />
+                                    {/* Start dash */}
+                                    <Route element={<RequireAuth allowedRoles={[ROLES.ROLE_ADMIN]}/>}>
+                                        <Route path="/admin" element={<AdminLayout/>}>
 
-                    {/* Map View Route */}
-                    <Route path="map-views">
-                      <Route index element={<MapViews />} />
-                    </Route>
+                                            {/* Dashboard Route*/}
+                                            <Route index element={<Dashboard/>}/>
 
-                    {/* History Route */}
-                    <Route path="parking-detail">
-                      <Route index element={<HistoryList />} />
-                    </Route>
+                                            {/* Map View Route */}
+                                            <Route path="map-views">
+                                                <Route index element={<MapViews/>}/>
+                                            </Route>
 
-                    {/* Check in */}
-                    <Route path="vehicle-entry">
-                      <Route index element={<CheckInList />}/>
-                    </Route>
+                                            {/* History Route */}
+                                            <Route path="parking-detail">
+                                                <Route index element={<HistoryList/>}/>
+                                            </Route>
 
-                    {/* Check out */}
-                    <Route path="vehicle-exit">
-                      <Route index element={<CheckOutList />}/>
-                    </Route>
+                                            {/* Check in */}
+                                            <Route path="vehicle-entry">
+                                                <Route index element={<CheckInList/>}/>
+                                            </Route>
 
-                    {/* Account Route */}
-                    <Route path="accounts" element={<Profile />}>
-                      <Route index element={<Account />} />
-                      <Route path="security" element={<Security />} />
-                    </Route>
+                                            {/* Check out */}
+                                            <Route path="vehicle-exit">
+                                                <Route index element={<CheckOutList/>}/>
+                                            </Route>
 
-                    {/* Users Route */}
-                    <Route path="users">
-                      <Route index element={<UserList />} />
-                      <Route path="new" element={<AddNewUser />} />
-                      <Route path=":id" element={<EditUser />} />
-                      <Route path=":id/view" element={<ViewUser />} />
-                    </Route>
+                                            {/* Account Route */}
+                                            <Route path="accounts" element={<Profile/>}>
+                                                <Route index element={<Account/>}/>
+                                                <Route path="security" element={<Security/>}/>
+                                            </Route>
 
-                    {/* Company Route */}
-                    <Route path="companies">
-                      <Route index element={<ListCompany/>} />
-                        <Route path="new" element={<AddCompany/>} />
-                        <Route path=":id" element={<EditCompany />} />
-                        <Route path=":id/view" element={<ViewCompany/>} />
-                    </Route>
+                                            {/* Users Route */}
+                                            <Route path="users">
+                                                <Route index element={<UserList/>}/>
+                                                <Route path="new" element={<AddNewUser/>}/>
+                                                <Route path=":id" element={<EditUser/>}/>
+                                                <Route path=":id/view" element={<ViewUser/>}/>
+                                            </Route>
 
-                    {/* Vehicle Route */}
-                    <Route path="vehicles">
-                      <Route index element={<VehicleList />} />
-                      <Route path="new" element={<AddNewVehicle />} />
-                      <Route path=":id" element={<EditVehicle />} />
-                      <Route path=":id/view" element={<ViewVehicle />} />
-                    </Route>
+                                            {/* Company Route */}
+                                            <Route path="companies">
+                                                <Route index element={<ListCompany/>}/>
+                                                <Route path="new" element={<AddCompany/>}/>
+                                                <Route path=":id" element={<EditCompany/>}/>
+                                                <Route path=":id/view" element={<ViewCompany/>}/>
+                                            </Route>
 
-                    {/* Message Route */}
-                    <Route path="messages">
-                      <Route index element={<MessagesList />} />
-                    </Route>                    
+                                            {/* Vehicle Route */}
+                                            <Route path="vehicles">
+                                                <Route index element={<VehicleList/>}/>
+                                                <Route path="new" element={<AddNewVehicle/>}/>
+                                                <Route path=":id" element={<EditVehicle/>}/>
+                                                <Route path=":id/view" element={<ViewVehicle/>}/>
+                                            </Route>
 
-                    {/* Parking Space Route */}
-                    <Route path="parking-spaces">
-                      <Route index element={<ParkingList />} />
-                      <Route path="new" element={<AddNewParking />} />
-                      <Route path=":id" element={<ParkingEdit />} />
-                      <Route path=":id/view" element={<ParkingView/>} />
-                    </Route>
+                                            {/* Message Route */}
+                                            <Route path="messages">
+                                                <Route index element={<MessagesList/>}/>
+                                            </Route>
 
-                    {/* Path slot Route */}
-                    <Route path="parking-slots">
-                       <Route index element={<ListParkingSlot/>} />
-                        <Route path="new" element={<AddNewSlot/>} />
-                        <Route path=":id" element={<EditSlot />} />
-                        <Route path=":id/view" element={<ViewSlot/>} />
-                    </Route>
+                                            {/* Parking Space Route */}
+                                            <Route path="parking-spaces">
+                                                <Route index element={<ParkingList/>}/>
+                                                <Route path="new" element={<AddNewParking/>}/>
+                                                <Route path=":id" element={<ParkingEdit/>}/>
+                                                <Route path=":id/view" element={<ParkingView/>}/>
+                                            </Route>
 
-                    {/* Report Route */}
-                    <Route path="reports">
-                      <Route index element={<ReportList />} />
-                      <Route path="new" element={<CreateReport />} />
-                      <Route path="user-history" element={<UserHistory />} />
-                      <Route path="vehicle-history" element={<VehicleHistory />} />
-                    </Route>                    
+                                            {/* Path slot Route */}
+                                            <Route path="parking-slots">
+                                                <Route index element={<ListParkingSlot/>}/>
+                                                <Route path="new" element={<AddNewSlot/>}/>
+                                                <Route path=":id" element={<EditSlot/>}/>
+                                                <Route path=":id/view" element={<ViewSlot/>}/>
+                                            </Route>
 
-                    {/* Branch Route */}
-                    <Route path="branches">
-                        <Route index element={<BranchList />} />
-                        <Route path="new" element={<AddNewBranch />} />
-                        <Route path=":id" element={<EditBranch />} />
-                        <Route path=":id/view" element={<ViewBranch />} />
-                    </Route>
-                  </Route>
-                </Route>
-              </Route>
-                {/* End dash */}
+                                            {/* Report Route */}
+                                            <Route path="reports">
+                                                <Route index element={<ReportList/>}/>
+                                                <Route path="new" element={<CreateReport/>}/>
+                                                <Route path="user-history" element={<UserHistory/>}/>
+                                                <Route path="vehicle-history" element={<VehicleHistory/>}/>
+                                            </Route>
 
-                <Route element={<RequireAuth allowedRoles={[ROLES.ROLE_MANAGER]}/>}>
-                 <Route path="/dash" element={<ManagerLayout/>}>
-                   <Route index element={<Dashboard />} />
+                                            {/* Branch Route */}
+                                            <Route path="branches">
+                                                <Route index element={<BranchList/>}/>
+                                                <Route path="new" element={<AddNewBranch/>}/>
+                                                <Route path=":id" element={<EditBranch/>}/>
+                                                <Route path=":id/view" element={<ViewBranch/>}/>
+                                            </Route>
+                                        </Route>
+                                    </Route>
+                                </Route>
+                                {/* End dash */}
 
-                   {/* Account Route */}
-                   <Route path="accounts" element={<Profile />}>
-                     <Route index element={<Account />} />
-                     <Route path="security" element={<Security />} />
-                   </Route>
+                                <Route element={<RequireAuth allowedRoles={[ROLES.ROLE_MANAGER]}/>}>
+                                    <Route path="/dash" element={<ManagerLayout/>}>
+                                        <Route index element={<Dashboard/>}/>
 
-                   {/* Parking Spaces */}
-                   <Route path="parking-spaces">
-                     <Route index element={<ParkingList />} />
-                     <Route path=":id/view" element={<ParkingView/>} />
-                   </Route>
+                                        {/* Account Route */}
+                                        <Route path="accounts" element={<Profile/>}>
+                                            <Route index element={<Account/>}/>
+                                            <Route path="security" element={<Security/>}/>
+                                        </Route>
 
-                   {/* Parking Slot */}
-                   <Route path="parking-slots">
-                     <Route index element={<ListParkingSlot/>} />
-                     <Route path=":id/view" element={<ViewSlot/>} />
-                   </Route>
+                                        {/* Parking Spaces */}
+                                        <Route path="parking-spaces">
+                                            <Route index element={<ParkingList/>}/>
+                                            <Route path=":id/view" element={<ParkingView/>}/>
+                                        </Route>
 
-                   {/* Vehicle Route */}
-                   <Route path="vehicles">
-                     <Route index element={<VehicleList />} />
-                     <Route path="new" element={<AddNewVehicle />} />
-                     <Route path=":id" element={<EditVehicle />} />
-                     <Route path=":id/view" element={<ViewVehicle />} />
-                   </Route>
+                                        {/* Parking Slot */}
+                                        <Route path="parking-slots">
+                                            <Route index element={<ListParkingSlot/>}/>
+                                            <Route path=":id/view" element={<ViewSlot/>}/>
+                                        </Route>
 
-                   {/* Account Route */}
-                   <Route path="accounts" element={<Profile />}>
-                     <Route index element={<Account />} />
-                     <Route path="security" element={<Security />} />
-                   </Route>
+                                        {/* Vehicle Route */}
+                                        <Route path="vehicles">
+                                            <Route index element={<VehicleList/>}/>
+                                            <Route path="new" element={<AddNewVehicle/>}/>
+                                            <Route path=":id" element={<EditVehicle/>}/>
+                                            <Route path=":id/view" element={<ViewVehicle/>}/>
+                                        </Route>
 
-                   {/* Parking Detail Route */}
-                   <Route path="parking-detail">
-                     <Route index element={<HistoryList />} />
-                   </Route>
+                                        {/* Account Route */}
+                                        <Route path="accounts" element={<Profile/>}>
+                                            <Route index element={<Account/>}/>
+                                            <Route path="security" element={<Security/>}/>
+                                        </Route>
 
-                   {/* Map View Route */}
-                   <Route path="map-views">
-                     <Route index element={<MapViews />} />
-                   </Route>
+                                        {/* Parking Detail Route */}
+                                        <Route path="parking-detail">
+                                            <Route index element={<HistoryList/>}/>
+                                        </Route>
 
-                   {/* Users Route */}
-                   <Route path="users">
-                     <Route index element={<UserList />} />
-                     <Route path="new" element={<AddNewUser />} />
-                     <Route path=":id" element={<EditUser />} />
-                     <Route path=":id/view" element={<ViewUser />} />
-                   </Route>
+                                        {/* Map View Route */}
+                                        <Route path="map-views">
+                                            <Route index element={<MapViews/>}/>
+                                        </Route>
 
-                 </Route>
-                </Route>
+                                        {/* Check in */}
+                                        <Route path="vehicle-entry">
+                                            <Route index element={<CheckInList/>}/>
+                                        </Route>
 
-            </Route>
-          </Route>
-          <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
-          <Route
-            path={`${
-              import.meta.env.VITE_API_BACKEND_URL
-            }/oauth2/authorization/azure`}
-          />
+                                        {/* Check out */}
+                                        <Route path="vehicle-exit">
+                                            <Route index element={<CheckOutList/>}/>
+                                        </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </ThemeProvider>
-  );
+                                        {/* Users Route */}
+                                        <Route path="users">
+                                            <Route index element={<UserList/>}/>
+                                            <Route path="new" element={<AddNewUser/>}/>
+                                            <Route path=":id" element={<EditUser/>}/>
+                                            <Route path=":id/view" element={<ViewUser/>}/>
+                                        </Route>
+
+                                        {/* Report Route */}
+                                        <Route path="reports">
+                                            <Route index element={<ReportList/>}/>
+                                            <Route path="new" element={<CreateReport/>}/>
+                                            <Route path="user-history" element={<UserHistory/>}/>
+                                            <Route path="vehicle-history" element={<VehicleHistory/>}/>
+                                        </Route>
+
+                                    </Route>
+                                </Route>
+
+                            </Route>
+                        </Route>
+                        <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler/>}/>
+                        <Route
+                            path={`${
+                                import.meta.env.VITE_API_BACKEND_URL
+                            }/oauth2/authorization/azure`}
+                        />
+
+                        <Route path="*" element={<NotFound/>}/>
+                    </Routes>
+                </Suspense>
+            </ThemeProvider>
+            <ToastContainer stacked
+                            theme="dark"
+            />
+        </>
+    );
 }
 
 export default App;

@@ -23,15 +23,6 @@ function TableActionMenuComponent() {
               vertical: "bottom",
               horizontal: "center",
             }}
-            slotProps={{
-              paper: {
-                style: {
-                  padding: 10,
-                  backgroundColor: "transparent",
-                  boxShadow: "none",
-                },
-              },
-            }}
             transformOrigin={{
               vertical: "top",
               horizontal: "center",
@@ -48,7 +39,6 @@ function TableActionMenuComponent() {
               <ListItemButton
                 sx={{
                   borderRadius: "6px",
-                  color: "#424242",
                 }}
               >
                 <ListItemText
@@ -59,7 +49,6 @@ function TableActionMenuComponent() {
                         component="span"
                         variant="body1"
                         sx={{
-                          color: "#424242",
                           display: "inline",
                         }}
                       >

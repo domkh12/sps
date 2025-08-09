@@ -215,7 +215,7 @@ function BranchList() {
               />
             ))
           ) : (
-            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+            <TableRow >
               <TableCell align="center" colSpan={20}>
                 <DataNotFound />
               </TableCell>
@@ -233,7 +233,7 @@ function BranchList() {
               />
             ))
           ) : (
-            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+            <TableRow >
               <TableCell align="center" colSpan={20}>
                 <DataNotFound />
               </TableCell>

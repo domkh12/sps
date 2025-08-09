@@ -1,7 +1,6 @@
 import {
   Avatar,
   Box,
-  Button,
   Chip,
   Drawer,
   IconButton,
@@ -14,12 +13,11 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
-import { useSendLogoutMutation } from "../redux/feature/auth/authApiSlice";
+import {useGetUserProfileQuery, useSendLogoutMutation} from "../redux/feature/auth/authApiSlice";
 import { useNavigate } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
 import useAuth from "../hook/useAuth";
-import { useSelector } from "react-redux";
-import { FaUserCircle, FaUserTie } from "react-icons/fa";
+import { FaUserTie } from "react-icons/fa";
 import { listItemButtonStyle } from "../assets/style";
 import { useConnectedUserMutation } from "../redux/feature/users/userApiSlice";
 import PortraitTwoToneIcon from "@mui/icons-material/PortraitTwoTone";
@@ -28,7 +26,7 @@ import useLocalStorage from "../hook/useLocalStorage.jsx";
 
 function ProfileDrawerComponent({ open: initialOpen, onClose }) {
   const { username, status } = useAuth();
-  const user = useSelector((state) => state.auth.userProfile);
+  const {data: user} = useGetUserProfileQuery("profileUser");
   const [open, setOpen] = useState(initialOpen);
   const { t } = useTranslate();
   const navigate = useNavigate();
@@ -118,13 +116,13 @@ function ProfileDrawerComponent({ open: initialOpen, onClose }) {
                 >
                   <Avatar
                     alt="Profile"
-                    src={user.profileImage}
+                    src={user?.profileImage}
                     sx={{ width: 100, height: 100 }}
                   />
                 </IconButton>
               </div>
               <Box className="flex flex-col justify-center items-center">
-                <Typography>{user.fullName}</Typography>
+                <Typography>{user?.fullName}</Typography>
                 <Chip icon={<FaUserTie className="w-5 h-5" />} label={status} />
                 <Typography variant="body1" color="gray">
                   {username}

@@ -286,7 +286,7 @@ function SelectSingleComponent({
                     {renderMenuItems()}
                 {
                     isCreate && (
-                        <div className="h-14 flex items-center justify-end px-2 sticky bottom-0 z-10 bg-white dark:bg-[#141A21] rounded-lg">
+                        <div className="h-14 flex items-center justify-end px-2 sticky bottom-0 z-10 dark:bg-[#141A21] rounded-lg">
                             <Button variant="contained" 
                               onClick={(event) => {
                                 event.stopPropagation();

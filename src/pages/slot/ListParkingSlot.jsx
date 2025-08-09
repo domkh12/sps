@@ -181,7 +181,7 @@ function ListParkingSlot() {
               />
             ))
           ) : (
-            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+            <TableRow >
               <TableCell align="center" colSpan={8}>
                 <DataNotFound />
               </TableCell>
@@ -199,7 +199,7 @@ function ListParkingSlot() {
               />
             ))
           ) : (
-            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+            <TableRow >
               <TableCell align="center" colSpan={8}>
                 <DataNotFound />
               </TableCell>

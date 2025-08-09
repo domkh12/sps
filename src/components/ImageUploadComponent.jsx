@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import {Typography, useColorScheme} from "@mui/material";
 import { useRef, useState } from "react";
 import { BsCameraFill } from "react-icons/bs";
 import useTranslate from "../hook/useTranslate";
@@ -13,6 +13,7 @@ function ImageUploadComponent({
   const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState(null);
   const { t } = useTranslate();
+  const { mode } = useColorScheme();
   const isError = !!error;
 
   const handleClick = () => {
@@ -81,12 +82,12 @@ function ImageUploadComponent({
             className={`absolute group-hover:block top-[6px] w-[97%] h-[160px]  rounded-[16px] ${isError ? "bg-[#F8DDDD] bg-opacity-100 hover:bg-opacity-80 " : "bg-black bg-opacity-10 hover:bg-opacity-5 "}`}
             type="button"
           >
-            <div className="flex justify-center items-center flex-col gap-2">
+            <div className="flex justify-center items-center flex-col gap-2 ">
               <BsCameraFill
-                className={`${isError ? "text-[#f44336] text-opacity-100" : " text-opacity-30"} w-7 h-7 `}
+                className={`${isError ? "text-[#f44336] text-opacity-100" : `${mode === "dark" ? "text-white" : "text-black"} text-opacity-40`} w-7 h-7 `}
               />
               <span
-                className={`${isError ? "text-[#f44336] text-opacity-100" : " text-opacity-40"}  text-sm`}
+                className={`${isError ? "text-[#f44336] text-opacity-100" : `${mode === "dark" ? "text-white" : "text-black"} text-opacity-40`}  text-sm`}
               >
                 Upload photo
               </span>

@@ -162,7 +162,7 @@ function ListCompany() {
               idsDataFilter?.map((companyId) => (
               <CompanyRowComponent key={companyId} companyId={companyId} company={entitiesFilter[companyId]}/>))
           ) : (
-            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+            <TableRow >
               <TableCell align="center" colSpan={8}>
                 <DataNotFound />
               </TableCell>
@@ -174,7 +174,7 @@ function ListCompany() {
           {ids?.length ? (
             ids?.map((companyId) => (<CompanyRowComponent key={companyId} companyId={companyId} company={entities[companyId]}/>))
           ) : (
-            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+            <TableRow >
               <TableCell align="center" colSpan={8}>
                 <DataNotFound />
               </TableCell>

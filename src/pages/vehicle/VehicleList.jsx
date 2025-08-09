@@ -196,7 +196,7 @@ function VehicleList() {
               />
             ))
           ) : (
-            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+            <TableRow >
               <TableCell align="center" colSpan={8}>
                 <DataNotFound />
               </TableCell>
@@ -214,7 +214,7 @@ function VehicleList() {
               />
             ))
           ) : (
-            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+            <TableRow >
               <TableCell align="center" colSpan={8}>
                 <DataNotFound />
               </TableCell>

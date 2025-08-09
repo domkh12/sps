@@ -167,7 +167,7 @@ function CheckOutList() {
                       />
                   ))
               ) : (
-                  <TableRow sx={{ bgcolor: "#f9fafb" }}>
+                  <TableRow>
                     <TableCell align="center" colSpan={20}>
                       <DataNotFound />
                     </TableCell>
@@ -184,7 +184,7 @@ function CheckOutList() {
                       />
                   ))
               ) : (
-                  <TableRow sx={{ bgcolor: "#f9fafb" }}>
+                  <TableRow >
                     <TableCell align="center" colSpan={20}>
                       <DataNotFound />
                     </TableCell>

@@ -1,4 +1,4 @@
-import {Box, Button, Drawer, IconButton, Typography, useColorScheme} from "@mui/material";
+import {Box, Drawer, Typography, useColorScheme} from "@mui/material";
 import {useDispatch} from "react-redux";
 import {setIsSettingDrawerOpen} from "../redux/feature/actions/actionSlice.js";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
@@ -11,7 +11,6 @@ import ToggleSettingButtonComponent from "./ToggleSettingButtonComponent.jsx";
 function SettingDrawerComponent({open}) {
     const dispatch = useDispatch();
     const {mode, setMode} = useColorScheme();
-
     const toggleDrawer = (newOpen) => () => {
         dispatch(setIsSettingDrawerOpen(newOpen));
     };

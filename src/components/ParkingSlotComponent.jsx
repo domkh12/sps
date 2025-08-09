@@ -3,6 +3,7 @@ import { Typography } from "@mui/material";
 import { toggleDrawerDetail } from "../redux/feature/mapView/mapViewSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetParkigDetailMutation } from "../redux/feature/parking/parkingDetailApiSlice";
+import ImageComponent from "./ImageComponent.jsx";
 
 function ParkingSlotComponent({ slot }) {
 
@@ -37,7 +38,7 @@ function ParkingSlotComponent({ slot }) {
         </>
       ) : (
         <>
-          <img src="/images/car.png" alt="car" />
+          <ImageComponent imageUrl={"/images/car.png"} alt={"car"} clasname={"w-[100px] h-[100px]"} />
         </>
       )}
     </button>

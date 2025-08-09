@@ -148,7 +148,7 @@ function VehicleHistory() {
               />
             ))
           ) : (
-            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+            <TableRow >
               <TableCell align="center" colSpan={8}>
                 <DataNotFound />
               </TableCell>
@@ -166,7 +166,7 @@ function VehicleHistory() {
               />
             ))
           ) : (
-            <TableRow sx={{ bgcolor: "#f9fafb" }}>
+            <TableRow >
               <TableCell align="center" colSpan={8}>
                 <DataNotFound />
               </TableCell>

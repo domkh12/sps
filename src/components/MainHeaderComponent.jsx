@@ -1,4 +1,4 @@
-import { Breadcrumbs, Button, IconButton, Typography } from "@mui/material";
+import {Breadcrumbs, Button, IconButton, Typography, useColorScheme} from "@mui/material";
 import React from "react";
 import { FiPlus } from "react-icons/fi";
 import { IoIosArrowBack } from "react-icons/io";
@@ -10,6 +10,7 @@ function MainHeaderComponent({
   onClick,
   handleBackClick,
 }) {
+  const {mode} = useColorScheme();
   return (
     <div className="pb-10 pt-1 flex flex-wrap justify-between items-center gap-5">
       <div className="flex flex-col gap-5">
@@ -20,11 +21,11 @@ function MainHeaderComponent({
               size="small"
               disableRipple
               sx={{
-                backgroundColor: "transparent", "&:hover": {backgroundColor: "transparent"}
+                color: mode === "dark" ? "#fff" : "#000",
               }}
           >
             <IoIosArrowBack/>
-            <Typography variant="h5" sx={{fontSize: "24px", fontWeight: "500"}}>
+            <Typography variant="h5" sx={{fontSize: "24px"}}>
               {title}
             </Typography>
           </IconButton>)}

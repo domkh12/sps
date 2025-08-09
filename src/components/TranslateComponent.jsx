@@ -40,7 +40,7 @@ function TranslateComponent() {
             closeOnClick: true,
             pauseOnHover: true,
             draggable: false,
-            transition: Slide,
+            transition: Slide
         });
     }
 }, [language]);

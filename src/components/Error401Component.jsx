@@ -1,4 +1,4 @@
-import {Button} from "@mui/material";
+import {Button, Paper} from "@mui/material";
 import React, {useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import useLocalStorage from "../hook/useLocalStorage.jsx";
@@ -23,7 +23,7 @@ function Error401Component() {
         });
     }, []);
     return (
-        <div className="flex justify-center items-center flex-col gap-5 h-screen">
+        <Paper component="div" className="flex justify-center items-center flex-col gap-5 h-screen">
             <img
                 src="/images/error401.svg"
                 alt="error401"
@@ -36,7 +36,7 @@ function Error401Component() {
             >
                 {t('goToLogin')}
             </Button>
-        </div>
+        </Paper>
     );
 }
 

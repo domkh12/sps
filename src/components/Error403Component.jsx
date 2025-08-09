@@ -1,11 +1,11 @@
-import { Button } from "@mui/material";
+import {Button, Paper} from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
 function Error403Component() {
   const navigate = useNavigate();
   return (
-    <div className="flex justify-center items-center flex-col gap-5 h-screen">
+    <Paper component="div" className="flex justify-center items-center flex-col gap-5 h-screen">
       <img
         src="/images/error403.svg"
         alt="error401"
@@ -18,7 +18,7 @@ function Error403Component() {
       >
         Go to Dashboard
       </Button>
-    </div>
+    </Paper>
   );
 }
 

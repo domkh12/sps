@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import {Typography, useColorScheme} from "@mui/material";
 import { useRef, useState } from "react";
 import { BsCameraFill } from "react-icons/bs";
 import useTranslate from "../hook/useTranslate";
@@ -10,6 +10,7 @@ function ProfileUploadComponent({ profileImageFile, setProfileImageFile, profile
   const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState(null);
   const { t } = useTranslate();
+  const {mode} = useColorScheme();
   const isError = !!error;
   const handleClick = () => {
     profileRef.current.click();
@@ -77,10 +78,10 @@ function ProfileUploadComponent({ profileImageFile, setProfileImageFile, profile
           >
             <div className="flex justify-center items-center flex-col gap-2">
               <BsCameraFill
-                className={`${isError ? "text-[#f44336] text-opacity-100" : " text-opacity-30"} w-7 h-7 `}
+                className={`${isError ? "text-[#f44336] text-opacity-100" : `${mode === "dark" ? "text-white" : "text-black"} text-opacity-40`} w-7 h-7 `}
               />
               <span
-                className={`${isError ? "text-[#f44336] text-opacity-100" : " text-opacity-40"}  text-sm`}
+                className={`${isError ? "text-[#f44336] text-opacity-100" : `${mode === "dark" ? "text-white" : "text-black"} text-opacity-40`}  text-sm`}
               >
                 Upload photo
               </span>

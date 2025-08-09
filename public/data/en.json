@@ -265,5 +265,6 @@
   "userAgent": "User agent",
   "changePasswordSuccess": "Change password success",
   "verifySuccess": "Verify success",
-  "verifyCodeSuccess": "Verify code success"
+  "verifyCodeSuccess": "Verify code success",
+  "back": "Back"
 }

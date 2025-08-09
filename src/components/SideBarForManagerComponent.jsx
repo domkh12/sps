@@ -12,7 +12,7 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    ListSubheader,
+    ListSubheader, Paper,
     Typography
 } from "@mui/material";
 import LogoComponent from "./LogoComponent.jsx";
@@ -28,6 +28,9 @@ import CarRepairIcon from "@mui/icons-material/CarRepair";
 import DirectionsCarRoundedIcon from "@mui/icons-material/DirectionsCarRounded";
 import AccountBoxTwoToneIcon from "@mui/icons-material/AccountBoxTwoTone";
 import DescriptionTwoToneIcon from "@mui/icons-material/DescriptionTwoTone";
+import ArrowCircleRightTwoToneIcon from "@mui/icons-material/ArrowCircleRightTwoTone";
+import ArrowCircleLeftTwoToneIcon from "@mui/icons-material/ArrowCircleLeftTwoTone";
+import GarageTwoToneIcon from "@mui/icons-material/GarageTwoTone";
 
 function SideBarForManagerComponent(){
     const [isOverviewOpen, setIsOverviewOpen] = useState(true);
@@ -82,7 +85,7 @@ function SideBarForManagerComponent(){
                     variant="temporary"
                     onClose={() => dispatch(setIsOpenSidebarDrawer(false))}
                 >
-                    <Box sx={{ width: 280 }}>
+                    <Paper sx={{ width: 280, height: "100%" }}>
                         <LogoComponent />
                         <div className="px-[16px] overflow-auto">
                             <List
@@ -99,7 +102,7 @@ function SideBarForManagerComponent(){
                                             width: "auto",
                                             position: "inherit",
                                         }}
-                                        className="group cursor-pointer hover:text-gray-cus"
+                                        className="group cursor-pointer"
                                         component="span"
                                         id="overview"
                                         onClick={handleOverViewClick}
@@ -121,7 +124,7 @@ function SideBarForManagerComponent(){
                                     <ListItemButton
                                         sx={{
                                             borderRadius: "10px",
-                                            color: "#424242",
+                                            
                                             mb: "5px",
                                             ...listItemButtonStyle,
                                         }}
@@ -143,7 +146,7 @@ function SideBarForManagerComponent(){
                                                     component="span"
                                                     variant="body1"
                                                     sx={{
-                                                        color: "#424242",
+                                                        
                                                         display: "inline",
                                                     }}
                                                 >
@@ -155,7 +158,7 @@ function SideBarForManagerComponent(){
                                     <ListItemButton
                                         sx={{
                                             borderRadius: "10px",
-                                            color: "#424242",
+                                            
                                             mb: "5px",
                                             ...listItemButtonStyle,
                                         }}
@@ -178,7 +181,7 @@ function SideBarForManagerComponent(){
                                                     component="span"
                                                     variant="body1"
                                                     sx={{
-                                                        color: "#424242",
+                                                        
                                                         display: "inline",
                                                         textWrap: "nowrap",
                                                     }}
@@ -191,11 +194,11 @@ function SideBarForManagerComponent(){
                                     <ListItemButton
                                         sx={{
                                             borderRadius: "10px",
-                                            color: "#424242",
+
                                             ...listItemButtonStyle,
                                         }}
-                                        onClick={handleNavigate("/dash/history")}
-                                        selected={location.pathname === "/dash/history"}
+                                        onClick={handleNavigate("/dash/vehicle-entry")}
+                                        selected={location.pathname === "/dash/vehicle-entry"}
                                     >
                                         <ListItemIcon
                                             sx={{
@@ -203,16 +206,76 @@ function SideBarForManagerComponent(){
                                                 mr: 1,
                                             }}
                                         >
-                                            <ScheduleTwoToneIcon className="w-6 h-6" />
+                                            <ArrowCircleRightTwoToneIcon className="w-6 h-6" />
                                         </ListItemIcon>
                                         <ListItemText
                                             primary={
                                                 <Typography
                                                     component="span"
                                                     variant="body1"
-                                                    sx={{ color: "#424242", display: "inline" }}
+                                                    sx={{  display: "inline" }}
                                                 >
-                                                    {t("history")}
+                                                    {t("vehicleEntry")}
+                                                </Typography>
+                                            }
+                                        />
+                                    </ListItemButton>
+                                    <ListItemButton
+                                        sx={{
+                                            borderRadius: "10px",
+                                            mt: "5px",
+
+                                            ...listItemButtonStyle,
+                                        }}
+                                        onClick={handleNavigate("/dash/vehicle-exit")}
+                                        selected={location.pathname === "/dash/vehicle-exit"}
+                                    >
+                                        <ListItemIcon
+                                            sx={{
+                                                minWidth: 0,
+                                                mr: 1,
+                                            }}
+                                        >
+                                            <ArrowCircleLeftTwoToneIcon className="w-6 h-6" />
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            primary={
+                                                <Typography
+                                                    component="span"
+                                                    variant="body1"
+                                                    sx={{  display: "inline" }}
+                                                >
+                                                    {t("vehicleExit")}
+                                                </Typography>
+                                            }
+                                        />
+                                    </ListItemButton>
+                                    <ListItemButton
+                                        sx={{
+                                            borderRadius: "10px",
+                                            mt: "5px",
+
+                                            ...listItemButtonStyle,
+                                        }}
+                                        onClick={handleNavigate("/dash/parking-detail")}
+                                        selected={location.pathname === "/dash/parking-detail"}
+                                    >
+                                        <ListItemIcon
+                                            sx={{
+                                                minWidth: 0,
+                                                mr: 1,
+                                            }}
+                                        >
+                                            <GarageTwoToneIcon className="w-6 h-6" />
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            primary={
+                                                <Typography
+                                                    component="span"
+                                                    variant="body1"
+                                                    sx={{  display: "inline" }}
+                                                >
+                                                    {t("parkingDetail")}
                                                 </Typography>
                                             }
                                         />
@@ -258,7 +321,7 @@ function SideBarForManagerComponent(){
                                     <ListItemButton
                                         sx={{
                                             borderRadius: "10px",
-                                            color: "#424242",
+                                            
                                             ...listItemButtonStyle,
                                         }}
                                         onClick={handleNavigate("/dash/parking-spaces")}
@@ -277,7 +340,7 @@ function SideBarForManagerComponent(){
                                                 <Typography
                                                     component="span"
                                                     variant="body1"
-                                                    sx={{ color: "#424242", display: "inline" }}
+                                                    sx={{  display: "inline" }}
                                                 >
                                                     {t("parkingSpace")}
                                                 </Typography>
@@ -289,7 +352,7 @@ function SideBarForManagerComponent(){
                                     <ListItemButton
                                         sx={{
                                             borderRadius: "10px",
-                                            color: "#424242",
+                                            
                                             mt: "5px",
                                             ...listItemButtonStyle,
                                         }}
@@ -309,7 +372,7 @@ function SideBarForManagerComponent(){
                                                 <Typography
                                                     component="span"
                                                     variant="body1"
-                                                    sx={{ color: "#424242", display: "inline" }}
+                                                    sx={{  display: "inline" }}
                                                 >
                                                     {t("parkingSpace")}
                                                 </Typography>
@@ -322,7 +385,7 @@ function SideBarForManagerComponent(){
                                         <ListItemButton
                                             sx={{
                                                 borderRadius: "10px",
-                                                color: "#424242",
+                                                
                                                 ...((isVehiclesListPage || isVehiclesCreatePage) &&
                                                     listItemButtonStyle),
                                                 mt: "5px",
@@ -348,7 +411,7 @@ function SideBarForManagerComponent(){
                                                     <Typography
                                                         component="span"
                                                         variant="body1"
-                                                        sx={{ color: "#424242", display: "inline" }}
+                                                        sx={{  display: "inline" }}
                                                     >
                                                         {t("vehicle")}
                                                     </Typography>
@@ -381,7 +444,7 @@ function SideBarForManagerComponent(){
                                                     <ListItemButton
                                                         sx={{
                                                             borderRadius: "10px",
-                                                            color: "#424242",
+                                                            
                                                             mb: "5px",
                                                         }}
                                                         onClick={handleNavigate("/dash/vehicles")}
@@ -392,7 +455,7 @@ function SideBarForManagerComponent(){
                                                                 <Typography
                                                                     component="span"
                                                                     variant="body1"
-                                                                    sx={{ color: "#424242", display: "inline" }}
+                                                                    sx={{  display: "inline" }}
                                                                 >
                                                                     {t("list")}
                                                                 </Typography>
@@ -409,7 +472,7 @@ function SideBarForManagerComponent(){
                                                     <ListItemButton
                                                         sx={{
                                                             borderRadius: "10px",
-                                                            color: "#424242",
+                                                            
                                                             mb: "5px",
                                                         }}
                                                         onClick={handleNavigate("/dash/vehicles/new")}
@@ -422,7 +485,7 @@ function SideBarForManagerComponent(){
                                                                 <Typography
                                                                     component="span"
                                                                     variant="body1"
-                                                                    sx={{ color: "#424242", display: "inline" }}
+                                                                    sx={{  display: "inline" }}
                                                                 >
                                                                     {t("create")}
                                                                 </Typography>
@@ -438,7 +501,7 @@ function SideBarForManagerComponent(){
                                     <ListItemButton
                                         sx={{
                                             borderRadius: "10px",
-                                            color: "#424242",
+                                            
                                             ...((isUserListPage || isUserCreatePage) &&
                                                 listItemButtonStyle),
                                             mt: "5px",
@@ -464,7 +527,7 @@ function SideBarForManagerComponent(){
                                                 <Typography
                                                     component="span"
                                                     variant="body1"
-                                                    sx={{ color: "#424242", display: "inline" }}
+                                                    sx={{  display: "inline" }}
                                                 >
                                                     {t("user")}
                                                 </Typography>
@@ -492,7 +555,7 @@ function SideBarForManagerComponent(){
                                                     <ListItemButton
                                                         sx={{
                                                             borderRadius: "10px",
-                                                            color: "#424242",
+                                                            
                                                             mb: "5px",
                                                         }}
                                                         onClick={handleNavigate("/dash/users")}
@@ -503,7 +566,7 @@ function SideBarForManagerComponent(){
                                                                 <Typography
                                                                     component="span"
                                                                     variant="body1"
-                                                                    sx={{ color: "#424242", display: "inline" }}
+                                                                    sx={{  display: "inline" }}
                                                                 >
                                                                     {t("list")}
                                                                 </Typography>
@@ -520,7 +583,7 @@ function SideBarForManagerComponent(){
                                                     <ListItemButton
                                                         sx={{
                                                             borderRadius: "10px",
-                                                            color: "#424242",
+                                                            
                                                             mb: "5px",
                                                         }}
                                                         onClick={handleNavigate("/dash/users/new")}
@@ -531,7 +594,7 @@ function SideBarForManagerComponent(){
                                                                 <Typography
                                                                     component="span"
                                                                     variant="body1"
-                                                                    sx={{ color: "#424242", display: "inline" }}
+                                                                    sx={{  display: "inline" }}
                                                                 >
                                                                     {t("create")}
                                                                 </Typography>
@@ -548,7 +611,7 @@ function SideBarForManagerComponent(){
                                     <ListItemButton
                                         sx={{
                                             borderRadius: "10px",
-                                            color: "#424242",
+                                            
                                             ...((isReportListPage || isReportCreatePage) &&
                                                 listItemButtonStyle),
                                             mt: "5px",
@@ -574,7 +637,7 @@ function SideBarForManagerComponent(){
                                                 <Typography
                                                     component="span"
                                                     variant="body1"
-                                                    sx={{ color: "#424242", display: "inline" }}
+                                                    sx={{  display: "inline" }}
                                                 >
                                                     {t("report")}
                                                 </Typography>
@@ -602,20 +665,20 @@ function SideBarForManagerComponent(){
                                                     <ListItemButton
                                                         sx={{
                                                             borderRadius: "10px",
-                                                            color: "#424242",
+
                                                             mb: "5px",
                                                         }}
-                                                        onClick={() => navigate("/dash/reports")}
-                                                        selected={location.pathname === "/dash/reports"}
+                                                        onClick={() => navigate("/dash/reports/user-history")}
+                                                        selected={location.pathname === "/dash/reports/user-history"}
                                                     >
                                                         <ListItemText
                                                             primary={
                                                                 <Typography
                                                                     component="span"
                                                                     variant="body1"
-                                                                    sx={{ color: "#424242", display: "inline" }}
+                                                                    sx={{ display: "inline" }}
                                                                 >
-                                                                    {t("list")}
+                                                                    {t("userHistory")}
                                                                 </Typography>
                                                             }
                                                         />
@@ -630,20 +693,22 @@ function SideBarForManagerComponent(){
                                                     <ListItemButton
                                                         sx={{
                                                             borderRadius: "10px",
-                                                            color: "#424242",
+
                                                             mb: "5px",
                                                         }}
-                                                        onClick={() => navigate("/dash/reports/new")}
-                                                        selected={location.pathname === "/dash/reports/new"}
+                                                        onClick={() => navigate("/dash/reports/vehicle-history")}
+                                                        selected={
+                                                            location.pathname === "/dash/reports/vehicle-history"
+                                                        }
                                                     >
                                                         <ListItemText
                                                             primary={
                                                                 <Typography
                                                                     component="span"
                                                                     variant="body1"
-                                                                    sx={{ color: "#424242", display: "inline" }}
+                                                                    sx={{ display: "inline" }}
                                                                 >
-                                                                    {t("create")}
+                                                                    {t("vehicleHistory")}
                                                                 </Typography>
                                                             }
                                                         />
@@ -655,7 +720,7 @@ function SideBarForManagerComponent(){
                                 </Collapse>
                             </List>
                         </div>
-                    </Box>
+                    </Paper>
                 </Drawer>
             )}
         </>

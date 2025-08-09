@@ -681,7 +681,6 @@ function AddNewUser() {
                         <ButtonComponent
                           btnTitle={t("createUser")}
                           type={"submit"}
-                          loadingCaption={t("creating")}
                           isLoading={isLoadingAddNewUser}
                         />
                       </div>

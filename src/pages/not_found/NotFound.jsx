@@ -1,10 +1,12 @@
-import { Button } from "@mui/material";
+import {Button, Paper} from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import useTranslate from "../../hook/useTranslate.jsx";
 
 function NotFound() {
   const navigate = useNavigate();
+  const { t } = useTranslate();
   return (
-    <div className="flex justify-center items-center flex-col gap-5 h-screen">
+    <Paper className="flex justify-center items-center flex-col gap-5 h-screen">
       <img
         src="/images/error404.svg"
         alt="error404"
@@ -15,9 +17,9 @@ function NotFound() {
         variant="contained"
         onClick={() => navigate("/dash")}
       >
-        Go to home
+          {t("back")}
       </Button>
-    </div>
+    </Paper>
   );
 }
 

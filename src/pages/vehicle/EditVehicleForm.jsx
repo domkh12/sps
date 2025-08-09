@@ -142,6 +142,7 @@ function EditUserForm({ vehicle }) {
         licensePlateProvinceId: values.lppId,
         branchUuid: isAdmin ? values.branchUuid : sites[0]
       });
+
     } catch (error) {
       console.log(error);
     } finally {

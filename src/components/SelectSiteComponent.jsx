@@ -6,6 +6,7 @@ import {
   Select,
   FormHelperText,
 } from "@mui/material";
+import ImageComponent from "./ImageComponent.jsx";
 
 function SelectSiteComponent({
   label,
@@ -89,11 +90,7 @@ function SelectSiteComponent({
               >
                 <div className="flex items-center gap-3">
                   <div className="w-[30px] h-[30px] overflow-hidden rounded-full">
-                    <img
-                      src={option?.image || "/images/logoPlaceholder.jpg"}
-                      alt={option?.uuid}
-                      className="object-cover w-full h-full"
-                    />
+                    <ImageComponent imageUrl={option?.image || "/images/logoPlaceholder.png"} alt={option?.uuid}/>
                   </div>
 
                   {option[optionLabelKey]}
