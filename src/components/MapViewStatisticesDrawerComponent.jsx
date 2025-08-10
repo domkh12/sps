@@ -32,7 +32,6 @@ function MapViewStatisticesDrawerComponent() {
     <div>
       <Drawer
         open={open}
-        sx={{ ...drawerStyle }}
         anchor={"right"}
         onClose={() => dispatch(toggleStatisticesDrawer(false))}
       >

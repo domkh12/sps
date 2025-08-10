@@ -17,8 +17,7 @@ function MapViewStatisticsComponent() {
 
       <Card
         sx={{
-          width: "100%",
-          ...cardStyle,
+          width: "100%"
         }}
       >
         <Typography variant="body1" component="div" className="p-[20px]">
@@ -67,11 +66,7 @@ function MapViewStatisticsComponent() {
         </div>
       </Card>
 
-      <Card
-        sx={{
-          ...cardStyle,
-        }}
-      >
+      <Card>
         <div className="flex justify-between">
           <Typography
             variant="body1"
@@ -129,8 +124,7 @@ function MapViewStatisticsComponent() {
 
       <Card
         sx={{
-          padding: "20px",
-          ...cardStyle,
+          padding: "20px"
         }}
       >
         <Typography variant="body1" component="div" sx={{ mb: 2 }}>
