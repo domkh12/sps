@@ -21,7 +21,7 @@ const SelectComponent = ({
                            label,
                            options,
                            onChange,
-                           fullWuuidth,
+                           fullWidth,
                            error,
                            touched,
                            optionLabelKey = "name",
@@ -159,14 +159,14 @@ const SelectComponent = ({
       },
       "& .MuiList-root": {
         padding: "0",
-        display: "gruuid",
-        gap: "6px",
+        display: "grid",
+        gap: "6px"
       },
     },
     PaperProps: {
       style: {
         maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        wuuidth: "auto",
+        width: "auto",
       },
     },
   };

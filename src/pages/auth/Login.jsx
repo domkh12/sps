@@ -236,7 +236,7 @@ export default function Login() {
             <>
                 <SeoComponent title="Login"/>
                 <nav
-                    className="fixed top-0 left-0 w-full bg-white bg-opacity-5 lg:bg-opacity-0 z-20 backdrop-blur-3xl lg:backdrop-blur-0">
+                    className="fixed top-0 left-0 w-full  bg-opacity-5 lg:bg-opacity-0 z-20 backdrop-blur-3xl lg:backdrop-blur-0">
                     <div className="flex justify-between items-center xxs:flex-nowrap flex-wrap">
                         <LogoComponent/>
                         <div className="pr-[20px] flex gap-[16px]  items-center">
@@ -395,7 +395,6 @@ export default function Login() {
                                                     }}
                                                     loading={isLoading}
                                                     type="submit"
-                                                    loadingIndicator="Logging..."
                                                     className="w-full "
                                                 >
                                                     {t("login")}
