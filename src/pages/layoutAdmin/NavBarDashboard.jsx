@@ -1,9 +1,7 @@
 import {useDispatch, useSelector} from "react-redux";
 import {Avatar, IconButton, Paper, Typography} from "@mui/material";
 import NotificationsNoneTwoToneIcon from "@mui/icons-material/NotificationsNoneTwoTone";
-import SearchTwoToneIcon from "@mui/icons-material/SearchTwoTone";
 import ToolTipButtonComponent from "../../components/ToolTipButtonComponent";
-import {IoSearch} from "react-icons/io5";
 import SettingComponent from "../../components/SettingComponent";
 import TranslateComponent from "../../components/TranslateComponent";
 import ProfileDrawerComponent from "../../components/ProfileDrawerComponent";

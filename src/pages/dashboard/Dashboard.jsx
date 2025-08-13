@@ -20,97 +20,23 @@ import {formatMinutesToHoursMinutes} from "../../redux/feature/utils/util.js";
 import {useSelector} from "react-redux";
 import {Box, Card, useTheme} from "@mui/material";
 import useAuth from "../../hook/useAuth.jsx";
+import DataNotFound from "../../components/DataNotFound.jsx";
+import useTranslate from "../../hook/useTranslate.jsx";
 
-// Mock data for manager views
-const MANAGER_MOCK_DATA = {
-    // Parking Areas Utilization (Donut Chart)
-    parkingAreasUtilization: [
-        { name: "Main Entrance", value: 45, color: "#3B82F6" },
-        { name: "Building A", value: 32, color: "#10B981" },
-        { name: "Building B", value: 28, color: "#F59E0B" },
-        { name: "VIP Area", value: 15, color: "#EF4444" },
-        { name: "Visitor Parking", value: 7, color: "#8B5CF6" }
-    ],
-
-    peakHoursData : [
-        { name: "12AM", data: [15, 18, 20, 22, 25, 45, 35] },
-        { name: "1AM", data: [10, 12, 15, 18, 20, 40, 30] },
-        { name: "2AM", data: [8, 10, 12, 15, 18, 35, 25] },
-        { name: "3AM", data: [5, 8, 10, 12, 15, 30, 20] },
-        { name: "4AM", data: [3, 5, 8, 10, 12, 25, 15] },
-        { name: "5AM", data: [5, 8, 10, 15, 20, 30, 20] },
-        { name: "6AM", data: [15, 20, 25, 30, 35, 40, 25] },
-        { name: "7AM", data: [30, 35, 40, 45, 50, 45, 30] },
-        { name: "8AM", data: [50, 55, 60, 65, 70, 50, 35] },
-        { name: "9AM", data: [70, 75, 80, 85, 90, 60, 45] },
-        { name: "10AM", data: [80, 85, 90, 95, 100, 70, 55] },
-        { name: "11AM", data: [85, 90, 95, 100, 105, 75, 60] },
-        { name: "12PM", data: [90, 95, 100, 105, 110, 80, 65] },
-        { name: "1PM", data: [85, 90, 95, 100, 105, 85, 70] },
-        { name: "2PM", data: [80, 85, 90, 95, 100, 90, 75] },
-        { name: "3PM", data: [85, 90, 95, 100, 105, 95, 80] },
-        { name: "4PM", data: [90, 95, 100, 105, 110, 100, 85] },
-        { name: "5PM", data: [95, 100, 105, 110, 115, 105, 90] },
-        { name: "6PM", data: [85, 90, 95, 100, 105, 110, 95] },
-        { name: "7PM", data: [75, 80, 85, 90, 95, 115, 100] },
-        { name: "8PM", data: [65, 70, 75, 80, 85, 120, 105] },
-        { name: "9PM", data: [55, 60, 65, 70, 75, 110, 95] },
-        { name: "10PM", data: [45, 50, 55, 60, 65, 95, 80] },
-        { name: "11PM", data: [25, 30, 35, 40, 45, 70, 55] }
-    ],
-
-    // Days of week for heatmap x-axis
-    daysOfWeek: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-
-    // Parking Areas Performance Details
-    parkingAreasDetails: [
-        {
-            id: 1,
-            name: "Main Entrance",
-            totalSlots: 50,
-            occupied: 45,
-            available: 5,
-            occupancyRate: 90,
-            barColor: "blue-500",
-        },
-        {
-            id: 2,
-            name: "Building A",
-            totalSlots: 40,
-            occupied: 32,
-            available: 8,
-            occupancyRate: 80,
-            barColor: "green-500",
-        },
-        {
-            id: 3,
-            name: "Building B",
-            totalSlots: 35,
-            occupied: 28,
-            available: 7,
-            occupancyRate: 80,
-            barColor: "yellow-500"
-        },
-        {
-            id: 4,
-            name: "VIP Area",
-            totalSlots: 20,
-            occupied: 15,
-            available: 5,
-            occupancyRate: 75,
-            barColor: "purple-500"
-        },
-        {
-            id: 5,
-            name: "Visitor Parking",
-            totalSlots: 15,
-            occupied: 7,
-            available: 8,
-            occupancyRate: 47,
-            barColor: "red-500"
-        }
-    ]
-};
+const VEHICLE_EXIT_MOCK = [
+    { hour: "2 PM", occupied: 0, total: 6 },
+    { hour: "3 PM", occupied: 1, total: 6 },
+    { hour: "4 PM", occupied: 2, total: 6 },
+    { hour: "5 PM", occupied: 3, total: 6 },
+    { hour: "6 PM", occupied: 4, total: 6 },
+    { hour: "7 PM", occupied: 3, total: 6 },
+    { hour: "8 PM", occupied: 2, total: 6 },
+    { hour: "9 PM", occupied: 3, total: 6 },
+    { hour: "10 PM", occupied: 4, total: 6 },
+    { hour: "11 PM", occupied: 3, total: 6 },
+    { hour: "12 AM", occupied: 1, total: 6 },
+    { hour: "1 AM", occupied: 0, total: 6 },
+];
 
 const StatCard = ({
                       icon: Icon,
@@ -178,8 +104,7 @@ const StatCard = ({
 };
 
 const Dashboard = () => {
-    const [timeFilter, setTimeFilter] = useState("today");
-    const [selectedCompany, setSelectedCompany] = useState("all");
+    const {t} = useTranslate();
     const {isAdmin, isManager} = useAuth();
     const [isLoaded, setIsLoaded] = useState(false);
     const {data: analysisData, isLoading, isSuccess, refetch} = useGetAnalysisQuery("analysisList");
@@ -193,6 +118,8 @@ const Dashboard = () => {
     // Safe fallbacks for Parking Areas Utilization chart
     const parkingAreasUtilization = analysisData?.parkingAreasUtilization ?? [];
     const hasParkingAreasUtilization = Array.isArray(parkingAreasUtilization) && parkingAreasUtilization.length > 0;
+    const parkingAreasDetails = analysisData?.parkingAreasDetails ?? [];
+    const hasParkingAreasDetails = Array.isArray(parkingAreasDetails) && parkingAreasDetails.length > 0;
 
     useEffect(() => {
         if (isRefetchCheckIn || isRefetchCheckOut) {
@@ -237,6 +164,8 @@ const Dashboard = () => {
         },
     });
 
+    
+
     let content;
 
     if (isLoading) content = <LoadingFetchingDataComponent/>;
@@ -245,7 +174,7 @@ const Dashboard = () => {
         <>
             <SeoComponent title={"Dashboard"}/>
             <Box className="min-h-screen">
-                <div className="mx-auto space-y-6">
+                <div className="space-y-6">
                     {/* Header */}
                     <div
                         className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
@@ -261,7 +190,7 @@ const Dashboard = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         <StatCard
                             icon={Users}
-                            title="Total Users"
+                            title={t('user')}
                             value={analysisData?.totalStats?.totalUserCount}
                             percentage="+12.5%"
                             trend="up"
@@ -271,7 +200,7 @@ const Dashboard = () => {
                         />
                         <StatCard
                             icon={Car}
-                            title="Vehicles"
+                            title={t('vehicle')}
                             value={analysisData.totalStats.totalVehicleCount}
                             percentage="+8.2%"
                             trend="up"
@@ -281,7 +210,7 @@ const Dashboard = () => {
                         />
                         <StatCard
                             icon={MapPin}
-                            title="Parking Areas"
+                            title={t('parkingSpace')}
                             value={analysisData.totalStats.totalParkingAreasCount}
                             percentage="+5.1%"
                             trend="up"
@@ -291,7 +220,7 @@ const Dashboard = () => {
                         />
                         <StatCard
                             icon={Square}
-                            title="Parking Slots"
+                            title={t('parkingSlot')}
                             value={analysisData.totalStats.totalParkingSlotsCount}
                             percentage="+3.4%"
                             trend="up"
@@ -306,7 +235,7 @@ const Dashboard = () => {
                         {isAdmin && (
                             <StatCard
                                 icon={Building}
-                                title="Companies"
+                                title={t('company')}
                                 value={analysisData?.totalStats?.totalCompanies}
                                 percentage="+0%"
                                 trend="up"
@@ -318,7 +247,7 @@ const Dashboard = () => {
                         {isAdmin && (
                             <StatCard
                                 icon={MapPin}
-                                title="Branches"
+                                title={t('branch')}
                                 value={analysisData.totalStats.totalBranches}
                                 percentage="+0%"
                                 trend="up"
@@ -330,7 +259,7 @@ const Dashboard = () => {
                         {isManager && (
                             <StatCard
                                 icon={Navigation}
-                                title="Active Sessions"
+                                title={t('activeSession')}
                                 value={analysisData.totalStats.activeSessionCount}
                                 percentage="+0%"
                                 trend="up"
@@ -363,7 +292,7 @@ const Dashboard = () => {
                         />
                         <StatCard
                             icon={Clock}
-                            title="Avg Stay Time"
+                            title={t('avgStayTime')}
                             value={` ${formatMinutesToHoursMinutes(analysisData.totalStats.averageStayTime)}`}
                             percentage="+0.3h"
                             trend="up"
@@ -374,16 +303,18 @@ const Dashboard = () => {
                     </div>
 
                     {/* Charts Section */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         {/* Hourly Occupancy Chart */}
                         <Card
                             className={`rounded-xl p-6 shadow-lg transition-all duration-1000 transform ${
+                                isManager ? 'lg:col-span-6 xl:col-span-6' : 'lg:col-span-6 xl:col-span-4'
+                            } ${
                                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                             }`}
                         >
                             <h3 className="text-xl font-semibold mb-4 flex items-center">
                                 <Clock className="mr-2" size={20}/>
-                                Hourly Slot Occupancy
+                                Hourly Vehicle Entry
                             </h3>
                             <Chart
                                 options={{
@@ -401,6 +332,10 @@ const Dashboard = () => {
                                             },
                                         },
                                     },
+                                    markers: {
+                                        size: 0,
+                                        hover: { size: 6 },
+                                    },
                                     dataLabels: {enabled: false},
                                     stroke: {
                                         curve: "smooth",
@@ -417,6 +352,15 @@ const Dashboard = () => {
                                     },
                                     colors: ["#3B82F6"],
                                     ...getBaseChartOptions(),
+                                    tooltip: {
+                                        ...getBaseChartOptions().tooltip,
+                                        enabled: true,
+                                        shared: true,
+                                        intersect: false,
+                                        y: {
+                                            formatter: (value) => `${value} vehicles`,
+                                        },
+                                    },
                                     xaxis: {
                                         ...getBaseChartOptions().xaxis,
                                         categories: analysisData.hourlyData.map((item) => item.hour),
@@ -424,7 +368,7 @@ const Dashboard = () => {
                                 }}
                                 series={[
                                     {
-                                        name: "Occupied Slots",
+                                        name: "Vehicle Entry",
                                         data: analysisData.hourlyData.map((item) => item.occupied),
                                     },
                                 ]}
@@ -433,91 +377,166 @@ const Dashboard = () => {
                             />
                         </Card>
 
+                         {/* Hourly Vehicle Exit (Static Mock Data) */}
+                         <Card
+                             className={`rounded-xl p-6 shadow-lg transition-all duration-1000 transform ${
+                                 isManager ? 'lg:col-span-6 xl:col-span-6' : 'lg:col-span-6 xl:col-span-4'
+                             } ${
+                                 isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                             }`}
+                         >
+                             <h3 className="text-xl font-semibold mb-4 flex items-center">
+                                 <Clock className="mr-2" size={20}/>
+                                 Hourly Vehicle Exit
+                             </h3>
+                             <Chart
+                                 options={{
+                                     chart: {
+                                         type: "area",
+                                         height: 300,
+                                         toolbar: {show: false},
+                                         animations: {
+                                             enabled: true,
+                                             easing: "easeinout",
+                                             speed: 800,
+                                             animateGradually: {
+                                                 enabled: true,
+                                                 delay: 150,
+                                             },
+                                         },
+                                     },
+                                     markers: {
+                                         size: 0,
+                                         hover: { size: 6 },
+                                     },
+                                     dataLabels: {enabled: false},
+                                     stroke: {
+                                         curve: "smooth",
+                                         width: 3,
+                                     },
+                                     fill: {
+                                         type: "gradient",
+                                         gradient: {
+                                             shadeIntensity: 1,
+                                             opacityFrom: 0.7,
+                                             opacityTo: 0.1,
+                                             stops: [0, 90, 100],
+                                         },
+                                     },
+                                      colors: ["#EF4444"],
+                                      ...getBaseChartOptions(),
+                                      tooltip: {
+                                          ...getBaseChartOptions().tooltip,
+                                          enabled: true,
+                                          shared: true,
+                                          intersect: false,
+                                          y: {
+                                              formatter: (value) => `${value} vehicles`,
+                                          },
+                                      },
+                                     xaxis: {
+                                         ...getBaseChartOptions().xaxis,
+                                         categories: analysisData.hourlyVehicleExitResponse.map((item) => item.hour),
+                                     },
+                                 }}
+                                 series={[
+                                      {
+                                          name: "Vehicle Exit",
+                                          data: analysisData.hourlyVehicleExitResponse.map((item) => item.occupied),
+                                      },
+                                 ]}
+                                 type="area"
+                                 height={300}
+                             />
+                         </Card>
+
                         {/* Weekly Stay Time Chart */}
-                        <Card
-                            className={`rounded-xl p-6 shadow-lg transition-all duration-1000 delay-200 transform ${
-                                isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                            }`}
-                        >
-                            <h3 className="text-xl font-semibold mb-4 flex items-center">
-                                <Clock className="mr-2" size={20}/>
-                                Weekly Average Stay Time
-                            </h3>
-                            <Chart
-                                options={{
-                                    chart: {
-                                        type: "bar",
-                                        height: 300,
-                                        toolbar: {show: false},
-                                        animations: {
-                                            enabled: true,
-                                            easing: "easeinout",
-                                            speed: 800,
-                                            animateGradually: {
+                        {!isManager && (
+                            <Card
+                                className={`rounded-xl p-6 shadow-lg transition-all duration-1000 delay-200 transform lg:col-span-6 xl:col-span-4 ${
+                                    isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                                }`}
+                            >
+                                <h3 className="text-xl font-semibold mb-4 flex items-center">
+                                    <Clock className="mr-2" size={20}/>
+                                    Weekly Average Stay Time
+                                </h3>
+                                <Chart
+                                    options={{
+                                        chart: {
+                                            type: "bar",
+                                            height: 300,
+                                            toolbar: {show: false},
+                                            animations: {
                                                 enabled: true,
-                                                delay: 150,
+                                                easing: "easeinout",
+                                                speed: 800,
+                                                animateGradually: {
+                                                    enabled: true,
+                                                    delay: 150,
+                                                },
                                             },
                                         },
-                                    },
-                                    plotOptions: {
-                                        bar: {
-                                            borderRadius: 8,
-                                            columnWidth: "60%",
+                                        plotOptions: {
+                                            bar: {
+                                                borderRadius: 8,
+                                                columnWidth: "60%",
+                                            },
                                         },
-                                    },
-                                    dataLabels: {enabled: false},
-                                    colors: ["#10B981"],
-                                    ...getBaseChartOptions(),
-                                    xaxis: {
-                                        ...getBaseChartOptions().xaxis,
-                                        categories: analysisData.weeklyData.map((item) => item.day),
-                                    },
-                                    yaxis: {
-                                        ...getBaseChartOptions().yaxis,
-                                        labels: {
-                                            ...getBaseChartOptions().yaxis.labels,
-                                            formatter: (value) => `${value}h`,
+                                        dataLabels: {enabled: false},
+                                        colors: ["#10B981"],
+                                        ...getBaseChartOptions(),
+                                        xaxis: {
+                                            ...getBaseChartOptions().xaxis,
+                                            categories: analysisData.weeklyData.map((item) => item.day),
                                         },
-                                    },
-                                    tooltip: {
-                                        ...getBaseChartOptions().tooltip,
-                                        y: {
-                                            formatter: (value) => `${value}h`,
+                                        yaxis: {
+                                            ...getBaseChartOptions().yaxis,
+                                            labels: {
+                                                ...getBaseChartOptions().yaxis.labels,
+                                                formatter: (value) => `${value}h`,
+                                            },
                                         },
-                                    },
-                                    fill: {
-                                        type: "gradient",
-                                        gradient: {
-                                            shade: "light",
-                                            type: "vertical",
-                                            shadeIntensity: 0.25,
-                                            gradientToColors: ["#34D399"],
-                                            inverseColors: false,
-                                            opacityFrom: 0.85,
-                                            opacityTo: 0.85,
-                                            stops: [50, 0, 100],
+                                        tooltip: {
+                                            ...getBaseChartOptions().tooltip,
+                                            y: {
+                                                formatter: (value) => `${value}h`,
+                                            },
                                         },
-                                    },
-                                }}
-                                series={[
-                                    {
-                                        name: "Average Stay Time",
-                                        data: analysisData.weeklyData.map((item) => item.avgStayTime),
-                                    },
-                                ]}
-                                type="bar"
-                                height={300}
-                            />
-                        </Card>
+                                        fill: {
+                                            type: "gradient",
+                                            gradient: {
+                                                shade: "light",
+                                                type: "vertical",
+                                                shadeIntensity: 0.25,
+                                                gradientToColors: ["#34D399"],
+                                                inverseColors: false,
+                                                opacityFrom: 0.85,
+                                                opacityTo: 0.85,
+                                                stops: [50, 0, 100],
+                                            },
+                                        },
+                                    }}
+                                    series={[
+                                        {
+                                            name: "Average Stay Time",
+                                            data: analysisData.weeklyData.map((item) => item.avgStayTime),
+                                        },
+                                    ]}
+                                    type="bar"
+                                    height={300}
+                                />
+                            </Card>
+                        )}
                     </div>
 
                     {/* Manager-specific charts or Admin-specific charts */}
                     {isManager ? (
                         // Manager View: Focus on branch parking areas performance with mapped data
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                             {/* Parking Areas Utilization */}
                             <Card
-                                className={`rounded-xl p-6 shadow-lg transition-all duration-1000 delay-400 transform ${
+                                className={`rounded-xl p-6 shadow-lg transition-all duration-1000 delay-400 transform lg:col-span-5 xl:col-span-5 ${
                                     isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                                 }`}
                             >
@@ -604,60 +623,89 @@ const Dashboard = () => {
                                     height={300}
                                 />
                             </Card>
-
-                            {/* Peak Hours Analysis */}
+                            {/* Weekly Average Stay Time (Manager Right Side) */}
                             <Card
-                                className={`rounded-xl p-6 shadow-lg transition-all duration-1000 delay-600 transform ${
+                                className={`rounded-xl p-6 shadow-lg transition-all duration-1000 delay-400 transform lg:col-span-7 xl:col-span-7 ${
                                     isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                                 }`}
                             >
-                                <h3 className="text-xl font-semibold mb-4">
-                                    Peak Hours Analysis
+                                <h3 className="text-xl font-semibold mb-4 flex items-center">
+                                    <Clock className="mr-2" size={20}/>
+                                    Weekly Average Stay Time
                                 </h3>
                                 <Chart
                                     options={{
                                         chart: {
-                                            type: "heatmap",
+                                            type: "bar",
                                             height: 300,
                                             toolbar: {show: false},
                                             animations: {
                                                 enabled: true,
                                                 easing: "easeinout",
                                                 speed: 800,
+                                                animateGradually: {
+                                                    enabled: true,
+                                                    delay: 150,
+                                                },
                                             },
                                         },
-                                        dataLabels: {
-                                            enabled: false,
+                                        plotOptions: {
+                                            bar: {
+                                                borderRadius: 8,
+                                                columnWidth: "60%",
+                                            },
                                         },
-                                        colors: ["#3B82F6"],
+                                        dataLabels: {enabled: false},
+                                        colors: ["#10B981"],
                                         ...getBaseChartOptions(),
                                         xaxis: {
                                             ...getBaseChartOptions().xaxis,
-                                            categories: MANAGER_MOCK_DATA.daysOfWeek,
+                                            categories: analysisData.weeklyData.map((item) => item.day),
                                         },
                                         yaxis: {
                                             ...getBaseChartOptions().yaxis,
-                                            categories: MANAGER_MOCK_DATA.peakHoursData.map(hour => hour.name),
+                                            labels: {
+                                                ...getBaseChartOptions().yaxis.labels,
+                                                formatter: (value) => `${value}h`,
+                                            },
                                         },
                                         tooltip: {
                                             ...getBaseChartOptions().tooltip,
                                             y: {
-                                                formatter: (value) => `${value}% occupancy`,
+                                                formatter: (value) => `${value}h`,
+                                            },
+                                        },
+                                        fill: {
+                                            type: "gradient",
+                                            gradient: {
+                                                shade: "light",
+                                                type: "vertical",
+                                                shadeIntensity: 0.25,
+                                                gradientToColors: ["#34D399"],
+                                                inverseColors: false,
+                                                opacityFrom: 0.85,
+                                                opacityTo: 0.85,
+                                                stops: [50, 0, 100],
                                             },
                                         },
                                     }}
-                                    series={MANAGER_MOCK_DATA.peakHoursData}
-                                    type="heatmap"
+                                    series={[
+                                        {
+                                            name: "Average Stay Time",
+                                            data: analysisData.weeklyData.map((item) => item.avgStayTime),
+                                        },
+                                    ]}
+                                    type="bar"
                                     height={300}
                                 />
                             </Card>
                         </div>
                     ) : (
                         // Admin View: Company and Branch Distribution
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                             {/* Company Distribution */}
                             <Card
-                                className={`rounded-xl p-6 shadow-lg transition-all duration-1000 delay-400 transform ${
+                                className={`rounded-xl p-6 shadow-lg transition-all duration-1000 delay-400 transform lg:col-span-4 ${
                                     isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                                 }`}
                             >
@@ -744,7 +792,7 @@ const Dashboard = () => {
 
                             {/* Branch Performance */}
                             <Card
-                                className={`lg:col-span-2 rounded-xl p-6 shadow-lg transition-all duration-1000 delay-600 transform ${
+                                className={`lg:col-span-8 rounded-xl p-6 shadow-lg transition-all duration-1000 delay-600 transform ${
                                     isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                                 }`}
                             >
@@ -787,7 +835,7 @@ const Dashboard = () => {
 
                     {/* Company Details Cards - Only for Admin */}
                     {isAdmin && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6">
                             {analysisData.companies.map((company, index) => (
                                 <Card
                                     key={company.id}
@@ -877,53 +925,59 @@ const Dashboard = () => {
                                     Parking Areas Performance
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {/* Map through analysisData.parkingAreasDetails */}
-                                    {analysisData.parkingAreasDetails.map((area) => (
-                                        <div
-                                            key={area.id}
-                                            className={`rounded-lg p-4 border transition-all duration-500`}
-                                        >
-                                            <div className="flex items-center justify-between mb-3">
-                                                <h4 className="text-lg font-semibold">
-                                                    {area.name}
-                                                </h4>
-                                                <div className="flex items-center space-x-1">
-                                                    <Activity size={16} />
-                                                    <span className={`text-sm font-medium `}>
-                                                        {area.occupancyRate}%
-                                                    </span>
+                                    {/* Map through parkingAreasDetails or show not found */}
+                                    {hasParkingAreasDetails ? (
+                                        parkingAreasDetails.map((area) => (
+                                            <div
+                                                key={area.id}
+                                                className={`rounded-lg p-4 border transition-all duration-500`}
+                                            >
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <h4 className="text-lg font-semibold">
+                                                        {area.name}
+                                                    </h4>
+                                                    <div className="flex items-center space-x-1">
+                                                        <Activity size={16} />
+                                                        <span className={`text-sm font-medium `}>
+                                                            {area.occupancyRate}%
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between text-sm">
+                                                        <span >Total Slots</span>
+                                                        <span className="font-medium">{area.totalSlots}</span>
+                                                    </div>
+                                                    <div className="flex justify-between text-sm">
+                                                        <span >Occupied</span>
+                                                        <span className="font-medium text-blue-600">{area.occupied}</span>
+                                                    </div>
+                                                    <div className="flex justify-between text-sm">
+                                                        <span >Available</span>
+                                                        <span className="font-medium text-green-600">{area.available}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-3">
+                                                    <div className="flex justify-between text-xs mb-1">
+                                                        <span>Occupancy</span>
+                                                        <span>{area.occupancyRate}%</span>
+                                                    </div>
+                                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                                        <div
+                                                            className={`bg-[${area.barColor}] h-2 rounded-full transition-all duration-1000`}
+                                                            style={{
+                                                                width: `${area.occupancyRate}%`
+                                                            }}
+                                                        ></div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="space-y-2">
-                                                <div className="flex justify-between text-sm">
-                                                    <span >Total Slots</span>
-                                                    <span className="font-medium">{area.totalSlots}</span>
-                                                </div>
-                                                <div className="flex justify-between text-sm">
-                                                    <span >Occupied</span>
-                                                    <span className="font-medium text-blue-600">{area.occupied}</span>
-                                                </div>
-                                                <div className="flex justify-between text-sm">
-                                                    <span >Available</span>
-                                                    <span className="font-medium text-green-600">{area.available}</span>
-                                                </div>
-                                            </div>
-                                            <div className="mt-3">
-                                                <div className="flex justify-between text-xs mb-1">
-                                                    <span>Occupancy</span>
-                                                    <span>{area.occupancyRate}%</span>
-                                                </div>
-                                                <div className="w-full bg-gray-200 rounded-full h-2">
-                                                    <div
-                                                        className={`bg-${area.barColor} h-2 rounded-full transition-all duration-1000`}
-                                                        style={{
-                                                            width: `${area.occupancyRate}%`
-                                                        }}
-                                                    ></div>
-                                                </div>
-                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="col-span-1 md:col-span-2 lg:col-span-3 flex items-center justify-center py-6">
+                                            <DataNotFound />
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
                             </Card>
                         </div>

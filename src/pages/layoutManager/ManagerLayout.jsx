@@ -22,6 +22,9 @@ import useAuth from "../../hook/useAuth.jsx";
 import {setCredentials} from "../../redux/feature/auth/authSlice.js";
 import SideBarForManagerComponent from "../../components/SideBarForManagerComponent.jsx";
 import {Paper} from "@mui/material";
+import {setIsRefetchCheckIn} from "../../redux/feature/checkIn/checkInSlice.js";
+import {Slide, toast} from "react-toastify";
+import {setIsRefetchCheckOut} from "../../redux/feature/checkOut/checkOutSlice.js";
 
 function ManagerLayout() {
   const isPaginationSuccess = useSelector((state) => state.action.isPaginationSuccess);
@@ -36,7 +39,67 @@ function ManagerLayout() {
   const isOpenSnackBar = useSelector((state) => state.action.isOpenSnackBar);
   const captionSnackBar = useSelector((state) => state.action.captionSnackBar);
   const isInitialLoading = useSelector(selectIsInitialLoading);
+
   const {sites} = useAuth();
+  const {messages: messageCheckOut, isConnected: isConnectedCheckOut, isLoading: isLoadingCheckOut} = useWebSocket(`/topic/${sites[0]}/check-out`);
+  const {messages: messageCheckIn, isConnected, isLoading} = useWebSocket(`/topic/${sites[0]}/check-in`);
+
+  useEffect(() => {
+    if (messageCheckIn) {
+      dispatch(setIsRefetchCheckIn(true));
+      toast(
+          `🎉 Vehicle Check-In Successful!\n\n` +
+          `🚗 License: ${messageCheckIn?.vehicle?.numberPlate || 'N/A'}\n` +
+          `📍 Province: ${messageCheckIn?.vehicle?.licensePlateProvince?.provinceNameEn || 'Unknown'}\n` +
+          `⏰ Time In: ${messageCheckIn?.timeIn || 'Not recorded'}`,
+          {
+            position: "top-right",
+            autoClose: 6000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            icon: "🚗",
+            transition: Slide,
+            style: {
+              whiteSpace: 'pre-line'
+            }
+          }
+      );
+      setTimeout(() => {
+        dispatch(setIsRefetchCheckIn(false));
+      }, 1000)
+    }
+  }, [messageCheckIn, dispatch]);
+
+  useEffect(() => {
+    if (messageCheckOut) {
+      dispatch(setIsRefetchCheckOut(true));
+      toast(
+          `✅ Vehicle Check-Out Completed!\n\n` +
+          `🚗 License: ${messageCheckOut?.vehicle?.numberPlate || 'N/A'}\n` +
+          `📍 Province: ${messageCheckOut?.vehicle?.licensePlateProvince?.provinceNameEn || 'Unknown'}\n` +
+          `🚪 Time Out: ${messageCheckOut?.timeOut || 'Not recorded'}\n` +
+          `⏱️ Duration: ${messageCheckOut?.duration || 'Not calculated'}`,
+          {
+            position: "top-right",
+            autoClose: 6000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            icon: "🚪",
+            transition: Slide,
+            style: {
+              whiteSpace: 'pre-line'
+            }
+          }
+      );
+      setTimeout(() => {
+        dispatch(setIsRefetchCheckOut(false));
+      }, 1000)
+    }
+  }, [messageCheckOut, dispatch]);
 
   const [verifySite, {
     isSuccess: isSuccessVerifySite,
@@ -147,7 +210,7 @@ function ManagerLayout() {
   const isError =
      isConnectUserError || wsError;
 
-  if (isInitialLoading) {
+  if (isInitialLoading || isLoadingVerifySite || isLoadingCheckOut || isLoading) {
     content = <LoadingOneComponent />; // Use LoadingOneComponent
   }
 
@@ -156,18 +219,18 @@ function ManagerLayout() {
     content = <>Error</>;
   }
 
-  if (isSuccessVerifySite){
+  if (isSuccessVerifySite && isConnected && isConnectedCheckOut){
     content = (
-        <div className="fixed top-0 left-0 w-full h-screen dark:bg-[#282828]">
-          <div className="flex h-full bg-white">
+        <div className="fixed top-0 left-0 w-full h-screen bg-gray-50 dark:bg-[#282828]">
+          <div className="flex h-full bg-white dark:bg-[#1a1f24]">
             <SideBar />
-            <Paper className="flex-grow h-full overflow-auto">
+            <Paper className="flex-grow h-full overflow-auto bg-white dark:bg-[#1a1f24]">
               <header className="sticky top-0 w-full z-20">
                 <NavBarDashboard />
               </header>
               <Paper component="main"
                   ref={mainContentRef}
-                  className="xl:px-[40px] px-[10px] sm:px-[20px] pt-[8px] pb-[64px] "
+                  className="xl:px-[40px] px-[10px] sm:px-[20px] pt-[8px] pb-[64px] bg-white dark:bg-[#1a1f24]"
               >
                 <Outlet />
               </Paper>

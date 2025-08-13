@@ -265,5 +265,13 @@
   "changePasswordSuccess": "ផ្លាស់ប្ដូរលេខសម្ងាត់បានជោគជ័យ",
   "verifySuccess": "ផ្ទៀងផ្ទាត់ជោគជ័យ",
   "verifyCodeSuccess": "ផ្ទៀងផ្ទាត់កូដជោគជ័យ",
-  "back": "ត្រឡប់ក្រោយ"
+  "back": "ត្រឡប់ក្រោយ",
+  "reportUser": "ប្រវត្តិអ្នកប្រើប្រាស់",
+  "reportVehicle": "ប្រវត្តិរថយន្ត",
+  "noResultFound": "មិនមានលទ្ធផល",
+  "noMatchesFoundFor": "មិនមានទិន្នន័យដែលដូចទៅនឹង",
+  "checkYourKeyword": "ពិនិត្យពាក្យរបស់អ្នក",
+  "totalUser": "អ្នកប្រើប្រាស់សរុប",
+  "totalVehicle": "រថយន្តសរុប",
+  "avgStayTime": "ពេលវេលាមធ្យមស្ថិតនៅ"
 }

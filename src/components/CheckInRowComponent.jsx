@@ -214,12 +214,6 @@ function CheckInRowComponent({parkingDetail}) {
                 <TableCell
                     sx={{borderTopStyle: "none", borderBottomStyle: "none"}}
                 >
-                    <Typography variant="body1">{formatDuration(durations) || "N/A"}</Typography>
-                </TableCell>
-
-                <TableCell
-                    sx={{borderTopStyle: "none", borderBottomStyle: "none"}}
-                >
                     {parkingDetail?.isParking ? (
                         <Chip
                             sx={{

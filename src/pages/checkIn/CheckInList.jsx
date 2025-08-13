@@ -116,12 +116,6 @@ function CheckInList() {
       align: "left",
     },
     {
-      id: "duration",
-      label: t("duration"),
-      minWidth: 120,
-      align: "left",
-    },
-    {
       id: "status",
       label: t("status"),
       minWidth: 120,

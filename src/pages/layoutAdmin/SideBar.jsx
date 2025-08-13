@@ -39,10 +39,8 @@ import GarageTwoToneIcon from '@mui/icons-material/GarageTwoTone';
 
 function SideBar() {
   const isCollapsed = useSelector((state) => state.action.isCollapsed);
-  const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
   const [isOverviewOpen, setIsOverviewOpen] = useState(true);
   const [isManagementOpen, setIsManagementOpen] = useState(true);
-  const [isSubParkingOpen, setIsSubParkingOpen] = useState(false);
   const [isParkingOpen, setIsParkingOpen] = useState(false);
   const [isVehicleOpen, setIsVehicleOpen] = useState(false);
   const [isBranchOpen, setIsBranchOpen] = useState(false);
@@ -63,16 +61,12 @@ function SideBar() {
   const isUserCreatePage = location.pathname === "/admin/users/new";
   const isReportListPage = location.pathname === "/admin/reports";
   const isReportCreatePage = location.pathname === "/admin/reports/new";
-  const isHistoryPage = location.pathname === "/admin/history";
   const isBranchListPage = location.pathname === "/admin/branches";
   const isBranchCreatePage = location.pathname === "/admin/branches/new";
   const isCompanyCreatePage=location.pathname === "/admin/companies";
   const isCompanyListPage=location.pathname === "/admin/companies/new";
-
   const isSlotCreatePage = location.pathname === "/admin/parking-slots";
   const isSlotListPage = location.pathname === "/admin/parking-slots/new";
-
-
 
   const { t } = useTranslate();
 
@@ -105,30 +99,32 @@ function SideBar() {
           isCollapsed
             ? "w-[95px] transition-all duration-500"
             : "w-[300px] transition-all duration-500"
-        } h-full border-r-[1px] border-r-gray-200 w-[15rem] shrink-0 hidden xl:block`}
+        } h-full border-r-[1px] border-r-gray-200 dark:border-gray-700 bg-white dark:bg-[#141A21] w-[15rem] shrink-0 hidden xl:block`}
       >
         <nav className="flex flex-col relative h-screen">
           <IconButton
             aria-label="collapse_btn"
             sx={{
-              border: "0.5px solid #e5e7eb",
-              position: "absolute",
-              top: "23px",
-              right: "-14px",
-              width: "28px",
-              height: "28px",
-              zIndex: "30",
-                bgcolor: "inherit"
+                border: "0.5px solid #e5e7eb",
+                position: "absolute",
+                top: "23px",
+                right: "-14px",
+                width: "28px",
+                height: "28px",
+                zIndex: "30",
+                backgroundColor: (theme) =>
+                    theme.palette.mode === 'dark' ? theme.palette.background.paper : '#ffffff',
             }}
+
             onClick={() => dispatch(toggleCollapsed(true))}
             size="small"
-          >
+        >
             {isCollapsed ? (
-              <KeyboardArrowRightRoundedIcon />
+                <KeyboardArrowRightRoundedIcon />
             ) : (
-              <KeyboardArrowLeftRoundedIcon />
+                <KeyboardArrowLeftRoundedIcon />
             )}
-          </IconButton>
+        </IconButton>
           <LogoComponent />
 
           <div

@@ -266,5 +266,13 @@
   "changePasswordSuccess": "Change password success",
   "verifySuccess": "Verify success",
   "verifyCodeSuccess": "Verify code success",
-  "back": "Back"
+  "back": "Back",
+  "reportUser": "Report user",
+  "reportVehicle": "Report vehicle",
+  "noResultFound": "No result found",
+  "noMatchesFoundFor": "No matches found for",
+  "checkYourKeyword": "Check your keyword",
+  "totalUser": "Total user",
+  "totalVehicle": "Total vehicle",
+  "avgStayTime": "Avg Stay Time"
 }

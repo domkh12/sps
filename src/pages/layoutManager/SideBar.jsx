@@ -101,7 +101,7 @@ function SideBar() {
           isCollapsed
             ? "w-[90px] transition-all duration-500"
             : "w-[300px] transition-all duration-500"
-        } h-full border-r-[1px] border-r-gray-200 w-[15rem] shrink-0 hidden xl:block`}
+        } h-full border-r-[1px] border-r-gray-200 dark:border-gray-700 bg-white dark:bg-[#141A21] w-[15rem] shrink-0 hidden xl:block`}
       >
         <nav className="flex flex-col relative h-screen">
           <IconButton
@@ -114,6 +114,8 @@ function SideBar() {
               width: "28px",
               height: "28px",
               zIndex: "30",
+              backgroundColor: (theme) =>
+                  theme.palette.mode === 'dark' ? theme.palette.background.paper : '#ffffff',
             }}
             onClick={() => dispatch(toggleCollapsed(true))}
             size="small"

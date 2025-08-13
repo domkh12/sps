@@ -3,7 +3,6 @@ import {Avatar, IconButton} from "@mui/material";
 import {useEffect} from "react";
 import NotificationsNoneTwoToneIcon from "@mui/icons-material/NotificationsNoneTwoTone";
 import ToolTipButtonComponent from "../../components/ToolTipButtonComponent";
-import {IoSearch} from "react-icons/io5";
 import SettingComponent from "../../components/SettingComponent";
 import TranslateComponent from "../../components/TranslateComponent";
 import ProfileDrawerComponent from "../../components/ProfileDrawerComponent";
@@ -34,7 +33,9 @@ function NavBarDashboard() {
         isSuccess: isSuccessGetSites,
         isLoading: isLoadingGetSites
     } = useGetListBranchQuery("siteList");
+
     const {sites} = useAuth();
+
     const [
         verifySites,
         {
@@ -46,7 +47,6 @@ function NavBarDashboard() {
     ] = useVerifySitesMutation();
 
     const handleChange = async (value) => {
-        console.log(value);
         await verifySites({
             uuid: value,
             token: token,
@@ -61,8 +61,8 @@ function NavBarDashboard() {
 
     return (
         <>
-            <div
-                className="h-[70px] backdrop-blur-md flex justify-between flex-nowrap items-center xl:px-[40px] px-[10px] sm:px-[20px]">
+            <div className="h-[70px] backdrop-blur-md flex justify-between flex-nowrap items-center xl:px-[40px] px-[10px] sm:px-[20px]">
+
                 <div className=" flex items-center gap-[10px]">
                     <div className="xl:hidden">
                         <ToolTipButtonComponent
@@ -71,12 +71,16 @@ function NavBarDashboard() {
                             onClick={() => dispatch(setIsOpenSidebarDrawer(true))}
                         />
                     </div>
-                    <SelectSiteComponent
-                        options={sitesData}
-                        optionLabelKey="siteName"
-                        onChange={handleChange}
-                        selectFistValue={sites[0]}
-                    />
+                    {
+                        sitesData && sitesData.length > 0 && (
+                            <SelectSiteComponent
+                                options={sitesData}
+                                optionLabelKey="siteName"
+                                onChange={handleChange}
+                                selectFistValue={sites[0]}
+                            />
+                        )
+                    }
                 </div>
 
                 <div className="flex lg:gap-2 items-center flex-nowrap">
@@ -105,12 +109,14 @@ function NavBarDashboard() {
                         </IconButton>
                     </div>
                 </div>
+
             </div>
 
             <ProfileDrawerComponent
                 open={drawerOpen}
                 onClose={() => dispatch(setIsOpenDrawerProfiles(false))}
             />
+
         </>
     );
 }
