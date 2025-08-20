@@ -88,14 +88,6 @@ function QuickEditBranchComponent() {
     siteTypeId: Yup.string().required(t("branchTypeIsRequired")),
   });
 
-  const style = {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    height: "100vh",
-  };
-
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       await updateSite({

@@ -36,37 +36,21 @@ import GarageTwoToneIcon from "@mui/icons-material/GarageTwoTone";
 
 function SideBar() {
   const isCollapsed = useSelector((state) => state.action.isCollapsed);
-  const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
   const [isOverviewOpen, setIsOverviewOpen] = useState(true);
   const [isManagementOpen, setIsManagementOpen] = useState(true);
-  const [isSubParkingOpen, setIsSubParkingOpen] = useState(false);
-  const [isParkingOpen, setIsParkingOpen] = useState(false);
   const [isVehicleOpen, setIsVehicleOpen] = useState(false);
-  const [isBranchOpen, setIsBranchOpen] = useState(false);
-  const [isCompanyOpen,setIsCompanyOpen]=useState(false);
-  const [isSlotOpen,setIsSlotOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const { isManager, isDash, isUser } = useAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const isVehiclesListPage = location.pathname === "/dash/vehicles";
   const isVehiclesCreatePage = location.pathname === "/dash/vehicles/new";
-  const isParkingListPage = location.pathname === "/dash/parking-spaces";
-  const isParkingCreatePage = location.pathname === "/dash/parking-spaces/new";
   const isUserListPage = location.pathname === "/dash/users";
   const isUserCreatePage = location.pathname === "/dash/users/new";
   const isReportListPage = location.pathname === "/dash/reports";
   const isReportCreatePage = location.pathname === "/dash/reports/new";
-  const isHistoryPage = location.pathname === "/dash/history";
-  const isBranchListPage = location.pathname === "/dash/branches";
-  const isBranchCreatePage = location.pathname === "/dash/branches/new";
-  const isCompanyCreatePage=location.pathname === "/dash/companies";
-  const isCompanyListPage=location.pathname === "/dash/companies/new";
-  const isSlotCreatePage = location.pathname === "/dash/parking-slots";
-  const isSlotListPage = location.pathname === "/dash/parking-slots/new";
 
 
 

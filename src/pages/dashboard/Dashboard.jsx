@@ -107,9 +107,7 @@ const Dashboard = () => {
     const {t} = useTranslate();
     const {isAdmin, isManager} = useAuth();
     const [isLoaded, setIsLoaded] = useState(false);
-    const {data: analysisData, isLoading, isSuccess, refetch} = useGetAnalysisQuery("analysisList");
-    const isRefetchCheckIn = useSelector((state) => state.checkIn.isRefetchCheckIn);
-    const isRefetchCheckOut = useSelector((state) => state.checkOut.isRefetchCheckOut);
+    const {data: analysisData, isLoading, isSuccess} = useGetAnalysisQuery("analysisList");
 
     // Get the current theme from Material-UI
     const theme = useTheme();
@@ -120,12 +118,6 @@ const Dashboard = () => {
     const hasParkingAreasUtilization = Array.isArray(parkingAreasUtilization) && parkingAreasUtilization.length > 0;
     const parkingAreasDetails = analysisData?.parkingAreasDetails ?? [];
     const hasParkingAreasDetails = Array.isArray(parkingAreasDetails) && parkingAreasDetails.length > 0;
-
-    useEffect(() => {
-        if (isRefetchCheckIn || isRefetchCheckOut) {
-            refetch();
-        }
-    }, [isRefetchCheckOut, isRefetchCheckIn]);
 
     useEffect(() => {
         const timer = setTimeout(() => setIsLoaded(true), 300);
@@ -259,7 +251,7 @@ const Dashboard = () => {
                         {isManager && (
                             <StatCard
                                 icon={Navigation}
-                                title={t('activeSession')}
+                                title={t('occupiedParking')}
                                 value={analysisData.totalStats.activeSessionCount}
                                 percentage="+0%"
                                 trend="up"
@@ -271,7 +263,7 @@ const Dashboard = () => {
                         {isManager && (
                             <StatCard
                                 icon={BarChart3}
-                                title="Check-ins"
+                                title={t('vehicleEntry')}
                                 value={`${analysisData.totalStats.checkInCount}`}
                                 percentage="+2.1%"
                                 trend="up"
@@ -282,7 +274,7 @@ const Dashboard = () => {
                         )}
                         <StatCard
                             icon={Activity}
-                            title="Occupancy Rate"
+                            title={t('occupancyRate')}
                             value={`${analysisData.totalStats.occupancyRate}%`}
                             percentage="+2.1%"
                             trend="up"

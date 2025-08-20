@@ -255,10 +255,26 @@ export const userApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
+    getReportUserPdf: builder.mutation({
+      query: () => ({
+        url: "/users/report/pdf",
+        responseHandler: (res) => res.blob()
+      }),
+    }),
+
+    getReportUserExcel: builder.mutation({
+      query: () => ({
+        url: "/users/report/excel",
+        responseHandler: (res) => res.blob()
+      }),
+    })
+
   }),
 });
 
 export const {
+  useGetReportUserExcelMutation,
+  useGetReportUserPdfMutation,
   useFilterReportUsersQuery,
   useSearchUserQuery,
   useGetAllSignUpMethodsQuery,

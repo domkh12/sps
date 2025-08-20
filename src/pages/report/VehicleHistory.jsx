@@ -1,11 +1,14 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import SeoComponent from '../../components/SeoComponent'
 import MainHeaderComponent from '../../components/MainHeaderComponent'
 import { Card, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
 import useTranslate from '../../hook/useTranslate';
 import { useNavigate } from 'react-router-dom';
 import DateFilterComponent from '../../components/DateFilterComponent';
-import { useFilterReportVehiclesQuery, useGetVehiclesQuery } from '../../redux/feature/vehicles/vehicleApiSlice';
+import {
+  useFilterReportVehiclesQuery, useGetReportVehicleExcelMutation, useGetReportVehiclePdfMutation,
+  useGetVehiclesQuery
+} from '../../redux/feature/vehicles/vehicleApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingFetchingDataComponent from '../../components/LoadingFetchingDataComponent';
 import SkeletonTableRowComponent from '../../components/SkeletonTableRowComponent';
@@ -13,6 +16,8 @@ import VehicleRowReportComponent from '../../components/VehicleRowReportComponen
 import { setPageNo, setPageSize } from '../../redux/feature/vehicles/vehicleSlice';
 import DataNotFound from '../../components/DataNotFound';
 import dayjs from 'dayjs';
+import PdfModalPreviewComponent from "../../components/PdfModalPreviewComponent.jsx";
+import {setIsOpenPdfModal} from "../../redux/feature/actions/actionSlice.js";
 
 function VehicleHistory() {
   const navigate = useNavigate();
@@ -22,6 +27,38 @@ function VehicleHistory() {
   const pageSize = useSelector((state) => state.vehicles.pageSize);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [pdfUrl, setPdfUrl] = useState("");
+
+  const [getReportVehicleExcel,
+    {
+      isSuccess: isSuccessGetReportVehicleExcel,
+      isLoading: isLoadingGetReportVehicleExcel,
+      isError: isErrorGetReportVehicleExcel,
+      error: errorGetReportVehicleExcel,
+    }
+  ] = useGetReportVehicleExcelMutation();
+
+  const [getReportVehiclePdf,
+    {
+      isSuccess: isSuccessGetReportVehiclePdf,
+      isLoading: isLoadingGetReportVehiclePdf,
+      isError: isErrorGetReportVehiclePdf,
+      error: errorGetReportVehiclePdf,
+    }
+  ] = useGetReportVehiclePdfMutation();
+
+  const handleBtnPdfClick = async () => {
+    dispatch(setIsOpenPdfModal(true));
+    const blob = await getReportVehiclePdf().unwrap();
+    const url = URL.createObjectURL(blob);
+    setPdfUrl(url);
+  }
+
+  const handleBtnExcelClick = async () => {
+    const blob = await getReportVehicleExcel().unwrap();
+    const url = URL.createObjectURL(blob);
+    window.open(url);
+  }
 
   const {
     data: vehicles,
@@ -75,8 +112,7 @@ function VehicleHistory() {
       minWidth: 120,
       align: "left",
     },
-    { id: "licensePlateProvinceKh", label: t('licensePlateProvinceNameKh'), minWidth: 170, align: "left" },   
-    { id: "licensePlateProvinceEn", label: t('licensePlateProvinceNameEn'), minWidth: 170, align: "left" },   
+    { id: "licensePlateProvinceKh", label: t('licensePlateProvinceNameKh'), minWidth: 170, align: "left" },
     { id: "owner", label: t('owner'), minWidth: 170, align: "left" },   
     { id: "model", label: t('model'), minWidth: 170, align: "left" },  
     { id: "make", label: t('make'), minWidth: 170, align: "left" }, 
@@ -93,13 +129,6 @@ function VehicleHistory() {
       minWidth: 120,
       align: "left",
       format: (value) => value.toLocaleString("en-US"),
-    },
-    {
-      id: "createdAt",
-      label: t("createdAt"),
-      minWidth: 120,
-      align: "left",
-      format: (value) => value.toFixed(2),
     }
   ];
 
@@ -184,7 +213,15 @@ function VehicleHistory() {
         />
 
         <Card>
-          <DateFilterComponent setFromDate={setFromDate} setToDate={setToDate} fromDate={fromDate == "" ? null : fromDate} toDate={toDate == "" ? null : toDate}/>
+          <DateFilterComponent
+              setFromDate={setFromDate}
+              setToDate={setToDate}
+              fromDate={fromDate == "" ? null : fromDate}
+              toDate={toDate == "" ? null : toDate}
+              onClickPdf={handleBtnPdfClick}
+              onClickExcel={handleBtnExcelClick}
+              isLoadingExcel={isLoadingGetReportVehicleExcel}
+          />
 
           <TableContainer>
               <Table>
@@ -232,6 +269,7 @@ function VehicleHistory() {
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
         </Card>
+        <PdfModalPreviewComponent pdfUrl={pdfUrl} isLoading={isLoadingGetReportVehiclePdf} isSuccess={isSuccessGetReportVehiclePdf}/>
       </div>
       )
   }

@@ -29,12 +29,6 @@ function VehicleRowReportComponent({vehicleId, vehicle}) {
 
           <TableCell sx={{ borderBottomStyle: "dashed" }}>
             <Typography variant="body1">
-              {vehicle?.licensePlateProvince?.provinceNameEn || "N/A"}
-            </Typography>
-          </TableCell>
-
-          <TableCell sx={{ borderBottomStyle: "dashed" }}>
-            <Typography variant="body1">
               {vehicle?.user?.fullName || "N/A"}
             </Typography>
           </TableCell>
@@ -59,21 +53,6 @@ function VehicleRowReportComponent({vehicleId, vehicle}) {
   
           <TableCell sx={{ borderBottomStyle: "dashed" }}>                        
               <Typography variant="body1">{vehicle?.color || "N/A"}</Typography>            
-          </TableCell>
-  
-          <TableCell sx={{borderBottomStyle: "dashed"}}>
-            <Typography variant="body1">
-              {vehicle.createdAt.substring(
-                  0,
-                  vehicle.createdAt.lastIndexOf(" ")
-              )}
-            </Typography>
-            <Typography variant="body2" color="gray">
-              {vehicle.createdAt.substring(
-                  vehicle.createdAt.lastIndexOf(" "),
-                  vehicle.createdAt.length
-              )}
-            </Typography>
           </TableCell>
         
         </TableRow>

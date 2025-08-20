@@ -18,6 +18,7 @@ import {toast, Slide} from "react-toastify";
 import {setIsRefetchCheckIn} from "../../redux/feature/checkIn/checkInSlice.js";
 import {setIsRefetchCheckOut} from "../../redux/feature/checkOut/checkOutSlice.js";
 import {Box, Paper} from "@mui/material";
+import {useGetAnalysisQuery} from "../../redux/feature/analysis/analysisApiSlice.js";
 
 function AdminLayout() {
   const mainContentRef = useRef(null);
@@ -33,6 +34,7 @@ function AdminLayout() {
   const {data: userProfile, isSuccess: isSuccessGetUserProfile, isLoading: isLoadingGetUserProfile} = useGetUserProfileQuery("userProfile");
   const {messages: messageCheckOut, isConnected: isConnectedCheckOut, isLoading: isLoadingCheckOut} = useWebSocket("/topic/check-out");
   const {messages: messageCheckIn, isConnected, isLoading} = useWebSocket("/topic/check-in");
+    const {data: analysisData, isLoading: isLoadingAnalysis, isSuccess, refetch} = useGetAnalysisQuery("analysisList");
 
     useEffect(() => {
         if (messageCheckIn) {
@@ -90,6 +92,13 @@ function AdminLayout() {
             }, 1000)
         }
     }, [messageCheckOut, dispatch]);
+
+
+    useEffect(() => {
+        if (messageCheckIn || messageCheckOut) {
+            refetch();
+        }
+    }, [messageCheckIn, messageCheckOut]);
 
   useEffect(() => {
     const handleScroll = () => {

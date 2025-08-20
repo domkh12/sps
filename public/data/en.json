@@ -274,5 +274,7 @@
   "checkYourKeyword": "Check your keyword",
   "totalUser": "Total user",
   "totalVehicle": "Total vehicle",
-  "avgStayTime": "Avg Stay Time"
+  "avgStayTime": "Avg Stay Time",
+  "occupancyRate": "Occupancy Rate",
+  "occupiedParking": "Occupied Parking"
 }

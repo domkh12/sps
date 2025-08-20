@@ -17,8 +17,12 @@ const actionSlice = createSlice({
     isOpenSidebarDrawer: false,
     isSettingDrawerOpen: false,
     isOpenUtilSearch: false,
+    isOpenPdfModal: false,
   },
   reducers: {
+    setIsOpenPdfModal(state, action) {
+      state.isOpenPdfModal = action.payload;
+    },
     setIsOpenUtilSearch(state, action) {
       state.isOpenUtilSearch = action.payload;
     },
@@ -65,6 +69,7 @@ const actionSlice = createSlice({
 });
 
 export const {
+  setIsOpenPdfModal,
   setIsOpenUtilSearch,
   setIsSettingDrawerOpen,
   setIsOpenSidebarDrawer,

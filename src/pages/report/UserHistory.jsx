@@ -2,7 +2,11 @@ import { useNavigate } from "react-router-dom";
 import useTranslate from "../../hook/useTranslate";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
-import {useFilterReportUsersQuery, useGetUsersQuery} from "../../redux/feature/users/userApiSlice.js";
+import {
+  useFilterReportUsersQuery, useGetReportUserExcelMutation,
+  useGetReportUserPdfMutation,
+  useGetUsersQuery
+} from "../../redux/feature/users/userApiSlice.js";
 import dayjs from "dayjs";
 import {
   Card,
@@ -23,6 +27,8 @@ import SeoComponent from "../../components/SeoComponent.jsx";
 import MainHeaderComponent from "../../components/MainHeaderComponent.jsx";
 import DateFilterComponent from "../../components/DateFilterComponent.jsx";
 import SkeletonTableRowComponent from "../../components/SkeletonTableRowComponent.jsx";
+import PdfModalPreviewComponent from "../../components/PdfModalPreviewComponent.jsx";
+import {setIsOpenPdfModal} from "../../redux/feature/actions/actionSlice.js";
 
 function UserHistory() {
   const navigate = useNavigate();
@@ -32,6 +38,7 @@ function UserHistory() {
   const pageSize = useSelector((state) => state.users.pageSize);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [pdfUrl, setPdfUrl] = useState("");
 
   const {
     data: users,
@@ -40,13 +47,25 @@ function UserHistory() {
     isError: isErrorGetUsers,
     error,
   } = useGetUsersQuery(
-    { pageNo, pageSize },
-    {
-      pollingInterval: 60000,
-      refetchOnFocus: true,
-      refetchOnMountOrArgChange: true,
-    }
+    { pageNo, pageSize }
   );
+
+  const [getReportUserPdf,{
+      isSuccess: isSuccessGetReportUserPdf,
+      isLoading: isLoadingGetReportUserPdf,
+      isError: isErrorGetReportUserPdf,
+      mutate: mutateGetReportUserPdf,
+    }] = useGetReportUserPdfMutation();
+
+
+  const [getReportUserExcel,
+    {
+      isSuccess: isSuccessGetReportUserExcel,
+      isLoading: isLoadingGetReportUserExcel,
+      isError: isErrorGetReportUserExcel,
+      error: errorGetReportUserExcel,
+    }
+  ] = useGetReportUserExcelMutation();
 
   const {
     data: userFilterData,
@@ -86,31 +105,9 @@ function UserHistory() {
       align: "left",
     },
     { id: "gender", label: t('gender'), minWidth: 170, align: "left" },   
-    { id: "dateOfBirth", label: t('dateOfBirth'), minWidth: 170, align: "left" },   
-    { id: "phoneNumber", label: t('phoneNumber'), minWidth: 170, align: "left" },   
-    { id: "email", label: t('email'), minWidth: 170, align: "left" },  
-    { id: "signUpMethod", label: t('signUpMethod'), minWidth: 170, align: "left" }, 
-    {
-      id: "status",
-      label: t("status"),
-      minWidth: 120,
-      align: "left",
-      format: (value) => value.toLocaleString("en-US"),
-    },
-    {
-      id: "branch",
-      label: t('branch'),
-      minWidth: 120,
-      align: "left",
-      format: (value) => value.toLocaleString("en-US"),
-    },
-    {
-      id: "createdAt",
-      label: t("createdAt"),
-      minWidth: 120,
-      align: "left",
-      format: (value) => value.toFixed(2),
-    }
+    { id: "dateOfBirth", label: t('dateOfBirth'), minWidth: 170, align: "left" },
+    { id: "email", label: t('email'), minWidth: 170, align: "left" },
+    { id: "phoneNumber", label: t('phoneNumber'), minWidth: 170, align: "left" },
   ];
 
   const handleChangePage = (event, newPage) => {
@@ -121,6 +118,19 @@ function UserHistory() {
     dispatch(setPageSizeReportUser(event.target.value));
     dispatch(setPageNoReportUser(1));
   };
+
+  const handleBtnPdfClick = async () => {
+    dispatch(setIsOpenPdfModal(true));
+    const blob = await getReportUserPdf().unwrap();
+    const url = URL.createObjectURL(blob);
+    setPdfUrl(url);
+  }
+
+  const handleBtnExcelClick = async () => {
+    const blob = await getReportUserExcel().unwrap();
+    const url = URL.createObjectURL(blob);
+    window.open(url);
+  }
 
   let content;
 
@@ -194,7 +204,15 @@ function UserHistory() {
         />
 
         <Card>
-          <DateFilterComponent setFromDate={setFromDate} setToDate={setToDate} fromDate={fromDate == "" ? null : fromDate} toDate={toDate == "" ? null : toDate}/>
+          <DateFilterComponent
+              setFromDate={setFromDate}
+              setToDate={setToDate}
+              fromDate={fromDate == "" ? null : fromDate}
+              toDate={toDate == "" ? null : toDate}
+              onClickPdf={handleBtnPdfClick}
+              onClickExcel={handleBtnExcelClick}
+              isLoadingExcel={isLoadingGetReportUserExcel}
+          />
 
           <TableContainer>
               <Table>
@@ -242,6 +260,7 @@ function UserHistory() {
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
         </Card>
+        <PdfModalPreviewComponent pdfUrl={pdfUrl} isLoading={isLoadingGetReportUserPdf} isSuccess={isSuccessGetReportUserPdf}/>
       </div>
       )
   }

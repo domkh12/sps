@@ -32,6 +32,7 @@ import {
 function QuickEditCompanyComponent() {
     const isQuickEditCompanyOpen = useSelector((state) => state.companies.isQuickEditCompanyOpen);
     const company = useSelector((state) => state.companies.companyDataForQuickEdit);
+    console.log({company})
     const { t } = useTranslate();
     const dispatch = useDispatch();
     const isQuickEditCompanyTypeOpen = useSelector((state) => state.companyType.isOpenQuickEditCompanyType);
@@ -263,7 +264,7 @@ function QuickEditCompanyComponent() {
                                                 error={errors.cityUuid}
                                                 touched={touched.cityUuid}
                                                 optionLabelKey="name"
-                                                selectFistValue={values.citiUuid}
+                                                selectFistValue={values.cityUuid}
                                                 isEditable={true}
                                                 onClickQuickEdit={(value) => {
                                                     dispatch(setIsOpenQuickEditCity(true));

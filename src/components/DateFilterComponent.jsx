@@ -3,7 +3,7 @@ import { DatePicker } from '@mui/x-date-pickers'
 import React from 'react'
 import useTranslate from '../hook/useTranslate'
 
-function DateFilterComponent({setFromDate, setToDate, fromDate, toDate}) {
+function DateFilterComponent({setFromDate, setToDate, fromDate, toDate, onClickPdf, onClickExcel, isLoadingExcel}) {
   const {t} = useTranslate();
 
   return (
@@ -34,9 +34,7 @@ function DateFilterComponent({setFromDate, setToDate, fromDate, toDate}) {
               variant="contained"
               color="primary"
               sx={{ mr: 1, minWidth: 120 }}
-              onClick={() => {
-                // TODO: Implement export PDF logic
-              }}
+              onClick={onClickPdf}
             >
               {t("exportPDF") || "Export PDF"}
             </Button>
@@ -44,21 +42,10 @@ function DateFilterComponent({setFromDate, setToDate, fromDate, toDate}) {
               variant="contained"
               color="success"
               sx={{ mr: 1, minWidth: 120 }}
-              onClick={() => {
-                // TODO: Implement export Excel logic
-              }}
+              onClick={onClickExcel}
+              loading={isLoadingExcel}
             >
               {t("exportExcel") || "Export Excel"}
-            </Button>
-            <Button
-              variant="contained"
-              color="warning"
-              sx={{ minWidth: 120 }}
-              onClick={() => {
-                // TODO: Implement export CSV logic
-              }}
-            >
-              {t("exportCSV") || "Export CSV"}
             </Button>
         </div>
       </div>

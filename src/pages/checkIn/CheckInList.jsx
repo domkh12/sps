@@ -27,16 +27,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { DatePicker } from "@mui/x-date-pickers";
 import {
   setDateFromCheckIn,
-  setDateToCheckIn, setIsRefetchCheckIn,
+  setDateToCheckIn,
   setKeywordsCheckIn, setPageNoCheckIn, setPageSizeCheckIn,
 } from "../../redux/feature/checkIn/checkInSlice.js";
 import dayjs from "dayjs";
 import SearchComponent from "../../components/SearchComponent.jsx";
 import TableActionMenuComponent from "../../components/TableActionMenuComponent.jsx";
-import useWebSocket from "../../hook/useWebSocket.jsx";
 import {useEffect} from "react";
 import FilterChipsComponent from "../../components/FilterChipsComponent.jsx";
-import {setIsRefetchCheckOut} from "../../redux/feature/checkOut/checkOutSlice.js";
 import useAuth from "../../hook/useAuth.jsx";
 
 function CheckInList() {
@@ -59,8 +57,6 @@ function CheckInList() {
     data: checkInData,
     isSuccess: isSuccessCheckIn,
     isLoading: isLoadingCheckIn,
-    isError: isErrorCheckIn,
-    error: errorCheckIn,
     refetch: refetchCheckIn,
   } = useGetCheckInQuery("checkInList");
 
@@ -76,7 +72,6 @@ function CheckInList() {
       dateFrom: dateFrom ? dayjs(dateFrom).format("YYYY-MM-DDTHH:mm:ss") : "",
       dateTo: dateTo ? dayjs(dateTo).format("YYYY-MM-DDTHH:mm:ss") : "",
     });
-
 
   useEffect(() => {
     if (isRefetchCheckIn || isRefetchCheckOut) {

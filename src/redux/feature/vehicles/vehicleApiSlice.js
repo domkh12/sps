@@ -155,12 +155,29 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
           return [{type: "VehicleByUuid", id: "LIST"}, ...result.ids.map((id) => ({type: "VehicleByUuid", id})),];
         } else return [{type: "VehicleByUuid", id: "LIST"}];
       },
+    }),
+
+    getReportVehiclePdf: builder.mutation({
+      query: () => ({
+        url: "/vehicles/report/pdf",
+        responseHandler: (res) => res.blob()
+      }),
+    }),
+
+
+    getReportVehicleExcel: builder.mutation({
+      query: () => ({
+        url: "/vehicles/report/excel",
+        responseHandler: (res) => res.blob()
+      }),
     })
 
   }),
 });
 
 export const {
+  useGetReportVehicleExcelMutation,
+  useGetReportVehiclePdfMutation,
   useFilterReportVehiclesQuery,
   useGetVehicleByUuidQuery,
   useGetVehiclesQuery,
