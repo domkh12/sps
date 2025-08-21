@@ -275,5 +275,17 @@
   "totalVehicle": "រថយន្តសរុប",
   "avgStayTime": "ពេលវេលាស្ថិតនៅជាមធ្យម",
   "occupancyRate": "ភាគរយចត",
-  "occupiedParking": "កន្លែងចតកំពុងប្រើប្រាស់"
+  "occupiedParking": "កន្លែងចតកំពុងប្រើប្រាស់",
+  "hourlyVehicleEntry": "រថយន្តចូលរៀងរាល់ម៉ោង",
+  "hourlyVehicleExit": "រថយន្តចេញរៀងរាល់ម៉ោង",
+  "weeklyAverageStayTime": "រយៈពេលស្នាក់នៅជាមធ្យមប្រចាំសប្តាហ៍",
+  "usage": "ការប្រើប្រាស់",
+  "branches": "សាខា",
+  "companies": "ក្រុមហ៊ុន",
+  "parkingSpaces": "ទីធ្លាចតរថយន្ត",
+  "totalSlots": "ចំណតសរុប",
+  "occupiedSlots": "ចំណតដែលកាន់កាប់",
+  "available": "ទំនេរ",
+  "occupancy": "កាន់កាប់",
+  "parking": "ចំណតរថយន្ត"
 }

@@ -306,7 +306,7 @@ const Dashboard = () => {
                         >
                             <h3 className="text-xl font-semibold mb-4 flex items-center">
                                 <Clock className="mr-2" size={20}/>
-                                Hourly Vehicle Entry
+                                {t('hourlyVehicleEntry')}
                             </h3>
                             <Chart
                                 options={{
@@ -379,7 +379,7 @@ const Dashboard = () => {
                          >
                              <h3 className="text-xl font-semibold mb-4 flex items-center">
                                  <Clock className="mr-2" size={20}/>
-                                 Hourly Vehicle Exit
+                                 {t('hourlyVehicleExit')}
                              </h3>
                              <Chart
                                  options={{
@@ -451,7 +451,7 @@ const Dashboard = () => {
                             >
                                 <h3 className="text-xl font-semibold mb-4 flex items-center">
                                     <Clock className="mr-2" size={20}/>
-                                    Weekly Average Stay Time
+                                    {t('weeklyAverageStayTime')}
                                 </h3>
                                 <Chart
                                     options={{
@@ -533,7 +533,7 @@ const Dashboard = () => {
                                 }`}
                             >
                                 <h3 className="text-xl font-semibold mb-4">
-                                    Parking Areas Utilization
+                                    {t('usage')}
                                 </h3>
                                 <Chart
                                     options={{
@@ -623,7 +623,7 @@ const Dashboard = () => {
                             >
                                 <h3 className="text-xl font-semibold mb-4 flex items-center">
                                     <Clock className="mr-2" size={20}/>
-                                    Weekly Average Stay Time
+                                    {t('weeklyAverageStayTime')}
                                 </h3>
                                 <Chart
                                     options={{
@@ -702,7 +702,7 @@ const Dashboard = () => {
                                 }`}
                             >
                                 <h3 className="text-xl font-semibold mb-4">
-                                    Company Slot Distribution
+                                    {t('companies')}
                                 </h3>
                                 <Chart
                                     options={{
@@ -789,7 +789,7 @@ const Dashboard = () => {
                                 }`}
                             >
                                 <h3 className="text-xl font-semibold mb-4">
-                                    Branch Performance
+                                    {t('branches')}
                                 </h3>
                                 <div className="space-y-4 max-h-64 overflow-y-auto">
                                     {analysisData.branchData.map((branch, index) => (
@@ -851,25 +851,25 @@ const Dashboard = () => {
 
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
-                                            <span>Branches</span>
+                                            <span>{t('branches')}</span>
                                             <span className="font-medium">{company.branches}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Parking Areas</span>
+                                            <span>{t('parkingSpaces')}</span>
                                             <span className="font-medium">{company.totalAreas}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Total Slots</span>
+                                            <span>{t("totalSlots")}</span>
                                             <span className="font-medium">{company.totalSlots}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Occupied Slots</span>
+                                            <span>{t('occupiedSlots')}</span>
                                             <span className="font-medium text-blue-600">
                                                 {company.occupiedSlots}
                                             </span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span>Avg Stay Time</span>
+                                            <span>{t('avgStayTime')}</span>
                                             <span className="font-medium text-green-600">
                                                 {formatMinutesToHoursMinutes(company.avgStayTime)}
                                             </span>
@@ -877,7 +877,7 @@ const Dashboard = () => {
 
                                         <div className="mt-4">
                                             <div className="flex justify-between text-sm mb-1">
-                                                <span>Occupancy Rate</span>
+                                                <span>{t('occupancyRate')}</span>
                                                 <span>
                                                     {(company.totalSlots && company.totalSlots > 0)
                                                         ? (((company.occupiedSlots || 0) / company.totalSlots) * 100).toFixed(1)
@@ -914,7 +914,7 @@ const Dashboard = () => {
                                 }`}
                             >
                                 <h3 className="text-xl font-semibold mb-6">
-                                    Parking Areas Performance
+                                    {t('parking')}
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {/* Map through parkingAreasDetails or show not found */}
@@ -937,21 +937,21 @@ const Dashboard = () => {
                                                 </div>
                                                 <div className="space-y-2">
                                                     <div className="flex justify-between text-sm">
-                                                        <span >Total Slots</span>
+                                                        <span >{t('totalSlots')}</span>
                                                         <span className="font-medium">{area.totalSlots}</span>
                                                     </div>
                                                     <div className="flex justify-between text-sm">
-                                                        <span >Occupied</span>
+                                                        <span >{t('occupied')}</span>
                                                         <span className="font-medium text-blue-600">{area.occupied}</span>
                                                     </div>
                                                     <div className="flex justify-between text-sm">
-                                                        <span >Available</span>
+                                                        <span >{t('available')}</span>
                                                         <span className="font-medium text-green-600">{area.available}</span>
                                                     </div>
                                                 </div>
                                                 <div className="mt-3">
                                                     <div className="flex justify-between text-xs mb-1">
-                                                        <span>Occupancy</span>
+                                                        <span>{t("occupancy")}</span>
                                                         <span>{area.occupancyRate}%</span>
                                                     </div>
                                                     <div className="w-full bg-gray-200 rounded-full h-2">

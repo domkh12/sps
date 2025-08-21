@@ -158,16 +158,16 @@ export const vehicleApiSlice = apiSlice.injectEndpoints({
     }),
 
     getReportVehiclePdf: builder.mutation({
-      query: () => ({
-        url: "/vehicles/report/pdf",
+      query: ({dateFrom = "", dateTo = ""}) => ({
+        url: `/vehicles/report/pdf?dateFrom=${dateFrom}&dateTo=${dateTo}`,
         responseHandler: (res) => res.blob()
       }),
     }),
 
 
     getReportVehicleExcel: builder.mutation({
-      query: () => ({
-        url: "/vehicles/report/excel",
+      query: ({dateFrom = "", dateTo = ""}) => ({
+        url: `/vehicles/report/excel?dateFrom=${dateFrom}&dateTo=${dateTo}`,
         responseHandler: (res) => res.blob()
       }),
     })

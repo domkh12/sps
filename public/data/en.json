@@ -276,5 +276,17 @@
   "totalVehicle": "Total vehicle",
   "avgStayTime": "Avg Stay Time",
   "occupancyRate": "Occupancy Rate",
-  "occupiedParking": "Occupied Parking"
+  "occupiedParking": "Occupied Parking",
+  "hourlyVehicleEntry": "Hourly Vehicle Entry",
+  "hourlyVehicleExit": "Hourly Vehicle Exit",
+  "weeklyAverageStayTime": "Weekly Average Stay Time",
+  "usage": "Usage",
+  "branches": "Branches",
+  "companies": "Companies",
+  "parkingSpaces": "Parking spaces",
+  "totalSlots": "Total slots",
+  "occupiedSlots": "Occupied Slots",
+  "available": "Available",
+  "occupancy": "Occupancy",
+  "parking": "Parking"
 }

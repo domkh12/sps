@@ -12,7 +12,6 @@ function VehicleRowReportComponent({vehicleId, vehicle}) {
       return (
         <TableRow hover>
           <TableCell padding="checkbox" sx={{ borderBottomStyle: "dashed" }}>
-            <Checkbox color="primary" />
           </TableCell>                   
   
           <TableCell sx={{ borderBottomStyle: "dashed" }}>

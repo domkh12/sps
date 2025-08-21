@@ -87,7 +87,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
-    filterReportUsers: builder.query({
+    getAllReportUser: builder.query({
       query: ({
         pageNo = 1,
         pageSize = 5,
@@ -256,15 +256,15 @@ export const userApiSlice = apiSlice.injectEndpoints({
     }),
 
     getReportUserPdf: builder.mutation({
-      query: () => ({
-        url: "/users/report/pdf",
+      query: ({dateFrom = "", dateTo = ""}) => ({
+        url: `/users/report/pdf?dateFrom=${dateFrom}&dateTo=${dateTo}`,
         responseHandler: (res) => res.blob()
       }),
     }),
 
     getReportUserExcel: builder.mutation({
-      query: () => ({
-        url: "/users/report/excel",
+      query: ({dateFrom = "", dateTo = ""}) => ({
+        url: `/users/report/excel?dateFrom=${dateFrom}&dateTo=${dateTo}`,
         responseHandler: (res) => res.blob()
       }),
     })
@@ -273,9 +273,9 @@ export const userApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
+  useGetAllReportUserQuery,
   useGetReportUserExcelMutation,
   useGetReportUserPdfMutation,
-  useFilterReportUsersQuery,
   useSearchUserQuery,
   useGetAllSignUpMethodsQuery,
   useGetAllRolesQuery,

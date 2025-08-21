@@ -49,13 +49,21 @@ function VehicleHistory() {
 
   const handleBtnPdfClick = async () => {
     dispatch(setIsOpenPdfModal(true));
-    const blob = await getReportVehiclePdf().unwrap();
+    const blob = await getReportVehiclePdf(
+        {
+          dateFrom: fromDate !== "" ? dayjs(fromDate).format("YYYY-MM-DDTHH:mm:ss") : "",
+          dateTo: toDate !== "" ? dayjs(toDate).endOf('day').format("YYYY-MM-DDTHH:mm:ss") : "",
+        }
+    ).unwrap();
     const url = URL.createObjectURL(blob);
     setPdfUrl(url);
   }
 
   const handleBtnExcelClick = async () => {
-    const blob = await getReportVehicleExcel().unwrap();
+    const blob = await getReportVehicleExcel({
+      dateFrom: fromDate !== "" ? dayjs(fromDate).format("YYYY-MM-DDTHH:mm:ss") : "",
+      dateTo: toDate !== "" ? dayjs(toDate).endOf('day').format("YYYY-MM-DDTHH:mm:ss") : "",
+    }).unwrap();
     const url = URL.createObjectURL(blob);
     window.open(url);
   }
@@ -66,13 +74,8 @@ function VehicleHistory() {
     isSuccess : isSuccessGetVehicles,
     isError: isErrorGetVehicles,
     error,
-  } = useGetVehiclesQuery(
-    { pageNo, pageSize },
-    {
-      pollingInterval: 60000,
-      refetchOnFocus: true,
-      refetchOnMountOrArgChange: true,
-    }
+  } = useFilterReportVehiclesQuery(
+    { pageNo, pageSize }
   );
 
   const {
@@ -82,7 +85,7 @@ function VehicleHistory() {
     {
       pageNo, pageSize,
       dateFrom: dayjs(fromDate).format("YYYY-MM-DDTHH:mm:ss"),
-      dateTo: dayjs(toDate).format("YYYY-MM-DDTHH:mm:ss"),
+      dateTo: dayjs(toDate).endOf('day').format("YYYY-MM-DDTHH:mm:ss"),
     },
     {
       skip: !fromDate || !toDate,
@@ -227,19 +230,7 @@ function VehicleHistory() {
               <Table>
                 <TableHead sx={{ backgroundColor: "#F4F6F8" }}>
                   <TableRow>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        sx={{
-                          "&.Mui-checked": {
-                            color: "#2C3092",
-                          },
-                          "&:hover": {
-                            color: "#2C3092",
-                          },
-                        }}
-                        color="primary"
-                      />
-                    </TableCell>
+                    <TableCell padding="checkbox"></TableCell>
                     {columns.map((column) => (
                       <TableCell
                         key={column.id}

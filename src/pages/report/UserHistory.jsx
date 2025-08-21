@@ -3,14 +3,12 @@ import useTranslate from "../../hook/useTranslate";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import {
-  useFilterReportUsersQuery, useGetReportUserExcelMutation,
+  useGetAllReportUserQuery, useGetReportUserExcelMutation,
   useGetReportUserPdfMutation,
-  useGetUsersQuery
 } from "../../redux/feature/users/userApiSlice.js";
 import dayjs from "dayjs";
 import {
   Card,
-  Checkbox,
   Table,
   TableBody,
   TableCell,
@@ -46,15 +44,13 @@ function UserHistory() {
     isSuccess : isSuccessGetUsers,
     isError: isErrorGetUsers,
     error,
-  } = useGetUsersQuery(
+  } = useGetAllReportUserQuery(
     { pageNo, pageSize }
   );
 
   const [getReportUserPdf,{
       isSuccess: isSuccessGetReportUserPdf,
       isLoading: isLoadingGetReportUserPdf,
-      isError: isErrorGetReportUserPdf,
-      mutate: mutateGetReportUserPdf,
     }] = useGetReportUserPdfMutation();
 
 
@@ -62,19 +58,17 @@ function UserHistory() {
     {
       isSuccess: isSuccessGetReportUserExcel,
       isLoading: isLoadingGetReportUserExcel,
-      isError: isErrorGetReportUserExcel,
-      error: errorGetReportUserExcel,
     }
   ] = useGetReportUserExcelMutation();
 
   const {
     data: userFilterData,
     isFetching: isFetchingGetParkingSpaceFilter,
-  } = useFilterReportUsersQuery(
+  } = useGetAllReportUserQuery(
     {
       pageNo, pageSize,
       dateFrom: dayjs(fromDate).format("YYYY-MM-DDTHH:mm:ss"),
-      dateTo: dayjs(toDate).format("YYYY-MM-DDTHH:mm:ss"),
+      dateTo: dayjs(toDate).endOf('day').format("YYYY-MM-DDTHH:mm:ss"),
     },
     {
       skip: !fromDate || !toDate,
@@ -121,13 +115,19 @@ function UserHistory() {
 
   const handleBtnPdfClick = async () => {
     dispatch(setIsOpenPdfModal(true));
-    const blob = await getReportUserPdf().unwrap();
+    const blob = await getReportUserPdf({
+      dateFrom: fromDate !== "" ? dayjs(fromDate).format("YYYY-MM-DDTHH:mm:ss") : "",
+      dateTo: toDate !== "" ? dayjs(toDate).endOf('day').format("YYYY-MM-DDTHH:mm:ss") : "",
+    }).unwrap();
     const url = URL.createObjectURL(blob);
     setPdfUrl(url);
   }
 
   const handleBtnExcelClick = async () => {
-    const blob = await getReportUserExcel().unwrap();
+    const blob = await getReportUserExcel({
+      dateFrom: fromDate !== "" ? dayjs(fromDate).format("YYYY-MM-DDTHH:mm:ss") : "",
+      dateTo: toDate !== "" ? dayjs(toDate).endOf('day').format("YYYY-MM-DDTHH:mm:ss") : "",
+    }).unwrap();
     const url = URL.createObjectURL(blob);
     window.open(url);
   }
@@ -218,19 +218,7 @@ function UserHistory() {
               <Table>
                 <TableHead sx={{ backgroundColor: "#F4F6F8" }}>
                   <TableRow>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        sx={{
-                          "&.Mui-checked": {
-                            color: "#2C3092",
-                          },
-                          "&:hover": {
-                            color: "#2C3092",
-                          },
-                        }}
-                        color="primary"
-                      />
-                    </TableCell>
+                    <TableCell padding="checkbox"></TableCell>
                     {columns.map((column) => (
                       <TableCell
                         key={column.id}

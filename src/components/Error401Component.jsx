@@ -11,7 +11,7 @@ function Error401Component() {
         isRemember: false,
         userRoles: "",
         uuid: null,
-        roomId: null
+        siteUuid: null
     });
 
     useEffect(() => {
@@ -19,7 +19,7 @@ function Error401Component() {
             isRemember: false,
             userRoles: "",
             uuid: null,
-            roomId: null
+            siteUuid: null
         });
     }, []);
     return (

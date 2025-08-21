@@ -1,9 +1,29 @@
 import {Button, Paper} from "@mui/material";
-import React from "react";
+import React, {useEffect} from "react";
 import { useNavigate } from "react-router-dom";
+import useLocalStorage from "../hook/useLocalStorage.jsx";
+import useTranslate from "../hook/useTranslate.jsx";
 
 function Error403Component() {
   const navigate = useNavigate();
+  const {t} = useTranslate();
+
+    const [authData, setAuthData] = useLocalStorage('authData', {
+        isRemember: false,
+        userRoles: "",
+        uuid: null,
+        siteUuid: null
+    });
+
+    useEffect(() => {
+        setAuthData({
+            isRemember: false,
+            userRoles: "",
+            uuid: null,
+            siteUuid: null
+        });
+    }, []);
+
   return (
     <Paper component="div" className="flex justify-center items-center flex-col gap-5 h-screen">
       <img
@@ -14,9 +34,9 @@ function Error403Component() {
       <Button
         sx={{ textTransform: "none", borderRadius: "6px", boxShadow: "none" }}
         variant="contained"
-        onClick={() => navigate("/dash")}
+        onClick={() => navigate("/login")}
       >
-        Go to Dashboard
+          {t('goToLogin')}
       </Button>
     </Paper>
   );
