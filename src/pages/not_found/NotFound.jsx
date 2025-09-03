@@ -15,7 +15,7 @@ function NotFound() {
       <Button
         sx={{ textTransform: "none", borderRadius: "6px", boxShadow: "none" }}
         variant="contained"
-        onClick={() => navigate("/dash")}
+        onClick={() => navigate("/login")}
       >
           {t("back")}
       </Button>

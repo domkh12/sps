@@ -14,6 +14,12 @@
   --primary: #2c3092;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    background-color: #000;
+  }
+}
+
 * {
   padding: 0;
   margin: 0;

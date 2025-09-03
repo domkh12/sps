@@ -355,26 +355,6 @@ function AddNewUser() {
                           profileImageFile={profileImageFile}
                         />
                       </div>
-                      <div className="flex items-center justify-between gap-7 mt-5">
-                        <div className="flex flex-col gap-2">
-                          <Typography
-                            variant="body1"
-                            sx={{ fontWeight: "500" }}
-                          >
-                            {t("emailVerified")}
-                          </Typography>
-                          <Typography variant="body2">
-                            {t(
-                              "disabling-this-will-automatically-send-the-user-a-verification-email"
-                            )}
-                          </Typography>
-                        </div>
-                        <AntSwitch
-                          checked={values.isVerified}
-                          onChange={handleIsVerifiedChange}
-                          inputProps={{ "aria-label": "ant design" }}
-                        />
-                      </div>
                     </Card>
                   </Grid2>
 

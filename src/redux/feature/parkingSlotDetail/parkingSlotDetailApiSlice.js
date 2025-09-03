@@ -125,10 +125,62 @@ export const parkingSlotDetailApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
+    getReportParking: builder.query({
+      query: ({
+                pageNo = 1,
+                pageSize = 5,
+                dateFrom = "",
+                dateTo = "",
+              }) => ({
+        url: `/parking-slot-details/report?pageNo=${pageNo}&pageSize=${pageSize}&dateFrom=${dateFrom}&dateTo=${dateTo}`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError;
+        },
+      }),
+      transformResponse: (responseData) => {
+        const loadedParkingSlotDetail = responseData.content.map((parkingSlotDetail) => {
+          parkingSlotDetail.id = parkingSlotDetail.uuid;
+          return parkingSlotDetail;
+        });
+        return {
+          ...parkingSlotDetailAdapter.setAll(initialState, loadedParkingSlotDetail),
+          totalPages: responseData.page.totalPages,
+          totalElements: responseData.page.totalElements,
+          pageNo: responseData.page.number,
+          pageSize: responseData.page.size,
+        };
+      },
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [
+            { type: "ParkingSlotDetail", id: "LIST" },
+            ...result.ids.map((id) => ({ type: "ParkingSlotDetail", id })),
+          ];
+        } else return [{ type: "ParkingSlotDetail", id: "LIST" }];
+      },
+    }),
+
+    getReportParkingPdf: builder.mutation({
+      query: ({dateFrom = "", dateTo = ""}) => ({
+        url: `/parking-slot-details/report/pdf?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+        responseHandler: (res) => res.blob()
+      }),
+    }),
+
+    getReportParkingExcel: builder.mutation({
+      query: ({dateFrom = "", dateTo = ""}) => ({
+        url: `/parking-slot-details/report/excel?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+        responseHandler: (res) => res.blob()
+      }),
+    })
+
   }),
 });
 
 export const {
+  useGetReportParkingExcelMutation,
+  useGetReportParkingPdfMutation,
+  useGetReportParkingQuery,
   useFilterParkingSlotDetailQuery,
   useGetParkingSlotDetailQuery,
   useFilterReportParkingSlotDetailQuery,

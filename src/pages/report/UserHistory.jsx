@@ -27,6 +27,8 @@ import DateFilterComponent from "../../components/DateFilterComponent.jsx";
 import SkeletonTableRowComponent from "../../components/SkeletonTableRowComponent.jsx";
 import PdfModalPreviewComponent from "../../components/PdfModalPreviewComponent.jsx";
 import {setIsOpenPdfModal} from "../../redux/feature/actions/actionSlice.js";
+import useAuth from "../../hook/useAuth.jsx";
+import FilterChipsComponent from "../../components/FilterChipsComponent.jsx";
 
 function UserHistory() {
   const navigate = useNavigate();
@@ -37,6 +39,7 @@ function UserHistory() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [pdfUrl, setPdfUrl] = useState("");
+  const {isAdmin} = useAuth();
 
   const {
     data: users,
@@ -78,7 +81,7 @@ function UserHistory() {
   const breadcrumbs = [
     <button
       className="hover:underline"
-      onClick={() => navigate("/admin")}
+      onClick={() => navigate(`${isAdmin ? "/admin" : "/dash"}`)}
       key={1}
     >
       {t("dashboard")}
@@ -212,6 +215,22 @@ function UserHistory() {
               onClickPdf={handleBtnPdfClick}
               onClickExcel={handleBtnExcelClick}
               isLoadingExcel={isLoadingGetReportUserExcel}
+          />
+
+          <FilterChipsComponent
+              searchQuery={""}
+              dateFrom={fromDate}
+              dateTo={toDate}
+              onDateChange={(dateFrom, dateTo) => {
+                setFromDate(dateFrom);
+                setToDate(dateTo);
+              }}
+              isFiltered={(fromDate && toDate)}
+              clearFilter={() => {
+                setFromDate("");
+                setToDate("");
+              }}
+              resultFound={displayTotalElements}
           />
 
           <TableContainer>

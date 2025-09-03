@@ -378,46 +378,6 @@ function EditUserForm({ user }) {
                         />
                       </div>
 
-                      <div className="flex items-center justify-between gap-7 mt-5">
-                        <div className="flex flex-col gap-2">
-                          <Typography
-                            variant="body1"
-                            sx={{ fontWeight: "500" }}
-                          >
-                            {t("emailVerified")}
-                          </Typography>
-                          <Typography variant="body2">
-                            {t(
-                              "disabling-this-will-automatically-send-the-user-a-verification-email"
-                            )}
-                          </Typography>
-                        </div>
-                        <AntSwitch
-                          checked={values.isVerified}
-                          onChange={handleIsVerifiedChange}
-                          inputProps={{ "aria-label": values.isVerified }}
-                        />
-                      </div>
-                      <div className="flex justify-center items-center">
-                        <Button
-                          variant="contained"
-                          sx={{
-                            backgroundColor: "#FFD6D6",
-                            color: "#981212",
-                            borderRadius: "8px",
-                            fontWeight: "500",
-                            boxShadow: "none",
-                            ":hover": {
-                              boxShadow: "none",
-                            },
-                            textTransform: "none",
-                            mt: 3,
-                          }}
-                          onClick={handleDelete}
-                        >
-                          {t("deleteUser")}
-                        </Button>
-                      </div>
                     </Card>
                   </Grid2>
 

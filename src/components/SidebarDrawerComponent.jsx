@@ -49,7 +49,7 @@ function SidebarDrawerComponent() {
   const isParkingListPage = location.pathname === "/dash/parking-spaces";
   const isParkingCreatePage = location.pathname === "/dash/parking-spaces/new";
   const isParkingSlotListPage = location.pathname === "/dash/parking-slots";
-    const isParkingSlotCreatePage = location.pathname === "/dash/parking-slots/new";
+  const isParkingSlotCreatePage = location.pathname === "/dash/parking-slots/new";
   const isUserListPage = location.pathname === "/dash/users";
   const isUserCreatePage = location.pathname === "/dash/users/new";
   const isReportListPage = location.pathname === "/dash/reports";
@@ -59,7 +59,6 @@ function SidebarDrawerComponent() {
   const navigate = useNavigate();
   const { t } = useTranslate();
   const dispatch = useDispatch();
-  const { isManager } = useAuth();
 
   const handleOverViewClick = () => {
     setIsOverviewOpen(!isOverviewOpen);
@@ -979,7 +978,6 @@ function SidebarDrawerComponent() {
                           <ListItemButton
                             sx={{
                               borderRadius: "10px",
-                              
                               mb: "5px",
                             }}
                             onClick={handleNavigate("/admin/users")}
@@ -1007,7 +1005,6 @@ function SidebarDrawerComponent() {
                           <ListItemButton
                             sx={{
                               borderRadius: "10px",
-                              
                               mb: "5px",
                             }}
                             onClick={handleNavigate("/admin/users/new")}
@@ -1079,7 +1076,7 @@ function SidebarDrawerComponent() {
                         dense={true}
                     >
                       <ul className="ml-6 pl-[12px]">
-                        <div className="absolute h-[60px] border-l-[2px] bg-primary left-6 top-0"></div>
+                        <div className="absolute h-[115px] border-l-[2px] bg-primary left-6 top-0"></div>
                         <li>
                           <img
                               src="/images/nav_sublist.svg"
@@ -1092,7 +1089,36 @@ function SidebarDrawerComponent() {
 
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/admin/reports/user-history")}
+                              onClick={handleNavigate("/admin/reports/parking-history")}
+                              selected={location.pathname === "/admin/reports/parking-history"}
+                          >
+                            <ListItemText
+                                primary={
+                                  <Typography
+                                      component="span"
+                                      variant="body1"
+                                      sx={{ display: "inline" }}
+                                  >
+                                    {t("parkingHistory")}
+                                  </Typography>
+                                }
+                            />
+                          </ListItemButton>
+                        </li>
+                        <li>
+                          <img
+                              src="/images/nav_sublist.svg"
+                              alt="sub_list_img"
+                              className="absolute top-[55px] left-6 h-[14px] w-[14px]"
+                          />
+
+                          <ListItemButton
+                              sx={{
+                                borderRadius: "10px",
+
+                                mb: "5px",
+                              }}
+                              onClick={handleNavigate("/admin/reports/user-history")}
                               selected={location.pathname === "/admin/reports/user-history"}
                           >
                             <ListItemText
@@ -1112,7 +1138,7 @@ function SidebarDrawerComponent() {
                           <img
                               src="/images/nav_sublist.svg"
                               alt="sub_list_img"
-                              className="absolute top-[55px] left-6 h-[14px] w-[14px]"
+                              className="absolute top-[105px] left-6 h-[30px] w-[14px]"
                           />
                           <ListItemButton
                               sx={{
@@ -1120,7 +1146,7 @@ function SidebarDrawerComponent() {
 
                                 mb: "5px",
                               }}
-                              onClick={() => navigate("/admin/reports/vehicle-history")}
+                              onClick={handleNavigate("/admin/reports/vehicle-history")}
                               selected={
                                   location.pathname === "/admin/reports/vehicle-history"
                               }

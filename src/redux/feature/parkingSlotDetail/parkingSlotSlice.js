@@ -9,9 +9,17 @@ const parkingSlotDetailSlice = createSlice({
         pageSizeParkingDetail: 5,
         keywords: "",
         dateFrom: "",
-        dateTo: ""
+        dateTo: "",
+        pageNoParkingReport: 1,
+        pageSizeParkingReport: 5,
     },
     reducers: {
+        setPageNoParkingReport(state, action) {
+            state.pageNoParkingReport = action.payload;
+        },
+        setPageSizeParkingReport(state, action) {
+            state.pageSizeParkingReport = action.payload;
+        },
         setPageNoParkingDetail(state, action) {
             state.pageNoParkingDetail = action.payload;
         },
@@ -37,6 +45,8 @@ const parkingSlotDetailSlice = createSlice({
 });
 
 export const {
+    setPageNoParkingReport,
+    setPageSizeParkingReport,
     setDateToParkingDetail,
     setDateFromParkingDetail,
     setKeywordsParkingDetail,

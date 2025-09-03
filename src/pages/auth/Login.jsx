@@ -39,10 +39,8 @@ import {Slide, toast} from "react-toastify";
 export default function Login() {
     const [otp, setOtp] = useState('');
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState(null);
-    const [verifyCodeErrorMessage, setVerifyCodeErrorMessage] = useState(null);
     const [openErrorVerifyCode, setOpenErrorVerifyCode] = useState(false);
     const [open, setOpen] = useState(false);
     const [step, setStep] = useState(1);

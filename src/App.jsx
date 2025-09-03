@@ -1,4 +1,4 @@
-import {CssBaseline, ThemeProvider, useColorScheme} from "@mui/material";
+import {CssBaseline, ThemeProvider} from "@mui/material";
 import Aos from "aos";
 import "aos/dist/aos.css";
 import {lazy, Suspense, useEffect} from "react";
@@ -7,7 +7,8 @@ import {ROLES} from "./config/roles.js";
 import RequireAuth from "./pages/auth/RequireAuth.jsx";
 import {getTheme} from "./config/themeConfig.js";
 import {ToastContainer} from "react-toastify";
-
+import LoadingOneComponent from "./components/LoadingOneComponent.jsx";
+const ParkingHistory = lazy(() => import("./pages/report/ParkingHistory.jsx"));
 const CheckOutList = lazy(() => import("./pages/checkOut/CheckOutList.jsx"));
 const CheckInList = lazy(() => import("./pages/checkIn/CheckInList.jsx"));
 const UserHistory = lazy(() => import("./pages/report/UserHistory.jsx"));
@@ -23,7 +24,6 @@ const ParkingView = lazy(() => import("./pages/parkingSpace/ViewParkingSpace"));
 const HistoryList = lazy(() => import("./pages/history/HistoryList.jsx"));
 const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword.jsx"));
 const ResetPassword = lazy(() => import("./pages/auth/ResetPassword.jsx"));
-const LoadingOneComponent = lazy(() => import("./components/LoadingOneComponent.jsx"));
 const Security = lazy(() => import("./pages/profile/Security.jsx"));
 const Account = lazy(() => import("./pages/profile/Account.jsx"));
 const BranchList = lazy(() => import("./pages/branch/BranchList.jsx"));
@@ -176,6 +176,7 @@ function App() {
                                                 <Route path="new" element={<CreateReport/>}/>
                                                 <Route path="user-history" element={<UserHistory/>}/>
                                                 <Route path="vehicle-history" element={<VehicleHistory/>}/>
+                                                <Route path="parking-history" element={<ParkingHistory/>}/>
                                             </Route>
 
                                             {/* Branch Route */}
@@ -260,6 +261,7 @@ function App() {
                                             <Route path="new" element={<CreateReport/>}/>
                                             <Route path="user-history" element={<UserHistory/>}/>
                                             <Route path="vehicle-history" element={<VehicleHistory/>}/>
+                                            <Route path="parking-history" element={<ParkingHistory/>}/>
                                         </Route>
 
                                     </Route>

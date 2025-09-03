@@ -59,8 +59,9 @@ function SideBar() {
   const isParkingCreatePage = location.pathname === "/admin/parking-spaces/new";
   const isUserListPage = location.pathname === "/admin/users";
   const isUserCreatePage = location.pathname === "/admin/users/new";
-  const isReportListPage = location.pathname === "/admin/reports";
-  const isReportCreatePage = location.pathname === "/admin/reports/new";
+  const isReportListPage = location.pathname === "/admin/reports/parking-history";
+  const isReportCreatePage = location.pathname === "/admin/reports/user-history";
+  const isReportVehicle = location.pathname === "/admin/reports/vehicle-history";
   const isBranchListPage = location.pathname === "/admin/branches";
   const isBranchCreatePage = location.pathname === "/admin/branches/new";
   const isCompanyCreatePage=location.pathname === "/admin/companies";
@@ -570,7 +571,6 @@ function SideBar() {
                                       paper: {
                                         style: {
                                           padding: 10,
-                                          backgroundColor: "transparent",
                                           boxShadow: "none",
                                         },
                                       },
@@ -591,18 +591,12 @@ function SideBar() {
                                       sx={{
                                         minWidth: 0,
                                         width: "200px",
-                                        padding: "5px",
                                         borderRadius: "10px",
-                                        background:
-                                          "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
-                                        boxShadow:
-                                          "0px 0px 15px rgba(0, 0, 0, 0.15)",
                                       }}
                                     >
                                       <ListItemButton
                                         sx={{
                                           borderRadius: "6px",
-                                         
                                           mb: "5px",
                                         }}
                                         onClick={() => {
@@ -624,7 +618,6 @@ function SideBar() {
                                               component="span"
                                               variant="body1"
                                               sx={{
-                                               
                                                 display: "inline",
                                               }}
                                             >
@@ -680,8 +673,7 @@ function SideBar() {
                               sx={{
                                 borderRadius: "10px",
                                
-                                ...((isCompanyListPage || isCompanyCreatePage) &&
-                                  listItemButtonStyle),
+                                ...((isCompanyListPage || isCompanyCreatePage)),
                               }}
                               selected={
                                 isCompanyOpen
@@ -749,7 +741,6 @@ function SideBar() {
                                 <ListItemButton
                                   sx={{
                                     borderRadius: "10px",
-                                   
                                     mb: "5px",
                                   }}
                                   onClick={() => navigate("/admin/companies")}
@@ -763,7 +754,6 @@ function SideBar() {
                                         component="span"
                                         variant="body1"
                                         sx={{
-                                         
                                           display: "inline",
                                         }}
                                       >
@@ -782,7 +772,6 @@ function SideBar() {
                                 <ListItemButton
                                   sx={{
                                     borderRadius: "10px",
-                                   
                                     mb: "5px",
                                   }}
                                   onClick={() => navigate("/admin/companies/new")}
@@ -826,8 +815,7 @@ function SideBar() {
                                       mb: "5px",
                                      
                                       ...((isBranchListPage ||
-                                        isBranchCreatePage) &&
-                                        listItemButtonStyle),
+                                        isBranchCreatePage)),
                                     }}
                                     selected={
                                       isBranchOpen
@@ -869,7 +857,6 @@ function SideBar() {
                                       paper: {
                                         style: {
                                           padding: 10,
-                                          backgroundColor: "transparent",
                                           boxShadow: "none",
                                         },
                                       },
@@ -890,12 +877,7 @@ function SideBar() {
                                       sx={{
                                         minWidth: 0,
                                         width: "200px",
-                                        padding: "5px",
                                         borderRadius: "10px",
-                                        background:
-                                          "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
-                                        boxShadow:
-                                          "0px 0px 15px rgba(0, 0, 0, 0.15)",
                                       }}
                                     >
                                       <ListItemButton
@@ -923,7 +905,6 @@ function SideBar() {
                                               component="span"
                                               variant="body1"
                                               sx={{
-                                               
                                                 display: "inline",
                                               }}
                                             >
@@ -936,7 +917,6 @@ function SideBar() {
                                       <ListItemButton
                                         sx={{
                                           borderRadius: "6px",
-                                         
                                         }}
                                         onClick={() => {
                                           if (
@@ -958,7 +938,6 @@ function SideBar() {
                                               component="span"
                                               variant="body1"
                                               sx={{
-                                               
                                                 display: "inline",
                                               }}
                                             >
@@ -978,10 +957,8 @@ function SideBar() {
                             <ListItemButton
                               sx={{
                                 borderRadius: "10px",
-                               
                                   mt:"5px",
-                                ...((isBranchListPage || isBranchCreatePage) &&
-                                  listItemButtonStyle),
+                                ...((isBranchListPage || isBranchCreatePage)),
                               }}
                               selected={
                                 isBranchOpen
@@ -1010,7 +987,6 @@ function SideBar() {
                                       component="span"
                                       variant="body1"
                                       sx={{
-                                       
                                         display: "inline",
                                       }}
                                     >
@@ -1049,7 +1025,6 @@ function SideBar() {
                                 <ListItemButton
                                   sx={{
                                     borderRadius: "10px",
-                                   
                                     mb: "5px",
                                   }}
                                   onClick={() => navigate("/admin/branches")}
@@ -1063,7 +1038,6 @@ function SideBar() {
                                         component="span"
                                         variant="body1"
                                         sx={{
-                                         
                                           display: "inline",
                                         }}
                                       >
@@ -1082,7 +1056,6 @@ function SideBar() {
                                 <ListItemButton
                                   sx={{
                                     borderRadius: "10px",
-                                   
                                     mb: "5px",
                                   }}
                                   onClick={() => navigate("/admin/branches/new")}
@@ -1126,8 +1099,7 @@ function SideBar() {
                                       borderRadius: "10px",
                                      
                                       ...((isParkingListPage ||
-                                        isParkingCreatePage) &&
-                                        listItemButtonStyle),
+                                        isParkingCreatePage)),
                                     }}
                                     selected={
                                       isParkingOpen
@@ -1171,7 +1143,6 @@ function SideBar() {
                                       paper: {
                                         style: {
                                           padding: 10,
-                                          backgroundColor: "transparent",
                                           boxShadow: "none",
                                         },
                                       },
@@ -1192,12 +1163,7 @@ function SideBar() {
                                       sx={{
                                         minWidth: 0,
                                         width: "200px",
-                                        padding: "5px",
                                         borderRadius: "10px",
-                                        background:
-                                          "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
-                                        boxShadow:
-                                          "0px 0px 15px rgba(0, 0, 0, 0.15)",
                                       }}
                                     >
                                       <ListItemButton
@@ -1234,7 +1200,6 @@ function SideBar() {
                                           }
                                         />
                                       </ListItemButton>
-                                      {isManager && (
                                         <ListItemButton
                                           sx={{
                                             borderRadius: "6px",
@@ -1269,7 +1234,6 @@ function SideBar() {
                                             }
                                           />
                                         </ListItemButton>
-                                      )}
                                     </List>
                                   </HoverPopover>
                                 </div>
@@ -1284,8 +1248,7 @@ function SideBar() {
                                
                                 mt: "5px",
                                 ...((isParkingListPage ||
-                                  isParkingCreatePage) &&
-                                  listItemButtonStyle),
+                                  isParkingCreatePage)),
                               }}
                               selected={isParkingOpen ? isParkingOpen : isParkingListPage || isParkingCreatePage}
                               onClick={() => setIsParkingOpen(!isParkingOpen)}
@@ -1329,7 +1292,6 @@ function SideBar() {
                           </>
                         )}
                       </>
-                    
 
                     <Collapse in={isCollapsed ? !isCollapsed : isParkingOpen}>
                       <List
@@ -1349,7 +1311,6 @@ function SideBar() {
                             <ListItemButton
                               sx={{
                                 borderRadius: "10px",
-                               
                                 mb: "5px",
                               }}
                               onClick={() => navigate("/admin/parking-spaces")}
@@ -1369,7 +1330,6 @@ function SideBar() {
                             </ListItemButton>
                           </li>
 
-                          
                             <li>
                               <img
                                 src="/images/nav_sublist.svg"
@@ -1379,7 +1339,6 @@ function SideBar() {
                               <ListItemButton
                                 sx={{
                                   borderRadius: "10px",
-                                 
                                   mb: "5px",
                                 }}
                                 onClick={() => navigate("/admin/parking-spaces/new")}
@@ -1456,7 +1415,6 @@ function SideBar() {
                                   paper: {
                                     style: {
                                       padding: 10,
-                                      backgroundColor: "transparent",
                                       boxShadow: "none",
                                     },
                                   },
@@ -1477,12 +1435,8 @@ function SideBar() {
                                   sx={{
                                     minWidth: 0,
                                     width: "200px",
-                                    padding: "5px",
                                     borderRadius: "10px",
-                                    background:
-                                      "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
-                                    boxShadow:
-                                      "0px 0px 15px rgba(0, 0, 0, 0.15)",
+                                   
                                   }}
                                 >
                                   <ListItemButton
@@ -1564,8 +1518,7 @@ function SideBar() {
                           sx={{
                             borderRadius: "10px",
                            
-                            ...((isSlotListPage || isSlotCreatePage) &&
-                              listItemButtonStyle),
+                            ...((isSlotListPage || isSlotCreatePage)),
                             mt: "5px",
                           }}
                           selected={isSlotOpen ? isSlotOpen : isSlotListPage || isSlotCreatePage}
@@ -1726,7 +1679,7 @@ function SideBar() {
                                   paper: {
                                     style: {
                                       padding: 10,
-                                      backgroundColor: "transparent",
+                                      
                                       boxShadow: "none",
                                     },
                                   },
@@ -1747,18 +1700,13 @@ function SideBar() {
                                   sx={{
                                     minWidth: 0,
                                     width: "200px",
-                                    padding: "5px",
                                     borderRadius: "10px",
-                                    background:
-                                      "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
-                                    boxShadow:
-                                      "0px 0px 15px rgba(0, 0, 0, 0.15)",
+                                   
                                   }}
                                 >
                                   <ListItemButton
                                     sx={{
                                       borderRadius: "6px",
-                                     
                                       mb: "5px",
                                     }}
                                     onClick={() => {
@@ -1779,7 +1727,6 @@ function SideBar() {
                                           component="span"
                                           variant="body1"
                                           sx={{
-                                           
                                             display: "inline",
                                           }}
                                         >
@@ -1813,7 +1760,6 @@ function SideBar() {
                                           component="span"
                                           variant="body1"
                                           sx={{
-                                           
                                             display: "inline",
                                           }}
                                         >
@@ -1833,9 +1779,7 @@ function SideBar() {
                         <ListItemButton
                           sx={{
                             borderRadius: "10px",
-                           
-                            ...((isVehiclesListPage || isVehiclesCreatePage) &&
-                              listItemButtonStyle),
+                            ...((isVehiclesListPage || isVehiclesCreatePage)),
                             mt: "5px",
                           }}
                           selected={
@@ -2001,7 +1945,7 @@ function SideBar() {
                                   paper: {
                                     style: {
                                       padding: 10,
-                                      backgroundColor: "transparent",
+                                      
                                       boxShadow: "none",
                                     },
                                   },
@@ -2022,18 +1966,13 @@ function SideBar() {
                                   sx={{
                                     minWidth: 0,
                                     width: "200px",
-                                    padding: "5px",
                                     borderRadius: "10px",
-                                    background:
-                                      "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
-                                    boxShadow:
-                                      "0px 0px 15px rgba(0, 0, 0, 0.15)",
+                                   
                                   }}
                                 >
                                   <ListItemButton
                                     sx={{
                                       borderRadius: "6px",
-                                     
                                       mb: "5px",
                                     }}
                                     onClick={() => {
@@ -2052,7 +1991,6 @@ function SideBar() {
                                           component="span"
                                           variant="body1"
                                           sx={{
-                                           
                                             display: "inline",
                                           }}
                                         >
@@ -2065,7 +2003,6 @@ function SideBar() {
                                   <ListItemButton
                                     sx={{
                                       borderRadius: "6px",
-                                     
                                     }}
                                     onClick={() => {
                                       if (
@@ -2085,7 +2022,6 @@ function SideBar() {
                                           component="span"
                                           variant="body1"
                                           sx={{
-                                           
                                             display: "inline",
                                           }}
                                         >
@@ -2105,9 +2041,7 @@ function SideBar() {
                         <ListItemButton
                           sx={{
                             borderRadius: "10px",
-                           
-                            ...((isUserListPage || isUserCreatePage) &&
-                              listItemButtonStyle),
+                            ...((isUserListPage || isUserCreatePage)),
                             mt: "5px",
                           }}
                           selected={
@@ -2227,16 +2161,14 @@ function SideBar() {
                                 {...bindHover(popupState)}
                                 sx={{
                                   borderRadius: "10px",
-                                 
                                   ...((isReportListPage ||
-                                    isReportCreatePage) &&
-                                    listItemButtonStyle),
+                                    isReportCreatePage || isReportVehicle)),
                                   mt: "5px",
                                 }}
                                 selected={
                                   isReportOpen
-                                    ? isReportListPage || isReportCreatePage
-                                    : isReportListPage || isReportCreatePage
+                                    ? isReportListPage || isReportCreatePage || isReportVehicle
+                                    : isReportListPage || isReportCreatePage || isReportVehicle
                                 }
                               >
                                 <ListItemIcon
@@ -2272,7 +2204,6 @@ function SideBar() {
                                   paper: {
                                     style: {
                                       padding: 10,
-                                      backgroundColor: "transparent",
                                       boxShadow: "none",
                                     },
                                   },
@@ -2293,18 +2224,45 @@ function SideBar() {
                                   sx={{
                                     minWidth: 0,
                                     width: "200px",
-                                    padding: "5px",
                                     borderRadius: "10px",
-                                    background:
-                                      "linear-gradient(to top right,#FFE4D6,#fff, #E0E0F6)",
-                                    boxShadow:
-                                      "0px 0px 15px rgba(0, 0, 0, 0.15)",
+                                   
                                   }}
                                 >
+                                    <ListItemButton
+                                        sx={{
+                                            borderRadius: "6px",
+                                            mb: "5px",
+                                        }}
+                                        onClick={() => {
+                                            if (
+                                                location.pathname !== "/admin/reports/user-history"
+                                            ) {
+                                                popupState.close();
+                                            }
+                                            navigate("/admin/reports/parking-history");
+                                        }}
+                                        selected={
+                                            location.pathname === "/admin/reports/parking-history"
+                                        }
+                                    >
+                                        <ListItemText
+                                            primary={
+                                                <Typography
+                                                    component="span"
+                                                    variant="body1"
+                                                    sx={{
+                                                        display: "inline",
+                                                    }}
+                                                >
+                                                    {t("parkingHistory")}
+                                                </Typography>
+                                            }
+                                        />
+                                    </ListItemButton>
+
                                   <ListItemButton
                                     sx={{
                                       borderRadius: "6px",
-                                     
                                       mb: "5px",
                                     }}
                                     onClick={() => {
@@ -2325,7 +2283,6 @@ function SideBar() {
                                           component="span"
                                           variant="body1"
                                           sx={{
-                                           
                                             display: "inline",
                                           }}
                                         >
@@ -2338,7 +2295,6 @@ function SideBar() {
                                   <ListItemButton
                                     sx={{
                                       borderRadius: "6px",
-                                     
                                     }}
                                     onClick={() => {
                                       if (
@@ -2359,7 +2315,6 @@ function SideBar() {
                                           component="span"
                                           variant="body1"
                                           sx={{
-                                           
                                             display: "inline",
                                           }}
                                         >
@@ -2379,15 +2334,13 @@ function SideBar() {
                         <ListItemButton
                           sx={{
                             borderRadius: "10px",
-                           
-                            ...((isReportListPage || isReportCreatePage) &&
-                              listItemButtonStyle),
+                            ...((isReportListPage || isReportCreatePage || isReportVehicle)),
                             mt: "5px",
                           }}
                           selected={
                             isReportOpen
                               ? isReportOpen
-                              : isReportListPage || isReportCreatePage
+                              : isReportListPage || isReportCreatePage || isReportVehicle
                           }
                           onClick={() => setIsReportOpen(!isReportOpen)}
                         >
@@ -2429,7 +2382,38 @@ function SideBar() {
                         dense={true}
                       >
                         <ul className="ml-6 pl-[12px]">
-                          <div className="absolute h-[60px] border-l-[2px] bg-primary left-6 top-0"></div>
+                            <li>
+                                <img
+                                    src="/images/nav_sublist.svg"
+                                    alt="sub_list_img"
+                                    className="absolute top-[55px] left-6 h-[14px] w-[14px]"
+                                />
+                                <ListItemButton
+                                    sx={{
+                                        borderRadius: "10px",
+
+                                        mb: "5px",
+                                    }}
+                                    onClick={() => navigate("/admin/reports/parking-history")}
+                                    selected={
+                                        location.pathname === "/admin/reports/parking-history"
+                                    }
+                                >
+                                    <ListItemText
+                                        primary={
+                                            <Typography
+                                                component="span"
+                                                variant="body1"
+                                                sx={{ display: "inline" }}
+                                            >
+                                                {t("parkingHistory")}
+                                            </Typography>
+                                        }
+                                    />
+                                </ListItemButton>
+                            </li>
+                            <div className="absolute h-[110px] border-l-[2px] bg-primary left-6 top-0"></div>
+
                           <li>
                             <img
                               src="/images/nav_sublist.svg"
@@ -2462,7 +2446,7 @@ function SideBar() {
                             <img
                               src="/images/nav_sublist.svg"
                               alt="sub_list_img"
-                              className="absolute top-[55px] left-6 h-[14px] w-[14px]"
+                              className="absolute top-[110px] left-6 h-[14px] w-[14px]"
                             />
                             <ListItemButton
                               sx={{

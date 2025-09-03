@@ -84,7 +84,7 @@ function ParkingSpaceRowComponent({parkingId, parkingSpace}) {
                                     (
                                         <Link
                                             className="hover:underline"
-                                            to={`/${!isAdmin ? "admin" : "dash"}/parking-spaces/${parkingId}/view`}
+                                            to={`/${isAdmin ? "admin" : "dash"}/parking-spaces/${parkingId}/view`}
                                         >
                                             {parkingSpace?.label || "N/A"}
                                         </Link>

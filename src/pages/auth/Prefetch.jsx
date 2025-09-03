@@ -21,7 +21,7 @@ import {parkingSlotDetailApiSlice} from "../../redux/feature/parkingSlotDetail/p
 import { checkInApiSlice } from "../../redux/feature/checkIn/checkInApiSlice.js";
 import {checkOutApiSlice} from "../../redux/feature/checkOut/checkOutApiSlice.js";
 import {analysisApiSlice} from "../../redux/feature/analysis/analysisApiSlice.js";
-import {clientInfoApiSlice} from "../../redux/feature/clientInfo/clientInfoApiSlice.js";
+import {Paper} from "@mui/material";
 
 
 function Prefetch() {
@@ -66,7 +66,7 @@ function Prefetch() {
     }
   }, []);
 
-  return <Outlet />;
+  return <Paper elevation={0}><Outlet /></Paper>;
 }
 
 export default Prefetch;

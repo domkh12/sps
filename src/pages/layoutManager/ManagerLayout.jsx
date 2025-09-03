@@ -15,9 +15,6 @@ import { DESTINATION } from "../../config/destination";
 import {useGetUserProfileQuery, useVerifySitesMutation} from "../../redux/feature/auth/authApiSlice";
 import LoadingOneComponent from "./../../components/LoadingOneComponent";
 import DeleteConfirmComponent from "../../components/DeleteConfirmComponent";
-import {
-  selectIsInitialLoading,
-} from "../../redux/feature/app/appSlice";
 import useAuth from "../../hook/useAuth.jsx";
 import {setCredentials} from "../../redux/feature/auth/authSlice.js";
 import SideBarForManagerComponent from "../../components/SideBarForManagerComponent.jsx";
@@ -38,7 +35,6 @@ function ManagerLayout() {
   const changedSite = useSelector((state) => state.sites.changedSite);
   const isOpenSnackBar = useSelector((state) => state.action.isOpenSnackBar);
   const captionSnackBar = useSelector((state) => state.action.captionSnackBar);
-  const isInitialLoading = useSelector(selectIsInitialLoading);
 
   const {sites} = useAuth();
   const {messages: messageCheckOut, isConnected: isConnectedCheckOut, isLoading: isLoadingCheckOut} = useWebSocket(`/topic/${sites[0]}/check-out`);
@@ -210,7 +206,7 @@ function ManagerLayout() {
   const isError =
      isConnectUserError || wsError;
 
-  if (isInitialLoading || isLoadingVerifySite || isLoadingCheckOut || isLoading) {
+  if (isLoadingVerifySite || isLoadingCheckOut || isLoading) {
     content = <LoadingOneComponent />; // Use LoadingOneComponent
   }
 

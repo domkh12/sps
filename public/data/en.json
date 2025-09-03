@@ -288,5 +288,6 @@
   "occupiedSlots": "Occupied Slots",
   "available": "Available",
   "occupancy": "Occupancy",
-  "parking": "Parking"
+  "parking": "Parking",
+  "parkingHistory": "Parking history"
 }

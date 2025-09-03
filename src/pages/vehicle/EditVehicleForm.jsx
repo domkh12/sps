@@ -324,26 +324,6 @@ function EditUserForm({ vehicle }) {
                           profileUrl={values?.image || ""}
                         />
 
-                        <div className="flex justify-center items-center">
-                          <Button
-                            variant="contained"
-                            sx={{
-                              backgroundColor: "#FFD6D6",
-                              color: "#981212",
-                              borderRadius: "8px",
-                              fontWeight: "500",
-                              boxShadow: "none",
-                              ":hover": {
-                                boxShadow: "none",
-                              },
-                              textTransform: "none",
-                              mt: 3,
-                            }}
-                            onClick={handleDelete}
-                          >
-                            Delete vehicle
-                          </Button>
-                        </div>
                       </Card>
                     </Grid2>
 

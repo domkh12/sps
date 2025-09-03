@@ -287,5 +287,6 @@
   "occupiedSlots": "ចំណតដែលកាន់កាប់",
   "available": "ទំនេរ",
   "occupancy": "កាន់កាប់",
-  "parking": "ចំណតរថយន្ត"
+  "parking": "ចំណតរថយន្ត",
+  "parkingHistory": "ប្រវត្តិចតរថយន្ត"
 }

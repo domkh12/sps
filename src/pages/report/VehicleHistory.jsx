@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import SeoComponent from '../../components/SeoComponent'
 import MainHeaderComponent from '../../components/MainHeaderComponent'
-import { Card, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import { Card, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
 import useTranslate from '../../hook/useTranslate';
 import { useNavigate } from 'react-router-dom';
 import DateFilterComponent from '../../components/DateFilterComponent';
 import {
   useFilterReportVehiclesQuery, useGetReportVehicleExcelMutation, useGetReportVehiclePdfMutation,
-  useGetVehiclesQuery
 } from '../../redux/feature/vehicles/vehicleApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingFetchingDataComponent from '../../components/LoadingFetchingDataComponent';
@@ -18,6 +17,7 @@ import DataNotFound from '../../components/DataNotFound';
 import dayjs from 'dayjs';
 import PdfModalPreviewComponent from "../../components/PdfModalPreviewComponent.jsx";
 import {setIsOpenPdfModal} from "../../redux/feature/actions/actionSlice.js";
+import FilterChipsComponent from "../../components/FilterChipsComponent.jsx";
 
 function VehicleHistory() {
   const navigate = useNavigate();
@@ -95,7 +95,7 @@ function VehicleHistory() {
   const breadcrumbs = [
     <button
       className="hover:underline"
-      onClick={() => navigate("/admin")}
+      onClick={() => navigate(`${isAdmin ? "/admin" : "/dash"}`)}
       key={1}
     >
       {t("dashboard")}
@@ -224,6 +224,22 @@ function VehicleHistory() {
               onClickPdf={handleBtnPdfClick}
               onClickExcel={handleBtnExcelClick}
               isLoadingExcel={isLoadingGetReportVehicleExcel}
+          />
+
+          <FilterChipsComponent
+              searchQuery={""}
+              dateFrom={fromDate}
+              dateTo={toDate}
+              onDateChange={(dateFrom, dateTo) => {
+                setFromDate(dateFrom);
+                setToDate(dateTo);
+              }}
+              isFiltered={(fromDate && toDate)}
+              clearFilter={() => {
+                setFromDate("");
+                setToDate("");
+              }}
+              resultFound={displayTotalElements}
           />
 
           <TableContainer>
