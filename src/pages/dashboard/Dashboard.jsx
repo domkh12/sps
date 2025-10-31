@@ -174,7 +174,8 @@ const Dashboard = () => {
                             <h1 className="text-3xl font-bold mb-2">
                                 {isManager ? "Branch Parking Dashboard" : "Smart Parking Dashboard"}
                             </h1>
-                            <p>{isManager ? "Your branch parking analytics and monitoring" : "Real-time analytics and monitoring"}</p>
+                            <p>{isManager? "Your branch parking analytics and monitoring" : "Real-time analytics and monitoring"}</p>
+                            <p>{t('Real-time analytics and monitoring')}</p>
                         </div>
                     </div>
 
